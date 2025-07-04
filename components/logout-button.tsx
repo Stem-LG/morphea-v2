@@ -13,5 +13,12 @@ export function LogoutButton() {
     router.push('/auth/login')
   }
 
-  return <Button onClick={logout}>Logout</Button>
+  return (
+    <Button 
+      onClick={logout}
+      className="bg-gradient-to-r from-[#785730] to-[#e9d079] hover:from-[#695029] hover:to-[#d4c066] text-white px-4 py-2 transition-all rounded-none"
+    >
+      Logout
+    </Button>
+  )
 }

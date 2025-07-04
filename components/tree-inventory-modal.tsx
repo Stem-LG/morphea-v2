@@ -1,0 +1,178 @@
+'use client';
+
+import { useState } from 'react';
+import Tree3DViewer from './tree-3d-viewer';
+
+// Tree inventory data
+const TREE_INVENTORY = [
+  {
+    id: 'tree1',
+    name: 'Tropical Palm',
+    model: '/3d/tree1.glb',
+    image: '/tree-images/palm.jpg', // Placeholder image
+    description: 'A beautiful tropical palm tree native to Key Biscayne.',
+    properties: {
+      height: '15-20 feet',
+      type: 'Coconut Palm',
+      age: '25-30 years',
+      location: 'Beachfront areas'
+    },
+    features: [
+      'Salt-tolerant',
+      'Hurricane resistant',
+      'Produces coconuts',
+      'Year-round greenery'
+    ]
+  },
+  {
+    id: 'tree2',
+    name: 'Mangrove Tree',
+    model: '/3d/tree2.glb',
+    image: '/tree-images/mangrove.jpg', // Placeholder image
+    description: 'A resilient mangrove tree that thrives in coastal environments.',
+    properties: {
+      height: '10-15 feet',
+      type: 'Red Mangrove',
+      age: '15-20 years',
+      location: 'Coastal wetlands'
+    },
+    features: [
+      'Water filtration',
+      'Erosion prevention',
+      'Wildlife habitat',
+      'Carbon sequestration'
+    ]
+  }
+];
+
+interface TreeInventoryModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export default function TreeInventoryModal({ isOpen, onClose }: TreeInventoryModalProps) {
+  const [selectedTree, setSelectedTree] = useState<string | null>(null);
+  const [show3DViewer, setShow3DViewer] = useState(false);
+
+  if (!isOpen) return null;
+
+  const selectedTreeData = TREE_INVENTORY.find(tree => tree.id === selectedTree);
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
+      <div className="relative w-full max-w-6xl max-h-[90vh] bg-gradient-to-br from-[#000c18] to-[#083543] border border-slate-700 overflow-hidden">
+        {/* Header */}
+        <div className="flex justify-between items-center p-6 border-b border-slate-700">
+          <div>
+            <h2 className="text-2xl font-bold font-parisienne bg-gradient-to-r from-[#785730] to-[#e9d079] bg-clip-text text-transparent mb-2">Tree Inventory</h2>
+            <p className="text-gray-300">Discover the tropical trees of Key Biscayne</p>
+          </div>
+          <button
+            onClick={onClose}
+            className="text-white hover:text-[#e9d079] transition-colors"
+          >
+            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+          {/* Tree Cards Grid - Horizontal Layout */}
+          <div className="space-y-4 mb-6">
+            {TREE_INVENTORY.map((tree) => (
+              <div
+                key={tree.id}
+                onClick={() => {
+                  setSelectedTree(tree.id);
+                  setShow3DViewer(true);
+                }}
+                className={`cursor-pointer border-2 transition-all duration-300 hover:border-[#e9d079] bg-gradient-to-br from-[#000c18] to-[#083543] border-slate-600 group`}
+              >
+                <div className="flex items-center p-4 space-x-6">
+                  {/* Tree 3D Preview */}
+                  <div className="w-32 h-32 bg-white flex items-center justify-center flex-shrink-0 shadow-lg">
+                    <div className="text-center">
+                      <div className="text-5xl mb-1">
+                        {tree.name.includes('Palm') ? '🌴' : '🌳'}
+                      </div>
+                      <div className="text-xs text-gray-600">3D Preview</div>
+                    </div>
+                  </div>
+
+                  {/* Tree Information */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex justify-between items-start mb-2">
+                      <h3 className="text-2xl font-bold text-white group-hover:text-[#e9d079] transition-colors">
+                        {tree.name}
+                      </h3>
+                      <div className="bg-gradient-to-r from-[#785730] to-[#e9d079] text-white px-3 py-1 text-sm font-medium">
+                        {tree.properties.type}
+                      </div>
+                    </div>
+                    
+                    <p className="text-gray-300 mb-4 line-clamp-2">{tree.description}</p>
+
+                    {/* Properties Grid */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                      <div className="text-center">
+                        <div className="text-[#e9d079] text-sm font-medium">Height</div>
+                        <div className="text-white text-lg">{tree.properties.height}</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-[#e9d079] text-sm font-medium">Age</div>
+                        <div className="text-white text-lg">{tree.properties.age}</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-[#e9d079] text-sm font-medium">Location</div>
+                        <div className="text-white text-sm">{tree.properties.location}</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-[#e9d079] text-sm font-medium">Features</div>
+                        <div className="text-white text-sm">{tree.features.length} traits</div>
+                      </div>
+                    </div>
+
+                    {/* Key Features Tags */}
+                    <div className="flex flex-wrap gap-2">
+                      {tree.features.slice(0, 3).map((feature, index) => (
+                        <span 
+                          key={index}
+                          className="bg-slate-700 text-gray-300 px-2 py-1 text-xs"
+                        >
+                          {feature}
+                        </span>
+                      ))}
+                      {tree.features.length > 3 && (
+                        <span className="bg-slate-600 text-gray-400 px-2 py-1 text-xs">
+                          +{tree.features.length - 3} more
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Action Button */}
+                  <div className="flex-shrink-0">
+                    <button className="bg-gradient-to-r from-[#785730] to-[#e9d079] hover:from-[#695029] hover:to-[#d4c066] text-white px-6 py-3 transition-colors font-medium shadow-lg group-hover:shadow-[#e9d079]/25 rounded-none">
+                      View in 3D
+                      <div className="text-xs opacity-75 mt-1">Click to explore</div>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* 3D Viewer Modal */}
+      {show3DViewer && selectedTreeData && (
+        <Tree3DViewer
+          treeData={selectedTreeData}
+          onClose={() => setShow3DViewer(false)}
+        />
+      )}
+    </div>
+  );
+}

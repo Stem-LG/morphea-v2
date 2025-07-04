@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 
-import { LogoutButton } from '@/components/logout-button'
 import { createClient } from '@/lib/server'
+import VirtualTour from '@/components/virtual-tour'
 
 export default async function ProtectedPage() {
   const supabase = await createClient()
@@ -12,11 +12,15 @@ export default async function ProtectedPage() {
   }
 
   return (
-    <div className="flex h-svh w-full items-center justify-center gap-2">
-      <p>
-        Hello <span>{data.user.email}</span>
-      </p>
-      <LogoutButton />
+    <div className="min-h-screen w-full">
+      {/* Virtual Tour */}
+      <VirtualTour 
+        height="100vh"
+        width="100%"
+        startingScene="0-key-biscayne-2"
+        showNavbar={true}
+        disableAutorotate={true}
+      />
     </div>
   )
 }
