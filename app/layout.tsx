@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import Link from "next/link";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,8 +28,57 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        {/* Simple Navigation Bar */}
+        <nav className="fixed top-0 left-0 right-0 z-50 bg-slate-900/95 backdrop-blur-sm border-b border-slate-700">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between h-16">
+              {/* Logo */}
+              <Link href="/" className="flex items-center space-x-2">
+                <span className="text-2xl font-bold text-white">
+                  <span className="text-teal-400">360</span> Mall
+                </span>
+              </Link>
+
+              {/* Navigation Links */}
+              <div className="hidden md:flex items-center space-x-8">
+                <Link href="/shop" className="text-gray-300 hover:text-white transition-colors">
+                  Shop
+                </Link>
+                <Link href="/virtual-tours" className="text-gray-300 hover:text-white transition-colors">
+                  Virtual Tours
+                </Link>
+                <Link href="/3d-products" className="text-gray-300 hover:text-white transition-colors">
+                  3D Products
+                </Link>
+                <Link href="/auth/login" className="text-gray-300 hover:text-white transition-colors">
+                  Sign In
+                </Link>
+                <Link 
+                  href="/auth/sign-up" 
+                  className="bg-gradient-to-r from-teal-400 to-cyan-400 hover:from-teal-500 hover:to-cyan-500 text-white px-4 py-2 rounded-lg transition-all"
+                >
+                  Get Started
+                </Link>
+              </div>
+
+              {/* Mobile menu button */}
+              <div className="md:hidden">
+                <button className="text-gray-300 hover:text-white">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </nav>
+
+        {/* Main content with navbar spacing */}
+        <div className="pt-16">
+          {children}
+        </div>
       </body>
     </html>
   );
 }
+
