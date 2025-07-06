@@ -37,7 +37,7 @@ export default function RootLayout({
                     {/* Animated 360° Background */}
                     <AnimatedBackground />
                     {/* Main content with navbar spacing */}
-                    <div className="pt-16 relative z-10">{children}</div>
+                    <div className="relative z-10">{children}</div>
                 </QueryClientProvider>
             </body>
         </html>
