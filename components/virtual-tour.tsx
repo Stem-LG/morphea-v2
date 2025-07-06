@@ -79,6 +79,16 @@ const TOUR_DATA: TourData = {
                         modalType: "products-list",
                     },
                 },
+                {
+                    position: { yaw: -0.744697120630752, pitch: -0.21497175500675247 },
+                    title: "section 2 products",
+                    text: "Look at these amazing tropical trees typical of Key Biscayne's landscape!",
+                    action: {
+                        id: "store-1-section-2-products",
+                        type: "modal",
+                        modalType: "products-list",
+                    },
+                },
             ],
         },
         {
