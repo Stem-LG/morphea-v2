@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { Viewer } from "@photo-sphere-viewer/core";
 import { AutorotatePlugin } from "@photo-sphere-viewer/autorotate-plugin";
 import { MarkersPlugin } from "@photo-sphere-viewer/markers-plugin";
@@ -139,7 +139,7 @@ export default function VirtualTour({
     }, [currentScene]);
 
     // Add markers for navigation links and info spots
-    const addMarkers = () => {
+    const addMarkers = useCallback(() => {
         if (!markersPluginRef.current) return;
 
         const currentSceneData = TOUR_DATA.scenes.find((scene) => scene.id === currentScene);
@@ -175,7 +175,7 @@ export default function VirtualTour({
           <div style="
             width: 32px; 
             height: 32px; 
-            background: #e9d079; 
+            background: var(--morpheus-gold-light); 
             border: 3px solid white; 
             border-radius: 50%; 
             display: flex; 
@@ -211,7 +211,7 @@ export default function VirtualTour({
                 },
             });
         });
-    };
+    }, [currentScene]);
 
     // Handle different action types dynamically
     const handleInfoSpotAction = (action: InfoSpotAction, title: string, text: string) => {
@@ -240,7 +240,7 @@ export default function VirtualTour({
     };
 
     // Handle marker clicks
-    const handleMarkerClick = (e: {
+    const handleMarkerClick = useCallback((e: {
         marker: { data?: { nodeId?: string; type?: string; title?: string; text?: string; action?: InfoSpotAction } };
     }) => {
         if (isTransitioning) return; // Prevent clicks during transitions
@@ -253,7 +253,7 @@ export default function VirtualTour({
             // Handle info spot action dynamically
             handleInfoSpotAction(marker.data.action, marker.data.title || "", marker.data.text || "");
         }
-    };
+    }, [isTransitioning, setCurrentScene, setProductsList]);
 
     return (
         <div className={`relative ${className}`} style={{ height, width }}>
@@ -277,7 +277,7 @@ export default function VirtualTour({
                             disabled={isTransitioning}
                             className={`px-3 py-2 text-sm transition-colors ${
                                 currentScene === scene.id
-                                    ? "bg-gradient-to-r from-[#785730] to-[#e9d079] text-white"
+                                    ? "bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light text-white"
                                     : isTransitioning
                                     ? "bg-gray-600 text-gray-400 cursor-not-allowed"
                                     : "hover:bg-white/20 text-gray-300"

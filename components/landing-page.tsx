@@ -20,15 +20,15 @@ export default function LandingPage() {
                         className="max-w-2xl rounded-3xl p-16"
                     >
                         <h1 className="text-6xl sm:text-7xl font-extrabold mb-6 text-white dark:text-white drop-shadow-2xl tracking-tight font-parisienne w-full">
-                            Welcome to <span className="bg-gradient-to-r from-[#785730] to-[#e9d079] bg-clip-text text-transparent w-full px-4">Morpheus Mall</span>
+                            Welcome to <span className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light bg-clip-text text-transparent w-full px-4">Morpheus Mall</span>
                         </h1>
                         <p className="text-2xl sm:text-3xl text-white dark:text-gray-200 mb-8 font-medium">
                             Experience shopping in a new dimension.<br />
-                            Explore our virtual mall with interactive <span className="bg-gradient-to-r from-[#785730] to-[#e9d079] bg-clip-text text-transparent font-semibold">3D products</span>.
+                            Explore our virtual mall with interactive <span className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light bg-clip-text text-transparent font-semibold">3D products</span>.
                         </p>
                         <div className="flex flex-col w-full gap-6">
                             <Link href="/auth/sign-up" className="w-full">
-                                <Button className="w-full bg-gradient-to-r from-[#785730] to-[#e9d079] hover:from-[#695029] hover:to-[#d4c066] text-white shadow-2xl text-2xl py-5 transition-all rounded-none">
+                                <Button className="w-full bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-[#695029] hover:to-[#d4c066] text-white shadow-2xl text-2xl py-5 transition-all rounded-none">
                                     Get Started
                                 </Button>
                             </Link>

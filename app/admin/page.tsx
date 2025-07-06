@@ -1,8 +1,8 @@
 "use client";
 import React, { useState } from "react";
-import { AdminSidebar } from "@/components/admin/admin-sidebar";
-import { AdminDashboard } from "@/components/admin/admin-dashboard";
-import { ProductManagement } from "@/components/admin/product-management";
+import { AdminSidebar } from "@/app/admin/_components/admin-sidebar";
+import { AdminDashboard } from "@/app/admin/_components/admin-dashboard";
+import { ProductManagement } from "@/app/admin/_components/product-management";
 
 export default function AdminPanel() {
     const [activeSection, setActiveSection] = useState("dashboard");

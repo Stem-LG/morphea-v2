@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Save, X, Trash2, GripVertical, Box } from "lucide-react";
+import { Plus, Save, X, Trash2, Box } from "lucide-react";
 import type { ProductWithObjects } from "@/hooks/useProducts";
 
 interface ProductFormProps {
@@ -279,7 +279,7 @@ export function ProductForm({ product, sectionId, storeName, sectionTitle, onBac
                     <CardContent>
                         {objects3D.length === 0 ? (
                             <p className="text-gray-500 text-center py-4 text-sm lg:text-base">
-                                No 3D objects added yet. Click "Add 3D Object" to get started.
+                                {`No 3D objects added yet. Click "Add 3D Object" to get started.`}
                             </p>
                         ) : (
                             <div className="space-y-4">

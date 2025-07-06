@@ -52,7 +52,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
       <div className="text-center space-y-4">
         <Link href="/" className="inline-block">
           <h1 className="text-4xl font-extrabold text-white font-parisienne">
-            <span className="bg-gradient-to-r from-[#785730] to-[#e9d079] bg-clip-text text-transparent">Morpheus Mall</span>
+            <span className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light bg-clip-text text-transparent">Morpheus Mall</span>
           </h1>
         </Link>
         <div>
@@ -62,7 +62,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
       </div>
 
       {/* Form Card */}
-      <div className="bg-gradient-to-br from-[#000c18] to-[#083543] border border-slate-700 p-8 shadow-2xl">
+      <div className="bg-gradient-to-br from-morpheus-blue-dark to-morpheus-blue-light border border-slate-700 p-8 shadow-2xl">
         <form onSubmit={handleSignUp} className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="email" className="text-white text-lg font-medium">Email</Label>
@@ -73,7 +73,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="bg-slate-700 border-slate-600 text-white placeholder:text-gray-400 h-12 text-lg focus:border-[#e9d079] focus:ring-[#e9d079] rounded-none"
+              className="bg-slate-700 border-slate-600 text-white placeholder:text-gray-400 h-12 text-lg focus:border-morpheus-gold-light focus:ring-morpheus-gold-light rounded-none"
             />
           </div>
           
@@ -86,7 +86,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="bg-slate-700 border-slate-600 text-white placeholder:text-gray-400 h-12 text-lg focus:border-[#e9d079] focus:ring-[#e9d079] rounded-none"
+              className="bg-slate-700 border-slate-600 text-white placeholder:text-gray-400 h-12 text-lg focus:border-morpheus-gold-light focus:ring-morpheus-gold-light rounded-none"
             />
           </div>
           
@@ -99,7 +99,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
               required
               value={repeatPassword}
               onChange={(e) => setRepeatPassword(e.target.value)}
-              className="bg-slate-700 border-slate-600 text-white placeholder:text-gray-400 h-12 text-lg focus:border-[#e9d079] focus:ring-[#e9d079] rounded-none"
+              className="bg-slate-700 border-slate-600 text-white placeholder:text-gray-400 h-12 text-lg focus:border-morpheus-gold-light focus:ring-morpheus-gold-light rounded-none"
             />
           </div>
           
@@ -112,7 +112,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
           <Button 
             type="submit" 
             disabled={isLoading}
-            className="w-full bg-gradient-to-r from-[#785730] to-[#e9d079] hover:from-[#695029] hover:to-[#d4c066] text-white h-12 text-lg font-semibold shadow-2xl transition-all duration-300 hover:scale-105 rounded-none"
+            className="w-full bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-[#695029] hover:to-[#d4c066] text-white h-12 text-lg font-semibold shadow-2xl transition-all duration-300 hover:scale-105 rounded-none"
           >
             {isLoading ? (
               <div className="flex items-center gap-2">
@@ -130,7 +130,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
             Already have an account?{' '}
             <Link 
               href="/auth/login" 
-              className="text-[#e9d079] hover:text-[#d4c066] font-semibold underline underline-offset-4 transition-colors"
+              className="text-morpheus-gold-light hover:text-[#d4c066] font-semibold underline underline-offset-4 transition-colors"
             >
               Sign In
             </Link>

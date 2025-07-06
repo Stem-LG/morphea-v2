@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Edit, Trash2, Plus, Package, Box } from "lucide-react";
 import type { ProductWithObjects } from "@/hooks/useProducts";
+import Image from "next/image";
 
 interface ProductListProps {
     sectionId: string;
@@ -98,9 +99,11 @@ export function ProductList({
                                 <div className="space-y-3">
                                     {/* Product Image */}
                                     {product.imageurl && (
-                                        <div className="w-full h-24 lg:h-32 bg-gray-100 rounded-md overflow-hidden">
-                                            <img
+                                        <div className="w-full h-24 lg:h-32 object-cover bg-gray-100 rounded-md overflow-hidden">
+                                            <Image
                                                 src={product.imageurl}
+                                                width={200}
+                                                height={200}
                                                 alt={product.yproduitintitule}
                                                 className="w-full h-full object-cover"
                                             />

@@ -1,7 +1,6 @@
 "use client";
 
 import { Geist, Geist_Mono, Parisienne } from "next/font/google";
-import localFont from "next/font/local";
 import "./globals.css";
 import AnimatedBackground from "@/components/animated-background";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -23,10 +22,6 @@ const parisienne = Parisienne({
     weight: "400",
 });
 
-const brownSugar = localFont({
-    src: "./_assets/fonts/Brown Sugar.woff2",
-});
-
 const queryClient = new QueryClient();
 
 export default function RootLayout({
@@ -36,9 +31,6 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
-            <head>
-
-            </head>
             <body className={`${geistSans.variable} ${geistMono.variable} ${parisienne.variable} antialiased`}>
                 <QueryClientProvider client={queryClient}>
                     <NavBar />

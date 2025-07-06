@@ -13,8 +13,8 @@ function LoadingSpinner() {
     return (
         <Html center>
             <div className="flex flex-col items-center justify-center text-white bg-black/50 backdrop-blur-sm px-6 py-4">
-                <div className="w-12 h-12 border-4 border-[#785730] border-t-[#e9d079] animate-spin mb-3"></div>
-                <div className="text-lg font-medium bg-gradient-to-r from-[#785730] to-[#e9d079] bg-clip-text text-transparent font-parisienne">
+                <div className="w-12 h-12 border-4 border-morpheus-gold-dark border-t-morpheus-gold-light animate-spin mb-3"></div>
+                <div className="text-lg font-medium bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light bg-clip-text text-transparent font-parisienne">
                     Loading 3D Model...
                 </div>
                 <div className="text-sm text-gray-300 mt-1">Please wait</div>
@@ -27,9 +27,9 @@ function LoadingSpinner() {
 function ModelNotFound({ name }: { name: string }) {
     return (
         <Html center>
-            <div className="flex flex-col items-center justify-center text-white bg-black/70 backdrop-blur-sm px-8 py-6 border border-[#785730]">
+            <div className="flex flex-col items-center justify-center text-white bg-black/70 backdrop-blur-sm px-8 py-6 border border-morpheus-gold-dark">
                 <div className="text-6xl mb-4">{name.includes("Palm") ? "🌴" : "🌳"}</div>
-                <div className="text-lg font-medium bg-gradient-to-r from-[#785730] to-[#e9d079] bg-clip-text text-transparent font-parisienne mb-2">
+                <div className="text-lg font-medium bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light bg-clip-text text-transparent font-parisienne mb-2">
                     {name}
                 </div>
                 <div className="text-sm text-gray-300 text-center">3D model preview coming soon</div>
@@ -104,17 +104,17 @@ interface Product3DViewerProps {
 export default function Product3DViewer({ productData, onClose }: Product3DViewerProps) {
     return (
         <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4">
-            <div className="relative w-full max-w-4xl h-[80vh] bg-gradient-to-br from-[#000c18] to-[#083543] border border-slate-700 overflow-hidden">
+            <div className="relative w-full max-w-4xl h-[80vh] bg-gradient-to-br from-morpheus-blue-dark to-morpheus-blue-light border border-slate-700 overflow-hidden">
                 {/* Header */}
                 <div className="absolute top-0 left-0 right-0 z-10 bg-gradient-to-b from-black/80 to-transparent p-4">
                     <div className="flex justify-between items-center">
                         <div>
-                            <h2 className="text-xl font-bold font-parisienne bg-gradient-to-r from-[#785730] to-[#e9d079] bg-clip-text text-transparent">
+                            <h2 className="text-xl font-bold font-parisienne bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light bg-clip-text text-transparent">
                                 {productData.name}
                             </h2>
                             <p className="text-sm text-gray-300">3D Model Viewer</p>
                         </div>
-                        <button onClick={onClose} className="text-white hover:text-[#e9d079] transition-colors">
+                        <button onClick={onClose} className="text-white hover:text-morpheus-gold-light transition-colors">
                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path
                                     strokeLinecap="round"
@@ -203,7 +203,7 @@ export default function Product3DViewer({ productData, onClose }: Product3DViewe
                             </div>
                             <button
                                 onClick={onClose}
-                                className="bg-gradient-to-r from-[#785730] to-[#e9d079] hover:from-[#695029] hover:to-[#d4c066] px-3 py-1 transition-colors rounded-none"
+                                className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-[#695029] hover:to-[#d4c066] px-3 py-1 transition-colors rounded-none"
                             >
                                 Back to Products List
                             </button>
