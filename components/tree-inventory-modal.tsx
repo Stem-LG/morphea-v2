@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import Tree3DViewer from './tree-3d-viewer';
+import Product3DViewer from './product-3d-viewer';
 
 // Tree inventory data
 const TREE_INVENTORY = [
@@ -168,8 +168,13 @@ export default function TreeInventoryModal({ isOpen, onClose }: TreeInventoryMod
 
       {/* 3D Viewer Modal */}
       {show3DViewer && selectedTreeData && (
-        <Tree3DViewer
-          treeData={selectedTreeData}
+        <Product3DViewer
+          productData={{
+            id: selectedTreeData.id,
+            name: selectedTreeData.name,
+            model: selectedTreeData.model,
+            description: selectedTreeData.description
+          }}
           onClose={() => setShow3DViewer(false)}
         />
       )}

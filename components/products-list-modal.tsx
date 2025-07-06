@@ -17,7 +17,7 @@ export default function ProductsListModal({ isOpen, onClose }: ProductsListModal
 
     const { data: productsData, isLoading } = useSceneProducts(sceneId);
 
-    let productsList = useMemo(() => {
+    const productsList = useMemo(() => {
         return productsData?.map((product) => ({
             id: product.yproduitcode,
             name: product.yproduitintitule,
@@ -62,8 +62,18 @@ export default function ProductsListModal({ isOpen, onClose }: ProductsListModal
 
                 {/* Content */}
                 <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
-                    {/* Product Cards Grid - Horizontal Layout */}
-                    <div className="space-y-4 mb-6">
+                    {isLoading ? (
+                        /* Loading State */
+                        <div className="flex flex-col items-center justify-center py-12 space-y-4">
+                            <div className="w-16 h-16 border-4 border-morpheus-gold-dark border-t-morpheus-gold-light animate-spin rounded-full"></div>
+                            <div className="text-center">
+                                <h3 className="text-xl font-semibold text-white mb-2">Loading Products...</h3>
+                                <p className="text-gray-300">Please wait while we fetch the store products</p>
+                            </div>
+                        </div>
+                    ) : productsList && productsList.length > 0 ? (
+                        /* Product Cards Grid - Horizontal Layout */
+                        <div className="space-y-4 mb-6">
                         {productsList?.map((product) => (
                             <div
                                 key={product.id}
@@ -145,7 +155,17 @@ export default function ProductsListModal({ isOpen, onClose }: ProductsListModal
                                 </div>
                             </div>
                         ))}
-                    </div>
+                        </div>
+                    ) : (
+                        /* No Products State */
+                        <div className="flex flex-col items-center justify-center py-12 space-y-4">
+                            <div className="text-6xl mb-4">🏪</div>
+                            <div className="text-center">
+                                <h3 className="text-xl font-semibold text-white mb-2">No Products Found</h3>
+                                <p className="text-gray-300">There are no products available in this section</p>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
 

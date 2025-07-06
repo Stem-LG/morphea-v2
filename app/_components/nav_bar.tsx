@@ -29,7 +29,12 @@ export default function NavBar() {
                         <Link href="/3d-products" className="text-gray-300 hover:text-white transition-colors">
                             3D Products
                         </Link>
-                        {user ? (
+                        {isLoading ? (
+                            <div className="flex items-center space-x-2">
+                                <div className="w-5 h-5 border-2 border-morpheus-gold-dark border-t-morpheus-gold-light animate-spin rounded-full"></div>
+                                <span className="text-gray-300 text-sm">Loading...</span>
+                            </div>
+                        ) : user ? (
                             <LogoutButton />
                         ) : (
                             <>
