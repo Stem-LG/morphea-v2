@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import Product3DViewer from "./product-3d-viewer";
 import { useSceneProducts } from "@/hooks/useSceneProducts";
+import Image from "next/image";
 
 interface ProductsListModalProps {
     isOpen: string | null;
@@ -21,8 +22,10 @@ export default function ProductsListModal({ isOpen, onClose }: ProductsListModal
         return productsData?.map((product) => ({
             id: product.yproduitcode,
             name: product.yproduitintitule,
-            model: "/3d/tree1.glb",
-            image: "/tree-images/palm.jpg", // Placeholder image
+            model: product[0]
+                ? product[0].url
+                : "https://bv90iny2pa.ufs.sh/f/JbGxKbqSczovUft4zqzPn9Rb1yKz8qNZXfhSgpM3GeAakC54",
+            image: product.imageurl, // Placeholder image
             description: product.yproduitdetailstech,
             properties: {
                 height: "15-20 feet",
@@ -77,10 +80,7 @@ export default function ProductsListModal({ isOpen, onClose }: ProductsListModal
                                     {/* Product 3D Preview */}
                                     <div className="w-32 h-32 bg-white flex items-center justify-center flex-shrink-0 shadow-lg">
                                         <div className="text-center">
-                                            <div className="text-5xl mb-1">
-                                                {product.name.includes("Palm") ? "🌴" : "🌳"}
-                                            </div>
-                                            <div className="text-xs text-gray-600">3D Preview</div>
+                                            <Image src={product.image} height={256} width={256} alt="" />
                                         </div>
                                     </div>
 
@@ -113,7 +113,9 @@ export default function ProductsListModal({ isOpen, onClose }: ProductsListModal
                                             </div>
                                             <div className="text-center">
                                                 <div className="text-[#e9d079] text-sm font-medium">Features</div>
-                                                <div className="text-white text-sm">{product.features.length} traits</div>
+                                                <div className="text-white text-sm">
+                                                    {product.features.length} traits
+                                                </div>
                                             </div>
                                         </div>
 
