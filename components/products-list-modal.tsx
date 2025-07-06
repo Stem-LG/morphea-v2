@@ -22,8 +22,8 @@ export default function ProductsListModal({ isOpen, onClose }: ProductsListModal
         return productsData?.map((product) => ({
             id: product.yproduitcode,
             name: product.yproduitintitule,
-            model: product[0]
-                ? product[0].url
+            model: (product as any)[0]
+                ? (product as any)[0].url
                 : "https://bv90iny2pa.ufs.sh/f/JbGxKbqSczovUft4zqzPn9Rb1yKz8qNZXfhSgpM3GeAakC54",
             image: product.imageurl, // Placeholder image
             description: product.yproduitdetailstech,
@@ -80,7 +80,7 @@ export default function ProductsListModal({ isOpen, onClose }: ProductsListModal
                                     {/* Product 3D Preview */}
                                     <div className="w-32 h-32 bg-white flex items-center justify-center flex-shrink-0 shadow-lg">
                                         <div className="text-center">
-                                            <Image src={product.image} height={256} width={256} alt="" />
+                                            <Image src={product.image!} height={256} width={256} alt="" />
                                         </div>
                                     </div>
 
