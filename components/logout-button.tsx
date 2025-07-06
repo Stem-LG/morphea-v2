@@ -16,7 +16,7 @@ export function LogoutButton() {
   return (
     <Button 
       onClick={logout}
-      className="bg-gradient-to-r from-[#785730] to-[#e9d079] hover:from-[#695029] hover:to-[#d4c066] text-white px-4 py-2 transition-all rounded-none"
+      className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-[#695029] hover:to-[#d4c066] text-white px-4 py-2 transition-all rounded-none"
     >
       Logout
     </Button>

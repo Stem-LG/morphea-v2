@@ -8,12 +8,12 @@ export default function NavBar() {
     const { data: user, isLoading } = useAuth();
 
     return (
-        <nav className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-br from-[#000c18] to-[#083543] backdrop-blur-sm border-b border-slate-700">
+        <nav className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-br from-morpheus-blue-dark to-morpheus-blue-light backdrop-blur-sm border-b border-slate-700">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-16">
                     {/* Logo */}
                     <Link href="/" className="flex items-center space-x-2">
-                        <span className="p-4 text-2xl font-bold font-parisienne bg-gradient-to-r from-[#785730] to-[#e9d079] bg-clip-text text-transparent">
+                        <span className="p-4 text-2xl font-bold font-parisienne bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light bg-clip-text text-transparent">
                             Morpheus Mall
                         </span>
                     </Link>
@@ -38,7 +38,7 @@ export default function NavBar() {
                                 </Link>
                                 <Link
                                     href="/auth/sign-up"
-                                    className="bg-gradient-to-r from-[#785730] to-[#e9d079] hover:from-[#695029] hover:to-[#d4c066] text-white px-4 py-2 transition-all"
+                                    className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-[#695029] hover:to-[#d4c066] text-white px-4 py-2 transition-all"
                                 >
                                     Get Started
                                 </Link>

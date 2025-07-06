@@ -10,7 +10,7 @@ interface ProductsListModalProps {
 }
 
 export default function ProductsListModal({ isOpen, onClose }: ProductsListModalProps) {
-    let sceneId = isOpen;
+    const sceneId = isOpen;
 
     const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
     const [show3DViewer, setShow3DViewer] = useState(false);
@@ -39,16 +39,16 @@ export default function ProductsListModal({ isOpen, onClose }: ProductsListModal
     if (!isOpen) return null;
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
-            <div className="relative w-full max-w-6xl max-h-[90vh] bg-gradient-to-br from-[#000c18] to-[#083543] border border-slate-700 overflow-hidden">
+            <div className="relative w-full max-w-6xl max-h-[90vh] bg-gradient-to-br from-morpheus-blue-dark to-morpheus-blue-light border border-slate-700 overflow-hidden">
                 {/* Header */}
                 <div className="flex justify-between items-center p-6 border-b border-slate-700">
                     <div>
-                        <h2 className="text-2xl font-bold font-parisienne bg-gradient-to-r from-[#785730] to-[#e9d079] bg-clip-text text-transparent mb-2">
+                        <h2 className="text-2xl font-bold font-parisienne bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light bg-clip-text text-transparent mb-2">
                             Product List
                         </h2>
                         <p className="text-gray-300">Discover the store products</p>
                     </div>
-                    <button onClick={onClose} className="text-white hover:text-[#e9d079] transition-colors">
+                    <button onClick={onClose} className="text-white hover:text-morpheus-gold-light transition-colors">
                         <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path
                                 strokeLinecap="round"
@@ -71,7 +71,7 @@ export default function ProductsListModal({ isOpen, onClose }: ProductsListModal
                                     setSelectedProduct(product.id);
                                     setShow3DViewer(true);
                                 }}
-                                className={`cursor-pointer border-2 transition-all duration-300 hover:border-[#e9d079] bg-gradient-to-br from-[#000c18] to-[#083543] border-slate-600 group`}
+                                className={`cursor-pointer border-2 transition-all duration-300 hover:border-morpheus-gold-light bg-gradient-to-br from-morpheus-blue-dark to-morpheus-blue-light border-slate-600 group`}
                             >
                                 <div className="flex items-center p-4 space-x-6">
                                     {/* Product 3D Preview */}
@@ -87,10 +87,10 @@ export default function ProductsListModal({ isOpen, onClose }: ProductsListModal
                                     {/* Product Information */}
                                     <div className="flex-1 min-w-0">
                                         <div className="flex justify-between items-start mb-2">
-                                            <h3 className="text-2xl font-bold text-white group-hover:text-[#e9d079] transition-colors">
+                                            <h3 className="text-2xl font-bold text-white group-hover:text-morpheus-gold-light transition-colors">
                                                 {product.name}
                                             </h3>
-                                            <div className="bg-gradient-to-r from-[#785730] to-[#e9d079] text-white px-3 py-1 text-sm font-medium">
+                                            <div className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light text-white px-3 py-1 text-sm font-medium">
                                                 {product.properties.type}
                                             </div>
                                         </div>
@@ -100,19 +100,19 @@ export default function ProductsListModal({ isOpen, onClose }: ProductsListModal
                                         {/* Properties Grid */}
                                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                                             <div className="text-center">
-                                                <div className="text-[#e9d079] text-sm font-medium">Height</div>
+                                                <div className="text-morpheus-gold-light text-sm font-medium">Height</div>
                                                 <div className="text-white text-lg">{product.properties.height}</div>
                                             </div>
                                             <div className="text-center">
-                                                <div className="text-[#e9d079] text-sm font-medium">Age</div>
+                                                <div className="text-morpheus-gold-light text-sm font-medium">Age</div>
                                                 <div className="text-white text-lg">{product.properties.age}</div>
                                             </div>
                                             <div className="text-center">
-                                                <div className="text-[#e9d079] text-sm font-medium">Location</div>
+                                                <div className="text-morpheus-gold-light text-sm font-medium">Location</div>
                                                 <div className="text-white text-sm">{product.properties.location}</div>
                                             </div>
                                             <div className="text-center">
-                                                <div className="text-[#e9d079] text-sm font-medium">Features</div>
+                                                <div className="text-morpheus-gold-light text-sm font-medium">Features</div>
                                                 <div className="text-white text-sm">{product.features.length} traits</div>
                                             </div>
                                         </div>
@@ -137,7 +137,7 @@ export default function ProductsListModal({ isOpen, onClose }: ProductsListModal
 
                                     {/* Action Button */}
                                     <div className="flex-shrink-0">
-                                        <button className="bg-gradient-to-r from-[#785730] to-[#e9d079] hover:from-[#695029] hover:to-[#d4c066] text-white px-6 py-3 transition-colors font-medium shadow-lg group-hover:shadow-[#e9d079]/25 rounded-none">
+                                        <button className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-[#695029] hover:to-[#d4c066] text-white px-6 py-3 transition-colors font-medium shadow-lg group-hover:shadow-morpheus-gold-light/25 rounded-none">
                                             View in 3D
                                             <div className="text-xs opacity-75 mt-1">Click to explore</div>
                                         </button>
