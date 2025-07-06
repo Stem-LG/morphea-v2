@@ -3,13 +3,16 @@
 import { createClient } from '@/lib/client'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
+import { useAuth } from '@/hooks/useAuth'
 
 export function LogoutButton() {
   const router = useRouter()
+  const { refetch } = useAuth()
 
   const logout = async () => {
     const supabase = createClient()
     await supabase.auth.signOut()
+    await refetch() // Refresh auth state
     router.push('/auth/login')
   }
 

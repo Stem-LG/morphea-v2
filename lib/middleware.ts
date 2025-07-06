@@ -37,18 +37,6 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // If user is already logged in and trying to access auth pages, redirect to protected area
-  if (
-    user &&
-    (request.nextUrl.pathname.startsWith('/auth/login') ||
-     request.nextUrl.pathname.startsWith('/auth/sign-up') ||
-     request.nextUrl.pathname.startsWith('/auth/forgot-password'))
-  ) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/protected'
-    return NextResponse.redirect(url)
-  }
-
   if (
     !user &&
     !request.nextUrl.pathname.startsWith('/login') &&
