@@ -48,11 +48,14 @@ export default function NavBar() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between h-16">
                         {/* Logo */}
-                        <Link href="/" className="flex items-center space-x-2">
-                            <span className="p-4 text-2xl font-bold font-parisienne bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light bg-clip-text text-transparent">
-                                Morpheus Mall
-                            </span>
-                        </Link>
+                        <div className="flex flex-row items-center justify-center">
+                            <img src="/logo.png" alt="Morpheus Mall Logo" className="h-8 w-auto hidden md:block" />
+                            <Link href="/" className="flex items-center space-x-2">
+                                <span className="p-4 text-2xl font-bold font-parisienne bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light bg-clip-text text-transparent">
+                                    Morpheus Mall
+                                </span>
+                            </Link>
+                        </div>
 
                         {/* Navigation Links */}
                         <div className="hidden md:flex items-center space-x-8">
