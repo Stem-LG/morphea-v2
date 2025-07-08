@@ -716,6 +716,147 @@ export type Database = {
         }
         Relationships: []
       }
+      yscenes: {
+        Row: {
+          yid: string
+          yname: string
+          ypanorama: string
+          yyaw: number
+          ypitch: number
+          yfov: number
+          ycreatedat: string | null
+        }
+        Insert: {
+          yid: string
+          yname: string
+          ypanorama: string
+          yyaw: number
+          ypitch: number
+          yfov: number
+          ycreatedat?: string | null
+        }
+        Update: {
+          yid?: string
+          yname?: string
+          ypanorama?: string
+          yyaw?: number
+          ypitch?: number
+          yfov?: number
+          ycreatedat?: string | null
+        }
+        Relationships: []
+      }
+      yscenelinks: {
+        Row: {
+          yid: string
+          ysceneid: string
+          ytargetid: string
+          yyaw: number
+          ypitch: number
+          yname: string
+          ycreatedat: string | null
+        }
+        Insert: {
+          yid?: string
+          ysceneid: string
+          ytargetid: string
+          yyaw: number
+          ypitch: number
+          yname: string
+          ycreatedat?: string | null
+        }
+        Update: {
+          yid?: string
+          ysceneid?: string
+          ytargetid?: string
+          yyaw?: number
+          ypitch?: number
+          yname?: string
+          ycreatedat?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "yscenelinks_ysceneid_fkey"
+            columns: ["ysceneid"]
+            isOneToOne: false
+            referencedRelation: "yscenes"
+            referencedColumns: ["yid"]
+          }
+        ]
+      }
+      yinfospots: {
+        Row: {
+          yid: string
+          ysceneid: string
+          ytitle: string
+          ytext: string
+          yyaw: number
+          ypitch: number
+          ycreatedat: string | null
+        }
+        Insert: {
+          yid?: string
+          ysceneid: string
+          ytitle: string
+          ytext: string
+          yyaw: number
+          ypitch: number
+          ycreatedat?: string | null
+        }
+        Update: {
+          yid?: string
+          ysceneid?: string
+          ytitle?: string
+          ytext?: string
+          yyaw?: number
+          ypitch?: number
+          ycreatedat?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "yinfospots_ysceneid_fkey"
+            columns: ["ysceneid"]
+            isOneToOne: false
+            referencedRelation: "yscenes"
+            referencedColumns: ["yid"]
+          }
+        ]
+      }
+      yinfospotactions: {
+        Row: {
+          yinfospotid: string
+          ytype: string
+          ymodaltype: string | null
+          ycustomhandler: string | null
+          yactionid: string | null
+          ycreatedat: string | null
+        }
+        Insert: {
+          yinfospotid: string
+          ytype: string
+          ymodaltype?: string | null
+          ycustomhandler?: string | null
+          yactionid?: string | null
+          ycreatedat?: string | null
+        }
+        Update: {
+          yinfospotid?: string
+          ytype?: string
+          ymodaltype?: string | null
+          ycustomhandler?: string | null
+          yactionid?: string | null
+          ycreatedat?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "yinfospotactions_yinfospotid_fkey"
+            columns: ["yinfospotid"]
+            isOneToOne: true
+            referencedRelation: "yinfospots"
+            referencedColumns: ["yid"]
+          }
+        ]
+      }
     }
     Views: {
       [_ in never]: never

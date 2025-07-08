@@ -5,7 +5,7 @@ import { Viewer } from "@photo-sphere-viewer/core";
 import { AutorotatePlugin } from "@photo-sphere-viewer/autorotate-plugin";
 import { MarkersPlugin } from "@photo-sphere-viewer/markers-plugin";
 import ProductsListModal from "./products-list-modal";
-import { InfoSpotAction, TOUR_DATA } from "@/app/_consts/tourdata";
+import { InfoSpotAction, getTourData, TourData } from "@/app/_consts/tourdata";
 
 interface VirtualTourProps {
     className?: string;
@@ -30,12 +30,39 @@ export default function VirtualTour({
     const [currentScene, setCurrentScene] = useState(startingScene);
     const [productsList, setProductsList] = useState<string | null>(null);
     const [isTransitioning, setIsTransitioning] = useState(false);
+    const [tourData, setTourData] = useState<TourData>({ scenes: [] });
+    const [isLoading, setIsLoading] = useState(true);
+
+    // Fetch tour data from Supabase
+    useEffect(() => {
+        const fetchTourData = async () => {
+            try {
+                setIsLoading(true);
+                const data = await getTourData();
+                setTourData(data);
+                
+                // Update starting scene if the data has scenes and the default scene doesn't exist
+                if (data.scenes.length > 0) {
+                    const sceneExists = data.scenes.some(scene => scene.id === startingScene);
+                    if (!sceneExists) {
+                        setCurrentScene(data.scenes[0].id);
+                    }
+                }
+            } catch (error) {
+                console.error('Failed to fetch tour data:', error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchTourData();
+    }, [startingScene]);
 
     useEffect(() => {
-        if (!containerRef.current) return;
+        if (!containerRef.current || isLoading || !tourData.scenes.length) return;
 
         const initializeViewer = () => {
-            const currentSceneData = TOUR_DATA.scenes.find((scene) => scene.id === currentScene);
+            const currentSceneData = tourData.scenes.find((scene) => scene.id === currentScene);
             if (!currentSceneData) return;
 
             // Initialize Photo Sphere Viewer only once
@@ -97,13 +124,13 @@ export default function VirtualTour({
                 viewerRef.current = null;
             }
         };
-    }, [showNavbar]);
+    }, [showNavbar, tourData, isLoading]);
 
     // Separate effect for scene transitions
     useEffect(() => {
-        if (!viewerRef.current) return;
+        if (!viewerRef.current || !tourData.scenes.length) return;
 
-        const currentSceneData = TOUR_DATA.scenes.find((scene) => scene.id === currentScene);
+        const currentSceneData = tourData.scenes.find((scene) => scene.id === currentScene);
         if (!currentSceneData) return;
 
         const transitionToScene = async () => {
@@ -136,13 +163,13 @@ export default function VirtualTour({
         };
 
         transitionToScene();
-    }, [currentScene]);
+    }, [currentScene, tourData]);
 
     // Add markers for navigation links and info spots
     const addMarkers = useCallback(() => {
-        if (!markersPluginRef.current) return;
+        if (!markersPluginRef.current || !tourData.scenes.length) return;
 
-        const currentSceneData = TOUR_DATA.scenes.find((scene) => scene.id === currentScene);
+        const currentSceneData = tourData.scenes.find((scene) => scene.id === currentScene);
         if (!currentSceneData) return;
 
         // Clear existing markers
@@ -211,7 +238,7 @@ export default function VirtualTour({
                 },
             });
         });
-    }, [currentScene]);
+    }, [currentScene, tourData]);
 
     // Handle different action types dynamically
     const handleInfoSpotAction = (action: InfoSpotAction, title: string, text: string) => {
@@ -255,22 +282,43 @@ export default function VirtualTour({
         }
     }, [isTransitioning, setCurrentScene, setProductsList]);
 
+    if (isLoading) {
+        return (
+            <div className={`relative ${className} flex items-center justify-center bg-gray-100`} style={{ height, width }}>
+                <div className="text-center">
+                    <img src="/loading.gif" alt="Loading" className="h-12 w-12 mx-auto mb-4" />
+                    <p className="text-gray-600">Loading virtual tour...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (!tourData.scenes.length) {
+        return (
+            <div className={`relative ${className} flex items-center justify-center bg-gray-100`} style={{ height, width }}>
+                <div className="text-center">
+                    <p className="text-gray-600">No tour scenes available</p>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className={`relative ${className}`} style={{ height, width }}>
             <div ref={containerRef} className="w-full h-full" style={{ height, width }} />
 
             {/* Scene information overlay */}
             <div className="absolute top-4 left-4 z-10 bg-black/70 text-white px-4 py-2 rounded-lg">
-                <h3 className="font-semibold">{TOUR_DATA.scenes.find((scene) => scene.id === currentScene)?.name}</h3>
+                <h3 className="font-semibold">{tourData.scenes.find((scene) => scene.id === currentScene)?.name}</h3>
                 <p className="text-sm opacity-75">
-                    {TOUR_DATA.scenes.findIndex((scene) => scene.id === currentScene) + 1} of {TOUR_DATA.scenes.length}
+                    {tourData.scenes.findIndex((scene) => scene.id === currentScene) + 1} of {tourData.scenes.length}
                 </p>
             </div>
 
             {/* Scene Navigation Menu */}
             <div className="absolute top-4 right-4 z-10 bg-black/70 text-white rounded-lg p-2">
                 <div className="flex flex-col space-y-1">
-                    {TOUR_DATA.scenes.map((scene, index) => (
+                    {tourData.scenes.map((scene, index) => (
                         <button
                             key={scene.id}
                             onClick={() => !isTransitioning && setCurrentScene(scene.id)}

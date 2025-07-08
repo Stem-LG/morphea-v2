@@ -1,3 +1,5 @@
+import { createClient } from '@/lib/client'
+
 // Type definitions for tour data
 export interface InfoSpotAction {
     id?: string;
@@ -6,20 +8,20 @@ export interface InfoSpotAction {
     customHandler?: string;
 }
 
-interface InfoSpot {
+export interface InfoSpot {
     position: { yaw: number; pitch: number };
     title: string;
     text: string;
     action: InfoSpotAction;
 }
 
-interface SceneLink {
+export interface SceneLink {
     nodeId: string;
     position: { yaw: number; pitch: number };
     name: string;
 }
 
-interface Scene {
+export interface Scene {
     id: string;
     name: string;
     panorama: string;
@@ -32,155 +34,113 @@ interface Scene {
     infoSpots: InfoSpot[];
 }
 
-interface TourData {
+export interface TourData {
     scenes: Scene[];
 }
 
-export const TOUR_DATA: TourData = {
-    scenes: [
-        {
-            id: "0-key-biscayne-2",
-            name: "Key Biscayne 2",
-            panorama: "https://photo-sphere-viewer-data.netlify.app/assets/tour/key-biscayne-2.jpg",
-            initialView: {
-                yaw: 1.1336577326040196,
-                pitch: 0.23814987400952958,
-                fov: 1.4488196474276132,
-            },
-            links: [
-                {
-                    nodeId: "1-key-biscayne-3",
-                    position: { yaw: 2.893400865239564, pitch: 0.1709109194111189 },
-                    name: "Key Biscayne 3",
+// Function to fetch tour data from Supabase
+export async function getTourData(): Promise<TourData> {
+    const supabase = createClient()
+    
+    try {
+        // Fetch all scenes
+        const { data: scenesData, error: scenesError } = await supabase
+            .schema('morpheus')
+            .from('yscenes')
+            .select('*')
+            .order('ycreatedat')
+        
+        if (scenesError) {
+            console.error('Error fetching scenes:', scenesError)
+            throw scenesError
+        }
+        
+        if (!scenesData || scenesData.length === 0) {
+            return { scenes: [] }
+        }
+        
+        // Fetch all scene links
+        const { data: linksData, error: linksError } = await supabase
+            .schema('morpheus')
+            .from('yscenelinks')
+            .select('*')
+            .order('ycreatedat')
+        
+        if (linksError) {
+            console.error('Error fetching scene links:', linksError)
+            throw linksError
+        }
+        
+        // Fetch all info spots with their actions
+        const { data: infospotsData, error: infospotsError } = await supabase
+            .schema('morpheus')
+            .from('yinfospots')
+            .select(`
+                *,
+                yinfospotactions (*)
+            `)
+            .order('ycreatedat')
+        
+        if (infospotsError) {
+            console.error('Error fetching info spots:', infospotsError)
+            throw infospotsError
+        }
+        
+        // Transform the data to match the expected format
+        const scenes: Scene[] = scenesData.map(scene => {
+            // Get links for this scene
+            const sceneLinks = linksData?.filter(link => link.ysceneid === scene.yid) || []
+            const links: SceneLink[] = sceneLinks.map(link => ({
+                nodeId: link.ytargetid,
+                position: { yaw: link.yyaw, pitch: link.ypitch },
+                name: link.yname
+            }))
+            
+            // Get info spots for this scene
+            const sceneInfoSpots = infospotsData?.filter(infospot => infospot.ysceneid === scene.yid) || []
+            const infoSpots: InfoSpot[] = sceneInfoSpots.map(infospot => {
+                const action: InfoSpotAction = {
+                    type: (infospot.yinfospotactions?.ytype as "alert" | "modal" | "custom") || "alert",
+                }
+                
+                // Add optional action properties if they exist
+                if (infospot.yinfospotactions?.yactionid) {
+                    action.id = infospot.yinfospotactions.yactionid
+                }
+                if (infospot.yinfospotactions?.ymodaltype) {
+                    action.modalType = infospot.yinfospotactions.ymodaltype
+                }
+                if (infospot.yinfospotactions?.ycustomhandler) {
+                    action.customHandler = infospot.yinfospotactions.ycustomhandler
+                }
+                
+                return {
+                    position: { yaw: infospot.yyaw, pitch: infospot.ypitch },
+                    title: infospot.ytitle,
+                    text: infospot.ytext,
+                    action
+                }
+            })
+            
+            return {
+                id: scene.yid,
+                name: scene.yname,
+                panorama: scene.ypanorama,
+                initialView: {
+                    yaw: scene.yyaw,
+                    pitch: scene.ypitch,
+                    fov: scene.yfov
                 },
-                {
-                    nodeId: "4-key-biscayne-1",
-                    position: { yaw: -0.531815479113158, pitch: 0.027308378719935078 },
-                    name: "Key Biscayne 1",
-                },
-            ],
-            infoSpots: [
-                {
-                    position: { yaw: 0.744697120630752, pitch: 0.21497175500675247 },
-                    title: "section 1 products",
-                    text: "Look at these amazing tropical trees typical of Key Biscayne's landscape!",
-                    action: {
-                        id: "store-1-section-1-products",
-                        type: "modal",
-                        modalType: "products-list",
-                    },
-                },
-                {
-                    position: { yaw: -0.744697120630752, pitch: -0.21497175500675247 },
-                    title: "section 2 products",
-                    text: "Look at these amazing tropical trees typical of Key Biscayne's landscape!",
-                    action: {
-                        id: "store-1-section-2-products",
-                        type: "modal",
-                        modalType: "products-list",
-                    },
-                },
-            ],
-        },
-        {
-            id: "1-key-biscayne-3",
-            name: "Key Biscayne 3",
-            panorama: "https://photo-sphere-viewer-data.netlify.app/assets/tour/key-biscayne-3.jpg",
-            initialView: {
-                yaw: 0,
-                pitch: 0,
-                fov: 1.5707963267948966,
-            },
-            links: [
-                {
-                    nodeId: "0-key-biscayne-2",
-                    position: { yaw: -0.18474699939073957, pitch: 0.15360608373157092 },
-                    name: "Key Biscayne 2",
-                },
-                {
-                    nodeId: "2-key-biscayne-4",
-                    position: { yaw: -1.6698032389065691, pitch: 0.08672819911773644 },
-                    name: "Key Biscayne 4",
-                },
-            ],
-            infoSpots: [],
-        },
-        {
-            id: "2-key-biscayne-4",
-            name: "Key Biscayne 4",
-            panorama: "https://photo-sphere-viewer-data.netlify.app/assets/tour/key-biscayne-4.jpg",
-            initialView: {
-                yaw: 0,
-                pitch: 0,
-                fov: 1.5707963267948966,
-            },
-            links: [
-                {
-                    nodeId: "3-key-biscayne-5",
-                    position: { yaw: -2.736698300684429, pitch: 0.08522144663561093 },
-                    name: "Key Biscayne 5",
-                },
-                {
-                    nodeId: "0-key-biscayne-2",
-                    position: { yaw: -0.5963643135940444, pitch: 0.09789476509356554 },
-                    name: "Key Biscayne 2",
-                },
-            ],
-            infoSpots: [
-                {
-                    position: { yaw: 0.8, pitch: 0.15 },
-                    title: "Coastal Path",
-                    text: "A scenic walking path that runs along the coastline, perfect for morning jogs.",
-                    action: {
-                        type: "alert",
-                    },
-                },
-            ],
-        },
-        {
-            id: "3-key-biscayne-5",
-            name: "Key Biscayne 5",
-            panorama: "https://photo-sphere-viewer-data.netlify.app/assets/tour/key-biscayne-5.jpg",
-            initialView: {
-                yaw: 0,
-                pitch: 0,
-                fov: 1.5707963267948966,
-            },
-            links: [
-                {
-                    nodeId: "2-key-biscayne-4",
-                    position: { yaw: -1.548428403774265, pitch: 0.08733478802806971 },
-                    name: "Key Biscayne 4",
-                },
-            ],
-            infoSpots: [
-                {
-                    position: { yaw: 2.1, pitch: 0.1 },
-                    title: "Mangrove Area",
-                    text: "Protected mangrove ecosystem that serves as a natural habitat for local wildlife.",
-                    action: {
-                        type: "alert",
-                    },
-                },
-            ],
-        },
-        {
-            id: "4-key-biscayne-1",
-            name: "Key Biscayne 1",
-            panorama: "https://photo-sphere-viewer-data.netlify.app/assets/tour/key-biscayne-1.jpg",
-            initialView: {
-                yaw: 0,
-                pitch: 0,
-                fov: 1.5707963267948966,
-            },
-            links: [
-                {
-                    nodeId: "0-key-biscayne-2",
-                    position: { yaw: 2.4558190395405024, pitch: 0.15457025486422538 },
-                    name: "Key Biscayne 2",
-                },
-            ],
-            infoSpots: [],
-        },
-    ],
-};
+                links,
+                infoSpots
+            }
+        })
+        
+        return { scenes }
+        
+    } catch (error) {
+        console.error('Error fetching tour data:', error)
+        // Return empty tour data as fallback
+        return { scenes: [] }
+    }
+}

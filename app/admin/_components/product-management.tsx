@@ -1,8 +1,9 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { StoreSectionSelector } from "./store-section-selector";
 import { ProductList } from "./product-list";
 import { ProductForm } from "./product-form";
+import { getTourData, TourData } from "@/app/_consts/tourdata";
 import type { ProductWithObjects } from "@/hooks/useProducts";
 
 export function ProductManagement() {
@@ -13,6 +14,25 @@ export function ProductManagement() {
         sectionTitle: string;
     } | null>(null);
     const [editingProduct, setEditingProduct] = useState<ProductWithObjects | undefined>(undefined);
+    const [tourData, setTourData] = useState<TourData>({ scenes: [] });
+    const [isLoadingTourData, setIsLoadingTourData] = useState(true);
+
+    // Fetch tour data on component mount
+    useEffect(() => {
+        const fetchTourData = async () => {
+            try {
+                setIsLoadingTourData(true);
+                const data = await getTourData();
+                setTourData(data);
+            } catch (error) {
+                console.error('Failed to fetch tour data:', error);
+            } finally {
+                setIsLoadingTourData(false);
+            }
+        };
+
+        fetchTourData();
+    }, []);
 
     const handleSectionSelect = (sectionId: string, storeName: string, sectionTitle: string) => {
         setSelectedSection({ id: sectionId, storeName, sectionTitle });
@@ -45,9 +65,24 @@ export function ProductManagement() {
         setCurrentView("list");
     };
 
+    if (isLoadingTourData) {
+        return (
+            <div className="flex items-center justify-center p-8">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-morpheus-gold-dark mx-auto mb-4"></div>
+                    <p className="text-gray-600">Loading tour data...</p>
+                </div>
+            </div>
+        );
+    }
+
     if (currentView === "selector") {
         return (
-            <StoreSectionSelector selectedSection={selectedSection?.id || null} onSectionSelect={handleSectionSelect} />
+            <StoreSectionSelector 
+                selectedSection={selectedSection?.id || null} 
+                onSectionSelect={handleSectionSelect}
+                tourData={tourData}
+            />
         );
     }
 
