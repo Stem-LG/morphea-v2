@@ -70,7 +70,7 @@ export function ProductManagement() {
             <div className="flex items-center justify-center p-8">
                 <div className="text-center">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-morpheus-gold-dark mx-auto mb-4"></div>
-                    <p className="text-gray-600">Loading tour data...</p>
+                    <p className="text-gray-600">Chargement des données de la visite...</p>
                 </div>
             </div>
         );

@@ -30,14 +30,14 @@ export function ProductList({
     const handleDelete = async (productId: number) => {
         if (
             window.confirm(
-                "Are you sure you want to delete this product? This will also delete all associated 3D objects."
+                "Êtes-vous sûr de vouloir supprimer ce produit ? Cela supprimera également tous les objets 3D associés."
             )
         ) {
             try {
                 await deleteProduct.mutateAsync(productId);
             } catch (error) {
                 console.error("Failed to delete product:", error);
-                alert("Failed to delete product. Please try again.");
+                alert("Échec de la suppression du produit. Veuillez réessayer.");
             }
         }
     };
@@ -46,7 +46,7 @@ export function ProductList({
         return (
             <div className="p-6">
                 <div className="flex items-center justify-center h-64">
-                    <div className="text-lg">Loading products...</div>
+                    <div className="text-lg">Chargement des produits...</div>
                 </div>
             </div>
         );
@@ -56,7 +56,7 @@ export function ProductList({
         return (
             <div className="p-6">
                 <div className="flex items-center justify-center h-64 text-red-600">
-                    <div>Error loading products: {error.message}</div>
+                    <div>Erreur lors du chargement des produits : {error.message}</div>
                 </div>
             </div>
         );
@@ -67,19 +67,19 @@ export function ProductList({
             {/* Header */}
             <div className="mb-4 lg:mb-6">
                 <Button variant="outline" onClick={onBack} className="mb-3 lg:mb-4 text-sm">
-                    ← Back to Store Selection
+                    ← Retour à la sélection du magasin
                 </Button>
                 <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                     <div>
-                        <h2 className="text-2xl lg:text-3xl font-bold">Products Management</h2>
+                        <h2 className="text-2xl lg:text-3xl font-bold">Gestion des produits</h2>
                         <p className="text-gray-600 mt-1 text-sm lg:text-base">
                             {storeName} - {sectionTitle}
                         </p>
                     </div>
                     <Button onClick={onCreateProduct} className="flex items-center gap-2 self-start lg:self-auto">
                         <Plus className="h-4 w-4" />
-                        <span className="hidden sm:inline">Add New Product</span>
-                        <span className="sm:hidden">Add Product</span>
+                        <span className="hidden sm:inline">Ajouter un nouveau produit</span>
+                        <span className="sm:hidden">Ajouter un produit</span>
                     </Button>
                 </div>
             </div>
@@ -155,13 +155,13 @@ export function ProductList({
             ) : (
                 <div className="text-center py-8 lg:py-12">
                     <Package className="h-12 w-12 lg:h-16 lg:w-16 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg lg:text-xl font-medium text-gray-900 mb-2">No products found</h3>
+                    <h3 className="text-lg lg:text-xl font-medium text-gray-900 mb-2">Aucun produit trouvé</h3>
                     <p className="text-sm lg:text-base text-gray-600 mb-6">
-                        Get started by creating your first product.
+                        Commencez par créer votre premier produit.
                     </p>
                     <Button onClick={onCreateProduct} className="flex items-center gap-2">
                         <Plus className="h-4 w-4" />
-                        Add New Product
+                        Ajouter un nouveau produit
                     </Button>
                 </div>
             )}

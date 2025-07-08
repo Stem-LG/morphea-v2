@@ -29,11 +29,11 @@ export function StoreSectionSelector({ selectedSection, onSectionSelect, tourDat
 
     return (
         <div className="p-4 lg:p-6">
-            <h2 className="text-2xl lg:text-3xl font-bold mb-4 lg:mb-6">Select Store & Section</h2>
+            <h2 className="text-2xl lg:text-3xl font-bold mb-4 lg:mb-6">Sélectionnez un magasin et une section</h2>
 
             {storesWithSections.length === 0 ? (
                 <div className="text-center py-8">
-                    <p className="text-gray-600">No stores with product sections found.</p>
+                    <p className="text-gray-600">Aucun magasin avec des sections de produits trouvé.</p>
                 </div>
             ) : (
                 <div className="grid gap-4 lg:gap-6">

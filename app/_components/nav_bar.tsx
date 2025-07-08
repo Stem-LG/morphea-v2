@@ -60,23 +60,23 @@ export default function NavBar() {
                         {/* Navigation Links */}
                         <div className="hidden md:flex items-center space-x-8">
                             <Link href="/shop" className="text-gray-300 hover:text-white transition-colors">
-                                Shop
+                                Boutique
                             </Link>
                             <Link href="/virtual-tours" className="text-gray-300 hover:text-white transition-colors">
-                                Virtual Tours
+                                Visites Virtuelles
                             </Link>
                             <Link href="/3d-products" className="text-gray-300 hover:text-white transition-colors">
-                                3D Products
+                                Produits 3D
                             </Link>
                             <Link href="/admin" className="text-gray-300 hover:text-white transition-colors">
-                                Admin
+                                Administration
                             </Link>
                             
                             {/* Auth Section */}
                             {loading ? (
                                 <div className="flex items-center space-x-2">
                                     <div className="w-5 h-5 border-2 border-morpheus-gold-dark border-t-morpheus-gold-light animate-spin rounded-full"></div>
-                                    <span className="text-gray-300 text-sm">Loading...</span>
+                                    <span className="text-gray-300 text-sm">Chargement...</span>
                                 </div>
                             ) : currentUser ? (
                                 <LogoutButton />
@@ -86,13 +86,13 @@ export default function NavBar() {
                                         href="/auth/login"
                                         className="text-gray-300 hover:text-white transition-colors"
                                     >
-                                        Sign In
+                                        Connexion
                                     </Link>
                                     <Link
                                         href="/auth/sign-up"
                                         className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-[#695029] hover:to-[#d4c066] text-white px-4 py-2 transition-all rounded-none"
                                     >
-                                        Get Started
+                                        Commencer
                                     </Link>
                                 </>
                             )}
@@ -126,28 +126,28 @@ export default function NavBar() {
                                     className="text-gray-300 hover:text-white block px-3 py-2 text-base font-medium transition-colors"
                                     onClick={closeMobileMenu}
                                 >
-                                    Shop
+                                    Boutique
                                 </Link>
                                 <Link
                                     href="/virtual-tours"
                                     className="text-gray-300 hover:text-white block px-3 py-2 text-base font-medium transition-colors"
                                     onClick={closeMobileMenu}
                                 >
-                                    Virtual Tours
+                                    Visites Virtuelles
                                 </Link>
                                 <Link
                                     href="/3d-products"
                                     className="text-gray-300 hover:text-white block px-3 py-2 text-base font-medium transition-colors"
                                     onClick={closeMobileMenu}
                                 >
-                                    3D Products
+                                    Produits 3D
                                 </Link>
                                 <Link
                                     href="/admin"
                                     className="text-gray-300 hover:text-white block px-3 py-2 text-base font-medium transition-colors"
                                     onClick={closeMobileMenu}
                                 >
-                                    Admin
+                                    Administration
                                 </Link>
                                 
                                 {/* Mobile Auth Section */}
@@ -155,7 +155,7 @@ export default function NavBar() {
                                     {loading ? (
                                         <div className="flex items-center justify-center px-3 py-2">
                                             <div className="w-5 h-5 border-2 border-morpheus-gold-dark border-t-morpheus-gold-light animate-spin rounded-full"></div>
-                                            <span className="text-gray-300 text-sm ml-2">Loading...</span>
+                                            <span className="text-gray-300 text-sm ml-2">Chargement...</span>
                                         </div>
                                     ) : currentUser ? (
                                         <div className="px-3 py-2">
@@ -168,14 +168,14 @@ export default function NavBar() {
                                                 className="text-gray-300 hover:text-white block px-3 py-2 text-base font-medium transition-colors"
                                                 onClick={closeMobileMenu}
                                             >
-                                                Sign In
+                                                Connexion
                                             </Link>
                                             <Link
                                                 href="/auth/sign-up"
                                                 className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-[#695029] hover:to-[#d4c066] text-white block px-3 py-2 mx-3 my-2 text-center transition-all rounded-none"
                                                 onClick={closeMobileMenu}
                                             >
-                                                Get Started
+                                                Commencer
                                             </Link>
                                         </>
                                     )}

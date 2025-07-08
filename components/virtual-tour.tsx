@@ -76,25 +76,10 @@ export default function VirtualTour({
                 maxFov: 120,
                 loadingImg: "", // Remove loading icon
                 loadingTxt: "", // Remove loading text
-                navbar: showNavbar ? ["autorotate", "zoom", "fullscreen"] : false,
+                navbar: showNavbar ? ["rotation automatique", "zoom", "plein écran"] : false,
                 plugins: disableAutorotate
-                    ? [
-                          [
-                              MarkersPlugin,
-                              {
-                                  markers: [],
-                              },
-                          ],
-                      ]
+                    ? []
                     : [
-                          [
-                              AutorotatePlugin,
-                              {
-                                  autostartDelay: 3000,
-                                  autostartOnIdle: true,
-                                  autorotateSpeed: "2rpm",
-                              },
-                          ],
                           [
                               MarkersPlugin,
                               {
@@ -184,7 +169,7 @@ export default function VirtualTour({
                 size: { width: 32, height: 32 },
                 anchor: "center center",
                 tooltip: {
-                    content: `Go to ${link.name}`,
+                    content: `Aller à ${link.name}`,
                     position: "top center",
                 },
                 data: {
@@ -215,7 +200,9 @@ export default function VirtualTour({
             animation: pulse 2s infinite;
             box-shadow: 0 2px 8px rgba(0,0,0,0.3);
           ">
-            i
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12L8.1 13h7.45c.75 0 1.41-.41 1.75-1.03L21.7 4H5.21l-.94-2H1zm16 16c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+            </svg>
           </div>
           <style>
             @keyframes pulse {
@@ -287,7 +274,7 @@ export default function VirtualTour({
             <div className={`relative ${className} flex items-center justify-center bg-gray-100`} style={{ height, width }}>
                 <div className="text-center">
                     <img src="/loading.gif" alt="Loading" className="h-12 w-12 mx-auto mb-4" />
-                    <p className="text-gray-600">Loading virtual tour...</p>
+                    <p className="text-gray-600">Chargement de la visite virtuelle...</p>
                 </div>
             </div>
         );
@@ -297,7 +284,7 @@ export default function VirtualTour({
         return (
             <div className={`relative ${className} flex items-center justify-center bg-gray-100`} style={{ height, width }}>
                 <div className="text-center">
-                    <p className="text-gray-600">No tour scenes available</p>
+                    <p className="text-gray-600">Aucune scène de visite disponible</p>
                 </div>
             </div>
         );
@@ -311,7 +298,7 @@ export default function VirtualTour({
             <div className="absolute top-4 left-4 z-10 bg-black/70 text-white px-4 py-2 rounded-lg">
                 <h3 className="font-semibold">{tourData.scenes.find((scene) => scene.id === currentScene)?.name}</h3>
                 <p className="text-sm opacity-75">
-                    {tourData.scenes.findIndex((scene) => scene.id === currentScene) + 1} of {tourData.scenes.length}
+                    {tourData.scenes.findIndex((scene) => scene.id === currentScene) + 1} sur {tourData.scenes.length}
                 </p>
             </div>
 
@@ -340,7 +327,7 @@ export default function VirtualTour({
             {/* Navigation hints */}
             <div className="absolute bottom-4 left-4 right-4 z-10 bg-black/70 text-white px-4 py-2 rounded-lg text-center">
                 <p className="text-sm">
-                    Click markers to navigate smoothly between locations • Click info markers for details
+                    Cliquez sur les marqueurs pour naviguer entre les lieux • Cliquez sur les marqueurs d'information pour plus de détails
                 </p>
             </div>
 

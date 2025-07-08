@@ -20,16 +20,16 @@ export default function LandingPage() {
                         className="max-w-2xl rounded-3xl p-16"
                     >
                         <h1 className="text-6xl sm:text-7xl font-extrabold mb-6 text-white dark:text-white drop-shadow-2xl tracking-tight font-parisienne w-full">
-                            Welcome to <span className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light bg-clip-text text-transparent w-full px-4">Morpheus Mall</span>
+                            Bienvenue à <span className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light bg-clip-text text-transparent w-full px-4">Morpheus Mall</span>
                         </h1>
                         <p className="text-2xl sm:text-3xl text-white dark:text-gray-200 mb-8 font-medium">
-                            Experience shopping in a new dimension.<br />
-                            Explore our virtual mall with interactive <span className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light bg-clip-text text-transparent font-semibold">3D products</span>.
+                            Découvrez le shopping dans une nouvelle dimension.<br />
+                            Explorez notre centre commercial virtuel avec des <span className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light bg-clip-text text-transparent font-semibold">produits 3D</span> interactifs.
                         </p>
                         <div className="flex flex-col w-full gap-6">
                             <Link href="/auth/sign-up" className="w-full">
                                 <Button className="w-full bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-[#695029] hover:to-[#d4c066] text-white shadow-2xl text-2xl py-5 transition-all rounded-none">
-                                    Get Started
+                                    Commencer
                                 </Button>
                             </Link>
                             <Link href="/auth/login" className="w-full">
@@ -37,7 +37,7 @@ export default function LandingPage() {
                                     variant="outline"
                                     className="w-full border-white/30 bg-white/20 text-white dark:text-white hover:bg-white/30 text-2xl py-5 transition-all rounded-none"
                                 >
-                                    Sign In
+                                    Connexion
                                 </Button>
                             </Link>
                             <Link href="/protected" className="w-full">
@@ -45,7 +45,7 @@ export default function LandingPage() {
                                     variant="ghost"
                                     className="w-full text-white dark:text-white text-2xl py-5 transition-all hover:bg-white/10 hover:text-white dark:hover:text-white rounded-none"
                                 >
-                                    Explore as Guest
+                                    Explorer en tant qu'invité
                                 </Button>
                             </Link>
                         </div>

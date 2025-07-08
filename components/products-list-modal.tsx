@@ -45,9 +45,9 @@ export default function ProductsListModal({ isOpen, onClose }: ProductsListModal
                 <div className="flex justify-between items-center p-6 border-b border-slate-700">
                     <div>
                         <h2 className="text-2xl font-bold font-parisienne bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light bg-clip-text text-transparent mb-2">
-                            Product List
+                            Liste des produits
                         </h2>
-                        <p className="text-gray-300">Discover the store products</p>
+                        <p className="text-gray-300">Découvrez les produits du magasin</p>
                     </div>
                     <button onClick={onClose} className="text-white hover:text-morpheus-gold-light transition-colors">
                         <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -68,8 +68,8 @@ export default function ProductsListModal({ isOpen, onClose }: ProductsListModal
                         <div className="flex flex-col items-center justify-center py-12 space-y-4">
                             <div className="w-16 h-16 border-4 border-morpheus-gold-dark border-t-morpheus-gold-light animate-spin rounded-full"></div>
                             <div className="text-center">
-                                <h3 className="text-xl font-semibold text-white mb-2">Loading Products...</h3>
-                                <p className="text-gray-300">Please wait while we fetch the store products</p>
+                                <h3 className="text-xl font-semibold text-white mb-2">Chargement des produits...</h3>
+                                <p className="text-gray-300">Veuillez patienter pendant que nous récupérons les produits du magasin</p>
                             </div>
                         </div>
                     ) : productsList && productsList.length > 0 ? (
@@ -109,7 +109,7 @@ export default function ProductsListModal({ isOpen, onClose }: ProductsListModal
                                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                                                 <div className="text-center">
                                                     <div className="text-morpheus-gold-light text-sm font-medium">
-                                                        Height
+                                                        Hauteur
                                                     </div>
                                                     <div className="text-white text-lg">
                                                         {product.properties.height}
@@ -117,20 +117,20 @@ export default function ProductsListModal({ isOpen, onClose }: ProductsListModal
                                                 </div>
                                                 <div className="text-center">
                                                     <div className="text-morpheus-gold-light text-sm font-medium">
-                                                        Age
+                                                        Âge
                                                     </div>
                                                     <div className="text-white text-lg">{product.properties.age}</div>
                                                 </div>
                                                 <div className="text-center">
                                                     <div className="text-morpheus-gold-light text-sm font-medium">
-                                                        Location
+                                                        Emplacement
                                                     </div>
                                                     <div className="text-white text-sm">
                                                         {product.properties.location}
                                                     </div>
                                                 </div>
                                                 <div className="text-center">
-                                                    <div className="text-[#e9d079] text-sm font-medium">Features</div>
+                                                    <div className="text-[#e9d079] text-sm font-medium">Caractéristiques</div>
                                                     <div className="text-white text-sm">
                                                         {product.features.length} traits
                                                     </div>
@@ -149,7 +149,7 @@ export default function ProductsListModal({ isOpen, onClose }: ProductsListModal
                                                 ))}
                                                 {product.features.length > 3 && (
                                                     <span className="bg-slate-600 text-gray-400 px-2 py-1 text-xs">
-                                                        +{product.features.length - 3} more
+                                                        +{product.features.length - 3} de plus
                                                     </span>
                                                 )}
                                             </div>
@@ -158,8 +158,8 @@ export default function ProductsListModal({ isOpen, onClose }: ProductsListModal
                                         {/* Action Button */}
                                         <div className="flex-shrink-0">
                                             <button className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-[#695029] hover:to-[#d4c066] text-white px-6 py-3 transition-colors font-medium shadow-lg group-hover:shadow-morpheus-gold-light/25 rounded-none">
-                                                View in 3D
-                                                <div className="text-xs opacity-75 mt-1">Click to explore</div>
+                                                Voir en 3D
+                                                <div className="text-xs opacity-75 mt-1">Cliquez pour explorer</div>
                                             </button>
                                         </div>
                                     </div>
@@ -171,8 +171,8 @@ export default function ProductsListModal({ isOpen, onClose }: ProductsListModal
                         <div className="flex flex-col items-center justify-center py-12 space-y-4">
                             <div className="text-6xl mb-4">🏪</div>
                             <div className="text-center">
-                                <h3 className="text-xl font-semibold text-white mb-2">No Products Found</h3>
-                                <p className="text-gray-300">There are no products available in this section</p>
+                                <h3 className="text-xl font-semibold text-white mb-2">Aucun produit trouvé</h3>
+                                <p className="text-gray-300">Il n'y a pas de produits disponibles dans cette section</p>
                             </div>
                         </div>
                     )}

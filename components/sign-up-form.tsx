@@ -24,7 +24,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
     setError(null)
 
     if (password !== repeatPassword) {
-      setError('Passwords do not match')
+      setError('Les mots de passe ne correspondent pas')
       setIsLoading(false)
       return
     }
@@ -40,7 +40,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
       if (error) throw error
       router.push('/auth/sign-up-success')
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : 'An error occurred')
+      setError(error instanceof Error ? error.message : 'Une erreur est survenue')
     } finally {
       setIsLoading(false)
     }
@@ -52,12 +52,12 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
       <div className="text-center space-y-4">
         <Link href="/" className="inline-block">
           <h1 className="text-4xl font-extrabold text-white font-parisienne">
-            <span className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light bg-clip-text text-transparent">Morpheus Mall</span>
+            <span className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light bg-clip-text text-transparent">Centre Commercial Morpheus</span>
           </h1>
         </Link>
         <div>
-          <h2 className="text-3xl font-bold text-white mb-2 font-parisienne">Join the Future</h2>
-          <p className="text-lg text-gray-300">Create your account and explore virtual shopping</p>
+          <h2 className="text-3xl font-bold text-white mb-2 font-parisienne">Rejoignez le Futur</h2>
+          <p className="text-lg text-gray-300">Créez votre compte et explorez le shopping virtuel</p>
         </div>
       </div>
 
@@ -65,11 +65,11 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
       <div className="bg-gradient-to-br from-morpheus-blue-dark to-morpheus-blue-light border border-slate-700 p-8 shadow-2xl">
         <form onSubmit={handleSignUp} className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-white text-lg font-medium">Email</Label>
+            <Label htmlFor="email" className="text-white text-lg font-medium">E-mail</Label>
             <Input
               id="email"
               type="email"
-              placeholder="your@email.com"
+              placeholder="votre@email.com"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -78,11 +78,11 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="password" className="text-white text-lg font-medium">Password</Label>
+            <Label htmlFor="password" className="text-white text-lg font-medium">Mot de passe</Label>
             <Input
               id="password"
               type="password"
-              placeholder="Create a strong password"
+              placeholder="Créez un mot de passe fort"
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -91,11 +91,11 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="repeat-password" className="text-white text-lg font-medium">Confirm Password</Label>
+            <Label htmlFor="repeat-password" className="text-white text-lg font-medium">Confirmez le mot de passe</Label>
             <Input
               id="repeat-password"
               type="password"
-              placeholder="Repeat your password"
+              placeholder="Répétez votre mot de passe"
               required
               value={repeatPassword}
               onChange={(e) => setRepeatPassword(e.target.value)}
@@ -117,22 +117,22 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
             {isLoading ? (
               <div className="flex items-center gap-2">
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                Creating Account...
+                Création du compte...
               </div>
             ) : (
-              'Create Account'
+              'Créer un compte'
             )}
           </Button>
         </form>
 
         <div className="mt-8 text-center">
           <p className="text-gray-300">
-            Already have an account?{' '}
+            Vous avez déjà un compte ?{' '}
             <Link 
               href="/auth/login" 
               className="text-morpheus-gold-light hover:text-[#d4c066] font-semibold underline underline-offset-4 transition-colors"
             >
-              Sign In
+              Se connecter
             </Link>
           </p>
         </div>
@@ -144,7 +144,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
           href="/" 
           className="text-gray-400 hover:text-white transition-colors inline-flex items-center gap-2"
         >
-          ← Back to Morpheus Mall
+          ← Retour au Centre Commercial Morpheus
         </Link>
       </div>
     </div>
