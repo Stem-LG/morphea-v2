@@ -22,7 +22,7 @@ export default function ProductsListModal({ isOpen, onClose }: ProductsListModal
         return productsData?.map((product) => ({
             id: product.yproduitcode,
             name: product.yproduitintitule,
-            model: product.yobjet3d[0].url,
+            model: product.yobjet3d.length > 0 ? product.yobjet3d[0].url : "",
             image: product.imageurl,
             description: product.yproduitdetailstech,
             properties: {
