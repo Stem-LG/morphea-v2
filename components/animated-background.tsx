@@ -14,7 +14,8 @@ export default function AnimatedBackground() {
     return (
         <div className="fixed inset-0 z-0">
             <PhotoSphereViewer
-                src="https://b8cfjlonmr.ufs.sh/f/kMrcl2nedu5fW3AV98q5ZqWdC1TvExe80rLJOnRX4Hc7liaF"
+                // src="https://b8cfjlonmr.ufs.sh/f/kMrcl2nedu5fW3AV98q5ZqWdC1TvExe80rLJOnRX4Hc7liaF"
+                src="/landing.png"
                 height="100vh"
                 width="100%"
                 className="absolute inset-0"
