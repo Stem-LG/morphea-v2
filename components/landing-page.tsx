@@ -45,7 +45,7 @@ export default function LandingPage() {
                                     variant="ghost"
                                     className="w-full text-white dark:text-white text-2xl py-5 transition-all hover:bg-white/10 hover:text-white dark:hover:text-white rounded-none"
                                 >
-                                    Explorer en tant qu'invité
+                                    Explorer en tant qu&apos;invité
                                 </Button>
                             </Link>
                         </div>

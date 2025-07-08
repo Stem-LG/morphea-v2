@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { Viewer } from "@photo-sphere-viewer/core";
-import { AutorotatePlugin } from "@photo-sphere-viewer/autorotate-plugin";
 import { MarkersPlugin } from "@photo-sphere-viewer/markers-plugin";
 import ProductsListModal from "./products-list-modal";
 import { InfoSpotAction, getTourData, TourData } from "@/app/_consts/tourdata";
@@ -327,7 +326,7 @@ export default function VirtualTour({
             {/* Navigation hints */}
             <div className="absolute bottom-4 left-4 right-4 z-10 bg-black/70 text-white px-4 py-2 rounded-lg text-center">
                 <p className="text-sm">
-                    Cliquez sur les marqueurs pour naviguer entre les lieux • Cliquez sur les marqueurs d'information pour plus de détails
+                    Cliquez sur les marqueurs pour naviguer entre les lieux • Cliquez sur les marqueurs d&apos;information pour plus de détails
                 </p>
             </div>
 

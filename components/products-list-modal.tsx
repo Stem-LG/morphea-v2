@@ -172,7 +172,7 @@ export default function ProductsListModal({ isOpen, onClose }: ProductsListModal
                             <div className="text-6xl mb-4">🏪</div>
                             <div className="text-center">
                                 <h3 className="text-xl font-semibold text-white mb-2">Aucun produit trouvé</h3>
-                                <p className="text-gray-300">Il n'y a pas de produits disponibles dans cette section</p>
+                                <p className="text-gray-300">Il n&apos;y a pas de produits disponibles dans cette section</p>
                             </div>
                         </div>
                     )}
