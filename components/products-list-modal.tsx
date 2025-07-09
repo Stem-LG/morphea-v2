@@ -25,7 +25,7 @@ export default function ProductsListModal({ isOpen, onClose }: ProductsListModal
             model: product.yobjet3d.length > 0 ? product.yobjet3d[0].url : "",
             image: product.imageurl,
             description: product.yproduitdetailstech,
-            models: product.yobjet3d.map((obj3d: any) => ({
+            models: product.yobjet3d.map((obj3d: { url: string; couleur?: string; id: number }) => ({
                 url: obj3d.url,
                 color: obj3d.couleur || "Default",
                 id: obj3d.id,
@@ -36,7 +36,12 @@ export default function ProductsListModal({ isOpen, onClose }: ProductsListModal
                 age: "25-30 ans",
                 location: "Zones côtières",
             },
-            features: ["Tolérant au sel", "Résistant aux ouragans", "Produit des noix de coco", "Verdure toute l'année"],
+            features: [
+                "Tolérant au sel",
+                "Résistant aux ouragans",
+                "Produit des noix de coco",
+                "Verdure toute l'année",
+            ],
         }));
     }, [productsData]);
 
@@ -74,7 +79,9 @@ export default function ProductsListModal({ isOpen, onClose }: ProductsListModal
                             <div className="w-16 h-16 border-4 border-morpheus-gold-dark border-t-morpheus-gold-light animate-spin rounded-full"></div>
                             <div className="text-center">
                                 <h3 className="text-xl font-semibold text-white mb-2">Chargement des produits...</h3>
-                                <p className="text-gray-300">Veuillez patienter pendant que nous récupérons les produits du magasin</p>
+                                <p className="text-gray-300">
+                                    Veuillez patienter pendant que nous récupérons les produits du magasin
+                                </p>
                             </div>
                         </div>
                     ) : productsList && productsList.length > 0 ? (
@@ -135,7 +142,9 @@ export default function ProductsListModal({ isOpen, onClose }: ProductsListModal
                                                     </div>
                                                 </div>
                                                 <div className="text-center">
-                                                    <div className="text-[#e9d079] text-sm font-medium">Caractéristiques</div>
+                                                    <div className="text-[#e9d079] text-sm font-medium">
+                                                        Caractéristiques
+                                                    </div>
                                                     <div className="text-white text-sm">
                                                         {product.features.length} caractéristiques
                                                     </div>
@@ -177,7 +186,9 @@ export default function ProductsListModal({ isOpen, onClose }: ProductsListModal
                             <div className="text-6xl mb-4">🏪</div>
                             <div className="text-center">
                                 <h3 className="text-xl font-semibold text-white mb-2">Aucun produit trouvé</h3>
-                                <p className="text-gray-300">Il n&apos;y a pas de produits disponibles dans cette section</p>
+                                <p className="text-gray-300">
+                                    Il n&apos;y a pas de produits disponibles dans cette section
+                                </p>
                             </div>
                         </div>
                     )}

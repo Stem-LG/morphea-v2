@@ -46,10 +46,6 @@ function GLBModel({ url, name }: { url: string; name: string }) {
     const gltf = useGLTF(url);
     const [normalizedScale, setNormalizedScale] = useState<[number, number, number]>([1, 1, 1]);
 
-    if (!url || url === "") {
-        return <ModelNotFound name={name} />;
-    }
-
     useEffect(() => {
         if (gltf && gltf.scene) {
             try {
@@ -75,6 +71,10 @@ function GLBModel({ url, name }: { url: string; name: string }) {
             }
         }
     }, [gltf]);
+
+    if (!url || url === "") {
+        return <ModelNotFound name={name} />;
+    }
 
     try {
         if (!gltf || !gltf.scene) {
