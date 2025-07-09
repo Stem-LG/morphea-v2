@@ -3,6 +3,7 @@
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, useGLTF, Html } from "@react-three/drei";
 import { Suspense } from "react";
+import { useLanguage } from "@/hooks/useLanguage";
 
 // Preload the GLB models
 useGLTF.preload("/3d/tree1.glb");
@@ -10,14 +11,16 @@ useGLTF.preload("/3d/tree2.glb");
 
 // Loading component for 3D model
 function LoadingSpinner() {
+    const { t } = useLanguage();
+    
     return (
         <Html center>
             <div className="flex flex-col items-center justify-center text-white bg-black/50 backdrop-blur-sm px-6 py-4">
-                <div className="w-12 h-12 border-4 border-morpheus-gold-dark border-t-morpheus-gold-light animate-spin mb-3"></div>
+                <img src="/loading.gif" alt="Loading" className="h-12 w-12 mx-auto mb-4" />
                 <div className="text-lg font-medium bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light bg-clip-text text-transparent font-parisienne">
-                    Loading 3D Model...
+                    {t('product3DViewer.loading')}
                 </div>
-                <div className="text-sm text-gray-300 mt-1">Please wait</div>
+                <div className="text-sm text-gray-300 mt-1">{t('product3DViewer.pleaseWait')}</div>
             </div>
         </Html>
     );
@@ -25,6 +28,8 @@ function LoadingSpinner() {
 
 // Error fallback component
 function ModelNotFound({ name }: { name: string }) {
+    const { t } = useLanguage();
+    
     return (
         <Html center>
             <div className="flex flex-col items-center justify-center text-white bg-black/70 backdrop-blur-sm px-8 py-6 border border-morpheus-gold-dark">
@@ -32,7 +37,7 @@ function ModelNotFound({ name }: { name: string }) {
                 <div className="text-lg font-medium bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light bg-clip-text text-transparent font-parisienne mb-2">
                     {name}
                 </div>
-                <div className="text-sm text-gray-300 text-center">3D model preview coming soon</div>
+                <div className="text-sm text-gray-300 text-center">{t('product3DViewer.modelPreviewComingSoon')}</div>
             </div>
         </Html>
     );
@@ -102,6 +107,8 @@ interface Product3DViewerProps {
 }
 
 export default function Product3DViewer({ productData, onClose }: Product3DViewerProps) {
+    const { t } = useLanguage();
+    
     return (
         <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4">
             <div className="relative w-full max-w-4xl h-[80vh] bg-gradient-to-br from-morpheus-blue-dark to-morpheus-blue-light border border-slate-700 overflow-hidden">
@@ -112,7 +119,7 @@ export default function Product3DViewer({ productData, onClose }: Product3DViewe
                             <h2 className="text-xl font-bold font-parisienne bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light bg-clip-text text-transparent">
                                 {productData.name}
                             </h2>
-                            <p className="text-sm text-gray-300">3D Model Viewer</p>
+                            <p className="text-sm text-gray-300">{t('product3DViewer.modelViewer')}</p>
                         </div>
                         <button onClick={onClose} className="text-white hover:text-morpheus-gold-light transition-colors">
                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -196,16 +203,16 @@ export default function Product3DViewer({ productData, onClose }: Product3DViewe
                     <div className="bg-black/70 backdrop-blur-sm p-3">
                         <div className="flex justify-between items-center text-white text-sm">
                             <div>
-                                <span className="font-semibold">Controls:</span>
+                                <span className="font-semibold">{t('product3DViewer.controls')}</span>
                                 <span className="ml-2">
-                                    🖱️ Drag to rotate • 🔍 Scroll to zoom • ⚡ Right-click to pan
+                                    {t('product3DViewer.dragToRotate')} • {t('product3DViewer.scrollToZoom')} • {t('product3DViewer.rightClickToPan')}
                                 </span>
                             </div>
                             <button
                                 onClick={onClose}
                                 className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-[#695029] hover:to-[#d4c066] px-3 py-1 transition-colors rounded-none"
                             >
-                                Back to Products List
+                                {t('product3DViewer.backToProductsList')}
                             </button>
                         </div>
                     </div>

@@ -15,14 +15,16 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false) // Add separate loading state for form
   const router = useRouter()
-  const { refetch, isLoading } = useAuth()
+  const { refetch } = useAuth()
   const { t } = useLanguage()
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     const supabase = createClient()
     setError(null)
+    setIsSubmitting(true) // Start loading
 
     try {
       const { error } = await supabase.auth.signInWithPassword({
@@ -34,6 +36,8 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
       router.push('/protected')
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : t('auth.errorOccurred'))
+    } finally {
+      setIsSubmitting(false) // Stop loading
     }
   }
 
@@ -97,12 +101,12 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
           
           <Button 
             type="submit" 
-            disabled={isLoading}
-            className="w-full bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-[#695029] hover:to-[#d4c066] text-white h-12 text-lg font-semibold shadow-2xl transition-all duration-300 hover:scale-105 rounded-none"
+            disabled={isSubmitting}
+            className="w-full bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-[#695029] hover:to-[#d4c066] text-white h-12 text-lg font-semibold shadow-2xl transition-all duration-300 hover:scale-105 rounded-none disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
-            {isLoading ? (
+            {isSubmitting ? (
               <div className="flex items-center gap-2">
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                <img src="/loading.gif" alt="Loading" className="h-5 w-5" />
                 {t('auth.signingIn')}
               </div>
             ) : (

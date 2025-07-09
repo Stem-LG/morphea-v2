@@ -108,5 +108,16 @@ export const enTranslations = {
     "noSectionsAvailable": "No sections available",
     "productDetails": "Product Details",
     "technicalDetails": "Technical Details"
+  },
+  "product3DViewer": {
+    "modelViewer": "3D Model Viewer",
+    "loading": "Loading 3D Model...",
+    "pleaseWait": "Please wait",
+    "modelPreviewComingSoon": "3D model preview coming soon",
+    "controls": "Controls:",
+    "dragToRotate": "🖱️ Drag to rotate",
+    "scrollToZoom": "🔍 Scroll to zoom",
+    "rightClickToPan": "⚡ Right-click to pan",
+    "backToProductsList": "Back to Products List"
   }
 };

@@ -108,5 +108,16 @@ export const frTranslations = {
     "noSectionsAvailable": "Aucune section disponible",
     "productDetails": "Détails du produit",
     "technicalDetails": "Détails techniques"
+  },
+  "product3DViewer": {
+    "modelViewer": "Visionneuse de modèle 3D",
+    "loading": "Chargement du modèle 3D...",
+    "pleaseWait": "Veuillez patienter",
+    "modelPreviewComingSoon": "Aperçu du modèle 3D bientôt disponible",
+    "controls": "Contrôles:",
+    "dragToRotate": "🖱️ Glisser pour faire tourner",
+    "scrollToZoom": "🔍 Faire défiler pour zoomer",
+    "rightClickToPan": "⚡ Clic droit pour panoramique",
+    "backToProductsList": "Retour à la liste des produits"
   }
 };
