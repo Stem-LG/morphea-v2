@@ -1,19 +1,23 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, useGLTF, Html } from "@react-three/drei";
 import { Suspense } from "react";
+import { useLanguage } from "@/hooks/useLanguage";
+import * as THREE from "three";
 
 // Loading component for 3D model
 function LoadingSpinner() {
+    const { t } = useLanguage();
+    
     return (
         <Html center>
             <div className="flex flex-col items-center justify-center text-white bg-black/50 backdrop-blur-sm px-6 py-4">
                 <div className="w-12 h-12 border-4 border-morpheus-gold-dark border-t-morpheus-gold-light animate-spin mb-3"></div>
                 <div className="text-lg font-medium bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light bg-clip-text text-transparent font-parisienne">
-                    Loading 3D Model...
+                    {t('productDetails.loading3DModel')}
                 </div>
             </div>
         </Html>
@@ -22,6 +26,8 @@ function LoadingSpinner() {
 
 // Error fallback component
 function ModelNotFound({ name }: { name: string }) {
+    const { t } = useLanguage();
+    
     return (
         <Html center>
             <div className="flex flex-col items-center justify-center text-white bg-black/70 backdrop-blur-sm px-8 py-6 border border-morpheus-gold-dark">
@@ -29,7 +35,7 @@ function ModelNotFound({ name }: { name: string }) {
                 <div className="text-lg font-medium bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light bg-clip-text text-transparent font-parisienne mb-2">
                     {name}
                 </div>
-                <div className="text-sm text-gray-300 text-center">3D model preview</div>
+                <div className="text-sm text-gray-300 text-center">{t('productDetails.modelPreview')}</div>
             </div>
         </Html>
     );
@@ -38,10 +44,37 @@ function ModelNotFound({ name }: { name: string }) {
 // GLB Model Loader Component
 function GLBModel({ url, name }: { url: string; name: string }) {
     const gltf = useGLTF(url);
+    const [normalizedScale, setNormalizedScale] = useState<[number, number, number]>([1, 1, 1]);
 
     if (!url || url === "") {
         return <ModelNotFound name={name} />;
     }
+
+    useEffect(() => {
+        if (gltf && gltf.scene) {
+            try {
+                // Create a bounding box to measure the model's actual size
+                const box = new THREE.Box3().setFromObject(gltf.scene);
+                const size = box.getSize(new THREE.Vector3());
+                
+                // Calculate the maximum dimension
+                const maxDimension = Math.max(size.x, size.y, size.z);
+                
+                // Define target size (adjust this value to make models bigger/smaller overall)
+                const targetSize = 50;
+                
+                // Calculate scale factor to normalize to target size
+                const scaleFactor = maxDimension > 0 ? targetSize / maxDimension : 1;
+                
+                // Apply the calculated scale
+                setNormalizedScale([scaleFactor, scaleFactor, scaleFactor]);
+            } catch (error) {
+                console.error("Error calculating model bounds:", error);
+                // Fallback to a reasonable default scale
+                setNormalizedScale([5, 5, 5]);
+            }
+        }
+    }, [gltf]);
 
     try {
         if (!gltf || !gltf.scene) {
@@ -49,7 +82,7 @@ function GLBModel({ url, name }: { url: string; name: string }) {
         }
 
         const clonedScene = gltf.scene.clone();
-        return <primitive object={clonedScene} scale={[8, 8, 8]} />;
+        return <primitive object={clonedScene} scale={normalizedScale} />;
     } catch (error) {
         console.error("Error in GLBModel component:", error);
         return <ModelNotFound name={name} />;
@@ -81,6 +114,7 @@ interface ProductDetailsPageProps {
 }
 
 export default function ProductDetailsPage({ productData, onClose }: ProductDetailsPageProps) {
+    const { t } = useLanguage();
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
     const [selectedModelIndex, setSelectedModelIndex] = useState(0);
     const [viewMode, setViewMode] = useState<"image" | "3d">("3d");
@@ -103,27 +137,27 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
         return productData.models.map((model, index) => {
             // Create a better display name for hex colors
             const getColorName = (color: string | null | undefined) => {
-                if (!color) return `Variant ${index + 1}`;
+                if (!color) return `${t('productDetails.variant')} ${index + 1}`;
                 
                 if (color.startsWith('#')) {
-                    // Convert common hex colors to names
+                    // Convert common hex colors to names based on language
                     const hexToNameMap: { [key: string]: string } = {
-                        '#ff0000': 'Red',
-                        '#0000ff': 'Blue',
-                        '#00ff00': 'Green',
-                        '#ffff00': 'Yellow',
-                        '#ff00ff': 'Magenta',
-                        '#00ffff': 'Cyan',
-                        '#000000': 'Black',
-                        '#ffffff': 'White',
-                        '#808080': 'Gray',
-                        '#ffa500': 'Orange',
-                        '#800080': 'Purple',
-                        '#ffc0cb': 'Pink',
-                        '#a52a2a': 'Brown'
+                        '#ff0000': t('productDetails.color') === 'Couleur' ? 'Rouge' : 'Red',
+                        '#0000ff': t('productDetails.color') === 'Couleur' ? 'Bleu' : 'Blue',
+                        '#00ff00': t('productDetails.color') === 'Couleur' ? 'Vert' : 'Green',
+                        '#ffff00': t('productDetails.color') === 'Couleur' ? 'Jaune' : 'Yellow',
+                        '#ff00ff': t('productDetails.color') === 'Couleur' ? 'Magenta' : 'Magenta',
+                        '#00ffff': t('productDetails.color') === 'Couleur' ? 'Cyan' : 'Cyan',
+                        '#000000': t('productDetails.color') === 'Couleur' ? 'Noir' : 'Black',
+                        '#ffffff': t('productDetails.color') === 'Couleur' ? 'Blanc' : 'White',
+                        '#808080': t('productDetails.color') === 'Couleur' ? 'Gris' : 'Gray',
+                        '#ffa500': t('productDetails.color') === 'Couleur' ? 'Orange' : 'Orange',
+                        '#800080': t('productDetails.color') === 'Couleur' ? 'Violet' : 'Purple',
+                        '#ffc0cb': t('productDetails.color') === 'Couleur' ? 'Rose' : 'Pink',
+                        '#a52a2a': t('productDetails.color') === 'Couleur' ? 'Marron' : 'Brown'
                     };
                     
-                    return hexToNameMap[color.toLowerCase()] || `Color ${index + 1}`;
+                    return hexToNameMap[color.toLowerCase()] || `${t('productDetails.color')} ${index + 1}`;
                 }
                 
                 return color;
@@ -174,7 +208,7 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                             <h1 className="text-2xl font-bold font-parisienne bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light bg-clip-text text-transparent">
                                 {productData.name}
                             </h1>
-                            <p className="text-sm text-gray-300">Product Details</p>
+                            <p className="text-sm text-gray-300">{t('productDetails.productDetails')}</p>
                         </div>
                         <button 
                             onClick={onClose} 
@@ -206,7 +240,7 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                                         : "bg-slate-700 text-gray-300 hover:bg-slate-600"
                                 }`}
                             >
-                                Images
+                                {t('productDetails.images')}
                             </button>
                             <button
                                 onClick={() => setViewMode("3d")}
@@ -216,7 +250,7 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                                         : "bg-slate-700 text-gray-300 hover:bg-slate-600"
                                 }`}
                             >
-                                3D View
+                                {t('productDetails.view3D')}
                             </button>
                         </div>
 
@@ -249,7 +283,7 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                                             >
                                                 <Image
                                                     src={image}
-                                                    alt={`View ${index + 1}`}
+                                                    alt={`${t('productDetails.view')} ${index + 1}`}
                                                     width={64}
                                                     height={64}
                                                     className="w-full h-full object-cover"
@@ -305,14 +339,14 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                             <div className="text-3xl font-bold bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light bg-clip-text text-transparent">
                                 $99.99
                             </div>
-                            <p className="text-sm text-gray-400 mt-1">Free shipping available</p>
+                            <p className="text-sm text-gray-400 mt-1">{t('productDetails.freeShippingAvailable')}</p>
                         </div>
 
                         {/* Color/Variant Selector */}
                         {productData.models.length > 0 && (
                             <div className="border-t border-slate-600 pt-6">
                                 <h3 className="text-lg font-semibold text-white mb-3">
-                                    Available {productData.models.length > 1 ? 'Variants' : 'Variant'} ({productData.models.length})
+                                    {productData.models.length > 1 ? t('productDetails.availableVariants') : t('productDetails.availableVariant')} ({productData.models.length})
                                 </h3>
                                 <div className="flex flex-wrap gap-3">
                                     {availableColors.map((colorOption) => {
@@ -393,7 +427,7 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
 
                         {/* Quantity Selector */}
                         <div className="border-t border-slate-600 pt-6">
-                            <h3 className="text-lg font-semibold text-white mb-3">Quantity</h3>
+                            <h3 className="text-lg font-semibold text-white mb-3">{t('productDetails.quantity')}</h3>
                             <div className="flex items-center gap-3">
                                 <button
                                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
@@ -419,7 +453,7 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                                     onClick={handleAddToCart}
                                     className="flex-1 bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-[#695029] hover:to-[#d4c066] text-white py-3 px-6 font-medium transition-colors"
                                 >
-                                    Add to Cart
+                                    {t('productDetails.addToCart')}
                                 </button>
                                 <button
                                     onClick={toggleWishlist}
@@ -445,29 +479,29 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                                 onClick={handleDirectOrder}
                                 className="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-6 font-medium transition-colors"
                             >
-                                Order Now
+                                {t('productDetails.orderNow')}
                             </button>
                         </div>
 
                         {/* Product Features */}
                         <div className="border-t border-slate-600 pt-6">
-                            <h3 className="text-lg font-semibold text-white mb-3">Features</h3>
+                            <h3 className="text-lg font-semibold text-white mb-3">{t('productDetails.features')}</h3>
                             <div className="space-y-2">
                                 <div className="flex items-center gap-2">
                                     <div className="w-2 h-2 bg-morpheus-gold-light"></div>
-                                    <span className="text-gray-300">High-quality 3D model</span>
+                                    <span className="text-gray-300">{t('productDetails.highQuality3DModel')}</span>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <div className="w-2 h-2 bg-morpheus-gold-light"></div>
-                                    <span className="text-gray-300">Multiple color variants</span>
+                                    <span className="text-gray-300">{t('productDetails.multipleColorVariants')}</span>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <div className="w-2 h-2 bg-morpheus-gold-light"></div>
-                                    <span className="text-gray-300">Interactive 3D preview</span>
+                                    <span className="text-gray-300">{t('productDetails.interactive3DPreview')}</span>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <div className="w-2 h-2 bg-morpheus-gold-light"></div>
-                                    <span className="text-gray-300">Free shipping available</span>
+                                    <span className="text-gray-300">{t('productDetails.freeShipping')}</span>
                                 </div>
                             </div>
                         </div>

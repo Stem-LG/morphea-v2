@@ -119,5 +119,26 @@ export const frTranslations = {
     "scrollToZoom": "🔍 Faire défiler pour zoomer",
     "rightClickToPan": "⚡ Clic droit pour panoramique",
     "backToProductsList": "Retour à la liste des produits"
+  },
+  "productDetails": {
+    "loading3DModel": "Chargement du modèle 3D...",
+    "modelPreview": "aperçu du modèle 3D",
+    "productDetails": "Détails du produit",
+    "images": "Images",
+    "view3D": "Vue 3D",
+    "freeShippingAvailable": "Livraison gratuite disponible",
+    "availableVariants": "Variantes disponibles",
+    "availableVariant": "Variante disponible",
+    "quantity": "Quantité",
+    "addToCart": "Ajouter au panier",
+    "orderNow": "Commander maintenant",
+    "features": "Caractéristiques",
+    "highQuality3DModel": "Modèle 3D de haute qualité",
+    "multipleColorVariants": "Plusieurs variantes de couleur",
+    "interactive3DPreview": "Aperçu 3D interactif",
+    "freeShipping": "Livraison gratuite disponible",
+    "variant": "Variante",
+    "color": "Couleur",
+    "view": "Vue"
   }
 };

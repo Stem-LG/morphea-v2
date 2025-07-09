@@ -31,12 +31,12 @@ export default function ProductsListModal({ isOpen, onClose }: ProductsListModal
                 id: obj3d.id,
             })),
             properties: {
-                height: "15-20 feet",
-                type: "Coconut Palm",
-                age: "25-30 years",
-                location: "Beachfront areas",
+                height: "15-20 pieds",
+                type: "Palmier à Coco",
+                age: "25-30 ans",
+                location: "Zones côtières",
             },
-            features: ["Salt-tolerant", "Hurricane resistant", "Produces coconuts", "Year-round greenery"],
+            features: ["Tolérant au sel", "Résistant aux ouragans", "Produit des noix de coco", "Verdure toute l'année"],
         }));
     }, [productsData]);
 
@@ -50,9 +50,9 @@ export default function ProductsListModal({ isOpen, onClose }: ProductsListModal
                 <div className="flex justify-between items-center p-6 border-b border-slate-700">
                     <div>
                         <h2 className="text-2xl font-bold font-parisienne bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light bg-clip-text text-transparent mb-2">
-                            Products Catalog
+                            Catalogue des Produits
                         </h2>
-                        <p className="text-gray-300">Browse our product collection</p>
+                        <p className="text-gray-300">Parcourez notre collection de produits</p>
                     </div>
                     <button onClick={onClose} className="text-white hover:text-morpheus-gold-light transition-colors">
                         <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -137,7 +137,7 @@ export default function ProductsListModal({ isOpen, onClose }: ProductsListModal
                                                 <div className="text-center">
                                                     <div className="text-[#e9d079] text-sm font-medium">Caractéristiques</div>
                                                     <div className="text-white text-sm">
-                                                        {product.features.length} traits
+                                                        {product.features.length} caractéristiques
                                                     </div>
                                                 </div>
                                             </div>
@@ -163,8 +163,8 @@ export default function ProductsListModal({ isOpen, onClose }: ProductsListModal
                                         {/* Action Button */}
                                         <div className="flex-shrink-0">
                                             <button className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-[#695029] hover:to-[#d4c066] text-white px-6 py-3 transition-colors font-medium shadow-lg group-hover:shadow-morpheus-gold-light/25 rounded-none">
-                                                View Details
-                                                <div className="text-xs opacity-75 mt-1">Click to explore</div>
+                                                Voir les Détails
+                                                <div className="text-xs opacity-75 mt-1">Cliquez pour explorer</div>
                                             </button>
                                         </div>
                                     </div>
