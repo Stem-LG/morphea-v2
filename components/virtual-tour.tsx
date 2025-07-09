@@ -20,7 +20,7 @@ export default function VirtualTour({
     className = "",
     height = "100vh",
     width = "100%",
-    startingScene = "0-key-biscayne-2",
+    startingScene = "1-i1",
     showNavbar = true,
     accountForNavbar = true, // Default to true to account for navbar
 }: VirtualTourProps) {
