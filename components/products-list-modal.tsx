@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Product3DViewer from "./product-3d-viewer";
+import ProductDetailsPage from "./product-details-page";
 import { useSceneProducts } from "@/hooks/useSceneProducts";
 import Image from "next/image";
 
@@ -14,7 +14,7 @@ export default function ProductsListModal({ isOpen, onClose }: ProductsListModal
     const sceneId = isOpen;
 
     const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
-    const [show3DViewer, setShow3DViewer] = useState(false);
+    const [showProductDetails, setShowProductDetails] = useState(false);
 
     const { data: productsData, isLoading } = useSceneProducts(sceneId);
 
@@ -25,6 +25,11 @@ export default function ProductsListModal({ isOpen, onClose }: ProductsListModal
             model: product.yobjet3d.length > 0 ? product.yobjet3d[0].url : "",
             image: product.imageurl,
             description: product.yproduitdetailstech,
+            models: product.yobjet3d.map((obj3d: any) => ({
+                url: obj3d.url,
+                color: obj3d.couleur || "Default",
+                id: obj3d.id,
+            })),
             properties: {
                 height: "15-20 feet",
                 type: "Coconut Palm",
@@ -45,9 +50,9 @@ export default function ProductsListModal({ isOpen, onClose }: ProductsListModal
                 <div className="flex justify-between items-center p-6 border-b border-slate-700">
                     <div>
                         <h2 className="text-2xl font-bold font-parisienne bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light bg-clip-text text-transparent mb-2">
-                            Product List
+                            Products Catalog
                         </h2>
-                        <p className="text-gray-300">Discover the store products</p>
+                        <p className="text-gray-300">Browse our product collection</p>
                     </div>
                     <button onClick={onClose} className="text-white hover:text-morpheus-gold-light transition-colors">
                         <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -80,7 +85,7 @@ export default function ProductsListModal({ isOpen, onClose }: ProductsListModal
                                     key={product.id}
                                     onClick={() => {
                                         setSelectedProduct(product.id);
-                                        setShow3DViewer(true);
+                                        setShowProductDetails(true);
                                     }}
                                     className={`cursor-pointer border-2 transition-all duration-300 hover:border-morpheus-gold-light bg-gradient-to-br from-morpheus-blue-dark to-morpheus-blue-light border-slate-600 group`}
                                 >
@@ -158,7 +163,7 @@ export default function ProductsListModal({ isOpen, onClose }: ProductsListModal
                                         {/* Action Button */}
                                         <div className="flex-shrink-0">
                                             <button className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-[#695029] hover:to-[#d4c066] text-white px-6 py-3 transition-colors font-medium shadow-lg group-hover:shadow-morpheus-gold-light/25 rounded-none">
-                                                View in 3D
+                                                View Details
                                                 <div className="text-xs opacity-75 mt-1">Click to explore</div>
                                             </button>
                                         </div>
@@ -179,16 +184,17 @@ export default function ProductsListModal({ isOpen, onClose }: ProductsListModal
                 </div>
             </div>
 
-            {/* 3D Viewer Modal */}
-            {show3DViewer && selectedProductData && (
-                <Product3DViewer
+            {/* Product Details Modal */}
+            {showProductDetails && selectedProductData && (
+                <ProductDetailsPage
                     productData={{
                         id: selectedProductData.id,
-                        description: selectedProductData.description,
-                        model: selectedProductData.model!,
                         name: selectedProductData.name,
+                        description: selectedProductData.description,
+                        image: selectedProductData.image!,
+                        models: selectedProductData.models || [],
                     }}
-                    onClose={() => setShow3DViewer(false)}
+                    onClose={() => setShowProductDetails(false)}
                 />
             )}
         </div>
