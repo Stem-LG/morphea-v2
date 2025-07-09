@@ -1,7 +1,7 @@
 export const frTranslations = {
   "nav": {
     "boutique": "Boutique",
-    "virtualTours": "Visites Virtuelles",
+    "virtualTours": "Visite Virtuelle",
     "products3d": "Produits 3D",
     "administration": "Administration",
     "login": "Connexion",
@@ -78,7 +78,7 @@ export const frTranslations = {
     "login": "Connexion",
     "exploreAsGuest": "Explorer en tant qu'invité",
     "immersiveExperience": "Expérience Immersive",
-    "virtualTours": "Visites Virtuelles",
+    "virtualTours": "Visite Virtuelle",
     "premiumQuality": "Qualité Premium",
     "securePayment": "Paiement Sécurisé"
   },

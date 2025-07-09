@@ -17,7 +17,7 @@ export default async function ProtectedPage() {
       <VirtualTour 
         height="100vh"
         width="100%"
-        startingScene="1-i1"
+        startingScene="i1"
         showNavbar={true}
         disableAutorotate={true}
         accountForNavbar={true}

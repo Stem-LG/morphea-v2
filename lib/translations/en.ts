@@ -1,7 +1,7 @@
 export const enTranslations = {
   "nav": {
     "boutique": "Shop",
-    "virtualTours": "Virtual Tours",
+    "virtualTours": "Virtual Tour",
     "products3d": "3D Products",
     "administration": "Administration",
     "login": "Login",
@@ -78,7 +78,7 @@ export const enTranslations = {
     "login": "Login",
     "exploreAsGuest": "Explore as Guest",
     "immersiveExperience": "Immersive Experience",
-    "virtualTours": "Virtual Tours",
+    "virtualTours": "Virtual Tour",
     "premiumQuality": "Premium Quality",
     "securePayment": "Secure Payment"
   },

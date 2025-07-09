@@ -44,7 +44,7 @@ export default function PhotoSphereViewer({
                   AutorotatePlugin,
                   {
                       autostartDelay: 2000, // Start auto-rotation after 2 seconds
-                      autostartOnIdle: true, // Resume auto-rotation when idle
+                      autostartOnIdle: false, // Resume auto-rotation when idle
                       autorotateSpeed: "1rpm", // Slow rotation: 1 revolution per minute
                   },
               ],

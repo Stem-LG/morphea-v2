@@ -48,7 +48,7 @@ export async function getTourData(): Promise<TourData> {
             .schema('morpheus')
             .from('yscenes')
             .select('*')
-            .order('ycreatedat')
+            .order('yid')
         
         if (scenesError) {
             console.error('Error fetching scenes:', scenesError)

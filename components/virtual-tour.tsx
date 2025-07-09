@@ -20,7 +20,7 @@ export default function VirtualTour({
     className = "",
     height = "100vh",
     width = "100%",
-    startingScene = "1-i1",
+    startingScene = "i1",
     showNavbar = true,
     accountForNavbar = true, // Default to true to account for navbar
 }: VirtualTourProps) {
@@ -86,7 +86,7 @@ export default function VirtualTour({
                 maxFov: 120,
                 loadingImg: "/loading.gif", // Remove loading icon
                 loadingTxt: "", // Remove loading text
-                navbar: showNavbar ? ["rotation automatique", "zoom", "plein écran"] : false,
+                navbar: showNavbar ? ["zoom", "plein écran"] : false,
                 plugins: [
                     [
                         MarkersPlugin,
@@ -177,7 +177,7 @@ export default function VirtualTour({
                 size: { width: 40, height: 40 },
                 anchor: "center center",
                 tooltip: {
-                    content: `Aller à ${link.name}`,
+                    content: `${link.name}`,
                     position: "top center",
                 },
                 data: {

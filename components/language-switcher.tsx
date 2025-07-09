@@ -2,14 +2,15 @@
 
 import { useLanguage } from '@/hooks/useLanguage';
 import { useState } from 'react';
+import Image from 'next/image';
 
 export const LanguageSwitcher = () => {
   const { language, setLanguage, t } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
 
   const languages = [
-    { code: 'fr' as const, name: t('common.french'), flag: '🇫🇷' },
-    { code: 'en' as const, name: t('common.english'), flag: '🇺🇸' },
+    { code: 'fr' as const, name: t('common.french'), flag: '/flags/fr.svg' },
+    { code: 'en' as const, name: t('common.english'), flag: '/flags/us.svg' },
   ];
 
   const currentLanguage = languages.find(lang => lang.code === language);
@@ -21,7 +22,13 @@ export const LanguageSwitcher = () => {
         className="flex items-center space-x-2 text-gray-300 hover:text-white transition-colors px-3 py-2 rounded-md"
         aria-label={t('common.language')}
       >
-        <span className="text-lg">{currentLanguage?.flag}</span>
+        <Image 
+          src={currentLanguage?.flag || '/flags/fr.svg'} 
+          alt={currentLanguage?.name || 'Language'} 
+          width={20} 
+          height={14} 
+          className="object-cover"
+        />
         <span className="hidden sm:inline text-sm font-medium">
           {currentLanguage?.name}
         </span>
@@ -66,7 +73,13 @@ export const LanguageSwitcher = () => {
                       : 'text-gray-300 hover:bg-slate-700 hover:text-white'
                   }`}
                 >
-                  <span className="text-lg">{lang.flag}</span>
+                  <Image 
+                    src={lang.flag} 
+                    alt={lang.name} 
+                    width={20} 
+                    height={14} 
+                    className="object-cover"
+                  />
                   <span>{lang.name}</span>
                   {language === lang.code && (
                     <svg

@@ -62,15 +62,15 @@ export default function NavBar() {
 
                         {/* Navigation Links */}
                         <div className="hidden md:flex items-center space-x-8">
-                            <Link href="/shop" className="text-gray-300 hover:text-white transition-colors">
+                            {/* <Link href="/shop" className="text-gray-300 hover:text-white transition-colors">
                                 {t('nav.boutique')}
-                            </Link>
+                            </Link> */}
                             <Link href="/virtual-tours" className="text-gray-300 hover:text-white transition-colors">
                                 {t('nav.virtualTours')}
                             </Link>
-                            <Link href="/3d-products" className="text-gray-300 hover:text-white transition-colors">
+                            {/* <Link href="/3d-products" className="text-gray-300 hover:text-white transition-colors">
                                 {t('nav.products3d')}
-                            </Link>
+                            </Link> */}
                             <Link href="/admin" className="text-gray-300 hover:text-white transition-colors">
                                 {t('nav.administration')}
                             </Link>
@@ -127,13 +127,13 @@ export default function NavBar() {
                     {isMobileMenuOpen && (
                         <div className="md:hidden">
                             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-gradient-to-br from-morpheus-blue-dark to-morpheus-blue-light border-t border-slate-700">
-                                <Link
+                                {/* <Link
                                     href="/shop"
                                     className="text-gray-300 hover:text-white block px-3 py-2 text-base font-medium transition-colors"
                                     onClick={closeMobileMenu}
                                 >
                                     {t('nav.boutique')}
-                                </Link>
+                                </Link> */}
                                 <Link
                                     href="/virtual-tours"
                                     className="text-gray-300 hover:text-white block px-3 py-2 text-base font-medium transition-colors"
@@ -141,13 +141,13 @@ export default function NavBar() {
                                 >
                                     {t('nav.virtualTours')}
                                 </Link>
-                                <Link
+                                {/* <Link
                                     href="/3d-products"
                                     className="text-gray-300 hover:text-white block px-3 py-2 text-base font-medium transition-colors"
                                     onClick={closeMobileMenu}
                                 >
                                     {t('nav.products3d')}
-                                </Link>
+                                </Link> */}
                                 <Link
                                     href="/admin"
                                     className="text-gray-300 hover:text-white block px-3 py-2 text-base font-medium transition-colors"
