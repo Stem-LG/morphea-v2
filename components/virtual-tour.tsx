@@ -22,7 +22,6 @@ export default function VirtualTour({
     width = "100%",
     startingScene = "0-key-biscayne-2",
     showNavbar = true,
-    disableAutorotate = false,
     accountForNavbar = true, // Default to true to account for navbar
 }: VirtualTourProps) {
     const containerRef = useRef<HTMLDivElement>(null);
