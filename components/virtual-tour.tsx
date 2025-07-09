@@ -174,7 +174,7 @@ export default function VirtualTour({
                 id: `link-${index}`,
                 position: { yaw: link.position.yaw, pitch: link.position.pitch },
                 image: "/explore.svg", // Using existing icon
-                size: { width: 32, height: 32 },
+                size: { width: 40, height: 40 },
                 anchor: "center center",
                 tooltip: {
                     content: `Aller à ${link.name}`,
