@@ -11,13 +11,14 @@ export default async function VirtualToursPage() {
   }
 
   return (
-    <div className="min-h-screen w-full">
+    <div className="w-full">
       {/* Virtual Tour */}
       <VirtualTour 
         height="100vh"
         width="100%"
         startingScene="0-key-biscayne-2"
         showNavbar={true}
+        accountForNavbar={true}
       />
     </div>
   )

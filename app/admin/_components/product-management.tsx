@@ -4,6 +4,7 @@ import { StoreSectionSelector } from "./store-section-selector";
 import { ProductList } from "./product-list";
 import { ProductForm } from "./product-form";
 import { getTourData, TourData } from "@/app/_consts/tourdata";
+import { useLanguage } from "@/hooks/useLanguage";
 import type { ProductWithObjects } from "@/hooks/useProducts";
 
 export function ProductManagement() {
@@ -16,6 +17,7 @@ export function ProductManagement() {
     const [editingProduct, setEditingProduct] = useState<ProductWithObjects | undefined>(undefined);
     const [tourData, setTourData] = useState<TourData>({ scenes: [] });
     const [isLoadingTourData, setIsLoadingTourData] = useState(true);
+    const { t } = useLanguage();
 
     // Fetch tour data on component mount
     useEffect(() => {
@@ -70,7 +72,7 @@ export function ProductManagement() {
             <div className="flex items-center justify-center p-8">
                 <div className="text-center">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-morpheus-gold-dark mx-auto mb-4"></div>
-                    <p className="text-gray-600">Chargement des données de la visite...</p>
+                    <p className="text-gray-600">{t('admin.loadingTourData')}</p>
                 </div>
             </div>
         );

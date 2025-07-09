@@ -13,6 +13,7 @@ interface VirtualTourProps {
     startingScene?: string;
     showNavbar?: boolean;
     disableAutorotate?: boolean;
+    accountForNavbar?: boolean; // New prop to account for navbar height
 }
 
 export default function VirtualTour({
@@ -22,6 +23,7 @@ export default function VirtualTour({
     startingScene = "0-key-biscayne-2",
     showNavbar = true,
     disableAutorotate = false,
+    accountForNavbar = true, // Default to true to account for navbar
 }: VirtualTourProps) {
     const containerRef = useRef<HTMLDivElement>(null);
     const viewerRef = useRef<Viewer | null>(null);
@@ -31,6 +33,16 @@ export default function VirtualTour({
     const [isTransitioning, setIsTransitioning] = useState(false);
     const [tourData, setTourData] = useState<TourData>({ scenes: [] });
     const [isLoading, setIsLoading] = useState(true);
+
+    // Calculate the actual height accounting for navbar
+    const getActualHeight = () => {
+        if (accountForNavbar && height === "100vh") {
+            return "calc(100vh - 4rem)"; // 4rem is the navbar height (h-16)
+        }
+        return height;
+    };
+
+    const actualHeight = getActualHeight();
 
     // Fetch tour data from Supabase
     useEffect(() => {
@@ -73,19 +85,17 @@ export default function VirtualTour({
                 defaultZoomLvl: currentSceneData.initialView.fov,
                 minFov: 30,
                 maxFov: 120,
-                loadingImg: "", // Remove loading icon
+                loadingImg: "/loading.gif", // Remove loading icon
                 loadingTxt: "", // Remove loading text
                 navbar: showNavbar ? ["rotation automatique", "zoom", "plein écran"] : false,
-                plugins: disableAutorotate
-                    ? []
-                    : [
-                          [
-                              MarkersPlugin,
-                              {
-                                  markers: [],
-                              },
-                          ],
-                      ],
+                plugins: [
+                    [
+                        MarkersPlugin,
+                        {
+                            markers: [],
+                        },
+                    ],
+                ],
             });
 
             // Store plugin references
@@ -270,7 +280,7 @@ export default function VirtualTour({
 
     if (isLoading) {
         return (
-            <div className={`relative ${className} flex items-center justify-center bg-gray-100`} style={{ height, width }}>
+            <div className={`relative ${className} flex items-center justify-center bg-gray-100`} style={{ height: actualHeight, width }}>
                 <div className="text-center">
                     <img src="/loading.gif" alt="Loading" className="h-12 w-12 mx-auto mb-4" />
                     <p className="text-gray-600">Chargement de la visite virtuelle...</p>
@@ -281,7 +291,7 @@ export default function VirtualTour({
 
     if (!tourData.scenes.length) {
         return (
-            <div className={`relative ${className} flex items-center justify-center bg-gray-100`} style={{ height, width }}>
+            <div className={`relative ${className} flex items-center justify-center bg-gray-100`} style={{ height: actualHeight, width }}>
                 <div className="text-center">
                     <p className="text-gray-600">Aucune scène de visite disponible</p>
                 </div>
@@ -290,8 +300,8 @@ export default function VirtualTour({
     }
 
     return (
-        <div className={`relative ${className}`} style={{ height, width }}>
-            <div ref={containerRef} className="w-full h-full" style={{ height, width }} />
+        <div className={`relative ${className}`} style={{ height: actualHeight, width }}>
+            <div ref={containerRef} className="w-full h-full" style={{ height: actualHeight, width }} />
 
             {/* Scene information overlay */}
             <div className="absolute top-4 left-4 z-10 bg-black/70 text-white px-4 py-2 rounded-lg">

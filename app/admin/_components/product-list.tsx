@@ -4,6 +4,7 @@ import { useProducts, useDeleteProduct } from "@/hooks/useProducts";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Edit, Trash2, Plus, Package, Box } from "lucide-react";
+import { useLanguage } from "@/hooks/useLanguage";
 import type { ProductWithObjects } from "@/hooks/useProducts";
 import Image from "next/image";
 
@@ -26,18 +27,19 @@ export function ProductList({
 }: ProductListProps) {
     const { data: products, isLoading, error } = useProducts(sectionId);
     const deleteProduct = useDeleteProduct();
+    const { t } = useLanguage();
 
     const handleDelete = async (productId: number) => {
         if (
             window.confirm(
-                "Êtes-vous sûr de vouloir supprimer ce produit ? Cela supprimera également tous les objets 3D associés."
+                t('admin.confirmDeleteProduct')
             )
         ) {
             try {
                 await deleteProduct.mutateAsync(productId);
             } catch (error) {
                 console.error("Failed to delete product:", error);
-                alert("Échec de la suppression du produit. Veuillez réessayer.");
+                alert(t('admin.deleteProductFailed'));
             }
         }
     };
@@ -46,7 +48,7 @@ export function ProductList({
         return (
             <div className="p-6">
                 <div className="flex items-center justify-center h-64">
-                    <div className="text-lg">Chargement des produits...</div>
+                    <div className="text-lg">{t('admin.loadingProducts')}</div>
                 </div>
             </div>
         );
@@ -56,7 +58,7 @@ export function ProductList({
         return (
             <div className="p-6">
                 <div className="flex items-center justify-center h-64 text-red-600">
-                    <div>Erreur lors du chargement des produits : {error.message}</div>
+                    <div>{t('admin.errorLoadingProducts')}: {error.message}</div>
                 </div>
             </div>
         );
@@ -67,19 +69,19 @@ export function ProductList({
             {/* Header */}
             <div className="mb-4 lg:mb-6">
                 <Button variant="outline" onClick={onBack} className="mb-3 lg:mb-4 text-sm">
-                    ← Retour à la sélection du magasin
+                    {t('admin.backToStoreSelection')}
                 </Button>
                 <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                     <div>
-                        <h2 className="text-2xl lg:text-3xl font-bold">Gestion des produits</h2>
+                        <h2 className="text-2xl lg:text-3xl font-bold">{t('admin.productManagement')}</h2>
                         <p className="text-gray-600 mt-1 text-sm lg:text-base">
                             {storeName} - {sectionTitle}
                         </p>
                     </div>
                     <Button onClick={onCreateProduct} className="flex items-center gap-2 self-start lg:self-auto">
                         <Plus className="h-4 w-4" />
-                        <span className="hidden sm:inline">Ajouter un nouveau produit</span>
-                        <span className="sm:hidden">Ajouter un produit</span>
+                        <span className="hidden sm:inline">{t('admin.addNewProduct')}</span>
+                        <span className="sm:hidden">{t('admin.addProduct')}</span>
                     </Button>
                 </div>
             </div>
@@ -113,7 +115,7 @@ export function ProductList({
                                     {/* Product Details */}
                                     <div>
                                         <p className="text-xs lg:text-sm text-gray-600 mb-2">
-                                            Code: {product.yproduitcode}
+                                            {t('admin.productCode')}: {product.yproduitcode}
                                         </p>
                                         <p className="text-xs lg:text-sm text-gray-800 line-clamp-2 lg:line-clamp-3">
                                             {product.yproduitdetailstech}
@@ -123,7 +125,7 @@ export function ProductList({
                                     {/* 3D Objects Count */}
                                     <div className="flex items-center gap-2 text-xs lg:text-sm text-blue-600">
                                         <Box className="h-3 w-3 lg:h-4 lg:w-4" />
-                                        <span>{product.yobjet3d?.length || 0} 3D Object(s)</span>
+                                        <span>{product.yobjet3d?.length || 0} {t('admin.threeDObjects')}</span>
                                     </div>
 
                                     {/* Actions */}
@@ -135,7 +137,7 @@ export function ProductList({
                                             onClick={() => onEditProduct(product)}
                                         >
                                             <Edit className="h-3 w-3 lg:h-4 lg:w-4 mr-1" />
-                                            Edit
+                                            {t('common.edit')}
                                         </Button>
                                         <Button
                                             variant="destructive"
@@ -155,13 +157,13 @@ export function ProductList({
             ) : (
                 <div className="text-center py-8 lg:py-12">
                     <Package className="h-12 w-12 lg:h-16 lg:w-16 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg lg:text-xl font-medium text-gray-900 mb-2">Aucun produit trouvé</h3>
+                    <h3 className="text-lg lg:text-xl font-medium text-gray-900 mb-2">{t('admin.noProductsFound')}</h3>
                     <p className="text-sm lg:text-base text-gray-600 mb-6">
-                        Commencez par créer votre premier produit.
+                        {t('admin.noProductsDescription')}
                     </p>
                     <Button onClick={onCreateProduct} className="flex items-center gap-2">
                         <Plus className="h-4 w-4" />
-                        Ajouter un nouveau produit
+                        {t('admin.addNewProduct')}
                     </Button>
                 </div>
             )}

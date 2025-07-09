@@ -3,6 +3,7 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Store, MapPin } from "lucide-react";
+import { useLanguage } from "@/hooks/useLanguage";
 import { TourData } from "@/app/_consts/tourdata";
 
 interface StoreSectionSelectorProps {
@@ -12,6 +13,8 @@ interface StoreSectionSelectorProps {
 }
 
 export function StoreSectionSelector({ selectedSection, onSectionSelect, tourData }: StoreSectionSelectorProps) {
+    const { t } = useLanguage();
+    
     // Extract stores and sections from tour data
     const storesWithSections = tourData.scenes
         .map((scene) => ({
@@ -29,11 +32,11 @@ export function StoreSectionSelector({ selectedSection, onSectionSelect, tourDat
 
     return (
         <div className="p-4 lg:p-6">
-            <h2 className="text-2xl lg:text-3xl font-bold mb-4 lg:mb-6">Sélectionnez un magasin et une section</h2>
+            <h2 className="text-2xl lg:text-3xl font-bold mb-4 lg:mb-6">{t('admin.selectStoreSection')}</h2>
 
             {storesWithSections.length === 0 ? (
                 <div className="text-center py-8">
-                    <p className="text-gray-600">Aucun magasin avec des sections de produits trouvé.</p>
+                    <p className="text-gray-600">{t('admin.noSectionsAvailable')}</p>
                 </div>
             ) : (
                 <div className="grid gap-4 lg:gap-6">

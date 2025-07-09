@@ -5,6 +5,7 @@ import "./globals.css";
 import AnimatedBackground from "@/components/animated-background";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import NavBar from "./_components/nav_bar";
+import { LanguageProvider } from "@/hooks/useLanguage";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -33,11 +34,13 @@ export default function RootLayout({
         <html lang="en">
             <body className={`${geistSans.variable} ${geistMono.variable} ${parisienne.variable} antialiased`}>
                 <QueryClientProvider client={queryClient}>
-                    <NavBar />
-                    {/* Animated 360° Background */}
-                    <AnimatedBackground />
-                    {/* Main content with navbar spacing */}
-                    <div className="relative z-10">{children}</div>
+                    <LanguageProvider>
+                        <NavBar />
+                        {/* Animated 360° Background */}
+                        <AnimatedBackground />
+                        {/* Main content with navbar spacing */}
+                        <div className="relative z-10">{children}</div>
+                    </LanguageProvider>
                 </QueryClientProvider>
             </body>
         </html>

@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { useLanguage } from '@/hooks/useLanguage'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
@@ -20,6 +21,7 @@ export function UpdatePasswordForm({ className, ...props }: React.ComponentProps
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
+  const { t } = useLanguage()
 
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -33,7 +35,7 @@ export function UpdatePasswordForm({ className, ...props }: React.ComponentProps
       // Update this route to redirect to an authenticated route. The user already has an active session.
       router.push('/protected')
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : 'An error occurred')
+      setError(error instanceof Error ? error.message : t('auth.errorOccurred'))
     } finally {
       setIsLoading(false)
     }
@@ -43,18 +45,18 @@ export function UpdatePasswordForm({ className, ...props }: React.ComponentProps
     <div className={cn('flex flex-col gap-6', className)} {...props}>
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">Réinitialisez votre mot de passe</CardTitle>
-          <CardDescription>Veuillez entrer votre nouveau mot de passe ci-dessous.</CardDescription>
+          <CardTitle className="text-2xl">{t('auth.resetYourPassword')}</CardTitle>
+          <CardDescription>{t('auth.pleaseEnterNewPassword')}</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleForgotPassword}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
-                <Label htmlFor="password">Nouveau mot de passe</Label>
+                <Label htmlFor="password">{t('auth.newPassword')}</Label>
                 <Input
                   id="password"
                   type="password"
-                  placeholder="Nouveau mot de passe"
+                  placeholder={t('auth.newPasswordPlaceholder')}
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -62,7 +64,7 @@ export function UpdatePasswordForm({ className, ...props }: React.ComponentProps
               </div>
               {error && <p className="text-sm text-red-500">{error}</p>}
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? 'Enregistrement...' : 'Enregistrer le nouveau mot de passe'}
+                {isLoading ? t('auth.saving') : t('auth.saveNewPassword')}
               </Button>
             </div>
           </form>

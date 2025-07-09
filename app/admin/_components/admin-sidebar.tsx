@@ -2,6 +2,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { BarChart3, Package, Menu, X } from "lucide-react";
+import { useLanguage } from "@/hooks/useLanguage";
 
 interface AdminSidebarProps {
     activeSection: string;
@@ -11,15 +12,17 @@ interface AdminSidebarProps {
 }
 
 export function AdminSidebar({ activeSection, onSectionChange, isOpen, onToggle }: AdminSidebarProps) {
+    const { t } = useLanguage();
+    
     const menuItems = [
         {
             id: "dashboard",
-            label: "Dashboard",
+            label: t('admin.dashboard'),
             icon: BarChart3,
         },
         {
             id: "products",
-            label: "Product Management",
+            label: t('admin.productManagement'),
             icon: Package,
         },
     ];
@@ -46,7 +49,7 @@ export function AdminSidebar({ activeSection, onSectionChange, isOpen, onToggle 
             `}
             >
                 <div className="mb-8 pt-8 lg:pt-0">
-                    <h1 className="text-2xl font-bold">Admin Panel</h1>
+                    <h1 className="text-2xl font-bold">{t('admin.adminPanel')}</h1>
                 </div>
 
                 <nav className="space-y-2">

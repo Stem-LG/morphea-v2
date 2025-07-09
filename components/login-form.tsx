@@ -5,6 +5,7 @@ import { createClient } from '@/lib/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { useLanguage } from '@/hooks/useLanguage'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -16,6 +17,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
   const { refetch, isLoading } = useAuth()
+  const { t } = useLanguage()
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -31,7 +33,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
       await refetch() // Refresh auth state
       router.push('/protected')
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : 'An error occurred')
+      setError(error instanceof Error ? error.message : t('auth.errorOccurred'))
     }
   }
 
@@ -41,12 +43,12 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
       <div className="text-center space-y-4">
         <Link href="/" className="inline-block">
           <h1 className="text-4xl font-extrabold text-white">
-            <span className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light bg-clip-text text-transparent">Morpheus</span> Mall
+            <span className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light bg-clip-text text-transparent">{t('auth.morpheusMall')}</span>
           </h1>
         </Link>
         <div>
-          <h2 className="text-3xl font-bold text-white mb-2">Welcome Back</h2>
-          <p className="text-lg text-gray-300">Sign in to continue your virtual shopping journey</p>
+          <h2 className="text-3xl font-bold text-white mb-2">{t('auth.welcomeBack')}</h2>
+          <p className="text-lg text-gray-300">{t('auth.signInSubtitle')}</p>
         </div>
       </div>
 
@@ -54,11 +56,11 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
       <div className="bg-gradient-to-br from-morpheus-blue-dark to-morpheus-blue-light border border-slate-700 p-8 shadow-2xl">
         <form onSubmit={handleLogin} className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-white text-lg font-medium">Email</Label>
+            <Label htmlFor="email" className="text-white text-lg font-medium">{t('auth.email')}</Label>
             <Input
               id="email"
               type="email"
-              placeholder="your@email.com"
+              placeholder={t('auth.emailPlaceholder')}
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -68,18 +70,18 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
           
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="password" className="text-white text-lg font-medium">Password</Label>
+              <Label htmlFor="password" className="text-white text-lg font-medium">{t('auth.password')}</Label>
               <Link
                 href="/auth/forgot-password"
                 className="text-sm text-morpheus-gold-light hover:text-[#d4c066] underline underline-offset-4 transition-colors"
               >
-                Forgot password?
+                {t('auth.forgotPassword')}
               </Link>
             </div>
             <Input
               id="password"
               type="password"
-              placeholder="Enter your password"
+              placeholder={t('auth.passwordPlaceholder')}
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -101,22 +103,22 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
             {isLoading ? (
               <div className="flex items-center gap-2">
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                Signing In...
+                {t('auth.signingIn')}
               </div>
             ) : (
-              'Sign In'
+              t('auth.signIn')
             )}
           </Button>
         </form>
 
         <div className="mt-8 text-center">
           <p className="text-gray-300">
-            Don&apos;t have an account?{' '}
+            {t('auth.dontHaveAccount')}{' '}
             <Link 
               href="/auth/sign-up" 
               className="text-morpheus-gold-light hover:text-[#d4c066] font-semibold underline underline-offset-4 transition-colors"
             >
-              Sign Up
+              {t('auth.signUp')}
             </Link>
           </p>
         </div>
@@ -128,7 +130,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
           href="/" 
           className="text-gray-400 hover:text-white transition-colors inline-flex items-center gap-2"
         >
-          ← Back to Morpheus Mall
+          {t('auth.backToMorpheusMall')}
         </Link>
       </div>
     </div>

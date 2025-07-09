@@ -12,7 +12,7 @@ export default async function ProtectedPage() {
   }
 
   return (
-    <div className="min-h-screen w-full">
+    <div className="w-full">
       {/* Virtual Tour */}
       <VirtualTour 
         height="100vh"
@@ -20,6 +20,7 @@ export default async function ProtectedPage() {
         startingScene="0-key-biscayne-2"
         showNavbar={true}
         disableAutorotate={true}
+        accountForNavbar={true}
       />
     </div>
   )
