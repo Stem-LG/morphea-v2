@@ -1,14 +1,15 @@
 "use client";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 import VirtualTour from "@/components/virtual-tour";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function ProtectedPage() {
+    const router = useRouter();
     const { data: user, error, isLoading, isFetching } = useAuth();
 
     if (!(isLoading || isFetching) && (error || !user)) {
-        redirect("/auth/login");
+        router.push("/auth/login");
     }
 
     return (
