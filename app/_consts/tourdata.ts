@@ -4,7 +4,7 @@ import { createClient } from '@/lib/client'
 export interface InfoSpotAction {
     id?: string;
     type: "alert" | "modal" | "custom";
-    modalType?: "tree-inventory" | string;
+    modalType?: "products-list" | string;
     customHandler?: string;
 }
 
@@ -104,8 +104,8 @@ export async function getTourData(): Promise<TourData> {
                 }
                 
                 // Add optional action properties if they exist
-                if (infospot.yinfospotactions?.yactionid) {
-                    action.id = infospot.yinfospotactions.yactionid
+                if (infospot.yinfospotactions?.yinfospotactionsid) {
+                    action.id = infospot.yinfospotactions.yinfospotactionsid
                 }
                 if (infospot.yinfospotactions?.ymodaltype) {
                     action.modalType = infospot.yinfospotactions.ymodaltype

@@ -25,11 +25,16 @@ export function useProducts(sectionId: string | null) {
                 .schema("morpheus")
                 .from("yproduit")
                 .select("*, yobjet3d(*)")
-                .eq("yproduitinfobulle", sectionId)
+                .eq("yinfospotactionsidfk", sectionId)
                 .order("yproduitid");
 
             if (error) {
-                console.error("Error fetching products:", error);
+                console.error("Error fetching products:", {
+                    message: error.message,
+                    details: error.details,
+                    hint: error.hint,
+                    code: error.code
+                });
                 throw error;
             }
 
@@ -56,7 +61,7 @@ export function useCreateProduct() {
             return data;
         },
         onSuccess: (data) => {
-            queryClient.invalidateQueries({ queryKey: ['products', data.yproduitinfobulle] });
+            queryClient.invalidateQueries({ queryKey: ['products', data.yinfospotactionsidfk] });
         },
     });
 }
@@ -79,7 +84,7 @@ export function useUpdateProduct() {
             return data;
         },
         onSuccess: (data) => {
-            queryClient.invalidateQueries({ queryKey: ['products', data.yproduitinfobulle] });
+            queryClient.invalidateQueries({ queryKey: ['products', data.yinfospotactionsidfk] });
         },
     });
 }

@@ -7,6 +7,11 @@ export type Json =
   | Json[]
 
 export type Database = {
+  // Allows to automatically instanciate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "12.2.3 (519615d)"
+  }
   graphql_public: {
     Tables: {
       [_ in never]: never
@@ -281,6 +286,89 @@ export type Database = {
           },
         ]
       }
+      yinfospotactions: {
+        Row: {
+          yboutiqueidfk: number | null
+          ycreatedat: string | null
+          ycustomhandler: string | null
+          yinfospotactionsid: string
+          ymodaltype: string | null
+          ytype: string
+        }
+        Insert: {
+          yboutiqueidfk?: number | null
+          ycreatedat?: string | null
+          ycustomhandler?: string | null
+          yinfospotactionsid: string
+          ymodaltype?: string | null
+          ytype: string
+        }
+        Update: {
+          yboutiqueidfk?: number | null
+          ycreatedat?: string | null
+          ycustomhandler?: string | null
+          yinfospotactionsid?: string
+          ymodaltype?: string | null
+          ytype?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "yinfospotactions_yboutiqueidfk_fkey"
+            columns: ["yboutiqueidfk"]
+            isOneToOne: false
+            referencedRelation: "yboutique"
+            referencedColumns: ["yboutiqueid"]
+          },
+        ]
+      }
+      yinfospots: {
+        Row: {
+          ycreatedat: string | null
+          yid: string
+          yinfospotactionsidfk: string | null
+          ypitch: number
+          ysceneid: string | null
+          ytext: string
+          ytitle: string
+          yyaw: number
+        }
+        Insert: {
+          ycreatedat?: string | null
+          yid?: string
+          yinfospotactionsidfk?: string | null
+          ypitch: number
+          ysceneid?: string | null
+          ytext: string
+          ytitle: string
+          yyaw: number
+        }
+        Update: {
+          ycreatedat?: string | null
+          yid?: string
+          yinfospotactionsidfk?: string | null
+          ypitch?: number
+          ysceneid?: string | null
+          ytext?: string
+          ytitle?: string
+          yyaw?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "yinfospots_yinfospotactionsidfk_fkey"
+            columns: ["yinfospotactionsidfk"]
+            isOneToOne: false
+            referencedRelation: "yinfospotactions"
+            referencedColumns: ["yinfospotactionsid"]
+          },
+          {
+            foreignKeyName: "yinfospots_ysceneid_fkey"
+            columns: ["ysceneid"]
+            isOneToOne: false
+            referencedRelation: "yscenes"
+            referencedColumns: ["yid"]
+          },
+        ]
+      }
       ymall: {
         Row: {
           sysaction: string | null
@@ -499,10 +587,10 @@ export type Database = {
           sysdate: string | null
           sysuser: string | null
           ydesigneuridfk: number | null
+          yinfospotactionsidfk: string
           yproduitcode: string
           yproduitdetailstech: string
           yproduitid: number
-          yproduitinfobulle: string
           yproduitintitule: string
           yvideoidfk: number | null
         }
@@ -513,10 +601,10 @@ export type Database = {
           sysdate?: string | null
           sysuser?: string | null
           ydesigneuridfk?: number | null
+          yinfospotactionsidfk: string
           yproduitcode: string
           yproduitdetailstech: string
           yproduitid?: number
-          yproduitinfobulle: string
           yproduitintitule: string
           yvideoidfk?: number | null
         }
@@ -527,10 +615,10 @@ export type Database = {
           sysdate?: string | null
           sysuser?: string | null
           ydesigneuridfk?: number | null
+          yinfospotactionsidfk?: string
           yproduitcode?: string
           yproduitdetailstech?: string
           yproduitid?: number
-          yproduitinfobulle?: string
           yproduitintitule?: string
           yvideoidfk?: number | null
         }
@@ -549,7 +637,82 @@ export type Database = {
             referencedRelation: "yvideo"
             referencedColumns: ["yvideoid"]
           },
+          {
+            foreignKeyName: "yproduit_yinfospotactionsidfk_fkey"
+            columns: ["yinfospotactionsidfk"]
+            isOneToOne: false
+            referencedRelation: "yinfospotactions"
+            referencedColumns: ["yinfospotactionsid"]
+          },
         ]
+      }
+      yscenelinks: {
+        Row: {
+          ycreatedat: string | null
+          yid: string
+          yname: string
+          ypitch: number
+          ysceneid: string | null
+          ytargetid: string
+          yyaw: number
+        }
+        Insert: {
+          ycreatedat?: string | null
+          yid?: string
+          yname: string
+          ypitch: number
+          ysceneid?: string | null
+          ytargetid: string
+          yyaw: number
+        }
+        Update: {
+          ycreatedat?: string | null
+          yid?: string
+          yname?: string
+          ypitch?: number
+          ysceneid?: string | null
+          ytargetid?: string
+          yyaw?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "yscenelinks_ysceneid_fkey"
+            columns: ["ysceneid"]
+            isOneToOne: false
+            referencedRelation: "yscenes"
+            referencedColumns: ["yid"]
+          },
+        ]
+      }
+      yscenes: {
+        Row: {
+          ycreatedat: string | null
+          yfov: number
+          yid: string
+          yname: string
+          ypanorama: string
+          ypitch: number
+          yyaw: number
+        }
+        Insert: {
+          ycreatedat?: string | null
+          yfov: number
+          yid: string
+          yname: string
+          ypanorama: string
+          ypitch: number
+          yyaw: number
+        }
+        Update: {
+          ycreatedat?: string | null
+          yfov?: number
+          yid?: string
+          yname?: string
+          ypanorama?: string
+          ypitch?: number
+          yyaw?: number
+        }
+        Relationships: []
       }
       yvideo: {
         Row: {
@@ -716,147 +879,6 @@ export type Database = {
         }
         Relationships: []
       }
-      yscenes: {
-        Row: {
-          yid: string
-          yname: string
-          ypanorama: string
-          yyaw: number
-          ypitch: number
-          yfov: number
-          ycreatedat: string | null
-        }
-        Insert: {
-          yid: string
-          yname: string
-          ypanorama: string
-          yyaw: number
-          ypitch: number
-          yfov: number
-          ycreatedat?: string | null
-        }
-        Update: {
-          yid?: string
-          yname?: string
-          ypanorama?: string
-          yyaw?: number
-          ypitch?: number
-          yfov?: number
-          ycreatedat?: string | null
-        }
-        Relationships: []
-      }
-      yscenelinks: {
-        Row: {
-          yid: string
-          ysceneid: string
-          ytargetid: string
-          yyaw: number
-          ypitch: number
-          yname: string
-          ycreatedat: string | null
-        }
-        Insert: {
-          yid?: string
-          ysceneid: string
-          ytargetid: string
-          yyaw: number
-          ypitch: number
-          yname: string
-          ycreatedat?: string | null
-        }
-        Update: {
-          yid?: string
-          ysceneid?: string
-          ytargetid?: string
-          yyaw?: number
-          ypitch?: number
-          yname?: string
-          ycreatedat?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "yscenelinks_ysceneid_fkey"
-            columns: ["ysceneid"]
-            isOneToOne: false
-            referencedRelation: "yscenes"
-            referencedColumns: ["yid"]
-          }
-        ]
-      }
-      yinfospots: {
-        Row: {
-          yid: string
-          ysceneid: string
-          ytitle: string
-          ytext: string
-          yyaw: number
-          ypitch: number
-          ycreatedat: string | null
-        }
-        Insert: {
-          yid?: string
-          ysceneid: string
-          ytitle: string
-          ytext: string
-          yyaw: number
-          ypitch: number
-          ycreatedat?: string | null
-        }
-        Update: {
-          yid?: string
-          ysceneid?: string
-          ytitle?: string
-          ytext?: string
-          yyaw?: number
-          ypitch?: number
-          ycreatedat?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "yinfospots_ysceneid_fkey"
-            columns: ["ysceneid"]
-            isOneToOne: false
-            referencedRelation: "yscenes"
-            referencedColumns: ["yid"]
-          }
-        ]
-      }
-      yinfospotactions: {
-        Row: {
-          yinfospotid: string
-          ytype: string
-          ymodaltype: string | null
-          ycustomhandler: string | null
-          yactionid: string | null
-          ycreatedat: string | null
-        }
-        Insert: {
-          yinfospotid: string
-          ytype: string
-          ymodaltype?: string | null
-          ycustomhandler?: string | null
-          yactionid?: string | null
-          ycreatedat?: string | null
-        }
-        Update: {
-          yinfospotid?: string
-          ytype?: string
-          ymodaltype?: string | null
-          ycustomhandler?: string | null
-          yactionid?: string | null
-          ycreatedat?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "yinfospotactions_yinfospotid_fkey"
-            columns: ["yinfospotid"]
-            isOneToOne: true
-            referencedRelation: "yinfospots"
-            referencedColumns: ["yid"]
-          }
-        ]
-      }
     }
     Views: {
       [_ in never]: never
@@ -890,21 +912,25 @@ export type Database = {
   }
 }
 
-type DefaultSchema = Database[Extract<keyof Database, "public">]
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-        Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-      Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
     ? R
@@ -922,14 +948,16 @@ export type Tables<
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I
     }
     ? I
@@ -945,14 +973,16 @@ export type TablesInsert<
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U
     }
     ? U
@@ -968,14 +998,16 @@ export type TablesUpdate<
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never = never,
-> = DefaultSchemaEnumNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
     ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
     : never
@@ -983,14 +1015,16 @@ export type Enums<
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
     : never = never,
-> = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
     ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never

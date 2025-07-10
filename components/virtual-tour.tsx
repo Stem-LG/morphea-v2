@@ -236,10 +236,14 @@ export default function VirtualTour({
 
     // Handle different action types dynamically
     const handleInfoSpotAction = (action: InfoSpotAction, title: string, text: string) => {
+        console.log('InfoSpot action triggered:', { action, title, text, currentScene });
+        
         switch (action.type) {
             case "modal":
                 if (action.modalType === "products-list") {
-                    setProductsList(action.id!);
+                    // Use the action ID to fetch products linked to this infospot action
+                    console.log('Opening products list for action ID:', action.id);
+                    setProductsList(action.id || currentScene);
                 }
                 // Add other modal types here as needed
                 break;
