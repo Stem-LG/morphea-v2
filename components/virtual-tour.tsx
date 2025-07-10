@@ -12,7 +12,6 @@ interface VirtualTourProps {
     width?: string;
     startingScene?: string;
     showNavbar?: boolean;
-    disableAutorotate?: boolean;
     accountForNavbar?: boolean; // New prop to account for navbar height
 }
 

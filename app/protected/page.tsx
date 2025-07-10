@@ -19,7 +19,6 @@ export default async function ProtectedPage() {
         width="100%"
         startingScene="i1"
         showNavbar={true}
-        disableAutorotate={true}
         accountForNavbar={true}
       />
     </div>
