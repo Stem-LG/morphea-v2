@@ -32,8 +32,8 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
                 password,
             });
             if (error) throw error;
-            router.push("/protected");
             await refetch(); // Refresh auth state
+            router.push("/protected");
         } catch (error: unknown) {
             setError(error instanceof Error ? error.message : t("auth.errorOccurred"));
         } finally {
@@ -107,7 +107,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
                         className="w-full bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-[#695029] hover:to-[#d4c066] text-white h-12 text-lg font-semibold shadow-2xl transition-all duration-300 hover:scale-105 rounded-none disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:scale-100"
                     >
                         {isSubmitting ? (
-                            <div className="flex items-center gap-2">
+                            <div className="flex ihttps://b8cfjlonmr.ufs.sh/f/kMrcl2nedu5f9APFW3XTHWfiIbY80Ctps4LSDP7za1c2FRBwtems-center gap-2">
                                 <img src="/loading.gif" alt="Loading" className="h-5 w-5" />
                                 {t("auth.signingIn")}
                             </div>

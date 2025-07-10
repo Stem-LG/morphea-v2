@@ -11,38 +11,38 @@ export default function NavBar() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isClient, setIsClient] = useState(false);
     const { t } = useLanguage();
-    
+
     // Auth state with error handling
     const authQuery = useAuth();
     const { data: user, error, isLoading } = authQuery || { data: null, error: null, isLoading: true };
-    
+
     // Handle client-side hydration
     useEffect(() => {
         setIsClient(true);
     }, []);
-    
+
     // Determine auth state safely
     const getAuthState = () => {
         if (!isClient) return { user: null, loading: true };
-        
+
         if (isLoading) return { user: null, loading: true };
-        
+
         // Handle auth session missing error (normal when not logged in)
-        if (error?.message?.includes('Auth session missing') || error?.name === 'AuthSessionMissingError') {
+        if (error?.message?.includes("Auth session missing") || error?.name === "AuthSessionMissingError") {
             return { user: null, loading: false };
         }
-        
+
         // Handle other errors
         if (error) {
-            console.error('Auth error:', error);
+            console.error("Auth error:", error);
             return { user: null, loading: false };
         }
-        
+
         return { user: user || null, loading: false };
     };
-    
+
     const { user: currentUser, loading } = getAuthState();
-    
+
     const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
     return (
@@ -65,24 +65,24 @@ export default function NavBar() {
                             {/* <Link href="/shop" className="text-gray-300 hover:text-white transition-colors">
                                 {t('nav.boutique')}
                             </Link> */}
-                            <Link href="/virtual-tours" className="text-gray-300 hover:text-white transition-colors">
-                                {t('nav.virtualTours')}
+                            <Link href="/protected" className="text-gray-300 hover:text-white transition-colors">
+                                {t("nav.virtualTours")}
                             </Link>
                             {/* <Link href="/3d-products" className="text-gray-300 hover:text-white transition-colors">
                                 {t('nav.products3d')}
                             </Link> */}
                             <Link href="/admin" className="text-gray-300 hover:text-white transition-colors">
-                                {t('nav.administration')}
+                                {t("nav.administration")}
                             </Link>
-                            
+
                             {/* Language Switcher */}
                             <LanguageSwitcher />
-                            
+
                             {/* Auth Section */}
                             {loading ? (
                                 <div className="flex items-center space-x-2">
                                     <div className="w-5 h-5 border-2 border-morpheus-gold-dark border-t-morpheus-gold-light animate-spin rounded-full"></div>
-                                    <span className="text-gray-300 text-sm">{t('nav.loading')}</span>
+                                    <span className="text-gray-300 text-sm">{t("nav.loading")}</span>
                                 </div>
                             ) : currentUser ? (
                                 <LogoutButton />
@@ -92,13 +92,13 @@ export default function NavBar() {
                                         href="/auth/login"
                                         className="text-gray-300 hover:text-white transition-colors"
                                     >
-                                        {t('nav.login')}
+                                        {t("nav.login")}
                                     </Link>
                                     <Link
                                         href="/auth/sign-up"
                                         className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-[#695029] hover:to-[#d4c066] text-white px-4 py-2 transition-all rounded-none"
                                     >
-                                        {t('nav.signup')}
+                                        {t("nav.signup")}
                                     </Link>
                                 </>
                             )}
@@ -135,11 +135,11 @@ export default function NavBar() {
                                     {t('nav.boutique')}
                                 </Link> */}
                                 <Link
-                                    href="/virtual-tours"
+                                    href="/protected"
                                     className="text-gray-300 hover:text-white block px-3 py-2 text-base font-medium transition-colors"
                                     onClick={closeMobileMenu}
                                 >
-                                    {t('nav.virtualTours')}
+                                    {t("nav.virtualTours")}
                                 </Link>
                                 {/* <Link
                                     href="/3d-products"
@@ -153,20 +153,20 @@ export default function NavBar() {
                                     className="text-gray-300 hover:text-white block px-3 py-2 text-base font-medium transition-colors"
                                     onClick={closeMobileMenu}
                                 >
-                                    {t('nav.administration')}
+                                    {t("nav.administration")}
                                 </Link>
-                                
+
                                 {/* Mobile Language Switcher */}
                                 <div className="px-3 py-2">
                                     <LanguageSwitcher />
                                 </div>
-                                
+
                                 {/* Mobile Auth Section */}
                                 <div className="border-t border-slate-600 pt-2 mt-2">
                                     {loading ? (
                                         <div className="flex items-center justify-center px-3 py-2">
                                             <div className="w-5 h-5 border-2 border-morpheus-gold-dark border-t-morpheus-gold-light animate-spin rounded-full"></div>
-                                            <span className="text-gray-300 text-sm ml-2">{t('nav.loading')}</span>
+                                            <span className="text-gray-300 text-sm ml-2">{t("nav.loading")}</span>
                                         </div>
                                     ) : currentUser ? (
                                         <div className="px-3 py-2">
@@ -179,14 +179,14 @@ export default function NavBar() {
                                                 className="text-gray-300 hover:text-white block px-3 py-2 text-base font-medium transition-colors"
                                                 onClick={closeMobileMenu}
                                             >
-                                                {t('nav.login')}
+                                                {t("nav.login")}
                                             </Link>
                                             <Link
                                                 href="/auth/sign-up"
                                                 className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-[#695029] hover:to-[#d4c066] text-white block px-3 py-2 mx-3 my-2 text-center transition-all rounded-none"
                                                 onClick={closeMobileMenu}
                                             >
-                                                {t('nav.signup')}
+                                                {t("nav.signup")}
                                             </Link>
                                         </>
                                     )}
@@ -196,7 +196,7 @@ export default function NavBar() {
                     )}
                 </div>
             </nav>
-            <div className="h-16"/>
+            <div className="h-16" />
         </>
     );
 }
