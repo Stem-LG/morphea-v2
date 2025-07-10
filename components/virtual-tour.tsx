@@ -160,19 +160,15 @@ export default function VirtualTour({
             try {
                 console.log('Starting transition to scene:', currentSceneData.id, 'Initial load:', isInitialLoad);
                 
-                // Skip transition effect on initial load
                 if (isInitialLoad) {
-                    console.log('Initial load - setting panorama without transition');
                     await viewerRef.current!.setPanorama(currentSceneData.panorama, {
                         transition: false, // Disable transition on initial load
                         showLoader: false,
                     });
                     
-                    // Add markers immediately on initial load
                     setTimeout(() => {
-                        console.log('Initial load completed, adding markers');
                         addMarkers();
-                    }, 500);
+                    }, 200);
                     
                     setIsInitialLoad(false);
                     return;
@@ -190,16 +186,8 @@ export default function VirtualTour({
                     showLoader: !isImagePreloaded, // Only show loader if image isn't preloaded
                 });
 
-                // Animate to new view position
-                viewerRef.current!.animate({
-                    yaw: currentSceneData.initialView.yaw,
-                    pitch: currentSceneData.initialView.pitch,
-                    zoom: currentSceneData.initialView.fov,
-                    speed: "2rpm",
-                });
-
                 // Update markers after transition (faster for preloaded images)
-                const delay = isImagePreloaded ? 100 : 200;
+                const delay = isImagePreloaded ? 0 : 200;
                 setTimeout(() => {
                     console.log('Transition completed, updating markers');
                     addMarkers();
