@@ -30,18 +30,8 @@ export default function ProductsListModal({ isOpen, onClose }: ProductsListModal
                 color: obj3d.couleur || "Default",
                 id: obj3d.id,
             })),
-            properties: {
-                height: "15-20 pieds",
-                type: "Palmier à Coco",
-                age: "25-30 ans",
-                location: "Zones côtières",
-            },
-            features: [
-                "Tolérant au sel",
-                "Résistant aux ouragans",
-                "Produit des noix de coco",
-                "Verdure toute l'année",
-            ],
+            properties: {},
+            features: [],
         }));
     }, [productsData]);
 
@@ -49,18 +39,25 @@ export default function ProductsListModal({ isOpen, onClose }: ProductsListModal
 
     if (!isOpen) return null;
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
-            <div className="relative w-full max-w-6xl max-h-[90vh] bg-gradient-to-br from-morpheus-blue-dark to-morpheus-blue-light border border-slate-700 overflow-hidden">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-sm p-4">
+            <div className="relative w-full max-w-6xl max-h-[90vh] bg-gradient-to-br from-morpheus-blue-dark via-morpheus-blue-dark/95 to-morpheus-blue-light/90 backdrop-blur-md border-2 border-morpheus-gold-dark/30 shadow-2xl shadow-black/50 overflow-hidden rounded-lg">
+                {/* Decorative top border */}
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-morpheus-gold-dark via-morpheus-gold-light to-morpheus-gold-dark"></div>
+                
                 {/* Header */}
-                <div className="flex justify-between items-center p-6 border-b border-slate-700">
+                <div className="relative flex justify-between items-center p-6 border-b border-morpheus-gold-dark/20 bg-gradient-to-r from-black/20 to-transparent">
                     <div>
-                        <h2 className="text-2xl font-bold font-parisienne bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light bg-clip-text text-transparent mb-2">
+                        <h2 className="text-3xl font-bold font-parisienne bg-gradient-to-r from-morpheus-gold-dark via-morpheus-gold-light to-morpheus-gold-dark bg-clip-text text-transparent mb-2 drop-shadow-lg">
                             Catalogue des Produits
                         </h2>
-                        <p className="text-gray-300">Parcourez notre collection de produits</p>
+                        <p className="text-gray-300 text-sm tracking-wide">Parcourez notre collection de produits exclusifs</p>
                     </div>
-                    <button onClick={onClose} className="text-white hover:text-morpheus-gold-light transition-colors">
-                        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <button
+                        onClick={onClose}
+                        className="group relative p-2 text-white/80 hover:text-morpheus-gold-light transition-all duration-300 hover:rotate-90"
+                    >
+                        <div className="absolute inset-0 bg-morpheus-gold-light/20 rounded-full scale-0 group-hover:scale-100 transition-transform duration-300"></div>
+                        <svg className="relative w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
@@ -72,7 +69,7 @@ export default function ProductsListModal({ isOpen, onClose }: ProductsListModal
                 </div>
 
                 {/* Content */}
-                <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+                <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)] custom-scrollbar">
                     {isLoading ? (
                         /* Loading State */
                         <div className="flex flex-col items-center justify-center py-12 space-y-4">
@@ -85,7 +82,7 @@ export default function ProductsListModal({ isOpen, onClose }: ProductsListModal
                             </div>
                         </div>
                     ) : productsList && productsList.length > 0 ? (
-                        /* Product Cards Grid - Horizontal Layout */
+                        /* Product Cards - Horizontal Layout with Theme */
                         <div className="space-y-4 mb-6">
                             {productsList?.map((product) => (
                                 <div
@@ -94,89 +91,55 @@ export default function ProductsListModal({ isOpen, onClose }: ProductsListModal
                                         setSelectedProduct(product.id);
                                         setShowProductDetails(true);
                                     }}
-                                    className={`cursor-pointer border-2 transition-all duration-300 hover:border-morpheus-gold-light bg-gradient-to-br from-morpheus-blue-dark to-morpheus-blue-light border-slate-600 group`}
+                                    className="cursor-pointer group relative overflow-hidden border-2 border-morpheus-gold-dark/30 bg-gradient-to-r from-morpheus-blue-dark/50 to-morpheus-blue-light/30 backdrop-blur-sm transition-all duration-300 hover:border-morpheus-gold-light/60 hover:shadow-xl hover:shadow-morpheus-gold-light/20 rounded-lg"
                                 >
-                                    <div className="flex items-center p-4 space-x-6">
-                                        {/* Product 3D Preview */}
-                                        <div className="w-32 h-32 bg-white flex items-center justify-center flex-shrink-0 shadow-lg">
-                                            <div className="text-center">
-                                                <Image src={product.image!} height={256} width={256} alt="" />
-                                            </div>
+                                    {/* Hover glow effect */}
+                                    <div className="absolute inset-0 bg-gradient-to-r from-morpheus-gold-light/0 via-morpheus-gold-light/5 to-morpheus-gold-light/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                                    
+                                    <div className="relative flex items-center p-6 space-x-6">
+                                        {/* Product Image */}
+                                        <div className="relative w-36 h-36 flex-shrink-0 overflow-hidden rounded-lg border-2 border-morpheus-gold-dark/20 group-hover:border-morpheus-gold-light/40 transition-colors duration-300">
+                                            <div className="absolute inset-0 bg-gradient-to-br from-white/95 to-white/90"></div>
+                                            <Image
+                                                src={product.image!}
+                                                fill
+                                                className="relative object-contain p-2 group-hover:scale-105 transition-transform duration-500"
+                                                alt={product.name}
+                                            />
                                         </div>
 
                                         {/* Product Information */}
                                         <div className="flex-1 min-w-0">
-                                            <div className="flex justify-between items-start mb-2">
-                                                <h3 className="text-2xl font-bold text-white group-hover:text-morpheus-gold-light transition-colors">
-                                                    {product.name}
-                                                </h3>
-                                                <div className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light text-white px-3 py-1 text-sm font-medium">
-                                                    {product.properties.type}
-                                                </div>
-                                            </div>
+                                            <h3 className="text-2xl font-bold text-white group-hover:text-morpheus-gold-light transition-colors duration-300 mb-3">
+                                                {product.name}
+                                            </h3>
+                                            
+                                            <p className="text-gray-300 text-sm line-clamp-2 mb-4">
+                                                {product.description || "Découvrez ce produit exceptionnel dans notre collection exclusive."}
+                                            </p>
 
-                                            <p className="text-gray-300 mb-4 line-clamp-2">{product.description}</p>
-
-                                            {/* Properties Grid */}
-                                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                                                <div className="text-center">
-                                                    <div className="text-morpheus-gold-light text-sm font-medium">
-                                                        Hauteur
-                                                    </div>
-                                                    <div className="text-white text-lg">
-                                                        {product.properties.height}
-                                                    </div>
-                                                </div>
-                                                <div className="text-center">
-                                                    <div className="text-morpheus-gold-light text-sm font-medium">
-                                                        Âge
-                                                    </div>
-                                                    <div className="text-white text-lg">{product.properties.age}</div>
-                                                </div>
-                                                <div className="text-center">
-                                                    <div className="text-morpheus-gold-light text-sm font-medium">
-                                                        Emplacement
-                                                    </div>
-                                                    <div className="text-white text-sm">
-                                                        {product.properties.location}
-                                                    </div>
-                                                </div>
-                                                <div className="text-center">
-                                                    <div className="text-[#e9d079] text-sm font-medium">
-                                                        Caractéristiques
-                                                    </div>
-                                                    <div className="text-white text-sm">
-                                                        {product.features.length} caractéristiques
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            {/* Key Features Tags */}
-                                            <div className="flex flex-wrap gap-2">
-                                                {product.features.slice(0, 3).map((feature, index) => (
-                                                    <span
-                                                        key={index}
-                                                        className="bg-slate-700 text-gray-300 px-2 py-1 text-xs"
-                                                    >
-                                                        {feature}
-                                                    </span>
-                                                ))}
-                                                {product.features.length > 3 && (
-                                                    <span className="bg-slate-600 text-gray-400 px-2 py-1 text-xs">
-                                                        +{product.features.length - 3} de plus
-                                                    </span>
-                                                )}
+                                            {/* Product ID Badge */}
+                                            <div className="inline-flex items-center space-x-2 text-xs text-morpheus-gold-light/80">
+                                                <span className="px-2 py-1 bg-morpheus-gold-dark/20 border border-morpheus-gold-dark/30 rounded">
+                                                    ID: {product.id}
+                                                </span>
                                             </div>
                                         </div>
 
                                         {/* Action Button */}
                                         <div className="flex-shrink-0">
-                                            <button className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-[#695029] hover:to-[#d4c066] text-white px-6 py-3 transition-colors font-medium shadow-lg group-hover:shadow-morpheus-gold-light/25 rounded-none">
-                                                Voir les Détails
-                                                <div className="text-xs opacity-75 mt-1">Cliquez pour explorer</div>
+                                            <button className="relative overflow-hidden bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light text-white px-8 py-4 font-semibold shadow-lg transition-all duration-300 hover:shadow-morpheus-gold-light/30 hover:scale-105 rounded group/btn">
+                                                <span className="relative z-10">
+                                                    Voir les Détails
+                                                    <span className="block text-xs font-normal opacity-80 mt-1">Explorer en 3D</span>
+                                                </span>
+                                                <div className="absolute inset-0 bg-gradient-to-r from-morpheus-gold-light to-morpheus-gold-dark opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300"></div>
                                             </button>
                                         </div>
                                     </div>
+
+                                    {/* Bottom accent line */}
+                                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-morpheus-gold-light to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
                                 </div>
                             ))}
                         </div>
