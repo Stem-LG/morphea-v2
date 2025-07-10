@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { Viewer } from "@photo-sphere-viewer/core";
 import { MarkersPlugin } from "@photo-sphere-viewer/markers-plugin";
 import ProductsListModal from "./products-list-modal";
-import { InfoSpotAction, getTourData, TourData } from "@/app/_consts/tourdata";
+import { InfoSpotAction, getTourData, TourData, Scene } from "@/app/_consts/tourdata";
 
 interface VirtualTourProps {
     className?: string;
@@ -31,7 +31,12 @@ export default function VirtualTour({
     const [isTransitioning, setIsTransitioning] = useState(false);
     const [tourData, setTourData] = useState<TourData>({ scenes: [] });
     const [isLoading, setIsLoading] = useState(true);
+    const [preloadedImages, setPreloadedImages] = useState<Set<string>>(new Set());
     const [isInitialLoad, setIsInitialLoad] = useState(true);
+    const [, setCurrentZoom] = useState(60); // Default zoom level
+    const [currentPosition, setCurrentPosition] = useState({ yaw: 0, pitch: 0 });
+    const [pressedKeys, setPressedKeys] = useState<Set<string>>(new Set());
+    const animationIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
     // Calculate the actual height accounting for navbar
     const getActualHeight = () => {
@@ -42,6 +47,223 @@ export default function VirtualTour({
     };
 
     const actualHeight = getActualHeight();
+
+    // Function to preload all scene images
+    const preloadSceneImages = useCallback(async (scenes: Scene[]) => {
+        if (scenes.length === 0) return;
+        
+        
+        const imagePromises = scenes.map(scene => {
+            return new Promise<string>((resolve,) => {
+                const img = new Image();
+                img.onload = () => {
+                    setPreloadedImages(prev => new Set(prev).add(scene.panorama));
+                    resolve(scene.panorama);
+                };
+                img.onerror = () => {
+                    console.warn(`Failed to preload scene image: ${scene.panorama}`);
+                    // Still resolve to not block other images
+                    resolve(scene.panorama);
+                };
+                img.src = scene.panorama;
+            });
+        });
+
+        try {
+            await Promise.all(imagePromises);
+        } catch (error) {
+            console.error('Error preloading scene images:', error);
+        }
+    }, []);
+
+    // Helper function to normalize angle to [-π, π]
+    const normalizeAngle = (angle: number): number => {
+        while (angle > Math.PI) angle -= 2 * Math.PI;
+        while (angle < -Math.PI) angle += 2 * Math.PI;
+        return angle;
+    };
+
+    // Helper function to calculate angular distance between two angles
+    const angularDistance = (a1: number, a2: number): number => {
+        const diff = normalizeAngle(a2 - a1);
+        return Math.abs(diff);
+    };
+
+    // Find closest scene in a given direction
+    const findClosestSceneInDirection = useCallback((direction: 'forward' | 'backward' | 'left' | 'right'): string | null => {
+        const currentSceneData = tourData.scenes.find(scene => scene.id === currentScene);
+        if (!currentSceneData || !currentSceneData.links.length) return null;
+
+        const currentYaw = currentPosition.yaw;
+        let targetYaw = currentYaw;
+
+        switch (direction) {
+            case 'forward':
+                targetYaw = currentYaw; // Same direction
+                break;
+            case 'backward':
+                targetYaw = normalizeAngle(currentYaw + Math.PI); // Opposite direction
+                break;
+            case 'left':
+                targetYaw = normalizeAngle(currentYaw - Math.PI / 2); // 90 degrees left
+                break;
+            case 'right':
+                targetYaw = normalizeAngle(currentYaw + Math.PI / 2); // 90 degrees right
+                break;
+        }
+
+        // Find the closest link in the target direction
+        let closestLink = null;
+        let minDistance = Infinity;
+
+        currentSceneData.links.forEach(link => {
+            const linkYaw = link.position.yaw;
+            const distance = angularDistance(targetYaw, linkYaw);
+            
+            if (distance < minDistance) {
+                minDistance = distance;
+                closestLink = link;
+            }
+        });
+
+        return closestLink ? closestLink.nodeId : null;
+    }, [currentScene, currentPosition.yaw, tourData.scenes]);
+
+    // Handle key press/release for smooth movement
+    const handleKeyDown = useCallback((event: KeyboardEvent) => {
+        if (!viewerRef.current || isTransitioning) return;
+
+        const key = event.key;
+        if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(key)) {
+            event.preventDefault();
+            setPressedKeys(prev => new Set(prev).add(key));
+        }
+    }, [isTransitioning]);
+
+    const handleKeyUp = useCallback((event: KeyboardEvent) => {
+        const key = event.key;
+        if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(key)) {
+            event.preventDefault();
+            setPressedKeys(prev => {
+                const newSet = new Set(prev);
+                newSet.delete(key);
+                return newSet;
+            });
+        }
+    }, []);
+
+    // Start/stop animation loop based on pressed keys
+    useEffect(() => {
+        if (pressedKeys.size > 0 && !animationIntervalRef.current && !isTransitioning) {
+            // Start smooth animation
+            animationIntervalRef.current = setInterval(() => {
+                if (!viewerRef.current || isTransitioning) return;
+
+                const viewer = viewerRef.current;
+                const minZoom = 40;
+                const maxZoom = 80;
+                const zoomSpeed = 0.8; // Smooth zoom speed
+                const rotationSpeed = 0.02; // Smooth rotation speed (radians per frame)
+
+                // Handle zoom controls
+                if (pressedKeys.has('ArrowUp')) {
+                    setCurrentZoom(prev => {
+                        if (prev < maxZoom) {
+                            const newZoom = Math.min(prev + zoomSpeed, maxZoom);
+                            viewer.zoom(newZoom);
+                            return newZoom;
+                        } else {
+                            // Navigate to closest scene forward when at max zoom
+                            const currentSceneData = tourData.scenes.find(scene => scene.id === currentScene);
+                            if (currentSceneData && currentSceneData.links.length > 0) {
+                                const nextScene = findClosestSceneInDirection('forward');
+                                if (nextScene) {
+                                    setCurrentScene(nextScene);
+                                    viewer.zoom(60);
+                                    // Clear pressed keys to prevent continuous navigation
+                                    setPressedKeys(new Set());
+                                    return 60;
+                                }
+                            }
+                            return prev;
+                        }
+                    });
+                }
+
+                if (pressedKeys.has('ArrowDown')) {
+                    setCurrentZoom(prev => {
+                        if (prev > minZoom) {
+                            const newZoom = Math.max(prev - zoomSpeed, minZoom);
+                            viewer.zoom(newZoom);
+                            return newZoom;
+                        } else {
+                            // Navigate to closest scene backward when at min zoom
+                            const currentSceneData = tourData.scenes.find(scene => scene.id === currentScene);
+                            if (currentSceneData && currentSceneData.links.length > 0) {
+                                const nextScene = findClosestSceneInDirection('backward');
+                                if (nextScene) {
+                                    setCurrentScene(nextScene);
+                                    viewer.zoom(60);
+                                    // Clear pressed keys to prevent continuous navigation
+                                    setPressedKeys(new Set());
+                                    return 60;
+                                }
+                            }
+                            return prev;
+                        }
+                    });
+                }
+
+                // Handle rotation controls
+                if (pressedKeys.has('ArrowLeft')) {
+                    setCurrentPosition(prev => {
+                        const newYaw = normalizeAngle(prev.yaw - rotationSpeed);
+                        viewer.rotate({
+                            yaw: newYaw,
+                            pitch: prev.pitch
+                        });
+                        return { ...prev, yaw: newYaw };
+                    });
+                }
+
+                if (pressedKeys.has('ArrowRight')) {
+                    setCurrentPosition(prev => {
+                        const newYaw = normalizeAngle(prev.yaw + rotationSpeed);
+                        viewer.rotate({
+                            yaw: newYaw,
+                            pitch: prev.pitch
+                        });
+                        return { ...prev, yaw: newYaw };
+                    });
+                }
+            }, 16); // ~60fps (16ms interval)
+        } else if (pressedKeys.size === 0 && animationIntervalRef.current) {
+            clearInterval(animationIntervalRef.current);
+            animationIntervalRef.current = null;
+        }
+
+        return () => {
+            if (animationIntervalRef.current) {
+                clearInterval(animationIntervalRef.current);
+                animationIntervalRef.current = null;
+            }
+        };
+    }, [pressedKeys, isTransitioning, tourData.scenes, currentScene, findClosestSceneInDirection]);
+
+    // Add keyboard event listeners
+    useEffect(() => {
+        window.addEventListener('keydown', handleKeyDown);
+        window.addEventListener('keyup', handleKeyUp);
+
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+            window.removeEventListener('keyup', handleKeyUp);
+            if (animationIntervalRef.current) {
+                clearInterval(animationIntervalRef.current);
+                animationIntervalRef.current = null;
+            }
+        };
+    }, [handleKeyDown, handleKeyUp]);
 
     // Fetch tour data from Supabase
     useEffect(() => {
@@ -57,6 +279,9 @@ export default function VirtualTour({
                     if (!sceneExists) {
                         setCurrentScene(data.scenes[0].id);
                     }
+                    
+                    // Start preloading all scene images
+                    preloadSceneImages(data.scenes);
                 }
             } catch (error) {
                 console.error('Failed to fetch tour data:', error);
@@ -66,7 +291,7 @@ export default function VirtualTour({
         };
 
         fetchTourData();
-    }, [startingScene]);
+    }, [startingScene, preloadSceneImages]);
 
     useEffect(() => {
         if (!containerRef.current || isLoading || !tourData.scenes.length) return;
@@ -101,6 +326,16 @@ export default function VirtualTour({
             viewerRef.current.addEventListener("ready", addMarkers);
             markersPluginRef.current?.addEventListener("select-marker", handleMarkerClick);
             
+            // Listen for position changes
+            viewerRef.current.addEventListener("position-updated", (event: any) => {
+                setCurrentPosition({ yaw: event.position.yaw, pitch: event.position.pitch });
+            });
+
+            // Listen for zoom changes
+            viewerRef.current.addEventListener("zoom-updated", (event: any) => {
+                setCurrentZoom(event.zoomLevel);
+            });
+            
         };
 
         // Only initialize viewer once
@@ -128,19 +363,15 @@ export default function VirtualTour({
             try {
                 console.log('Starting transition to scene:', currentSceneData.id, 'Initial load:', isInitialLoad);
                 
-                // Skip transition effect on initial load
                 if (isInitialLoad) {
-                    console.log('Initial load - setting panorama without transition');
                     await viewerRef.current!.setPanorama(currentSceneData.panorama, {
                         transition: false, // Disable transition on initial load
                         showLoader: false,
                     });
                     
-                    // Add markers immediately on initial load
                     setTimeout(() => {
-                        console.log('Initial load completed, adding markers');
                         addMarkers();
-                    }, 500);
+                    }, 200);
                     
                     setIsInitialLoad(false);
                     return;
@@ -149,24 +380,22 @@ export default function VirtualTour({
                 // Normal transition for scene changes
                 setIsTransitioning(true);
 
+                // Check if image is preloaded for faster transition
+                const isImagePreloaded = preloadedImages.has(currentSceneData.panorama);
+                
                 // Use setPanorama for smooth transitions
                 await viewerRef.current!.setPanorama(currentSceneData.panorama, {
                     transition: true, // Enable smooth transition
-                    showLoader: false, // Disable loading screen
+                    showLoader: !isImagePreloaded, // Only show loader if image isn't preloaded
                 });
 
-                // Update markers after transition with longer timeout
+                // Update markers after transition with reduced delay for faster feel
+                const delay = isImagePreloaded ? 0 : 100; // Reduced delay from 200ms to 100ms
                 setTimeout(() => {
                     console.log('Transition completed, updating markers');
                     addMarkers();
                     setIsTransitioning(false);
-                }, 1000); // Increased from 200ms to 1000ms
-                
-                // Failsafe: ensure transition state is reset after maximum time
-                setTimeout(() => {
-                    console.log('Failsafe: resetting transition state');
-                    setIsTransitioning(false);
-                }, 3000);
+                }, delay);
             } catch (error) {
                 console.error("Error transitioning to scene:", error);
                 setIsTransitioning(false);
@@ -174,7 +403,7 @@ export default function VirtualTour({
         };
 
         transitionToScene();
-    }, [currentScene, tourData]);
+    }, [currentScene, tourData, preloadedImages]);
 
     // Add markers for navigation links and info spots
     const addMarkers = useCallback(() => {
@@ -368,6 +597,13 @@ export default function VirtualTour({
                     Cliquez sur les marqueurs pour naviguer entre les lieux • Cliquez sur les marqueurs d&apos;information pour plus de détails
                 </p>
             </div> */}
+
+            {/* Navigation hints */}
+            <div className="absolute bottom-4 left-4 right-4 z-10 bg-black/70 text-white px-4 py-2 rounded-lg text-center">
+                <p className="text-sm">
+                    Use arrow keys to navigate: ↑ Zoom in/Forward • ↓ Zoom out/Backward • ← → Rotate view
+                </p>
+            </div>
 
             {/* Tree Inventory Modal */}
             <ProductsListModal isOpen={productsList} onClose={() => setProductsList(null)} />

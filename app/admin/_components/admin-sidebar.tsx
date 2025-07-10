@@ -1,29 +1,32 @@
 "use client";
 import React from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { BarChart3, Package, Menu, X } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
 
 interface AdminSidebarProps {
-    activeSection: string;
-    onSectionChange: (section: string) => void;
     isOpen: boolean;
     onToggle: () => void;
 }
 
-export function AdminSidebar({ activeSection, onSectionChange, isOpen, onToggle }: AdminSidebarProps) {
+export function AdminSidebar({ isOpen, onToggle }: AdminSidebarProps) {
     const { t } = useLanguage();
+    const pathname = usePathname();
     
     const menuItems = [
         {
             id: "dashboard",
             label: t('admin.dashboard'),
             icon: BarChart3,
+            href: "/admin",
         },
         {
             id: "products",
             label: t('admin.productManagement'),
             icon: Package,
+            href: "/admin/products",
         },
     ];
 
@@ -55,20 +58,21 @@ export function AdminSidebar({ activeSection, onSectionChange, isOpen, onToggle 
                 <nav className="space-y-2">
                     {menuItems.map((item) => {
                         const Icon = item.icon;
+                        const isActive = pathname === item.href;
                         return (
-                            <Button
-                                key={item.id}
-                                variant={activeSection === item.id ? "secondary" : "ghost"}
-                                className={`w-full justify-start text-left ${
-                                    activeSection === item.id
-                                        ? "bg-gray-700 text-white"
-                                        : "text-gray-300 hover:text-white hover:bg-gray-800"
-                                }`}
-                                onClick={() => onSectionChange(item.id)}
-                            >
-                                <Icon className="mr-3 h-4 w-4" />
-                                {item.label}
-                            </Button>
+                            <Link key={item.id} href={item.href}>
+                                <Button
+                                    variant={isActive ? "secondary" : "ghost"}
+                                    className={`w-full justify-start text-left ${
+                                        isActive
+                                            ? "bg-gray-700 text-white"
+                                            : "text-gray-300 hover:text-white hover:bg-gray-800"
+                                    }`}
+                                >
+                                    <Icon className="mr-3 h-4 w-4" />
+                                    {item.label}
+                                </Button>
+                            </Link>
                         );
                     })}
                 </nav>
