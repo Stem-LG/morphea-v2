@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Product3DViewer from "./product-3d-viewer";
+import ProductDetailsPage from "./product-details-page";
 import { useSceneProducts } from "@/hooks/useSceneProducts";
 import Image from "next/image";
 
@@ -14,7 +14,7 @@ export default function ProductsListModal({ isOpen, onClose }: ProductsListModal
     const sceneId = isOpen;
 
     const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
-    const [show3DViewer, setShow3DViewer] = useState(false);
+    const [showProductDetails, setShowProductDetails] = useState(false);
 
     const { data: productsData, isLoading } = useSceneProducts(sceneId);
 
@@ -25,13 +25,23 @@ export default function ProductsListModal({ isOpen, onClose }: ProductsListModal
             model: product.yobjet3d.length > 0 ? product.yobjet3d[0].url : "",
             image: product.imageurl,
             description: product.yproduitdetailstech,
+            models: product.yobjet3d.map((obj3d: { url: string; couleur?: string; id: number }) => ({
+                url: obj3d.url,
+                color: obj3d.couleur || "Default",
+                id: obj3d.id,
+            })),
             properties: {
-                height: "15-20 feet",
-                type: "Coconut Palm",
-                age: "25-30 years",
-                location: "Beachfront areas",
+                height: "15-20 pieds",
+                type: "Palmier à Coco",
+                age: "25-30 ans",
+                location: "Zones côtières",
             },
-            features: ["Salt-tolerant", "Hurricane resistant", "Produces coconuts", "Year-round greenery"],
+            features: [
+                "Tolérant au sel",
+                "Résistant aux ouragans",
+                "Produit des noix de coco",
+                "Verdure toute l'année",
+            ],
         }));
     }, [productsData]);
 
@@ -45,9 +55,9 @@ export default function ProductsListModal({ isOpen, onClose }: ProductsListModal
                 <div className="flex justify-between items-center p-6 border-b border-slate-700">
                     <div>
                         <h2 className="text-2xl font-bold font-parisienne bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light bg-clip-text text-transparent mb-2">
-                            Liste des produits
+                            Catalogue des Produits
                         </h2>
-                        <p className="text-gray-300">Découvrez les produits du magasin</p>
+                        <p className="text-gray-300">Parcourez notre collection de produits</p>
                     </div>
                     <button onClick={onClose} className="text-white hover:text-morpheus-gold-light transition-colors">
                         <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -69,7 +79,9 @@ export default function ProductsListModal({ isOpen, onClose }: ProductsListModal
                             <div className="w-16 h-16 border-4 border-morpheus-gold-dark border-t-morpheus-gold-light animate-spin rounded-full"></div>
                             <div className="text-center">
                                 <h3 className="text-xl font-semibold text-white mb-2">Chargement des produits...</h3>
-                                <p className="text-gray-300">Veuillez patienter pendant que nous récupérons les produits du magasin</p>
+                                <p className="text-gray-300">
+                                    Veuillez patienter pendant que nous récupérons les produits du magasin
+                                </p>
                             </div>
                         </div>
                     ) : productsList && productsList.length > 0 ? (
@@ -80,7 +92,7 @@ export default function ProductsListModal({ isOpen, onClose }: ProductsListModal
                                     key={product.id}
                                     onClick={() => {
                                         setSelectedProduct(product.id);
-                                        setShow3DViewer(true);
+                                        setShowProductDetails(true);
                                     }}
                                     className={`cursor-pointer border-2 transition-all duration-300 hover:border-morpheus-gold-light bg-gradient-to-br from-morpheus-blue-dark to-morpheus-blue-light border-slate-600 group`}
                                 >
@@ -130,9 +142,11 @@ export default function ProductsListModal({ isOpen, onClose }: ProductsListModal
                                                     </div>
                                                 </div>
                                                 <div className="text-center">
-                                                    <div className="text-[#e9d079] text-sm font-medium">Caractéristiques</div>
+                                                    <div className="text-[#e9d079] text-sm font-medium">
+                                                        Caractéristiques
+                                                    </div>
                                                     <div className="text-white text-sm">
-                                                        {product.features.length} traits
+                                                        {product.features.length} caractéristiques
                                                     </div>
                                                 </div>
                                             </div>
@@ -158,7 +172,7 @@ export default function ProductsListModal({ isOpen, onClose }: ProductsListModal
                                         {/* Action Button */}
                                         <div className="flex-shrink-0">
                                             <button className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-[#695029] hover:to-[#d4c066] text-white px-6 py-3 transition-colors font-medium shadow-lg group-hover:shadow-morpheus-gold-light/25 rounded-none">
-                                                Voir en 3D
+                                                Voir les Détails
                                                 <div className="text-xs opacity-75 mt-1">Cliquez pour explorer</div>
                                             </button>
                                         </div>
@@ -172,23 +186,26 @@ export default function ProductsListModal({ isOpen, onClose }: ProductsListModal
                             <div className="text-6xl mb-4">🏪</div>
                             <div className="text-center">
                                 <h3 className="text-xl font-semibold text-white mb-2">Aucun produit trouvé</h3>
-                                <p className="text-gray-300">Il n&apos;y a pas de produits disponibles dans cette section</p>
+                                <p className="text-gray-300">
+                                    Il n&apos;y a pas de produits disponibles dans cette section
+                                </p>
                             </div>
                         </div>
                     )}
                 </div>
             </div>
 
-            {/* 3D Viewer Modal */}
-            {show3DViewer && selectedProductData && (
-                <Product3DViewer
+            {/* Product Details Modal */}
+            {showProductDetails && selectedProductData && (
+                <ProductDetailsPage
                     productData={{
                         id: selectedProductData.id,
-                        description: selectedProductData.description,
-                        model: selectedProductData.model!,
                         name: selectedProductData.name,
+                        description: selectedProductData.description,
+                        image: selectedProductData.image!,
+                        models: selectedProductData.models || [],
                     }}
-                    onClose={() => setShow3DViewer(false)}
+                    onClose={() => setShowProductDetails(false)}
                 />
             )}
         </div>

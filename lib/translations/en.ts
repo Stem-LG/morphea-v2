@@ -119,5 +119,26 @@ export const enTranslations = {
     "scrollToZoom": "🔍 Scroll to zoom",
     "rightClickToPan": "⚡ Right-click to pan",
     "backToProductsList": "Back to Products List"
+  },
+  "productDetails": {
+    "loading3DModel": "Loading 3D Model...",
+    "modelPreview": "3D model preview",
+    "productDetails": "Product Details",
+    "images": "Images",
+    "view3D": "3D View",
+    "freeShippingAvailable": "Free shipping available",
+    "availableVariants": "Available Variants",
+    "availableVariant": "Available Variant",
+    "quantity": "Quantity",
+    "addToCart": "Add to Cart",
+    "orderNow": "Order Now",
+    "features": "Features",
+    "highQuality3DModel": "High-quality 3D model",
+    "multipleColorVariants": "Multiple color variants",
+    "interactive3DPreview": "Interactive 3D preview",
+    "freeShipping": "Free shipping available",
+    "variant": "Variant",
+    "color": "Color",
+    "view": "View"
   }
 };
