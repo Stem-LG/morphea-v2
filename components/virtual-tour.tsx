@@ -33,7 +33,7 @@ export default function VirtualTour({
     const [isLoading, setIsLoading] = useState(true);
     const [preloadedImages, setPreloadedImages] = useState<Set<string>>(new Set());
     const [isInitialLoad, setIsInitialLoad] = useState(true);
-    const [currentZoom, setCurrentZoom] = useState(60); // Default zoom level
+    const [, setCurrentZoom] = useState(60); // Default zoom level
     const [currentPosition, setCurrentPosition] = useState({ yaw: 0, pitch: 0 });
     const [pressedKeys, setPressedKeys] = useState<Set<string>>(new Set());
     const animationIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -54,7 +54,7 @@ export default function VirtualTour({
         
         
         const imagePromises = scenes.map(scene => {
-            return new Promise<string>((resolve, reject) => {
+            return new Promise<string>((resolve,) => {
                 const img = new Image();
                 img.onload = () => {
                     setPreloadedImages(prev => new Set(prev).add(scene.panorama));
