@@ -80,7 +80,7 @@ export default function ProductsListModal({ isOpen, onClose }: ProductsListModal
                             <div className="text-center">
                                 <h3 className="text-xl font-semibold text-white mb-2">Chargement des produits...</h3>
                                 <p className="text-gray-300">
-                                    Veuillez patienter pendant que nous récupérons les produits du magasin
+                                    Veuillez patienter pendant que nous récupérons les produits du boutique
                                 </p>
                             </div>
                         </div>
