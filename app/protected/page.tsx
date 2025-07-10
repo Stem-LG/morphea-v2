@@ -5,9 +5,9 @@ import VirtualTour from "@/components/virtual-tour";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function ProtectedPage() {
-    const { data: user, error, isLoading } = useAuth();
+    const { data: user, error, isLoading, isFetching } = useAuth();
 
-    if (!isLoading && (error || !user)) {
+    if (!(isLoading || isFetching) && (error || !user)) {
         redirect("/auth/login");
     }
 
