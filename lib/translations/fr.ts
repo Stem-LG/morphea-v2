@@ -106,9 +106,6 @@ export const frTranslations = {
     "storeSectionSelector": "Sélecteur de section de magasin",
     "selectStoreSection": "Sélectionnez une section de magasin pour gérer les produits",
     "noSectionsAvailable": "Aucune section disponible",
-    "selectStore": "Sélectionner le magasin",
-    "noStoresAvailable": "Aucun magasin disponible",
-    "selected": "Sélectionné",
     "productDetails": "Détails du produit",
     "technicalDetails": "Détails techniques"
   },

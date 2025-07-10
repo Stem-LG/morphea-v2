@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { useProducts, useProductsByCategory, useDeleteProduct } from "@/hooks/useProducts";
+import { useProducts, useDeleteProduct } from "@/hooks/useProducts";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Edit, Trash2, Plus, Package, Box } from "lucide-react";
@@ -9,35 +9,23 @@ import type { ProductWithObjects } from "@/hooks/useProducts";
 import Image from "next/image";
 
 interface ProductListProps {
-    storeId: string;
+    sectionId: string;
     storeName: string;
-    categoryId?: string;
-    categoryName?: string;
-    categoryProducts?: any[];
+    sectionTitle: string;
     onEditProduct: (product: ProductWithObjects) => void;
     onCreateProduct: () => void;
     onBack: () => void;
 }
 
 export function ProductList({
-    storeId,
+    sectionId,
     storeName,
-    categoryId,
-    categoryName,
-    categoryProducts,
+    sectionTitle,
     onEditProduct,
     onCreateProduct,
     onBack,
 }: ProductListProps) {
-    // Use category products if provided, otherwise fetch products using appropriate hook
-    const categoryQuery = useProductsByCategory(categoryId && !categoryProducts ? categoryId : null);
-    const storeQuery = useProducts(!categoryProducts && !categoryId ? storeId : null);
-    
-    // Determine which query to use
-    const activeQuery = categoryId && !categoryProducts ? categoryQuery : storeQuery;
-    const { data: fetchedProducts, isLoading, error } = activeQuery;
-    
-    const products = categoryProducts || fetchedProducts;
+    const { data: products, isLoading, error } = useProducts(sectionId);
     const deleteProduct = useDeleteProduct();
     const { t } = useLanguage();
 
@@ -87,12 +75,7 @@ export function ProductList({
                     <div>
                         <h2 className="text-2xl lg:text-3xl font-bold">{t('admin.productManagement')}</h2>
                         <p className="text-gray-600 mt-1 text-sm lg:text-base">
-                            {storeName}
-                            {categoryName && (
-                                <span className="block text-blue-600 font-medium">
-                                    Category: {categoryName}
-                                </span>
-                            )}
+                            {storeName} - {sectionTitle}
                         </p>
                     </div>
                     <Button onClick={onCreateProduct} className="flex items-center gap-2 self-start lg:self-auto">
