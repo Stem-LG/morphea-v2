@@ -47,8 +47,8 @@ export default function NavBar() {
 
     return (
         <>
-            <nav className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-br from-morpheus-blue-dark to-morpheus-blue-light backdrop-blur-sm border-b border-slate-700">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <nav className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-morpheus-blue-dark to-morpheus-blue-light backdrop-blur-sm border-b border-slate-700">
+                <div className="mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between h-16">
                         {/* Logo */}
                         <div className="flex flex-row items-center justify-center">
@@ -96,7 +96,7 @@ export default function NavBar() {
                                     </Link>
                                     <Link
                                         href="/auth/sign-up"
-                                        className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-[#695029] hover:to-[#d4c066] text-white px-4 py-2 transition-all rounded-none"
+                                        className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-morpheus-gold-dark hover:to-morpheus-gold-light text-white px-4 py-2 transition-all rounded-none"
                                     >
                                         {t("nav.signup")}
                                     </Link>

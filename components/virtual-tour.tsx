@@ -31,6 +31,7 @@ export default function VirtualTour({
     const [isTransitioning, setIsTransitioning] = useState(false);
     const [tourData, setTourData] = useState<TourData>({ scenes: [] });
     const [isLoading, setIsLoading] = useState(true);
+    const [isInitialLoad, setIsInitialLoad] = useState(true);
 
     // Calculate the actual height accounting for navbar
     const getActualHeight = () => {
@@ -78,9 +79,6 @@ export default function VirtualTour({
             viewerRef.current = new Viewer({
                 container: containerRef.current!,
                 panorama: currentSceneData.panorama,
-                defaultYaw: currentSceneData.initialView.yaw,
-                defaultPitch: currentSceneData.initialView.pitch,
-                defaultZoomLvl: currentSceneData.initialView.fov,
                 minFov: 30,
                 maxFov: 120,
                 loadingImg: "/loading.gif", // Remove loading icon
@@ -102,6 +100,7 @@ export default function VirtualTour({
             // Set up event listeners
             viewerRef.current.addEventListener("ready", addMarkers);
             markersPluginRef.current?.addEventListener("select-marker", handleMarkerClick);
+            
         };
 
         // Only initialize viewer once
@@ -127,6 +126,27 @@ export default function VirtualTour({
 
         const transitionToScene = async () => {
             try {
+                console.log('Starting transition to scene:', currentSceneData.id, 'Initial load:', isInitialLoad);
+                
+                // Skip transition effect on initial load
+                if (isInitialLoad) {
+                    console.log('Initial load - setting panorama without transition');
+                    await viewerRef.current!.setPanorama(currentSceneData.panorama, {
+                        transition: false, // Disable transition on initial load
+                        showLoader: false,
+                    });
+                    
+                    // Add markers immediately on initial load
+                    setTimeout(() => {
+                        console.log('Initial load completed, adding markers');
+                        addMarkers();
+                    }, 500);
+                    
+                    setIsInitialLoad(false);
+                    return;
+                }
+                
+                // Normal transition for scene changes
                 setIsTransitioning(true);
 
                 // Use setPanorama for smooth transitions
@@ -135,19 +155,18 @@ export default function VirtualTour({
                     showLoader: false, // Disable loading screen
                 });
 
-                // Animate to new view position
-                viewerRef.current!.animate({
-                    yaw: currentSceneData.initialView.yaw,
-                    pitch: currentSceneData.initialView.pitch,
-                    zoom: currentSceneData.initialView.fov,
-                    speed: "2rpm",
-                });
-
-                // Update markers after transition
+                // Update markers after transition with longer timeout
                 setTimeout(() => {
+                    console.log('Transition completed, updating markers');
                     addMarkers();
                     setIsTransitioning(false);
-                }, 200);
+                }, 1000); // Increased from 200ms to 1000ms
+                
+                // Failsafe: ensure transition state is reset after maximum time
+                setTimeout(() => {
+                    console.log('Failsafe: resetting transition state');
+                    setIsTransitioning(false);
+                }, 3000);
             } catch (error) {
                 console.error("Error transitioning to scene:", error);
                 setIsTransitioning(false);
@@ -268,14 +287,22 @@ export default function VirtualTour({
     const handleMarkerClick = useCallback((e: {
         marker: { data?: { nodeId?: string; type?: string; title?: string; text?: string; action?: InfoSpotAction } };
     }) => {
-        if (isTransitioning) return; // Prevent clicks during transitions
+        console.log('Marker clicked:', e.marker);
+        console.log('Is transitioning:', isTransitioning);
+        
+        if (isTransitioning) {
+            console.log('Ignoring click - transitioning');
+            return; // Prevent clicks during transitions
+        }
 
         const marker = e.marker;
         if (marker.data?.nodeId) {
             // Navigate to another scene
+            console.log('Navigating to scene:', marker.data.nodeId);
             setCurrentScene(marker.data.nodeId);
         } else if (marker.data?.type === "info" && marker.data.action) {
             // Handle info spot action dynamically
+            console.log('Handling info spot action');
             handleInfoSpotAction(marker.data.action, marker.data.title || "", marker.data.text || "");
         }
     }, [isTransitioning, setCurrentScene, setProductsList]);
@@ -314,7 +341,7 @@ export default function VirtualTour({
             </div>
 
             {/* Scene Navigation Menu */}
-            <div className="absolute top-4 right-4 z-10 bg-black/70 text-white rounded-lg p-2">
+            {/* <div className="absolute top-4 right-4 z-10 bg-black/70 text-white rounded-lg p-2">
                 <div className="flex flex-col space-y-1">
                     {tourData.scenes.map((scene, index) => (
                         <button
@@ -333,14 +360,14 @@ export default function VirtualTour({
                         </button>
                     ))}
                 </div>
-            </div>
+            </div> */}
 
             {/* Navigation hints */}
-            <div className="absolute bottom-4 left-4 right-4 z-10 bg-black/70 text-white px-4 py-2 rounded-lg text-center">
+            {/* <div className="absolute bottom-4 left-4 right-4 z-10 bg-black/70 text-white px-4 py-2 rounded-lg text-center">
                 <p className="text-sm">
                     Cliquez sur les marqueurs pour naviguer entre les lieux • Cliquez sur les marqueurs d&apos;information pour plus de détails
                 </p>
-            </div>
+            </div> */}
 
             {/* Tree Inventory Modal */}
             <ProductsListModal isOpen={productsList} onClose={() => setProductsList(null)} />
