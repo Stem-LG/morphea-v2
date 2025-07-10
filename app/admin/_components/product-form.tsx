@@ -131,7 +131,7 @@ export function ProductForm({ product, sectionId, storeName, sectionTitle, onBac
                     id: product.yproduitid,
                     updates: {
                         ...formData,
-                        yproduitinfobulle: sectionId,
+                        yinfospotactionsidfk: sectionId,
                     },
                 });
                 productId = updatedProduct.yproduitid;
@@ -139,7 +139,7 @@ export function ProductForm({ product, sectionId, storeName, sectionTitle, onBac
                 // Create new product
                 const newProduct = await createProduct.mutateAsync({
                     ...formData,
-                    yproduitinfobulle: sectionId,
+                    yinfospotactionsidfk: sectionId,
                 });
                 productId = newProduct.yproduitid;
             }
