@@ -32,8 +32,16 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
                 password,
             });
             if (error) throw error;
-            await refetch(); // Refresh auth state
-            router.push("/protected");
+            
+            // Wait for auth state to be refreshed and ensure user is authenticated
+            const { data: user } = await refetch();
+            
+            // Only navigate if we have a valid user
+            if (user) {
+                router.push("/protected");
+            } else {
+                throw new Error(t("auth.errorOccurred"));
+            }
         } catch (error: unknown) {
             setError(error instanceof Error ? error.message : t("auth.errorOccurred"));
         } finally {
