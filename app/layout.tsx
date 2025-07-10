@@ -4,7 +4,7 @@ import { Geist, Geist_Mono, Parisienne } from "next/font/google";
 import "./globals.css";
 import AnimatedBackground from "@/components/animated-background";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import NavBnorear from "./_components/nav_bar";
+import NavBar from "./_components/nav_bar";
 import { LanguageProvider } from "@/hooks/useLanguage";
 
 const geistSans = Geist({
