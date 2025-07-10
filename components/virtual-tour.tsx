@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { Viewer } from "@photo-sphere-viewer/core";
 import { MarkersPlugin } from "@photo-sphere-viewer/markers-plugin";
 import ProductsListModal from "./products-list-modal";
-import { InfoSpotAction, getTourData, TourData } from "@/app/_consts/tourdata";
+import { InfoSpotAction, getTourData, TourData, Scene } from "@/app/_consts/tourdata";
 
 interface VirtualTourProps {
     className?: string;
@@ -31,6 +31,7 @@ export default function VirtualTour({
     const [isTransitioning, setIsTransitioning] = useState(false);
     const [tourData, setTourData] = useState<TourData>({ scenes: [] });
     const [isLoading, setIsLoading] = useState(true);
+    const [preloadedImages, setPreloadedImages] = useState<Set<string>>(new Set());
 
     // Calculate the actual height accounting for navbar
     const getActualHeight = () => {
@@ -41,6 +42,34 @@ export default function VirtualTour({
     };
 
     const actualHeight = getActualHeight();
+
+    // Function to preload all scene images
+    const preloadSceneImages = useCallback(async (scenes: Scene[]) => {
+        if (scenes.length === 0) return;
+        
+        
+        const imagePromises = scenes.map(scene => {
+            return new Promise<string>((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => {
+                    setPreloadedImages(prev => new Set(prev).add(scene.panorama));
+                    resolve(scene.panorama);
+                };
+                img.onerror = () => {
+                    console.warn(`Failed to preload scene image: ${scene.panorama}`);
+                    // Still resolve to not block other images
+                    resolve(scene.panorama);
+                };
+                img.src = scene.panorama;
+            });
+        });
+
+        try {
+            await Promise.all(imagePromises);
+        } catch (error) {
+            console.error('Error preloading scene images:', error);
+        }
+    }, []);
 
     // Fetch tour data from Supabase
     useEffect(() => {
@@ -56,6 +85,9 @@ export default function VirtualTour({
                     if (!sceneExists) {
                         setCurrentScene(data.scenes[0].id);
                     }
+                    
+                    // Start preloading all scene images
+                    preloadSceneImages(data.scenes);
                 }
             } catch (error) {
                 console.error('Failed to fetch tour data:', error);
@@ -65,7 +97,7 @@ export default function VirtualTour({
         };
 
         fetchTourData();
-    }, [startingScene]);
+    }, [startingScene, preloadSceneImages]);
 
     useEffect(() => {
         if (!containerRef.current || isLoading || !tourData.scenes.length) return;
@@ -129,10 +161,13 @@ export default function VirtualTour({
             try {
                 setIsTransitioning(true);
 
+                // Check if image is preloaded for faster transition
+                const isImagePreloaded = preloadedImages.has(currentSceneData.panorama);
+                
                 // Use setPanorama for smooth transitions
                 await viewerRef.current!.setPanorama(currentSceneData.panorama, {
                     transition: true, // Enable smooth transition
-                    showLoader: false, // Disable loading screen
+                    showLoader: !isImagePreloaded, // Only show loader if image isn't preloaded
                 });
 
                 // Animate to new view position
@@ -143,11 +178,12 @@ export default function VirtualTour({
                     speed: "2rpm",
                 });
 
-                // Update markers after transition
+                // Update markers after transition (faster for preloaded images)
+                const delay = isImagePreloaded ? 100 : 200;
                 setTimeout(() => {
                     addMarkers();
                     setIsTransitioning(false);
-                }, 200);
+                }, delay);
             } catch (error) {
                 console.error("Error transitioning to scene:", error);
                 setIsTransitioning(false);
@@ -155,7 +191,7 @@ export default function VirtualTour({
         };
 
         transitionToScene();
-    }, [currentScene, tourData]);
+    }, [currentScene, tourData, preloadedImages]);
 
     // Add markers for navigation links and info spots
     const addMarkers = useCallback(() => {
