@@ -5,71 +5,75 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Store, MapPin } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
 import { TourData } from "@/app/_consts/tourdata";
+import { useStores } from "@/app/admin/_hooks/use-stores";
 
-interface StoreSectionSelectorProps {
-    selectedSection: string | null;
-    onSectionSelect: (sectionId: string, storeName: string, sectionTitle: string) => void;
+interface StoreSelectorProps {
+    selectedStore: string | null;
+    onStoreSelect: (storeId: string, storeName: string) => void;
     tourData: TourData;
 }
 
-export function StoreSectionSelector({ selectedSection, onSectionSelect, tourData }: StoreSectionSelectorProps) {
+export function StoreSelector({ selectedStore, onStoreSelect }: StoreSelectorProps) {
     const { t } = useLanguage();
     
-    // Extract stores and sections from tour data
-    const storesWithSections = tourData.scenes
-        .map((scene) => ({
-            id: scene.id,
-            name: scene.name,
-            sections: scene.infoSpots
-                .filter((spot) => spot.action.modalType === "products-list")
-                .map((spot) => ({
-                    id: spot.action.id!,
-                    title: spot.title,
-                    text: spot.text,
-                })),
-        }))
-        .filter((store) => store.sections.length > 0);
+    const { data: stores, isLoading, error } = useStores();
+
+    if (isLoading) {
+        return (
+            <div className="p-4 lg:p-6">
+                <h2 className="text-2xl lg:text-3xl font-bold mb-4 lg:mb-6">{t('admin.selectStore')}</h2>
+                <div className="text-center py-8">
+                    <p className="text-gray-600">Loading stores...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="p-4 lg:p-6">
+                <h2 className="text-2xl lg:text-3xl font-bold mb-4 lg:mb-6">{t('admin.selectStore')}</h2>
+                <div className="text-center py-8">
+                    <p className="text-red-600">Error loading stores: {error.message}</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="p-4 lg:p-6">
-            <h2 className="text-2xl lg:text-3xl font-bold mb-4 lg:mb-6">{t('admin.selectStoreSection')}</h2>
+            <h2 className="text-2xl lg:text-3xl font-bold mb-4 lg:mb-6">{t('admin.selectStore')}</h2>
 
-            {storesWithSections.length === 0 ? (
+            {!stores || stores.length === 0 ? (
                 <div className="text-center py-8">
-                    <p className="text-gray-600">{t('admin.noSectionsAvailable')}</p>
+                    <p className="text-gray-600">{t('admin.noStoresAvailable')}</p>
                 </div>
             ) : (
-                <div className="grid gap-4 lg:gap-6">
-                    {storesWithSections.map((store) => (
-                        <Card key={store.id} className="border-2">
+                <div className="grid gap-4 lg:gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    {stores.map((store: any) => (
+                        <Card key={store.yboutiqueid} className="border-2 hover:shadow-lg transition-shadow cursor-pointer">
                             <CardHeader className="pb-3">
                                 <CardTitle className="flex items-center gap-2 text-lg lg:text-xl">
                                     <Store className="h-4 w-4 lg:h-5 lg:w-5" />
-                                    {store.name}
+                                    {store.yboutiqueintitule || store.yboutiquecode}
                                 </CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <div className="grid gap-2 lg:gap-3">
-                                    {store.sections.map((section) => (
-                                        <Button
-                                            key={section.id}
-                                            variant={selectedSection === section.id ? "default" : "outline"}
-                                            className="justify-start h-auto p-3 lg:p-4 text-left"
-                                            onClick={() => onSectionSelect(section.id, store.name, section.title)}
-                                        >
-                                            <div className="w-full">
-                                                <div className="flex items-start gap-2 mb-1">
-                                                    <MapPin className="h-3 w-3 lg:h-4 lg:w-4 mt-0.5 flex-shrink-0" />
-                                                    <span className="font-medium text-sm lg:text-base break-words">
-                                                        {section.title}
-                                                    </span>
-                                                </div>
-                                                <p className="text-xs lg:text-sm text-gray-600 ml-5 lg:ml-6 break-words">
-                                                    {section.text}
-                                                </p>
-                                            </div>
-                                        </Button>
-                                    ))}
+                                <div className="space-y-3">
+                                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                                        <MapPin className="h-3 w-3 lg:h-4 lg:w-4" />
+                                        <span>{store.categories?.length || 0} categor{(store.categories?.length || 0) !== 1 ? 'ies' : 'y'}</span>
+                                    </div>
+                                    <div className="text-sm text-gray-500">
+                                        {store.yboutiqueadressemall}
+                                    </div>
+                                    <Button
+                                        variant={selectedStore === store.yboutiqueid.toString() ? "default" : "outline"}
+                                        className="w-full"
+                                        onClick={() => onStoreSelect(store.yboutiqueid.toString(), store.yboutiqueintitule || store.yboutiquecode)}
+                                    >
+                                        {selectedStore === store.yboutiqueid.toString() ? t('admin.selected') : t('admin.selectStore')}
+                                    </Button>
                                 </div>
                             </CardContent>
                         </Card>

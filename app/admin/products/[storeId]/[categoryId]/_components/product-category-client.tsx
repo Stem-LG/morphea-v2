@@ -3,18 +3,30 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ProductList } from "@/app/admin/_components/product-list";
 import { ProductForm } from "@/app/admin/_components/product-form";
+import { useStores } from "@/app/admin/_hooks/use-stores";
 import type { ProductWithObjects } from "@/hooks/useProducts";
 
-interface ProductSectionClientProps {
-    sectionId: string;
+interface ProductCategoryClientProps {
+    storeId: string;
+    categoryId: string;
     storeName: string;
-    sectionTitle: string;
+    categoryName: string;
 }
 
-export function ProductSectionClient({ sectionId, storeName, sectionTitle }: ProductSectionClientProps) {
+export function ProductCategoryClient({ 
+    storeId, 
+    categoryId, 
+    storeName, 
+    categoryName 
+}: ProductCategoryClientProps) {
     const [currentView, setCurrentView] = useState<"list" | "form">("list");
     const [editingProduct, setEditingProduct] = useState<ProductWithObjects | undefined>(undefined);
+    const { data: stores } = useStores();
     const router = useRouter();
+
+    // Find the current store and category
+    const currentStore = stores?.find((store: any) => store.yboutiqueid.toString() === storeId);
+    const currentCategory = currentStore?.categories?.find((cat: any) => cat.id === categoryId);
 
     const handleEditProduct = (product: ProductWithObjects) => {
         setEditingProduct(product);
@@ -26,7 +38,7 @@ export function ProductSectionClient({ sectionId, storeName, sectionTitle }: Pro
         setCurrentView("form");
     };
 
-    const handleBackToSelector = () => {
+    const handleBackToCategories = () => {
         router.push("/admin/products");
     };
 
@@ -43,12 +55,14 @@ export function ProductSectionClient({ sectionId, storeName, sectionTitle }: Pro
     if (currentView === "list") {
         return (
             <ProductList
-                sectionId={sectionId}
+                storeId={storeId}
                 storeName={storeName}
-                sectionTitle={sectionTitle}
+                categoryId={categoryId}
+                categoryName={categoryName}
+                categoryProducts={currentCategory?.products || []}
                 onEditProduct={handleEditProduct}
                 onCreateProduct={handleCreateProduct}
-                onBack={handleBackToSelector}
+                onBack={handleBackToCategories}
             />
         );
     }
@@ -57,9 +71,10 @@ export function ProductSectionClient({ sectionId, storeName, sectionTitle }: Pro
         return (
             <ProductForm
                 product={editingProduct}
-                sectionId={sectionId}
+                storeId={storeId}
                 storeName={storeName}
-                sectionTitle={sectionTitle}
+                categoryId={categoryId}
+                categoryName={categoryName}
                 onBack={handleBackToList}
                 onSave={handleProductSaved}
             />

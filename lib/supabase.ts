@@ -291,24 +291,30 @@ export type Database = {
           yboutiqueidfk: number | null
           ycreatedat: string | null
           ycustomhandler: string | null
+          ydescription: string | null
           yinfospotactionsid: string
           ymodaltype: string | null
+          ytitle: string | null
           ytype: string
         }
         Insert: {
           yboutiqueidfk?: number | null
           ycreatedat?: string | null
           ycustomhandler?: string | null
+          ydescription?: string | null
           yinfospotactionsid: string
           ymodaltype?: string | null
+          ytitle?: string | null
           ytype: string
         }
         Update: {
           yboutiqueidfk?: number | null
           ycreatedat?: string | null
           ycustomhandler?: string | null
+          ydescription?: string | null
           yinfospotactionsid?: string
           ymodaltype?: string | null
+          ytitle?: string | null
           ytype?: string
         }
         Relationships: [
