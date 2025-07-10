@@ -13,19 +13,44 @@ export interface ProductWithObjects extends Product {
     yobjet3d: Object3D[];
 }
 
-export function useProducts(sectionId: string | null) {
+export function useProducts(storeId: string | null) {
     const supabase = createClient();
 
     return useQuery({
-        queryKey: ['products', sectionId],
+        queryKey: ['products', storeId],
         queryFn: async () => {
-            if (!sectionId) return [];
+            if (!storeId) return [];
 
+            // First, get all info spots for the given store (scene)
+            const { data: infoSpots, error: infoSpotsError } = await supabase
+                .schema("morpheus")
+                .from("yinfospots")
+                .select("yinfospotactionsidfk")
+                .eq("ysceneid", storeId)
+                .not("yinfospotactionsidfk", "is", null);
+
+            if (infoSpotsError) {
+                console.error("Error fetching info spots:", infoSpotsError);
+                throw infoSpotsError;
+            }
+
+            if (!infoSpots || infoSpots.length === 0) {
+                return [];
+            }
+
+            // Extract unique action IDs
+            const actionIds = [...new Set(infoSpots.map(spot => spot.yinfospotactionsidfk).filter(Boolean))];
+
+            if (actionIds.length === 0) {
+                return [];
+            }
+
+            // Then get all products for those info spot actions
             const { data, error } = await supabase
                 .schema("morpheus")
                 .from("yproduit")
                 .select("*, yobjet3d(*)")
-                .eq("yinfospotactionsidfk", sectionId)
+                .in("yinfospotactionsidfk", actionIds)
                 .order("yproduitid");
 
             if (error) {
@@ -40,7 +65,38 @@ export function useProducts(sectionId: string | null) {
 
             return data as ProductWithObjects[] || [];
         },
-        enabled: !!sectionId,
+        enabled: !!storeId,
+    });
+}
+
+export function useProductsByCategory(categoryId: string | null) {
+    const supabase = createClient();
+
+    return useQuery({
+        queryKey: ['products-by-category', categoryId],
+        queryFn: async () => {
+            if (!categoryId) return [];
+
+            const { data, error } = await supabase
+                .schema("morpheus")
+                .from("yproduit")
+                .select("*, yobjet3d(*)")
+                .eq("yinfospotactionsidfk", categoryId)
+                .order("yproduitid");
+
+            if (error) {
+                console.error("Error fetching products by category:", {
+                    message: error.message,
+                    details: error.details,
+                    hint: error.hint,
+                    code: error.code
+                });
+                throw error;
+            }
+
+            return data as ProductWithObjects[] || [];
+        },
+        enabled: !!categoryId,
     });
 }
 
