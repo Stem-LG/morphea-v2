@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { StoreSectionSelector } from "./store-section-selector";
+import { StoreSelector } from "./store-section-selector";
 import { ProductList } from "./product-list";
 import { ProductForm } from "./product-form";
 import { getTourData, TourData } from "@/app/_consts/tourdata";
@@ -80,9 +80,9 @@ export function ProductManagement() {
 
     if (currentView === "selector") {
         return (
-            <StoreSectionSelector 
-                selectedSection={selectedSection?.id || null} 
-                onSectionSelect={handleSectionSelect}
+            <StoreSelector
+                selectedStore={selectedSection?.id || null}
+                onStoreSelect={(storeId, storeName) => handleSectionSelect(storeId, storeName, storeName)}
                 tourData={tourData}
             />
         );
@@ -91,9 +91,8 @@ export function ProductManagement() {
     if (currentView === "list" && selectedSection) {
         return (
             <ProductList
-                sectionId={selectedSection.id}
+                storeId={selectedSection.id}
                 storeName={selectedSection.storeName}
-                sectionTitle={selectedSection.sectionTitle}
                 onEditProduct={handleEditProduct}
                 onCreateProduct={handleCreateProduct}
                 onBack={handleBackToSelector}
@@ -105,9 +104,8 @@ export function ProductManagement() {
         return (
             <ProductForm
                 product={editingProduct}
-                sectionId={selectedSection.id}
+                storeId={selectedSection.id}
                 storeName={selectedSection.storeName}
-                sectionTitle={selectedSection.sectionTitle}
                 onBack={handleBackToList}
                 onSave={handleProductSaved}
             />
