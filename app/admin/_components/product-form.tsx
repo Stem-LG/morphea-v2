@@ -16,9 +16,10 @@ import type { ProductWithObjects } from "@/hooks/useProducts";
 
 interface ProductFormProps {
     product?: ProductWithObjects;
-    sectionId: string;
+    storeId: string;
     storeName: string;
-    sectionTitle: string;
+    categoryId?: string;
+    categoryName?: string;
     onBack: () => void;
     onSave?: () => void;
 }
@@ -30,7 +31,7 @@ interface Object3DForm {
     order: number;
 }
 
-export function ProductForm({ product, sectionId, storeName, sectionTitle, onBack, onSave }: ProductFormProps) {
+export function ProductForm({ product, storeId, storeName, categoryId, categoryName, onBack, onSave }: ProductFormProps) {
     const [formData, setFormData] = useState({
         yproduitintitule: "",
         yproduitcode: "",
@@ -131,7 +132,7 @@ export function ProductForm({ product, sectionId, storeName, sectionTitle, onBac
                     id: product.yproduitid,
                     updates: {
                         ...formData,
-                        yinfospotactionsidfk: sectionId,
+                        yinfospotactionsidfk: categoryId || storeId,
                     },
                 });
                 productId = updatedProduct.yproduitid;
@@ -139,7 +140,7 @@ export function ProductForm({ product, sectionId, storeName, sectionTitle, onBac
                 // Create new product
                 const newProduct = await createProduct.mutateAsync({
                     ...formData,
-                    yinfospotactionsidfk: sectionId,
+                    yinfospotactionsidfk: categoryId || storeId,
                 });
                 productId = newProduct.yproduitid;
             }
@@ -187,7 +188,12 @@ export function ProductForm({ product, sectionId, storeName, sectionTitle, onBac
                 </Button>
                 <h2 className="text-2xl lg:text-3xl font-bold">{product ? "Edit Product" : "Create New Product"}</h2>
                 <p className="text-gray-600 mt-1 text-sm lg:text-base">
-                    {storeName} - {sectionTitle}
+                    {storeName}
+                    {categoryName && (
+                        <span className="block text-blue-600 font-medium">
+                            Category: {categoryName}
+                        </span>
+                    )}
                 </p>
             </div>
 

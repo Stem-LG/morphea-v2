@@ -341,9 +341,9 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                                 </div>
                             ) : (
                                 /* 3D Viewer */
-                                <div className="h-full bg-gradient-to-br from-gray-300 via-gray-100 to-gray-200 rounded-lg border-2 border-morpheus-gold-dark/20 shadow-xl overflow-hidden relative">
+                                <div className="h-full bg-gradient-to-br from-morpheus-blue-dark/10 via-transparent to-morpheus-blue-light/10 rounded-lg border-2 border-morpheus-gold-dark/20 shadow-xl overflow-hidden relative">
                                     {/* Gradient overlay for depth */}
-                                    <div className="absolute inset-0 bg-gradient-to-t from-gray-400/30 via-transparent to-transparent pointer-events-none z-10"></div>
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none z-10"></div>
                                     
                                     <Canvas
                                         camera={{ position: [200, 200, 200], fov: 60 }}
@@ -356,16 +356,16 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                                     >
                                         <Suspense fallback={<LoadingSpinner />}>
                                             {/* Environment and Fog for atmosphere */}
-                                            <fog attach="fog" args={['#e5e7eb', 400, 1000]} />
+                                            <fog attach="fog" args={['#f0f0f0', 400, 1000]} />
                                             
                                             {/* Main ambient light - bright white overall illumination */}
-                                            <ambientLight intensity={1.0} color="#e5e7eb" />
+                                            <ambientLight intensity={1.0} color="#ffffff" />
                                             
                                             {/* Key light - main directional light pure white */}
                                             <directionalLight
                                                 position={[150, 200, 150]}
                                                 intensity={3.0}
-                                                color="#e5e7eb"
+                                                color="#ffffff"
                                                 castShadow
                                                 shadow-mapSize={[2048, 2048]}
                                                 shadow-camera-far={500}
@@ -379,14 +379,14 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                                             <directionalLight
                                                 position={[-150, 200, -150]}
                                                 intensity={2.5}
-                                                color="#e5e7eb"
+                                                color="#ffffff"
                                             />
                                             
                                             {/* Front light */}
                                             <pointLight
                                                 position={[200, 100, 0]}
                                                 intensity={2.5}
-                                                color="#e5e7eb"
+                                                color="#ffffff"
                                                 distance={400}
                                                 decay={2}
                                             />
@@ -395,7 +395,7 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                                             <pointLight
                                                 position={[-200, 100, 0]}
                                                 intensity={2.5}
-                                                color="#e5e7eb"
+                                                color="#ffffff"
                                                 distance={400}
                                                 decay={2}
                                             />
@@ -404,7 +404,7 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                                             <pointLight
                                                 position={[0, 100, 200]}
                                                 intensity={2.5}
-                                                color="#e5e7eb"
+                                                color="#ffffff"
                                                 distance={400}
                                                 decay={2}
                                             />
@@ -413,7 +413,7 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                                             <pointLight
                                                 position={[0, 100, -200]}
                                                 intensity={2.5}
-                                                color="#e5e7eb"
+                                                color="#ffffff"
                                                 distance={400}
                                                 decay={2}
                                             />
@@ -422,7 +422,7 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                                             <pointLight
                                                 position={[0, 300, 0]}
                                                 intensity={3.0}
-                                                color="#e5e7eb"
+                                                color="#ffffff"
                                                 distance={500}
                                                 decay={2}
                                             />
@@ -431,16 +431,16 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                                             <pointLight
                                                 position={[0, -80, 0]}
                                                 intensity={1.5}
-                                                color="#e5e7eb"
+                                                color="#ffffff"
                                                 distance={250}
                                                 decay={2}
                                             />
                                             
                                             {/* Corner lights for complete coverage */}
-                                            <pointLight position={[150, 150, 150]} intensity={2.0} color="#e5e7eb" distance={350} decay={2} />
-                                            <pointLight position={[-150, 150, 150]} intensity={2.0} color="#e5e7eb" distance={350} decay={2} />
-                                            <pointLight position={[150, 150, -150]} intensity={2.0} color="#e5e7eb" distance={350} decay={2} />
-                                            <pointLight position={[-150, 150, -150]} intensity={2.0} color="#e5e7eb" distance={350} decay={2} />
+                                            <pointLight position={[150, 150, 150]} intensity={2.0} color="#ffffff" distance={350} decay={2} />
+                                            <pointLight position={[-150, 150, 150]} intensity={2.0} color="#ffffff" distance={350} decay={2} />
+                                            <pointLight position={[150, 150, -150]} intensity={2.0} color="#ffffff" distance={350} decay={2} />
+                                            <pointLight position={[-150, 150, -150]} intensity={2.0} color="#ffffff" distance={350} decay={2} />
                                             
                                             {/* Spot lights for additional brightness */}
                                             <spotLight
@@ -448,7 +448,7 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                                                 angle={0.4}
                                                 penumbra={0.5}
                                                 intensity={2.5}
-                                                color="#e5e7eb"
+                                                color="#ffffff"
                                                 castShadow
                                                 target-position={[0, 0, 0]}
                                             />
@@ -458,7 +458,7 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                                                 angle={0.4}
                                                 penumbra={0.5}
                                                 intensity={2.5}
-                                                color="#e5e7eb"
+                                                color="#ffffff"
                                                 target-position={[0, 0, 0]}
                                             />
                                             

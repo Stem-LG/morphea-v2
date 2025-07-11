@@ -106,6 +106,9 @@ export const enTranslations = {
     "storeSectionSelector": "Store Section Selector",
     "selectStoreSection": "Select a store section to manage products",
     "noSectionsAvailable": "No sections available",
+    "selectStore": "Select Store",
+    "noStoresAvailable": "No stores available",
+    "selected": "Selected",
     "productDetails": "Product Details",
     "technicalDetails": "Technical Details"
   },
