@@ -5,43 +5,13 @@ import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/hooks/useLanguage";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 export default function NavBar() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const [isClient, setIsClient] = useState(false);
     const { t } = useLanguage();
 
-    // Auth state with error handling
-    const authQuery = useAuth();
-    const { data: user, error, isLoading } = authQuery || { data: null, error: null, isLoading: true };
-
-    // Handle client-side hydration
-    useEffect(() => {
-        setIsClient(true);
-    }, []);
-
-    // Determine auth state safely
-    const getAuthState = () => {
-        if (!isClient) return { user: null, loading: true };
-
-        if (isLoading) return { user: null, loading: true };
-
-        // Handle auth session missing error (normal when not logged in)
-        if (error?.message?.includes("Auth session missing") || error?.name === "AuthSessionMissingError") {
-            return { user: null, loading: false };
-        }
-
-        // Handle other errors
-        if (error) {
-            console.error("Auth error:", error);
-            return { user: null, loading: false };
-        }
-
-        return { user: user || null, loading: false };
-    };
-
-    const { user: currentUser, loading } = getAuthState();
+    const { data: currentUser, isLoading } = useAuth();
 
     const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
@@ -88,7 +58,7 @@ export default function NavBar() {
                             <LanguageSwitcher />
 
                             {/* Auth Section */}
-                            {loading ? (
+                            {isLoading ? (
                                 <div className="flex items-center space-x-2">
                                     <div className="w-5 h-5 border-2 border-morpheus-gold-dark border-t-morpheus-gold-light animate-spin rounded-full"></div>
                                     <span className="text-gray-300 text-sm">{t("nav.loading")}</span>
@@ -161,9 +131,9 @@ export default function NavBar() {
                                 </div>
 
                                 {/* Mobile Auth Section */}
-                                <div className="border-t border-morpheus-gold-dark/20 pt-2 mt-2">
-                                    {loading ? (
-                                        <div className="flex items-center justify-center px-4 py-3">
+                                <div className="border-t border-slate-600 pt-2 mt-2">
+                                    {isLoading ? (
+                                        <div className="flex items-center justify-center px-3 py-2">
                                             <div className="w-5 h-5 border-2 border-morpheus-gold-dark border-t-morpheus-gold-light animate-spin rounded-full"></div>
                                             <span className="text-gray-300 text-sm ml-2">{t("nav.loading")}</span>
                                         </div>

@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useLanguage } from "@/hooks/useLanguage";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -16,7 +15,6 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
     const [password, setPassword] = useState("");
     const [error, setError] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false); // Add separate loading state for form
-    const router = useRouter();
     const { refetch } = useAuth();
     const { t } = useLanguage();
 
@@ -32,14 +30,13 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
                 password,
             });
             if (error) throw error;
-            
             // Wait for auth state to be refreshed and ensure user is authenticated
             const { data: user } = await refetch();
-            
             // Only navigate if we have a valid user
-            if (user) {
-                router.push("/protected");
+            if (user && window != undefined) {
+                window.location.href = "/protected";
             } else {
+                console.log("not redirecting due to error");
                 throw new Error(t("auth.errorOccurred"));
             }
         } catch (error: unknown) {
