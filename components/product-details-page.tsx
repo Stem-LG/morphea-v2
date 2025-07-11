@@ -136,6 +136,7 @@ interface ProductDetailsPageProps {
         name: string;
         description: string;
         image: string;
+        backgroundColor?: string;
         models: Array<{
             url: string;
             color: string;
@@ -341,7 +342,15 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                                 </div>
                             ) : (
                                 /* 3D Viewer */
-                                <div className="h-full bg-gradient-to-br from-morpheus-blue-dark/10 via-transparent to-morpheus-blue-light/10 rounded-lg border-2 border-morpheus-gold-dark/20 shadow-xl overflow-hidden relative">
+                                <div
+                                    className="h-full rounded-lg border-2 border-morpheus-gold-dark/20 shadow-xl overflow-hidden relative"
+                                    style={{
+                                        backgroundColor: productData.backgroundColor || '#f0f0f0',
+                                        background: productData.backgroundColor
+                                            ? productData.backgroundColor
+                                            : 'linear-gradient(to bottom right, rgba(30, 58, 138, 0.1), transparent, rgba(59, 130, 246, 0.1))'
+                                    }}
+                                >
                                     {/* Gradient overlay for depth */}
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none z-10"></div>
                                     

@@ -37,6 +37,7 @@ export function ProductForm({ product, storeId, storeName, categoryId, categoryN
         yproduitcode: "",
         yproduitdetailstech: "",
         imageurl: "",
+        yarriereplancouleur: "",
     });
 
     const [objects3D, setObjects3D] = useState<Object3DForm[]>([]);
@@ -55,6 +56,7 @@ export function ProductForm({ product, storeId, storeName, categoryId, categoryN
                 yproduitcode: product.yproduitcode,
                 yproduitdetailstech: product.yproduitdetailstech,
                 imageurl: product.imageurl || "",
+                yarriereplancouleur: product.yarriereplancouleur || "",
             });
 
             setObjects3D(
@@ -257,6 +259,23 @@ export function ProductForm({ product, storeId, storeName, categoryId, categoryN
                                 placeholder="https://example.com/image.jpg"
                                 className="mt-1"
                             />
+                        </div>
+
+                        <div>
+                            <Label htmlFor="backgroundColor" className="text-sm lg:text-base">
+                                3D Preview Background Color
+                            </Label>
+                            <Input
+                                id="backgroundColor"
+                                type="text"
+                                value={formData.yarriereplancouleur}
+                                onChange={(e) => handleInputChange("yarriereplancouleur", e.target.value)}
+                                placeholder="#ffffff or transparent"
+                                className="mt-1"
+                            />
+                            <p className="text-xs text-gray-500 mt-1">
+                                Enter a hex color code (e.g., #ff0000) or color name (e.g., red, transparent)
+                            </p>
                         </div>
                     </CardContent>
                 </Card>

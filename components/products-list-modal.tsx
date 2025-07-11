@@ -25,6 +25,7 @@ export default function ProductsListModal({ isOpen, onClose }: ProductsListModal
             model: product.yobjet3d.length > 0 ? product.yobjet3d[0].url : "",
             image: product.imageurl,
             description: product.yproduitdetailstech,
+            backgroundColor: product.yarriereplancouleur,
             models: product.yobjet3d.map((obj3d: { url: string; couleur?: string; id: number }) => ({
                 url: obj3d.url,
                 color: obj3d.couleur || "Default",
@@ -167,6 +168,7 @@ export default function ProductsListModal({ isOpen, onClose }: ProductsListModal
                         description: selectedProductData.description,
                         image: selectedProductData.image!,
                         models: selectedProductData.models || [],
+                        backgroundColor: selectedProductData.backgroundColor,
                     }}
                     onClose={() => setShowProductDetails(false)}
                 />

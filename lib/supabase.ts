@@ -592,6 +592,7 @@ export type Database = {
           sysadresseip: string | null
           sysdate: string | null
           sysuser: string | null
+          yarriereplancouleur: string | null
           ydesigneuridfk: number | null
           yinfospotactionsidfk: string
           yproduitcode: string
@@ -606,6 +607,7 @@ export type Database = {
           sysadresseip?: string | null
           sysdate?: string | null
           sysuser?: string | null
+          yarriereplancouleur?: string | null
           ydesigneuridfk?: number | null
           yinfospotactionsidfk: string
           yproduitcode: string
@@ -620,6 +622,7 @@ export type Database = {
           sysadresseip?: string | null
           sysdate?: string | null
           sysuser?: string | null
+          yarriereplancouleur?: string | null
           ydesigneuridfk?: number | null
           yinfospotactionsidfk?: string
           yproduitcode?: string
