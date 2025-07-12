@@ -17,7 +17,8 @@ export function useStores() {
                         *,
                         yproduit!yproduit_yinfospotactionsidfk_fkey (
                             *,
-                            ydesigneur (*)
+                            ydesigneur (*),
+                            yobjet3d (*)
                         ),
                         yinfospots!yinfospots_yinfospotactionsidfk_fkey (
                             *,
@@ -52,6 +53,8 @@ export function useStores() {
                     sections: []
                 };
             });
+
+            console.log(transformedBoutiques)
 
             return transformedBoutiques || [];
         },

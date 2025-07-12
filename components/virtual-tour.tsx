@@ -38,6 +38,8 @@ export default function VirtualTour({
     
     const [currentScene, setCurrentScene] = useState(getInitialScene);
     const [productsList, setProductsList] = useState<string | null>(null);
+    const [isProductDetailsOpen, setIsProductDetailsOpen] = useState(false);
+    const [isProductsListOpen, setIsProductsListOpen] = useState(false);
     const [isTransitioning, setIsTransitioning] = useState(false);
     const [tourData, setTourData] = useState<TourData>({ scenes: [] });
     const [isLoading, setIsLoading] = useState(true);
@@ -322,7 +324,7 @@ export default function VirtualTour({
                 maxFov: 120,
                 loadingImg: "/loading.gif", // Remove loading icon
                 loadingTxt: "", // Remove loading text
-                navbar: showNavbar ? ["zoom", "plein écran"] : false,
+                navbar: showNavbar && !isProductDetailsOpen && !isProductsListOpen ? ["zoom", "plein écran"] : false,
                 plugins: [
                     [
                         MarkersPlugin,
@@ -364,7 +366,7 @@ export default function VirtualTour({
                 viewerRef.current = null;
             }
         };
-    }, [showNavbar, tourData, isLoading]);
+    }, [showNavbar, isProductDetailsOpen, tourData, isLoading]);
 
     // Separate effect for scene transitions
     useEffect(() => {
@@ -441,6 +443,21 @@ export default function VirtualTour({
 
         transitionToScene();
     }, [currentScene, tourData, preloadedImages]);
+
+    // Effect to dynamically show/hide navbar based on modal states
+    useEffect(() => {
+        if (!viewerRef.current) return;
+        
+        // Get the navbar element and hide/show it with CSS
+        const navbarElement = viewerRef.current.container.querySelector('.psv-navbar');
+        if (navbarElement) {
+            if (isProductDetailsOpen || isProductsListOpen) {
+                (navbarElement as HTMLElement).style.display = 'none';
+            } else {
+                (navbarElement as HTMLElement).style.display = '';
+            }
+        }
+    }, [isProductDetailsOpen, isProductsListOpen]);
 
     // Add markers for navigation links and info spots
     const addMarkers = useCallback(() => {
@@ -529,6 +546,7 @@ export default function VirtualTour({
                     // Use the action ID to fetch products linked to this infospot action
                     console.log('Opening products list for action ID:', action.id);
                     setProductsList(action.id || currentScene);
+                    setIsProductsListOpen(true);
                 }
                 // Add other modal types here as needed
                 break;
@@ -635,15 +653,22 @@ export default function VirtualTour({
                 </p>
             </div> */}
 
-            {/* Navigation hints */}
+            {/* Navigation hints
             <div className="absolute bottom-4 left-4 right-4 z-10 bg-black/70 text-white px-4 py-2 rounded-lg text-center">
                 <p className="text-sm">
                     Use arrow keys to navigate: ↑ Zoom in/Forward • ↓ Zoom out/Backward • ← → Rotate view
                 </p>
-            </div>
+            </div> */}
 
             {/* Tree Inventory Modal */}
-            <ProductsListModal isOpen={productsList} onClose={() => setProductsList(null)} />
+            <ProductsListModal
+                isOpen={productsList}
+                onClose={() => {
+                    setProductsList(null);
+                    setIsProductsListOpen(false);
+                }}
+                onProductDetailsChange={setIsProductDetailsOpen}
+            />
         </div>
     );
 }
