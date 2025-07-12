@@ -28,6 +28,7 @@ export default function VirtualTour({
     const markersPluginRef = useRef<MarkersPlugin | null>(null);
     const [currentScene, setCurrentScene] = useState(startingScene);
     const [productsList, setProductsList] = useState<string | null>(null);
+    const [isProductDetailsOpen, setIsProductDetailsOpen] = useState(false);
     const [isTransitioning, setIsTransitioning] = useState(false);
     const [tourData, setTourData] = useState<TourData>({ scenes: [] });
     const [isLoading, setIsLoading] = useState(true);
@@ -308,7 +309,7 @@ export default function VirtualTour({
                 maxFov: 120,
                 loadingImg: "/loading.gif", // Remove loading icon
                 loadingTxt: "", // Remove loading text
-                navbar: showNavbar ? ["zoom", "plein écran"] : false,
+                navbar: showNavbar && !isProductDetailsOpen ? ["zoom", "plein écran"] : false,
                 plugins: [
                     [
                         MarkersPlugin,
@@ -350,7 +351,7 @@ export default function VirtualTour({
                 viewerRef.current = null;
             }
         };
-    }, [showNavbar, tourData, isLoading]);
+    }, [showNavbar, isProductDetailsOpen, tourData, isLoading]);
 
     // Separate effect for scene transitions
     useEffect(() => {
@@ -404,6 +405,21 @@ export default function VirtualTour({
 
         transitionToScene();
     }, [currentScene, tourData, preloadedImages]);
+
+    // Effect to dynamically show/hide navbar based on product details state
+    useEffect(() => {
+        if (!viewerRef.current) return;
+        
+        // Get the navbar element and hide/show it with CSS
+        const navbarElement = viewerRef.current.container.querySelector('.psv-navbar');
+        if (navbarElement) {
+            if (isProductDetailsOpen) {
+                (navbarElement as HTMLElement).style.display = 'none';
+            } else {
+                (navbarElement as HTMLElement).style.display = '';
+            }
+        }
+    }, [isProductDetailsOpen]);
 
     // Add markers for navigation links and info spots
     const addMarkers = useCallback(() => {
@@ -606,7 +622,11 @@ export default function VirtualTour({
             </div>
 
             {/* Tree Inventory Modal */}
-            <ProductsListModal isOpen={productsList} onClose={() => setProductsList(null)} />
+            <ProductsListModal
+                isOpen={productsList}
+                onClose={() => setProductsList(null)}
+                onProductDetailsChange={setIsProductDetailsOpen}
+            />
         </div>
     );
 }

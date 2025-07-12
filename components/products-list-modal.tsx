@@ -8,9 +8,10 @@ import Image from "next/image";
 interface ProductsListModalProps {
     isOpen: string | null;
     onClose: () => void;
+    onProductDetailsChange?: (isOpen: boolean) => void;
 }
 
-export default function ProductsListModal({ isOpen, onClose }: ProductsListModalProps) {
+export default function ProductsListModal({ isOpen, onClose, onProductDetailsChange }: ProductsListModalProps) {
     const sceneId = isOpen;
 
     const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
@@ -91,6 +92,7 @@ export default function ProductsListModal({ isOpen, onClose }: ProductsListModal
                                     onClick={() => {
                                         setSelectedProduct(product.id);
                                         setShowProductDetails(true);
+                                        onProductDetailsChange?.(true);
                                     }}
                                     className="cursor-pointer group relative overflow-hidden border-2 border-morpheus-gold-dark/30 bg-gradient-to-r from-morpheus-blue-dark/50 to-morpheus-blue-light/30 backdrop-blur-sm transition-all duration-300 hover:border-morpheus-gold-light/60 hover:shadow-xl hover:shadow-morpheus-gold-light/20 rounded-lg"
                                 >
@@ -170,7 +172,10 @@ export default function ProductsListModal({ isOpen, onClose }: ProductsListModal
                         models: selectedProductData.models || [],
                         backgroundColor: selectedProductData.backgroundColor,
                     }}
-                    onClose={() => setShowProductDetails(false)}
+                    onClose={() => {
+                        setShowProductDetails(false);
+                        onProductDetailsChange?.(false);
+                    }}
                 />
             )}
         </div>

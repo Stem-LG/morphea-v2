@@ -232,13 +232,13 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
     };
 
     return (
-        <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="relative w-full max-w-7xl h-[90vh] bg-gradient-to-br from-morpheus-blue-dark via-morpheus-blue-dark/95 to-morpheus-blue-light/90 backdrop-blur-md border-2 border-morpheus-gold-dark/30 shadow-2xl shadow-black/50 overflow-hidden rounded-xl">
+        <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm">
+            <div className="relative w-full h-full bg-gradient-to-br from-morpheus-blue-dark via-morpheus-blue-dark/95 to-morpheus-blue-light/90 backdrop-blur-md shadow-2xl shadow-black/50 overflow-hidden" style={{ marginTop: '4rem', height: 'calc(100vh - 4rem)' }}>
                 {/* Decorative top border */}
                 <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-morpheus-gold-dark via-morpheus-gold-light to-morpheus-gold-dark"></div>
                 
                 {/* Header */}
-                <div className="absolute top-0 left-0 right-0 z-10 bg-gradient-to-b from-black/60 via-black/30 to-transparent backdrop-blur-sm p-6">
+                <div className="absolute top-0 left-0 right-0 z-10 bg-gradient-to-b from-black/60 via-black/30 to-transparent backdrop-blur-sm p-6 border-b border-morpheus-gold-dark/20">
                     <div className="flex justify-between items-center">
                         <div>
                             <h1 className="text-3xl font-bold font-parisienne bg-gradient-to-r from-morpheus-gold-dark via-morpheus-gold-light to-morpheus-gold-dark bg-clip-text text-transparent drop-shadow-lg">
@@ -264,7 +264,7 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                 </div>
 
                 {/* Main Content */}
-                <div className="pt-24 h-full flex">
+                <div className="pt-20 h-full flex">
                     {/* Left Side - Images/3D Viewer */}
                     <div className="w-1/2 h-full flex flex-col p-6">
                         {/* View Mode Toggle */}
@@ -355,7 +355,7 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none z-10"></div>
                                     
                                     <Canvas
-                                        camera={{ position: [200, 200, 200], fov: 60 }}
+                                        camera={{ position: [120, 120, 120], fov: 50 }}
                                         shadows
                                         gl={{
                                             antialias: true,
@@ -490,8 +490,8 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                                                 enableZoom={true}
                                                 enableRotate={true}
                                                 maxPolarAngle={Math.PI / 2.2}
-                                                minDistance={100}
-                                                maxDistance={600}
+                                                minDistance={60}
+                                                maxDistance={300}
                                                 target={[0, 15, 0]}
                                                 autoRotate={true}
                                                 autoRotateSpeed={0.5}
