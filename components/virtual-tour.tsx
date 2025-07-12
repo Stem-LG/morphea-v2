@@ -616,12 +616,12 @@ export default function VirtualTour({
                 </p>
             </div> */}
 
-            {/* Navigation hints */}
+            {/* Navigation hints
             <div className="absolute bottom-4 left-4 right-4 z-10 bg-black/70 text-white px-4 py-2 rounded-lg text-center">
                 <p className="text-sm">
                     Use arrow keys to navigate: ↑ Zoom in/Forward • ↓ Zoom out/Backward • ← → Rotate view
                 </p>
-            </div>
+            </div> */}
 
             {/* Tree Inventory Modal */}
             <ProductsListModal
