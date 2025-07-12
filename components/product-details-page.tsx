@@ -357,7 +357,7 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                                     <Canvas
                                         camera={{
                                             position: [120, 120, 120],
-                                            fov: window.innerWidth < 768 ? 60 : 50
+                                            fov: 30
                                         }}
                                         shadows
                                         gl={{
