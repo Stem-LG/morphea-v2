@@ -232,16 +232,16 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
     };
 
     return (
-        <div className="fixed top-0 left-0 right-0 bottom-0 z-[70] bg-black/90 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[70] bg-black/90 backdrop-blur-sm">
             <div className="relative w-full h-full bg-gradient-to-br from-morpheus-blue-dark via-morpheus-blue-dark/95 to-morpheus-blue-light/90 backdrop-blur-md shadow-2xl shadow-black/50 overflow-hidden">
                 {/* Decorative top border */}
                 <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-morpheus-gold-dark via-morpheus-gold-light to-morpheus-gold-dark"></div>
                 
                 {/* Header */}
-                <div className="absolute top-0 left-0 right-0 z-10 bg-gradient-to-b from-black/60 via-black/30 to-transparent backdrop-blur-sm p-4 sm:p-6 border-b border-morpheus-gold-dark/20">
+                <div className="absolute top-0 left-0 right-0 z-10 bg-gradient-to-b from-black/60 via-black/30 to-transparent backdrop-blur-sm p-3 sm:p-4 lg:p-6 border-b border-morpheus-gold-dark/20">
                     <div className="flex justify-between items-center">
                         <div className="flex-1 min-w-0">
-                            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold font-parisienne bg-gradient-to-r from-morpheus-gold-dark via-morpheus-gold-light to-morpheus-gold-dark bg-clip-text text-transparent drop-shadow-lg">
+                            <h1 className="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-bold font-parisienne bg-gradient-to-r from-morpheus-gold-dark via-morpheus-gold-light to-morpheus-gold-dark bg-clip-text text-transparent drop-shadow-lg">
                                 {productData.name}
                             </h1>
                             <p className="text-xs sm:text-sm text-gray-300 mt-1 hidden sm:block">{t('productDetails.productDetails')}</p>
@@ -251,7 +251,7 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                             className="group relative p-2 text-white/80 hover:text-morpheus-gold-light transition-all duration-300 hover:rotate-90 flex-shrink-0"
                         >
                             <div className="absolute inset-0 bg-morpheus-gold-light/20 rounded-full scale-0 group-hover:scale-100 transition-transform duration-300"></div>
-                            <svg className="relative w-6 h-6 sm:w-8 sm:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="relative w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path
                                     strokeLinecap="round"
                                     strokeLinejoin="round"
@@ -264,14 +264,14 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                 </div>
 
                 {/* Main Content */}
-                <div className="pt-16 sm:pt-20 h-full flex flex-col lg:flex-row">
+                <div className="pt-16 sm:pt-24 lg:pt-28 h-full flex flex-col xl:flex-row">
                     {/* Left Side - Images/3D Viewer */}
-                    <div className="w-full lg:w-1/2 h-1/2 lg:h-full flex flex-col p-3 sm:p-6">
+                    <div className="w-full xl:w-3/5 h-[45vh] sm:h-[50vh] lg:h-[55vh] xl:h-full flex flex-col p-2 sm:p-3 lg:p-4 xl:p-6">
                         {/* View Mode Toggle */}
-                        <div className="flex gap-2 mb-3 sm:mb-4">
+                        <div className="flex gap-1 sm:gap-2 mb-2 sm:mb-3">
                             <button
                                 onClick={() => setViewMode("image")}
-                                className={`relative px-3 sm:px-6 py-2 text-xs sm:text-sm font-medium transition-all duration-300 rounded-lg overflow-hidden group ${
+                                className={`relative px-2 sm:px-4 lg:px-6 py-1.5 sm:py-2 text-xs sm:text-sm font-medium transition-all duration-300 rounded-lg overflow-hidden group ${
                                     viewMode === "image"
                                         ? "bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light text-white shadow-lg shadow-morpheus-gold-light/25"
                                         : "bg-morpheus-blue-dark/50 text-gray-300 hover:text-morpheus-gold-light border border-morpheus-gold-dark/30"
@@ -284,7 +284,7 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                             </button>
                             <button
                                 onClick={() => setViewMode("3d")}
-                                className={`relative px-3 sm:px-6 py-2 text-xs sm:text-sm font-medium transition-all duration-300 rounded-lg overflow-hidden group ${
+                                className={`relative px-2 sm:px-4 lg:px-6 py-1.5 sm:py-2 text-xs sm:text-sm font-medium transition-all duration-300 rounded-lg overflow-hidden group ${
                                     viewMode === "3d"
                                         ? "bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light text-white shadow-lg shadow-morpheus-gold-light/25"
                                         : "bg-morpheus-blue-dark/50 text-gray-300 hover:text-morpheus-gold-light border border-morpheus-gold-dark/30"
@@ -298,12 +298,12 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                         </div>
 
                         {/* Main Display Area */}
-                        <div className="flex-1">
+                        <div className="flex-1 min-h-0">
                             {viewMode === "image" ? (
                                 <div className="h-full flex flex-col">
                                     {/* Main Image */}
-                                    <div className="flex-1 bg-gradient-to-br from-white/95 to-white/90 rounded-lg border-2 border-morpheus-gold-dark/20 shadow-xl overflow-hidden mb-4">
-                                        <div className="h-full flex items-center justify-center p-8">
+                                    <div className="flex-1 min-h-0 bg-gradient-to-br from-white/95 to-white/90 rounded-lg border-2 border-morpheus-gold-dark/20 shadow-xl overflow-hidden mb-2 sm:mb-3">
+                                        <div className="h-full flex items-center justify-center p-2 sm:p-4 lg:p-6">
                                             <Image
                                                 src={imageGallery[selectedImageIndex]}
                                                 alt={productData.name}
@@ -315,12 +315,12 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                                     </div>
                                     
                                     {/* Image Thumbnails */}
-                                    <div className="flex gap-3 overflow-x-auto pb-2 custom-scrollbar">
+                                    <div className="flex gap-2 sm:gap-3 overflow-x-auto pb-1 sm:pb-2 custom-scrollbar flex-shrink-0">
                                         {imageGallery.map((image, index) => (
                                             <button
                                                 key={index}
                                                 onClick={() => setSelectedImageIndex(index)}
-                                                className={`relative flex-shrink-0 w-20 h-20 bg-white rounded-lg border-2 transition-all duration-300 overflow-hidden group ${
+                                                className={`relative flex-shrink-0 w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 bg-white rounded-lg border-2 transition-all duration-300 overflow-hidden group ${
                                                     selectedImageIndex === index
                                                         ? "border-morpheus-gold-light shadow-lg shadow-morpheus-gold-light/25 scale-105"
                                                         : "border-morpheus-gold-dark/20 hover:border-morpheus-gold-light/50"
@@ -343,7 +343,7 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                             ) : (
                                 /* 3D Viewer */
                                 <div
-                                    className="h-full rounded-lg border-2 border-morpheus-gold-dark/20 shadow-xl overflow-hidden relative"
+                                    className="h-full w-full rounded-lg border-2 border-morpheus-gold-dark/20 shadow-xl overflow-hidden relative"
                                     style={{
                                         backgroundColor: productData.backgroundColor || '#f0f0f0',
                                         background: productData.backgroundColor
@@ -355,13 +355,17 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none z-10"></div>
                                     
                                     <Canvas
-                                        camera={{ position: [120, 120, 120], fov: 50 }}
+                                        camera={{
+                                            position: [120, 120, 120],
+                                            fov: window.innerWidth < 768 ? 60 : 50
+                                        }}
                                         shadows
                                         gl={{
                                             antialias: true,
                                             toneMapping: THREE.ACESFilmicToneMapping,
                                             toneMappingExposure: 1.2
                                         }}
+                                        style={{ width: '100%', height: '100%' }}
                                     >
                                         <Suspense fallback={<LoadingSpinner />}>
                                             {/* Environment and Fog for atmosphere */}
@@ -500,7 +504,7 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                                     </Canvas>
                                     
                                     {/* 3D indicator badge */}
-                                    <div className="absolute top-4 right-4 bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg z-20">
+                                    <div className="absolute top-2 right-2 sm:top-4 sm:right-4 bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light text-white px-2 py-1 sm:px-3 sm:py-1 rounded-full text-xs font-semibold shadow-lg z-20">
                                         3D Preview
                                     </div>
                                 </div>
@@ -509,21 +513,21 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                     </div>
 
                     {/* Right Side - Product Details */}
-                    <div className="w-full lg:w-1/2 h-1/2 lg:h-full overflow-y-auto p-3 sm:p-6 custom-scrollbar">
-                        <div className="space-y-4 sm:space-y-6">
+                    <div className="w-full xl:w-2/5 h-[55vh] sm:h-[50vh] lg:h-[45vh] xl:h-full overflow-y-auto p-2 sm:p-3 lg:p-4 xl:p-6 custom-scrollbar">
+                        <div className="space-y-3 sm:space-y-4 lg:space-y-6">
                             {/* Product Title & Description */}
-                            <div className="bg-morpheus-blue-dark/30 backdrop-blur-sm rounded-lg p-4 sm:p-6 border border-morpheus-gold-dark/20">
-                                <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-3 sm:mb-4">{productData.name}</h2>
-                                <p className="text-gray-300 leading-relaxed text-sm sm:text-base">{productData.description}</p>
+                            <div className="bg-morpheus-blue-dark/30 backdrop-blur-sm rounded-lg p-3 sm:p-4 lg:p-6 border border-morpheus-gold-dark/20">
+                                <h2 className="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-bold text-white mb-2 sm:mb-3 lg:mb-4">{productData.name}</h2>
+                                <p className="text-gray-300 leading-relaxed text-xs sm:text-sm lg:text-base">{productData.description}</p>
                             </div>
 
                             {/* Price Section */}
-                            <div className="bg-gradient-to-r from-morpheus-gold-dark/20 to-morpheus-gold-light/20 rounded-lg p-4 sm:p-6 border border-morpheus-gold-dark/30">
-                                <div className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-morpheus-gold-dark via-morpheus-gold-light to-morpheus-gold-dark bg-clip-text text-transparent">
+                            <div className="bg-gradient-to-r from-morpheus-gold-dark/20 to-morpheus-gold-light/20 rounded-lg p-3 sm:p-4 lg:p-6 border border-morpheus-gold-dark/30">
+                                <div className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-bold bg-gradient-to-r from-morpheus-gold-dark via-morpheus-gold-light to-morpheus-gold-dark bg-clip-text text-transparent">
                                     $99.99
                                 </div>
-                                <p className="text-sm text-gray-300 mt-2 flex items-center">
-                                    <svg className="w-4 h-4 mr-1 text-morpheus-gold-light" fill="currentColor" viewBox="0 0 20 20">
+                                <p className="text-xs sm:text-sm text-gray-300 mt-1 sm:mt-2 flex items-center">
+                                    <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1 text-morpheus-gold-light" fill="currentColor" viewBox="0 0 20 20">
                                         <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z"/>
                                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clipRule="evenodd"/>
                                     </svg>
@@ -533,12 +537,12 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
 
                             {/* Color/Variant Selector */}
                             {productData.models.length > 0 && (
-                                <div className="bg-morpheus-blue-dark/30 backdrop-blur-sm rounded-lg p-4 sm:p-6 border border-morpheus-gold-dark/20">
-                                    <h3 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4 flex items-center">
-                                        <span className="w-2 h-2 bg-morpheus-gold-light rounded-full mr-2"></span>
+                                <div className="bg-morpheus-blue-dark/30 backdrop-blur-sm rounded-lg p-3 sm:p-4 lg:p-6 border border-morpheus-gold-dark/20">
+                                    <h3 className="text-sm sm:text-base lg:text-lg font-semibold text-white mb-2 sm:mb-3 lg:mb-4 flex items-center">
+                                        <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-morpheus-gold-light rounded-full mr-2"></span>
                                         {productData.models.length > 1 ? t('productDetails.availableVariants') : t('productDetails.availableVariant')} ({productData.models.length})
                                     </h3>
-                                    <div className="flex flex-wrap gap-2 sm:gap-3">
+                                    <div className="flex flex-wrap gap-1.5 sm:gap-2 lg:gap-3">
                                     {availableColors.map((colorOption) => {
                                         // Handle both hex codes and color names
                                         const getColorValue = (colorInput: string | null | undefined) => {
@@ -586,7 +590,7 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                                                 <button
                                                     key={colorOption.id}
                                                     onClick={() => setSelectedModelIndex(colorOption.index)}
-                                                    className={`w-12 h-12 sm:w-14 sm:h-14 rounded-lg border-4 transition-all duration-300 relative group ${
+                                                    className={`w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 rounded-lg border-2 sm:border-4 transition-all duration-300 relative group ${
                                                         selectedModelIndex === colorOption.index
                                                             ? "border-morpheus-gold-light scale-110 shadow-lg shadow-morpheus-gold-light/40"
                                                             : "border-morpheus-gold-dark/30 hover:border-morpheus-gold-light/60 hover:scale-105"
@@ -600,7 +604,7 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                                                     {/* Selected indicator */}
                                                     {selectedModelIndex === colorOption.index && (
                                                         <div className="absolute inset-0 flex items-center justify-center">
-                                                            <svg className="w-6 h-6 text-white drop-shadow-lg" fill="currentColor" viewBox="0 0 20 20">
+                                                            <svg className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white drop-shadow-lg" fill="currentColor" viewBox="0 0 20 20">
                                                                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                                                             </svg>
                                                         </div>
@@ -618,22 +622,22 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                             )}
 
                             {/* Quantity Selector */}
-                            <div className="bg-morpheus-blue-dark/30 backdrop-blur-sm rounded-lg p-4 sm:p-6 border border-morpheus-gold-dark/20">
-                                <h3 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4 flex items-center">
-                                    <span className="w-2 h-2 bg-morpheus-gold-light rounded-full mr-2"></span>
+                            <div className="bg-morpheus-blue-dark/30 backdrop-blur-sm rounded-lg p-3 sm:p-4 lg:p-6 border border-morpheus-gold-dark/20">
+                                <h3 className="text-sm sm:text-base lg:text-lg font-semibold text-white mb-2 sm:mb-3 lg:mb-4 flex items-center">
+                                    <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-morpheus-gold-light rounded-full mr-2"></span>
                                     {t('productDetails.quantity')}
                                 </h3>
-                                <div className="flex items-center gap-4">
+                                <div className="flex items-center gap-3 sm:gap-4">
                                     <button
                                         onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                                        className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg border-2 border-morpheus-gold-dark/30 text-white hover:border-morpheus-gold-light hover:bg-morpheus-gold-dark/20 transition-all duration-300 flex items-center justify-center text-lg sm:text-xl font-semibold"
+                                        className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-lg border-2 border-morpheus-gold-dark/30 text-white hover:border-morpheus-gold-light hover:bg-morpheus-gold-dark/20 transition-all duration-300 flex items-center justify-center text-base sm:text-lg lg:text-xl font-semibold"
                                     >
                                         −
                                     </button>
-                                    <span className="text-white text-xl sm:text-2xl font-bold w-12 sm:w-16 text-center">{quantity}</span>
+                                    <span className="text-white text-lg sm:text-xl lg:text-2xl font-bold w-10 sm:w-12 lg:w-16 text-center">{quantity}</span>
                                     <button
                                         onClick={() => setQuantity(quantity + 1)}
-                                        className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg border-2 border-morpheus-gold-dark/30 text-white hover:border-morpheus-gold-light hover:bg-morpheus-gold-dark/20 transition-all duration-300 flex items-center justify-center text-lg sm:text-xl font-semibold"
+                                        className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-lg border-2 border-morpheus-gold-dark/30 text-white hover:border-morpheus-gold-light hover:bg-morpheus-gold-dark/20 transition-all duration-300 flex items-center justify-center text-base sm:text-lg lg:text-xl font-semibold"
                                     >
                                         +
                                     </button>
@@ -641,15 +645,15 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                             </div>
 
                             {/* Action Buttons */}
-                            <div className="space-y-3 sm:space-y-4">
+                            <div className="space-y-2 sm:space-y-3 lg:space-y-4">
                                 {/* Add to Cart & Wishlist Row */}
                                 <div className="flex gap-2 sm:gap-3">
                                     <button
                                         onClick={handleAddToCart}
-                                        className="flex-1 relative overflow-hidden bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light text-white py-3 sm:py-4 px-4 sm:px-6 font-semibold rounded-lg shadow-lg hover:shadow-morpheus-gold-light/30 transition-all duration-300 group"
+                                        className="flex-1 relative overflow-hidden bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light text-white py-2.5 sm:py-3 lg:py-4 px-3 sm:px-4 lg:px-6 font-semibold rounded-lg shadow-lg hover:shadow-morpheus-gold-light/30 transition-all duration-300 group"
                                     >
-                                        <span className="relative z-10 flex items-center justify-center text-sm sm:text-base">
-                                            <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <span className="relative z-10 flex items-center justify-center text-xs sm:text-sm lg:text-base">
+                                            <svg className="w-3 h-3 sm:w-4 sm:h-4 lg:w-5 lg:h-5 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                                             </svg>
                                             {t('productDetails.addToCart')}
@@ -658,13 +662,13 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                                     </button>
                                     <button
                                         onClick={toggleWishlist}
-                                        className={`w-12 h-12 sm:w-14 sm:h-14 rounded-lg border-2 transition-all duration-300 flex items-center justify-center ${
+                                        className={`w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 rounded-lg border-2 transition-all duration-300 flex items-center justify-center ${
                                             isWishlisted
                                                 ? "border-red-500 bg-red-500/20 text-red-500 shadow-lg shadow-red-500/25"
                                                 : "border-morpheus-gold-dark/30 text-gray-400 hover:border-red-500 hover:text-red-500 hover:bg-red-500/10"
                                         }`}
                                     >
-                                        <svg className="w-5 h-5 sm:w-6 sm:h-6" fill={isWishlisted ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" fill={isWishlisted ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
                                             <path
                                                 strokeLinecap="round"
                                                 strokeLinejoin="round"
@@ -678,10 +682,10 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                                 {/* Direct Order Button */}
                                 <button
                                     onClick={handleDirectOrder}
-                                    className="w-full relative overflow-hidden bg-gradient-to-r from-green-600 to-green-500 text-white py-3 sm:py-4 px-4 sm:px-6 font-semibold rounded-lg shadow-lg hover:shadow-green-500/30 transition-all duration-300 group"
+                                    className="w-full relative overflow-hidden bg-gradient-to-r from-green-600 to-green-500 text-white py-2.5 sm:py-3 lg:py-4 px-3 sm:px-4 lg:px-6 font-semibold rounded-lg shadow-lg hover:shadow-green-500/30 transition-all duration-300 group"
                                 >
-                                    <span className="relative z-10 flex items-center justify-center text-sm sm:text-base">
-                                        <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <span className="relative z-10 flex items-center justify-center text-xs sm:text-sm lg:text-base">
+                                        <svg className="w-3 h-3 sm:w-4 sm:h-4 lg:w-5 lg:h-5 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                                         </svg>
                                         {t('productDetails.orderNow')}
@@ -691,45 +695,45 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                             </div>
 
                             {/* Product Features */}
-                            <div className="bg-morpheus-blue-dark/30 backdrop-blur-sm rounded-lg p-4 sm:p-6 border border-morpheus-gold-dark/20">
-                                <h3 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4 flex items-center">
-                                    <span className="w-2 h-2 bg-morpheus-gold-light rounded-full mr-2"></span>
+                            <div className="bg-morpheus-blue-dark/30 backdrop-blur-sm rounded-lg p-3 sm:p-4 lg:p-6 border border-morpheus-gold-dark/20">
+                                <h3 className="text-sm sm:text-base lg:text-lg font-semibold text-white mb-2 sm:mb-3 lg:mb-4 flex items-center">
+                                    <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-morpheus-gold-light rounded-full mr-2"></span>
                                     {t('productDetails.features')}
                                 </h3>
-                                <div className="grid grid-cols-1 gap-2 sm:gap-3">
-                                    <div className="flex items-center gap-3 group">
-                                        <div className="w-8 h-8 rounded-lg bg-morpheus-gold-dark/20 flex items-center justify-center group-hover:bg-morpheus-gold-dark/30 transition-colors">
-                                            <svg className="w-4 h-4 text-morpheus-gold-light" fill="currentColor" viewBox="0 0 20 20">
+                                <div className="grid grid-cols-1 gap-1.5 sm:gap-2 lg:gap-3">
+                                    <div className="flex items-center gap-2 sm:gap-3 group">
+                                        <div className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 rounded-lg bg-morpheus-gold-dark/20 flex items-center justify-center group-hover:bg-morpheus-gold-dark/30 transition-colors">
+                                            <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 lg:w-4 lg:h-4 text-morpheus-gold-light" fill="currentColor" viewBox="0 0 20 20">
                                                 <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                             </svg>
                                         </div>
-                                        <span className="text-gray-300 text-sm sm:text-base">{t('productDetails.highQuality3DModel')}</span>
+                                        <span className="text-gray-300 text-xs sm:text-sm lg:text-base">{t('productDetails.highQuality3DModel')}</span>
                                     </div>
-                                    <div className="flex items-center gap-3 group">
-                                        <div className="w-8 h-8 rounded-lg bg-morpheus-gold-dark/20 flex items-center justify-center group-hover:bg-morpheus-gold-dark/30 transition-colors">
-                                            <svg className="w-4 h-4 text-morpheus-gold-light" fill="currentColor" viewBox="0 0 20 20">
+                                    <div className="flex items-center gap-2 sm:gap-3 group">
+                                        <div className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 rounded-lg bg-morpheus-gold-dark/20 flex items-center justify-center group-hover:bg-morpheus-gold-dark/30 transition-colors">
+                                            <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 lg:w-4 lg:h-4 text-morpheus-gold-light" fill="currentColor" viewBox="0 0 20 20">
                                                 <path fillRule="evenodd" d="M4 2a2 2 0 00-2 2v11a3 3 0 106 0V4a2 2 0 00-2-2H4zm1 14a1 1 0 100-2 1 1 0 000 2zm5-1.757l4.9-4.9a2 2 0 000-2.828L13.485 5.1a2 2 0 00-2.828 0L10 5.757v8.486zM16 18H9.071l6-6H16a2 2 0 012 2v2a2 2 0 01-2 2z" clipRule="evenodd" />
                                             </svg>
                                         </div>
-                                        <span className="text-gray-300 text-sm sm:text-base">{t('productDetails.multipleColorVariants')}</span>
+                                        <span className="text-gray-300 text-xs sm:text-sm lg:text-base">{t('productDetails.multipleColorVariants')}</span>
                                     </div>
-                                    <div className="flex items-center gap-3 group">
-                                        <div className="w-8 h-8 rounded-lg bg-morpheus-gold-dark/20 flex items-center justify-center group-hover:bg-morpheus-gold-dark/30 transition-colors">
-                                            <svg className="w-4 h-4 text-morpheus-gold-light" fill="currentColor" viewBox="0 0 20 20">
+                                    <div className="flex items-center gap-2 sm:gap-3 group">
+                                        <div className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 rounded-lg bg-morpheus-gold-dark/20 flex items-center justify-center group-hover:bg-morpheus-gold-dark/30 transition-colors">
+                                            <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 lg:w-4 lg:h-4 text-morpheus-gold-light" fill="currentColor" viewBox="0 0 20 20">
                                                 <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
                                                 <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd"/>
                                             </svg>
                                         </div>
-                                        <span className="text-gray-300 text-sm sm:text-base">{t('productDetails.interactive3DPreview')}</span>
+                                        <span className="text-gray-300 text-xs sm:text-sm lg:text-base">{t('productDetails.interactive3DPreview')}</span>
                                     </div>
-                                    <div className="flex items-center gap-3 group">
-                                        <div className="w-8 h-8 rounded-lg bg-morpheus-gold-dark/20 flex items-center justify-center group-hover:bg-morpheus-gold-dark/30 transition-colors">
-                                            <svg className="w-4 h-4 text-morpheus-gold-light" fill="currentColor" viewBox="0 0 20 20">
+                                    <div className="flex items-center gap-2 sm:gap-3 group">
+                                        <div className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 rounded-lg bg-morpheus-gold-dark/20 flex items-center justify-center group-hover:bg-morpheus-gold-dark/30 transition-colors">
+                                            <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 lg:w-4 lg:h-4 text-morpheus-gold-light" fill="currentColor" viewBox="0 0 20 20">
                                                 <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/>
                                                 <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0015 7h-1z"/>
                                             </svg>
                                         </div>
-                                        <span className="text-gray-300 text-sm sm:text-base">{t('productDetails.freeShipping')}</span>
+                                        <span className="text-gray-300 text-xs sm:text-sm lg:text-base">{t('productDetails.freeShipping')}</span>
                                         </div>
                                     </div>
                                 </div>
