@@ -11,6 +11,8 @@ interface VirtualTourProps {
     height?: string;
     width?: string;
     startingScene?: string;
+    startingYaw?: number; // Default yaw angle in radians
+    startingPitch?: number; // Default pitch angle in radians
     showNavbar?: boolean;
     accountForNavbar?: boolean; // New prop to account for navbar height
 }
@@ -20,6 +22,8 @@ export default function VirtualTour({
     height = "100vh",
     width = "100%",
     startingScene = "a1",
+    startingYaw = -1.57, // Default to -1.57 radians (facing left)
+    startingPitch = 0, // Default to 0 radians (horizontal)
     showNavbar = true,
     accountForNavbar = true, // Default to true to account for navbar
 }: VirtualTourProps) {
@@ -46,7 +50,7 @@ export default function VirtualTour({
     const [preloadedImages, setPreloadedImages] = useState<Set<string>>(new Set());
     const [isInitialLoad, setIsInitialLoad] = useState(true);
     const [, setCurrentZoom] = useState(60); // Default zoom level
-    const [currentPosition, setCurrentPosition] = useState({ yaw: 0, pitch: 0 });
+    const [currentPosition, setCurrentPosition] = useState({ yaw: startingYaw, pitch: startingPitch });
     const [pressedKeys, setPressedKeys] = useState<Set<string>>(new Set());
     const animationIntervalRef = useRef<NodeJS.Timeout | null>(null);
     const isUpdatingUrlRef = useRef(false);
@@ -339,7 +343,16 @@ export default function VirtualTour({
             markersPluginRef.current = viewerRef.current.getPlugin(MarkersPlugin) as MarkersPlugin;
 
             // Set up event listeners
-            viewerRef.current.addEventListener("ready", addMarkers);
+            viewerRef.current.addEventListener("ready", () => {
+                // Set initial position when viewer is ready
+                if (viewerRef.current) {
+                    viewerRef.current.rotate({
+                        yaw: startingYaw,
+                        pitch: startingPitch
+                    });
+                }
+                addMarkers();
+            });
             markersPluginRef.current?.addEventListener("select-marker", handleMarkerClick);
             
             // Listen for position changes
@@ -366,7 +379,7 @@ export default function VirtualTour({
                 viewerRef.current = null;
             }
         };
-    }, [showNavbar, isProductDetailsOpen, tourData, isLoading]);
+    }, [showNavbar, isProductDetailsOpen, tourData, isLoading, startingYaw, startingPitch]);
 
     // Separate effect for scene transitions
     useEffect(() => {
