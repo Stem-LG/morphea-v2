@@ -23,7 +23,7 @@ export function StoreSelector({ selectedStore, onStoreSelect }: StoreSelectorPro
             <div className="p-4 lg:p-6">
                 <h2 className="text-2xl lg:text-3xl font-bold mb-4 lg:mb-6">{t('admin.selectStore')}</h2>
                 <div className="text-center py-8">
-                    <p className="text-gray-600">Loading stores...</p>
+                    <p className="text-gray-600">{t('admin.loadingStores')}</p>
                 </div>
             </div>
         );
@@ -34,7 +34,7 @@ export function StoreSelector({ selectedStore, onStoreSelect }: StoreSelectorPro
             <div className="p-4 lg:p-6">
                 <h2 className="text-2xl lg:text-3xl font-bold mb-4 lg:mb-6">{t('admin.selectStore')}</h2>
                 <div className="text-center py-8">
-                    <p className="text-red-600">Error loading stores: {error.message}</p>
+                    <p className="text-red-600">{t('admin.errorLoadingStores')}: {error.message}</p>
                 </div>
             </div>
         );
@@ -62,7 +62,9 @@ export function StoreSelector({ selectedStore, onStoreSelect }: StoreSelectorPro
                                 <div className="space-y-3">
                                     <div className="flex items-center gap-2 text-sm text-gray-600">
                                         <MapPin className="h-3 w-3 lg:h-4 lg:w-4" />
-                                        <span>{store.categories?.length || 0} categor{(store.categories?.length || 0) !== 1 ? 'ies' : 'y'}</span>
+                                        <span>
+                                            {store.categories?.length || 0} {(store.categories?.length || 0) !== 1 ? t('admin.categoryPlural') : t('admin.categorySingular')}
+                                        </span>
                                     </div>
                                     <div className="text-sm text-gray-500">
                                         {store.yboutiqueadressemall}

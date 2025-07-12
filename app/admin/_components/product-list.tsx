@@ -132,7 +132,7 @@ export function ProductList({
                                     {/* Product Details */}
                                     <div>
                                         <p className="text-xs lg:text-sm text-gray-600 mb-2">
-                                            {t('admin.productCode')}: {product.yproduitcode}
+                                            {t('admin.productCodeLabel')}: {product.yproduitcode}
                                         </p>
                                         <p className="text-xs lg:text-sm text-gray-800 line-clamp-2 lg:line-clamp-3">
                                             {product.yproduitdetailstech}
