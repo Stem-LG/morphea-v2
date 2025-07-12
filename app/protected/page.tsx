@@ -15,7 +15,7 @@ export default function ProtectedPage() {
     return (
         <div className="w-full">
             {/* Virtual Tour */}
-            <VirtualTour height="100vh" width="100%" startingScene="i1" showNavbar={true} accountForNavbar={true} />
+            <VirtualTour height="100vh" width="100%" startingScene="a1" showNavbar={true} accountForNavbar={true} />
         </div>
     );
 }

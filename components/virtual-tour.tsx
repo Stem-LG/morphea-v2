@@ -19,7 +19,7 @@ export default function VirtualTour({
     className = "",
     height = "100vh",
     width = "100%",
-    startingScene = "i1",
+    startingScene = "a1",
     showNavbar = true,
     accountForNavbar = true, // Default to true to account for navbar
 }: VirtualTourProps) {
