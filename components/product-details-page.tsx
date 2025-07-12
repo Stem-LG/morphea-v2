@@ -15,7 +15,7 @@ function LoadingSpinner() {
     return (
         <Html center>
             <div className="flex flex-col items-center justify-center text-white bg-black/50 backdrop-blur-sm px-6 py-4">
-                <div className="w-12 h-12 border-4 border-morpheus-gold-dark border-t-morpheus-gold-light animate-spin mb-3"></div>
+                <div className="w-12 h-12 border-4 border-morpheus-gold-dark rounded rounded-full border-t-morpheus-gold-light animate-spin mb-3"></div>
                 <div className="text-lg font-medium bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light bg-clip-text text-transparent font-parisienne">
                     {t('productDetails.loading3DModel')}
                 </div>
