@@ -4,8 +4,10 @@ import { useRouter } from "next/navigation";
 import { StoreSelector } from "@/app/admin/_components/store-section-selector";
 import { CategorySelector } from "@/app/admin/_components/category-selector";
 import { useStores } from "@/app/admin/_hooks/use-stores";
+import { useLanguage } from "@/hooks/useLanguage";
 
 export function ProductsPageClient() {
+    const { t } = useLanguage();
     const [selectedStore, setSelectedStore] = useState<{id: string, name: string} | null>(null);
     const { data: stores, isLoading, error } = useStores();
     const router = useRouter();
@@ -34,7 +36,7 @@ export function ProductsPageClient() {
             <div className="flex items-center justify-center p-8">
                 <div className="text-center">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-morpheus-gold-dark mx-auto mb-4"></div>
-                    <p className="text-gray-600">Loading stores...</p>
+                    <p className="text-gray-600">{t('admin.loadingStores')}</p>
                 </div>
             </div>
         );
@@ -44,7 +46,7 @@ export function ProductsPageClient() {
         return (
             <div className="flex items-center justify-center p-8">
                 <div className="text-center">
-                    <p className="text-red-600">Error loading stores: {error.message}</p>
+                    <p className="text-red-600">{t('admin.errorLoadingStores')}: {error.message}</p>
                 </div>
             </div>
         );

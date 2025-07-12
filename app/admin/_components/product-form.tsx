@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, Save, X, Trash2, Box } from "lucide-react";
+import { useLanguage } from "@/hooks/useLanguage";
 import type { ProductWithObjects } from "@/hooks/useProducts";
 
 interface ProductFormProps {
@@ -32,6 +33,7 @@ interface Object3DForm {
 }
 
 export function ProductForm({ product, storeId, storeName, categoryId, categoryName, onBack, onSave }: ProductFormProps) {
+    const { t } = useLanguage();
     const [formData, setFormData] = useState({
         yproduitintitule: "",
         yproduitcode: "",
@@ -92,7 +94,7 @@ export function ProductForm({ product, storeId, storeName, categoryId, categoryN
                 await delete3DObject.mutateAsync(object.id);
             } catch (error) {
                 console.error("Failed to delete 3D object:", error);
-                alert("Failed to delete 3D object. Please try again.");
+                alert(t('admin.failedToDelete3DObject'));
                 return;
             }
         }
@@ -175,7 +177,7 @@ export function ProductForm({ product, storeId, storeName, categoryId, categoryN
             onBack();
         } catch (error) {
             console.error("Failed to save product:", error);
-            alert("Failed to save product. Please try again.");
+            alert(t('admin.saveProductFailed'));
         } finally {
             setIsSubmitting(false);
         }
@@ -186,14 +188,14 @@ export function ProductForm({ product, storeId, storeName, categoryId, categoryN
             {/* Header */}
             <div className="mb-4 lg:mb-6">
                 <Button variant="outline" onClick={onBack} className="mb-3 lg:mb-4 text-sm">
-                    ← Back to Product List
+                    {t('admin.backToProductList')}
                 </Button>
-                <h2 className="text-2xl lg:text-3xl font-bold">{product ? "Edit Product" : "Create New Product"}</h2>
+                <h2 className="text-2xl lg:text-3xl font-bold">{product ? t('admin.editProduct') : t('admin.createNewProduct')}</h2>
                 <p className="text-gray-600 mt-1 text-sm lg:text-base">
                     {storeName}
                     {categoryName && (
                         <span className="block text-blue-600 font-medium">
-                            Category: {categoryName}
+                            {t('admin.category')}: {categoryName}
                         </span>
                     )}
                 </p>
@@ -203,13 +205,13 @@ export function ProductForm({ product, storeId, storeName, categoryId, categoryN
                 {/* Product Information */}
                 <Card>
                     <CardHeader className="pb-3 lg:pb-6">
-                        <CardTitle className="text-lg lg:text-xl">Product Information</CardTitle>
+                        <CardTitle className="text-lg lg:text-xl">{t('admin.productInformation')}</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                             <div>
                                 <Label htmlFor="name" className="text-sm lg:text-base">
-                                    Product Name *
+                                    {t('admin.productName')} *
                                 </Label>
                                 <Input
                                     id="name"
@@ -221,7 +223,7 @@ export function ProductForm({ product, storeId, storeName, categoryId, categoryN
                             </div>
                             <div>
                                 <Label htmlFor="code" className="text-sm lg:text-base">
-                                    Product Code *
+                                    {t('admin.productCode')} *
                                 </Label>
                                 <Input
                                     id="code"
@@ -235,7 +237,7 @@ export function ProductForm({ product, storeId, storeName, categoryId, categoryN
 
                         <div>
                             <Label htmlFor="description" className="text-sm lg:text-base">
-                                Description *
+                                {t('admin.description')} *
                             </Label>
                             <textarea
                                 id="description"
@@ -249,32 +251,32 @@ export function ProductForm({ product, storeId, storeName, categoryId, categoryN
 
                         <div>
                             <Label htmlFor="image" className="text-sm lg:text-base">
-                                Image URL
+                                {t('admin.imageUrl')}
                             </Label>
                             <Input
                                 id="image"
                                 type="url"
                                 value={formData.imageurl}
                                 onChange={(e) => handleInputChange("imageurl", e.target.value)}
-                                placeholder="https://example.com/image.jpg"
+                                placeholder={t('admin.imageUrlPlaceholder')}
                                 className="mt-1"
                             />
                         </div>
 
                         <div>
                             <Label htmlFor="backgroundColor" className="text-sm lg:text-base">
-                                3D Preview Background Color
+                                {t('admin.backgroundColorLabel')}
                             </Label>
                             <Input
                                 id="backgroundColor"
                                 type="text"
                                 value={formData.yarriereplancouleur}
                                 onChange={(e) => handleInputChange("yarriereplancouleur", e.target.value)}
-                                placeholder="#ffffff or transparent"
+                                placeholder={t('admin.backgroundColorPlaceholder')}
                                 className="mt-1"
                             />
                             <p className="text-xs text-gray-500 mt-1">
-                                Enter a hex color code (e.g., #ff0000) or color name (e.g., red, transparent)
+                                {t('admin.backgroundColorHelp')}
                             </p>
                         </div>
                     </CardContent>
@@ -286,7 +288,7 @@ export function ProductForm({ product, storeId, storeName, categoryId, categoryN
                         <CardTitle className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                             <span className="flex items-center gap-2 text-lg lg:text-xl">
                                 <Box className="h-4 w-4 lg:h-5 lg:w-5" />
-                                3D Objects
+                                {t('admin.threeDObjectsTitle')}
                             </span>
                             <Button
                                 type="button"
@@ -296,15 +298,15 @@ export function ProductForm({ product, storeId, storeName, categoryId, categoryN
                                 className="self-start sm:self-auto"
                             >
                                 <Plus className="h-3 w-3 lg:h-4 lg:w-4 mr-2" />
-                                <span className="hidden sm:inline">Add 3D Object</span>
-                                <span className="sm:hidden">Add Object</span>
+                                <span className="hidden sm:inline">{t('admin.addThreeDObject')}</span>
+                                <span className="sm:hidden">{t('admin.addObject')}</span>
                             </Button>
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
                         {objects3D.length === 0 ? (
                             <p className="text-gray-500 text-center py-4 text-sm lg:text-base">
-                                {`No 3D objects added yet. Click "Add 3D Object" to get started.`}
+                                {t('admin.noThreeDObjectsMessage')}
                             </p>
                         ) : (
                             <div className="space-y-4">
@@ -312,7 +314,7 @@ export function ProductForm({ product, storeId, storeName, categoryId, categoryN
                                     <div key={index} className="border rounded-lg p-3 lg:p-4 bg-gray-50">
                                         <div className="flex items-center justify-between mb-3">
                                             <span className="font-medium text-sm lg:text-base">
-                                                3D Object #{index + 1}
+                                                {t('admin.threeDObjectNumber')}{index + 1}
                                             </span>
                                             <div className="flex items-center gap-1 lg:gap-2">
                                                 <Button
@@ -350,19 +352,19 @@ export function ProductForm({ product, storeId, storeName, categoryId, categoryN
                                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
                                             <div className="lg:col-span-2">
                                                 <Label htmlFor={`url-${index}`} className="text-sm lg:text-base">
-                                                    3D Model URL
+                                                    {t('admin.threeDModelUrl')}
                                                 </Label>
                                                 <Input
                                                     id={`url-${index}`}
                                                     value={obj.url}
                                                     onChange={(e) => handleUpdate3DObject(index, "url", e.target.value)}
-                                                    placeholder="https://example.com/model.glb"
+                                                    placeholder={t('admin.threeDModelUrlPlaceholder')}
                                                     className="mt-1"
                                                 />
                                             </div>
                                             <div>
                                                 <Label htmlFor={`color-${index}`} className="text-sm lg:text-base">
-                                                    Color
+                                                    {t('admin.color')}
                                                 </Label>
                                                 <Input
                                                     id={`color-${index}`}
@@ -370,14 +372,14 @@ export function ProductForm({ product, storeId, storeName, categoryId, categoryN
                                                     onChange={(e) =>
                                                         handleUpdate3DObject(index, "couleur", e.target.value)
                                                     }
-                                                    placeholder="#ffffff or red"
+                                                    placeholder={t('admin.colorPlaceholder')}
                                                     className="mt-1"
                                                 />
                                             </div>
                                         </div>
                                         <div className="mt-3">
                                             <Label htmlFor={`order-${index}`} className="text-sm lg:text-base">
-                                                Order
+                                                {t('admin.order')}
                                             </Label>
                                             <Input
                                                 id={`order-${index}`}
@@ -400,11 +402,11 @@ export function ProductForm({ product, storeId, storeName, categoryId, categoryN
                 <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 sm:justify-end">
                     <Button type="button" variant="outline" onClick={onBack} className="order-2 sm:order-1">
                         <X className="h-4 w-4 mr-2" />
-                        Cancel
+                        {t('common.cancel')}
                     </Button>
                     <Button type="submit" disabled={isSubmitting} className="order-1 sm:order-2">
                         <Save className="h-4 w-4 mr-2" />
-                        {isSubmitting ? "Saving..." : "Save Product"}
+                        {isSubmitting ? t('admin.saving') : t('admin.saveProduct')}
                     </Button>
                 </div>
             </form>
