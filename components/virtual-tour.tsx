@@ -26,7 +26,17 @@ export default function VirtualTour({
     const containerRef = useRef<HTMLDivElement>(null);
     const viewerRef = useRef<Viewer | null>(null);
     const markersPluginRef = useRef<MarkersPlugin | null>(null);
-    const [currentScene, setCurrentScene] = useState(startingScene);
+    
+    // Get scene from URL on initial load only
+    const getInitialScene = useCallback(() => {
+        if (typeof window !== 'undefined') {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('scene') || startingScene;
+        }
+        return startingScene;
+    }, [startingScene]);
+    
+    const [currentScene, setCurrentScene] = useState(getInitialScene);
     const [productsList, setProductsList] = useState<string | null>(null);
     const [isTransitioning, setIsTransitioning] = useState(false);
     const [tourData, setTourData] = useState<TourData>({ scenes: [] });
@@ -37,6 +47,7 @@ export default function VirtualTour({
     const [currentPosition, setCurrentPosition] = useState({ yaw: 0, pitch: 0 });
     const [pressedKeys, setPressedKeys] = useState<Set<string>>(new Set());
     const animationIntervalRef = useRef<NodeJS.Timeout | null>(null);
+    const isUpdatingUrlRef = useRef(false);
 
     // Calculate the actual height accounting for navbar
     const getActualHeight = () => {
@@ -265,6 +276,8 @@ export default function VirtualTour({
         };
     }, [handleKeyDown, handleKeyUp]);
 
+    // Update URL when scene changes (handled in transition completion to avoid blocking navigation)
+
     // Fetch tour data from Supabase
     useEffect(() => {
         const fetchTourData = async () => {
@@ -275,7 +288,8 @@ export default function VirtualTour({
                 
                 // Update starting scene if the data has scenes and the default scene doesn't exist
                 if (data.scenes.length > 0) {
-                    const sceneExists = data.scenes.some(scene => scene.id === startingScene);
+                    const initialSceneId = getInitialScene();
+                    const sceneExists = data.scenes.some(scene => scene.id === initialSceneId);
                     if (!sceneExists) {
                         setCurrentScene(data.scenes[0].id);
                     }
@@ -291,7 +305,7 @@ export default function VirtualTour({
         };
 
         fetchTourData();
-    }, [startingScene, preloadSceneImages]);
+    }, [getInitialScene, preloadSceneImages]);
 
     useEffect(() => {
         if (!containerRef.current || isLoading || !tourData.scenes.length) return;
@@ -395,6 +409,29 @@ export default function VirtualTour({
                     console.log('Transition completed, updating markers');
                     addMarkers();
                     setIsTransitioning(false);
+                    
+                    // Update URL after transition is complete using simple history API
+                    setTimeout(() => {
+                        if (!isUpdatingUrlRef.current) {
+                            isUpdatingUrlRef.current = true;
+                            const currentUrl = new URL(window.location.href);
+                            const currentSceneParam = currentUrl.searchParams.get('scene');
+                            
+                            if (currentSceneParam !== currentSceneData.id) {
+                                currentUrl.searchParams.set('scene', currentSceneData.id);
+                                window.history.replaceState(
+                                    { ...window.history.state },
+                                    '',
+                                    currentUrl.toString()
+                                );
+                            }
+                            
+                            // Reset the flag after a short delay
+                            setTimeout(() => {
+                                isUpdatingUrlRef.current = false;
+                            }, 100);
+                        }
+                    }, 50);
                 }, delay);
             } catch (error) {
                 console.error("Error transitioning to scene:", error);
@@ -564,9 +601,9 @@ export default function VirtualTour({
             {/* Scene information overlay */}
             <div className="absolute top-4 left-4 z-10 bg-black/70 text-white px-4 py-2 rounded-lg">
                 <h3 className="font-semibold">{tourData.scenes.find((scene) => scene.id === currentScene)?.name}</h3>
-                <p className="text-sm opacity-75">
+                {/* <p className="text-sm opacity-75">
                     {tourData.scenes.findIndex((scene) => scene.id === currentScene) + 1} sur {tourData.scenes.length}
-                </p>
+                </p> */}
             </div>
 
             {/* Scene Navigation Menu */}
