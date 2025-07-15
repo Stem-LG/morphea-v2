@@ -3,17 +3,47 @@
 import { LogoutButton } from "@/components/logout-button";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/hooks/useLanguage";
+import { useCart } from "@/hooks/useCart";
+import { useWishlist } from "@/hooks/useWishlist";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { CartDropdown } from "@/components/cart-dropdown";
+import { WishlistDropdown } from "@/components/wishlist-dropdown";
+import ProductDetailsPage from "@/components/product-details-page";
 import Link from "next/link";
 import { useState } from "react";
 
 export default function NavBar() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [isCartOpen, setIsCartOpen] = useState(false);
+    const [isWishlistOpen, setIsWishlistOpen] = useState(false);
+    const [selectedProduct, setSelectedProduct] = useState<{
+        id: number;
+        name: string;
+        description: string;
+        image: string;
+        backgroundColor?: string;
+        models: Array<{
+            url: string;
+            color: string;
+            id: number;
+        }>;
+    } | null>(null);
     const { t } = useLanguage();
 
     const { data: currentUser, isLoading } = useAuth();
+    const { cart } = useCart();
+    const { wishlist } = useWishlist();
 
     const closeMobileMenu = () => setIsMobileMenuOpen(false);
+    
+    const handleProductClick = (productData: typeof selectedProduct) => {
+        setSelectedProduct(productData);
+        setIsCartOpen(false);
+        setIsWishlistOpen(false);
+    };
+    
+    const totalCartItems = cart.reduce((sum, item) => sum + item.yquantite, 0);
+    const totalWishlistItems = wishlist.length;
 
     return (
         <>
@@ -50,6 +80,55 @@ export default function NavBar() {
                                 {t("nav.administration")}
                                 <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light group-hover:w-full transition-all duration-300"></span>
                             </Link>
+
+                            {/* Cart & Wishlist - Only show when logged in */}
+                            {currentUser && (
+                                <>
+                                    <div className="relative">
+                                        <button
+                                            onClick={() => setIsWishlistOpen(!isWishlistOpen)}
+                                            className="relative p-2 text-gray-300 hover:text-morpheus-gold-light transition-all duration-300 group"
+                                        >
+                                            <div className="absolute inset-0 bg-morpheus-gold-light/20 rounded-full scale-0 group-hover:scale-100 transition-transform duration-300"></div>
+                                            <svg className="relative w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                            </svg>
+                                            {totalWishlistItems > 0 && (
+                                                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold">
+                                                    {totalWishlistItems}
+                                                </span>
+                                            )}
+                                        </button>
+                                        <WishlistDropdown 
+                                            isOpen={isWishlistOpen} 
+                                            onClose={() => setIsWishlistOpen(false)}
+                                            onProductClick={handleProductClick}
+                                        />
+                                    </div>
+                                    
+                                    <div className="relative">
+                                        <button
+                                            onClick={() => setIsCartOpen(!isCartOpen)}
+                                            className="relative p-2 text-gray-300 hover:text-morpheus-gold-light transition-all duration-300 group"
+                                        >
+                                            <div className="absolute inset-0 bg-morpheus-gold-light/20 rounded-full scale-0 group-hover:scale-100 transition-transform duration-300"></div>
+                                            <svg className="relative w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                                            </svg>
+                                            {totalCartItems > 0 && (
+                                                <span className="absolute -top-1 -right-1 bg-morpheus-gold-light text-morpheus-blue-dark text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold">
+                                                    {totalCartItems}
+                                                </span>
+                                            )}
+                                        </button>
+                                        <CartDropdown 
+                                            isOpen={isCartOpen} 
+                                            onClose={() => setIsCartOpen(false)}
+                                            onProductClick={handleProductClick}
+                                        />
+                                    </div>
+                                </>
+                            )}
 
                             {/* Divider */}
                             <div className="h-6 w-px bg-morpheus-gold-dark/30"></div>
@@ -125,6 +204,47 @@ export default function NavBar() {
                                     {t("nav.administration")}
                                 </Link>
 
+                                {/* Mobile Cart & Wishlist - Only show when logged in */}
+                                {currentUser && (
+                                    <>
+                                        <button
+                                            onClick={() => {
+                                                setIsWishlistOpen(true);
+                                                closeMobileMenu();
+                                            }}
+                                            className="text-gray-300 hover:text-morpheus-gold-light hover:bg-morpheus-gold-dark/10 flex items-center px-4 py-3 text-base font-medium transition-all duration-300 rounded w-full"
+                                        >
+                                            <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                            </svg>
+                                            Wishlist
+                                            {totalWishlistItems > 0 && (
+                                                <span className="ml-auto bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold">
+                                                    {totalWishlistItems}
+                                                </span>
+                                            )}
+                                        </button>
+                                        
+                                        <button
+                                            onClick={() => {
+                                                setIsCartOpen(true);
+                                                closeMobileMenu();
+                                            }}
+                                            className="text-gray-300 hover:text-morpheus-gold-light hover:bg-morpheus-gold-dark/10 flex items-center px-4 py-3 text-base font-medium transition-all duration-300 rounded w-full"
+                                        >
+                                            <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                                            </svg>
+                                            Cart
+                                            {totalCartItems > 0 && (
+                                                <span className="ml-auto bg-morpheus-gold-light text-morpheus-blue-dark text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold">
+                                                    {totalCartItems}
+                                                </span>
+                                            )}
+                                        </button>
+                                    </>
+                                )}
+
                                 {/* Mobile Language Switcher */}
                                 <div className="px-4 py-3">
                                     <LanguageSwitcher />
@@ -169,6 +289,26 @@ export default function NavBar() {
                 <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-morpheus-gold-dark/50 to-transparent"></div>
             </nav>
             <div className="h-16" />
+            
+            {/* Product Details Dialog */}
+            {selectedProduct && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center">
+                    {/* Backdrop */}
+                    <div 
+                        className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+                        onClick={() => setSelectedProduct(null)}
+                    />
+                    
+                    {/* Dialog Content */}
+                    <div className="relative w-full h-full max-w-7xl max-h-[95vh] mx-4">
+                        <ProductDetailsPage 
+                            productData={selectedProduct}
+                            onClose={() => setSelectedProduct(null)}
+                        />
+                    </div>
+                </div>
+            )}
+
         </>
     );
 }

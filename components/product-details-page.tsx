@@ -6,12 +6,14 @@ import { Canvas } from "@react-three/fiber";
 import { OrbitControls, useGLTF, Html } from "@react-three/drei";
 import { Suspense } from "react";
 import { useLanguage } from "@/hooks/useLanguage";
+import { useCart } from "@/hooks/useCart";
+import { useWishlist } from "@/hooks/useWishlist";
 import * as THREE from "three";
 
 // Loading component for 3D model
 function LoadingSpinner() {
     const { t } = useLanguage();
-    
+
     return (
         <Html center>
             <div className="flex flex-col items-center justify-center text-white bg-black/50 backdrop-blur-sm px-6 py-4">
@@ -27,7 +29,7 @@ function LoadingSpinner() {
 // Error fallback component
 function ModelNotFound({ name }: { name: string }) {
     const { t } = useLanguage();
-    
+
     return (
         <Html center>
             <div className="flex flex-col items-center justify-center text-white bg-black/70 backdrop-blur-sm px-8 py-6 border border-morpheus-gold-dark">
@@ -52,25 +54,25 @@ function GLBModel({ url, name }: { url: string; name: string }) {
                 // Create a bounding box to measure the model's actual size
                 const box = new THREE.Box3().setFromObject(gltf.scene);
                 const size = box.getSize(new THREE.Vector3());
-                
+
                 // Calculate the maximum dimension
                 const maxDimension = Math.max(size.x, size.y, size.z);
-                
+
                 // Define target size (adjust this value to make models bigger/smaller overall)
                 const targetSize = 50;
-                
+
                 // Calculate scale factor to normalize to target size
                 const scaleFactor = maxDimension > 0 ? targetSize / maxDimension : 1;
-                
+
                 // Apply the calculated scale
                 setNormalizedScale([scaleFactor, scaleFactor, scaleFactor]);
-                
+
                 // Enable shadows for all meshes in the model
                 gltf.scene.traverse((child) => {
                     if (child instanceof THREE.Mesh) {
                         child.castShadow = true;
                         child.receiveShadow = true;
-                        
+
                         // Enhance materials for better lighting
                         if (child.material) {
                             if (Array.isArray(child.material)) {
@@ -105,7 +107,7 @@ function GLBModel({ url, name }: { url: string; name: string }) {
         }
 
         const clonedScene = gltf.scene.clone();
-        
+
         // Apply shadow settings to cloned scene
         clonedScene.traverse((child) => {
             if (child instanceof THREE.Mesh) {
@@ -113,7 +115,7 @@ function GLBModel({ url, name }: { url: string; name: string }) {
                 child.receiveShadow = true;
             }
         });
-        
+
         return <primitive object={clonedScene} scale={normalizedScale} />;
     } catch (error) {
         console.error("Error in GLBModel component:", error);
@@ -132,7 +134,7 @@ function ProductModel({ url, name }: { url: string; name: string }) {
 
 interface ProductDetailsPageProps {
     productData: {
-        id: string;
+        id: number;
         name: string;
         description: string;
         image: string;
@@ -148,11 +150,15 @@ interface ProductDetailsPageProps {
 
 export default function ProductDetailsPage({ productData, onClose }: ProductDetailsPageProps) {
     const { t } = useLanguage();
+    const { addToCart } = useCart();
+    const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
     const [selectedModelIndex, setSelectedModelIndex] = useState(0);
     const [viewMode, setViewMode] = useState<"image" | "3d">("3d");
     const [quantity, setQuantity] = useState(1);
-    const [isWishlisted, setIsWishlisted] = useState(false);
+
+    const productId = productData.id;
+    const isWishlisted = isInWishlist(productId);
 
     // Create image gallery (product image + 3D model previews)
     const imageGallery = useMemo(() => {
@@ -171,7 +177,7 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
             // Create a better display name for hex colors
             const getColorName = (color: string | null | undefined) => {
                 if (!color) return `${t('productDetails.variant')} ${index + 1}`;
-                
+
                 if (color.startsWith('#')) {
                     // Convert common hex colors to names based on language
                     const hexToNameMap: { [key: string]: string } = {
@@ -189,13 +195,13 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                         '#ffc0cb': t('productDetails.color') === 'Couleur' ? 'Rose' : 'Pink',
                         '#a52a2a': t('productDetails.color') === 'Couleur' ? 'Marron' : 'Brown'
                     };
-                    
+
                     return hexToNameMap[color.toLowerCase()] || `${t('productDetails.color')} ${index + 1}`;
                 }
-                
+
                 return color;
             };
-            
+
             return {
                 ...model,
                 index,
@@ -207,13 +213,11 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
     const selectedModel = productData.models[selectedModelIndex];
 
     const handleAddToCart = () => {
-        // Implementation for add to cart
-        console.log("Adding to cart:", {
-            productId: productData.id,
+        addToCart({
+            productId: productId,
             quantity,
-            selectedModel: selectedModel
+            color: selectedModel?.color
         });
-        // You would integrate with your cart system here
     };
 
     const handleDirectOrder = () => {
@@ -227,8 +231,14 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
     };
 
     const toggleWishlist = () => {
-        setIsWishlisted(!isWishlisted);
-        // You would integrate with your wishlist system here
+
+        console.log(productData)
+
+        if (isWishlisted) {
+            removeFromWishlist(productId);
+        } else {
+            addToWishlist(productId);
+        }
     };
 
     return (
@@ -236,7 +246,7 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
             <div className="relative w-full h-full bg-gradient-to-br from-morpheus-blue-dark via-morpheus-blue-dark/95 to-morpheus-blue-light/90 backdrop-blur-md shadow-2xl shadow-black/50 overflow-hidden">
                 {/* Decorative top border */}
                 <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-morpheus-gold-dark via-morpheus-gold-light to-morpheus-gold-dark"></div>
-                
+
                 {/* Header */}
                 <div className="absolute top-0 left-0 right-0 z-10 bg-gradient-to-b from-black/60 via-black/30 to-transparent backdrop-blur-sm p-3 sm:p-4 lg:p-6 border-b border-morpheus-gold-dark/20">
                     <div className="flex justify-between items-center">
@@ -271,11 +281,10 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                         <div className="flex gap-1 sm:gap-2 mb-2 sm:mb-3">
                             <button
                                 onClick={() => setViewMode("image")}
-                                className={`relative px-2 sm:px-4 lg:px-6 py-1.5 sm:py-2 text-xs sm:text-sm font-medium transition-all duration-300 rounded-lg overflow-hidden group ${
-                                    viewMode === "image"
+                                className={`relative px-2 sm:px-4 lg:px-6 py-1.5 sm:py-2 text-xs sm:text-sm font-medium transition-all duration-300 rounded-lg overflow-hidden group ${viewMode === "image"
                                         ? "bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light text-white shadow-lg shadow-morpheus-gold-light/25"
                                         : "bg-morpheus-blue-dark/50 text-gray-300 hover:text-morpheus-gold-light border border-morpheus-gold-dark/30"
-                                }`}
+                                    }`}
                             >
                                 <span className="relative z-10">{t('productDetails.images')}</span>
                                 {viewMode !== "image" && (
@@ -284,11 +293,10 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                             </button>
                             <button
                                 onClick={() => setViewMode("3d")}
-                                className={`relative px-2 sm:px-4 lg:px-6 py-1.5 sm:py-2 text-xs sm:text-sm font-medium transition-all duration-300 rounded-lg overflow-hidden group ${
-                                    viewMode === "3d"
+                                className={`relative px-2 sm:px-4 lg:px-6 py-1.5 sm:py-2 text-xs sm:text-sm font-medium transition-all duration-300 rounded-lg overflow-hidden group ${viewMode === "3d"
                                         ? "bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light text-white shadow-lg shadow-morpheus-gold-light/25"
                                         : "bg-morpheus-blue-dark/50 text-gray-300 hover:text-morpheus-gold-light border border-morpheus-gold-dark/30"
-                                }`}
+                                    }`}
                             >
                                 <span className="relative z-10">{t('productDetails.view3D')}</span>
                                 {viewMode !== "3d" && (
@@ -313,18 +321,17 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                                             />
                                         </div>
                                     </div>
-                                    
+
                                     {/* Image Thumbnails */}
                                     <div className="flex gap-2 sm:gap-3 overflow-x-auto pb-1 sm:pb-2 custom-scrollbar flex-shrink-0">
                                         {imageGallery.map((image, index) => (
                                             <button
                                                 key={index}
                                                 onClick={() => setSelectedImageIndex(index)}
-                                                className={`relative flex-shrink-0 w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 bg-white rounded-lg border-2 transition-all duration-300 overflow-hidden group ${
-                                                    selectedImageIndex === index
+                                                className={`relative flex-shrink-0 w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 bg-white rounded-lg border-2 transition-all duration-300 overflow-hidden group ${selectedImageIndex === index
                                                         ? "border-morpheus-gold-light shadow-lg shadow-morpheus-gold-light/25 scale-105"
                                                         : "border-morpheus-gold-dark/20 hover:border-morpheus-gold-light/50"
-                                                }`}
+                                                    }`}
                                             >
                                                 <Image
                                                     src={image}
@@ -353,7 +360,7 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                                 >
                                     {/* Gradient overlay for depth */}
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none z-10"></div>
-                                    
+
                                     <Canvas
                                         camera={{
                                             position: [120, 120, 120],
@@ -370,10 +377,10 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                                         <Suspense fallback={<LoadingSpinner />}>
                                             {/* Environment and Fog for atmosphere */}
                                             <fog attach="fog" args={['#f0f0f0', 400, 1000]} />
-                                            
+
                                             {/* Main ambient light - bright white overall illumination */}
                                             <ambientLight intensity={1.0} color="#ffffff" />
-                                            
+
                                             {/* Key light - main directional light pure white */}
                                             <directionalLight
                                                 position={[150, 200, 150]}
@@ -387,14 +394,14 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                                                 shadow-camera-top={200}
                                                 shadow-camera-bottom={-200}
                                             />
-                                            
+
                                             {/* Secondary directional light from opposite side */}
                                             <directionalLight
                                                 position={[-150, 200, -150]}
                                                 intensity={2.5}
                                                 color="#ffffff"
                                             />
-                                            
+
                                             {/* Front light */}
                                             <pointLight
                                                 position={[200, 100, 0]}
@@ -403,7 +410,7 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                                                 distance={400}
                                                 decay={2}
                                             />
-                                            
+
                                             {/* Back light */}
                                             <pointLight
                                                 position={[-200, 100, 0]}
@@ -412,7 +419,7 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                                                 distance={400}
                                                 decay={2}
                                             />
-                                            
+
                                             {/* Left side light */}
                                             <pointLight
                                                 position={[0, 100, 200]}
@@ -421,7 +428,7 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                                                 distance={400}
                                                 decay={2}
                                             />
-                                            
+
                                             {/* Right side light */}
                                             <pointLight
                                                 position={[0, 100, -200]}
@@ -430,7 +437,7 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                                                 distance={400}
                                                 decay={2}
                                             />
-                                            
+
                                             {/* Top light - bright white from above */}
                                             <pointLight
                                                 position={[0, 300, 0]}
@@ -439,7 +446,7 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                                                 distance={500}
                                                 decay={2}
                                             />
-                                            
+
                                             {/* Bottom fill light - white upward illumination */}
                                             <pointLight
                                                 position={[0, -80, 0]}
@@ -448,13 +455,13 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                                                 distance={250}
                                                 decay={2}
                                             />
-                                            
+
                                             {/* Corner lights for complete coverage */}
                                             <pointLight position={[150, 150, 150]} intensity={2.0} color="#ffffff" distance={350} decay={2} />
                                             <pointLight position={[-150, 150, 150]} intensity={2.0} color="#ffffff" distance={350} decay={2} />
                                             <pointLight position={[150, 150, -150]} intensity={2.0} color="#ffffff" distance={350} decay={2} />
                                             <pointLight position={[-150, 150, -150]} intensity={2.0} color="#ffffff" distance={350} decay={2} />
-                                            
+
                                             {/* Spot lights for additional brightness */}
                                             <spotLight
                                                 position={[200, 250, 200]}
@@ -465,7 +472,7 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                                                 castShadow
                                                 target-position={[0, 0, 0]}
                                             />
-                                            
+
                                             <spotLight
                                                 position={[-200, 250, -200]}
                                                 angle={0.4}
@@ -474,7 +481,7 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                                                 color="#ffffff"
                                                 target-position={[0, 0, 0]}
                                             />
-                                            
+
                                             {/* Ground plane for shadows */}
                                             <mesh
                                                 rotation={[-Math.PI / 2, 0, 0]}
@@ -502,7 +509,7 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                                             />
                                         </Suspense>
                                     </Canvas>
-                                    
+
                                     {/* 3D indicator badge */}
                                     <div className="absolute top-2 right-2 sm:top-4 sm:right-4 bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light text-white px-2 py-1 sm:px-3 sm:py-1 rounded-full text-xs font-semibold shadow-lg z-20">
                                         3D Preview
@@ -528,8 +535,8 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                                 </div>
                                 <p className="text-xs sm:text-sm text-gray-300 mt-1 sm:mt-2 flex items-center">
                                     <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1 text-morpheus-gold-light" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z"/>
-                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clipRule="evenodd"/>
+                                        <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" />
+                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clipRule="evenodd" />
                                     </svg>
                                     {t('productDetails.freeShippingAvailable')}
                                 </p>
@@ -543,64 +550,63 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                                         {productData.models.length > 1 ? t('productDetails.availableVariants') : t('productDetails.availableVariant')} ({productData.models.length})
                                     </h3>
                                     <div className="flex flex-wrap gap-1.5 sm:gap-2 lg:gap-3">
-                                    {availableColors.map((colorOption) => {
-                                        // Handle both hex codes and color names
-                                        const getColorValue = (colorInput: string | null | undefined) => {
-                                            if (!colorInput) return '#6b7280'; // Default gray
-                                            
-                                            // If it's already a hex code, use it directly
-                                            if (colorInput.startsWith('#')) {
-                                                return colorInput;
-                                            }
-                                            
-                                            // If it's a color name, convert to hex
-                                            const colorMap: { [key: string]: string } = {
-                                                'red': '#ef4444',
-                                                'rouge': '#ef4444',
-                                                'blue': '#3b82f6',
-                                                'bleu': '#3b82f6',
-                                                'green': '#10b981',
-                                                'vert': '#10b981',
-                                                'yellow': '#eab308',
-                                                'jaune': '#eab308',
-                                                'purple': '#8b5cf6',
-                                                'violet': '#8b5cf6',
-                                                'pink': '#ec4899',
-                                                'rose': '#ec4899',
-                                                'orange': '#f97316',
-                                                'brown': '#a3a3a3',
-                                                'marron': '#a3a3a3',
-                                                'black': '#000000',
-                                                'noir': '#000000',
-                                                'white': '#ffffff',
-                                                'blanc': '#ffffff',
-                                                'gray': '#6b7280',
-                                                'grey': '#6b7280',
-                                                'gris': '#6b7280',
-                                                'default': '#6b7280'
-                                            };
-                                            
-                                            const normalizedColor = colorInput.toLowerCase().trim();
-                                            return colorMap[normalizedColor] || colorInput; // Return original if not found
-                                        };
+                                        {availableColors.map((colorOption) => {
+                                            // Handle both hex codes and color names
+                                            const getColorValue = (colorInput: string | null | undefined) => {
+                                                if (!colorInput) return '#6b7280'; // Default gray
 
-                                        const colorHex = getColorValue(colorOption.color);
-                                        
+                                                // If it's already a hex code, use it directly
+                                                if (colorInput.startsWith('#')) {
+                                                    return colorInput;
+                                                }
+
+                                                // If it's a color name, convert to hex
+                                                const colorMap: { [key: string]: string } = {
+                                                    'red': '#ef4444',
+                                                    'rouge': '#ef4444',
+                                                    'blue': '#3b82f6',
+                                                    'bleu': '#3b82f6',
+                                                    'green': '#10b981',
+                                                    'vert': '#10b981',
+                                                    'yellow': '#eab308',
+                                                    'jaune': '#eab308',
+                                                    'purple': '#8b5cf6',
+                                                    'violet': '#8b5cf6',
+                                                    'pink': '#ec4899',
+                                                    'rose': '#ec4899',
+                                                    'orange': '#f97316',
+                                                    'brown': '#a3a3a3',
+                                                    'marron': '#a3a3a3',
+                                                    'black': '#000000',
+                                                    'noir': '#000000',
+                                                    'white': '#ffffff',
+                                                    'blanc': '#ffffff',
+                                                    'gray': '#6b7280',
+                                                    'grey': '#6b7280',
+                                                    'gris': '#6b7280',
+                                                    'default': '#6b7280'
+                                                };
+
+                                                const normalizedColor = colorInput.toLowerCase().trim();
+                                                return colorMap[normalizedColor] || colorInput; // Return original if not found
+                                            };
+
+                                            const colorHex = getColorValue(colorOption.color);
+
                                             return (
                                                 <button
                                                     key={colorOption.id}
                                                     onClick={() => setSelectedModelIndex(colorOption.index)}
-                                                    className={`w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 rounded-lg border-2 sm:border-4 transition-all duration-300 relative group ${
-                                                        selectedModelIndex === colorOption.index
+                                                    className={`w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 rounded-lg border-2 sm:border-4 transition-all duration-300 relative group ${selectedModelIndex === colorOption.index
                                                             ? "border-morpheus-gold-light scale-110 shadow-lg shadow-morpheus-gold-light/40"
                                                             : "border-morpheus-gold-dark/30 hover:border-morpheus-gold-light/60 hover:scale-105"
-                                                    }`}
+                                                        }`}
                                                     style={{ backgroundColor: colorHex }}
                                                     title={colorOption.displayName}
                                                 >
                                                     {/* Inner border for white/light colors visibility */}
                                                     <div className="absolute inset-1 border border-gray-400/20 rounded"></div>
-                                                    
+
                                                     {/* Selected indicator */}
                                                     {selectedModelIndex === colorOption.index && (
                                                         <div className="absolute inset-0 flex items-center justify-center">
@@ -609,7 +615,7 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                                                             </svg>
                                                         </div>
                                                     )}
-                                                    
+
                                                     {/* Tooltip */}
                                                     <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 bg-black/90 backdrop-blur-sm text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
                                                         {colorOption.displayName}
@@ -662,11 +668,10 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                                     </button>
                                     <button
                                         onClick={toggleWishlist}
-                                        className={`w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 rounded-lg border-2 transition-all duration-300 flex items-center justify-center ${
-                                            isWishlisted
+                                        className={`w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 rounded-lg border-2 transition-all duration-300 flex items-center justify-center ${isWishlisted
                                                 ? "border-red-500 bg-red-500/20 text-red-500 shadow-lg shadow-red-500/25"
                                                 : "border-morpheus-gold-dark/30 text-gray-400 hover:border-red-500 hover:text-red-500 hover:bg-red-500/10"
-                                        }`}
+                                            }`}
                                     >
                                         <svg className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" fill={isWishlisted ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
                                             <path
@@ -720,8 +725,8 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                                     <div className="flex items-center gap-2 sm:gap-3 group">
                                         <div className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 rounded-lg bg-morpheus-gold-dark/20 flex items-center justify-center group-hover:bg-morpheus-gold-dark/30 transition-colors">
                                             <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 lg:w-4 lg:h-4 text-morpheus-gold-light" fill="currentColor" viewBox="0 0 20 20">
-                                                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
-                                                <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd"/>
+                                                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                                                <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
                                             </svg>
                                         </div>
                                         <span className="text-gray-300 text-xs sm:text-sm lg:text-base">{t('productDetails.interactive3DPreview')}</span>
@@ -729,16 +734,16 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                                     <div className="flex items-center gap-2 sm:gap-3 group">
                                         <div className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 rounded-lg bg-morpheus-gold-dark/20 flex items-center justify-center group-hover:bg-morpheus-gold-dark/30 transition-colors">
                                             <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 lg:w-4 lg:h-4 text-morpheus-gold-light" fill="currentColor" viewBox="0 0 20 20">
-                                                <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/>
-                                                <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0015 7h-1z"/>
+                                                <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
+                                                <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0015 7h-1z" />
                                             </svg>
                                         </div>
                                         <span className="text-gray-300 text-xs sm:text-sm lg:text-base">{t('productDetails.freeShipping')}</span>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                    </div>
                 </div>
             </div>
         </div>
