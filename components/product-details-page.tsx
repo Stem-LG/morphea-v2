@@ -150,8 +150,8 @@ interface ProductDetailsPageProps {
 
 export default function ProductDetailsPage({ productData, onClose }: ProductDetailsPageProps) {
     const { t } = useLanguage();
-    const { addToCart, isAddingToCart } = useCart();
-    const { addToWishlist, removeFromWishlist, isInWishlist, isAddingToWishlist, isRemovingFromWishlist } = useWishlist();
+    const { addToCart } = useCart();
+    const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
     const [selectedModelIndex, setSelectedModelIndex] = useState(0);
     const [viewMode, setViewMode] = useState<"image" | "3d">("3d");
