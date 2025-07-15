@@ -56,7 +56,7 @@ export default function LandingPage() {
                                         {t('landing.login')}
                                     </Button>
                                 </Link>
-                                <Link href="/protected" className="w-full">
+                                <Link href="/main" className="w-full">
                                     <Button
                                         variant="ghost"
                                         className="w-full text-white dark:text-white text-lg sm:text-xl md:text-2xl py-4 md:py-5 transition-all hover:bg-white/10 hover:text-white dark:hover:text-white rounded-none font-medium"

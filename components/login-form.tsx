@@ -34,7 +34,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
             const { data: user } = await refetch();
             // Only navigate if we have a valid user
             if (user && window != undefined) {
-                window.location.href = "/protected";
+                window.location.href = "/main";
             } else {
                 console.log("not redirecting due to error");
                 throw new Error(t("auth.errorOccurred"));

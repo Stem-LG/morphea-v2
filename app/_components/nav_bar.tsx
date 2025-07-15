@@ -47,7 +47,7 @@ export default function NavBar() {
                         {/* Navigation Links */}
                         <div className="hidden md:flex items-center space-x-6">
                             <Link
-                                href="/protected"
+                                href="/main"
                                 className="relative text-gray-300 hover:text-morpheus-gold-light transition-all duration-300 font-medium group"
                             >
                                 {t("nav.virtualTours")}
@@ -162,7 +162,7 @@ export default function NavBar() {
                         <div className="md:hidden absolute top-full left-0 right-0 bg-gradient-to-br from-morpheus-blue-dark/98 to-morpheus-blue-light/95 backdrop-blur-md border-t border-morpheus-gold-dark/20 shadow-xl">
                             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
                                 <Link
-                                    href="/protected"
+                                    href="/main"
                                     className="text-gray-300 hover:text-morpheus-gold-light hover:bg-morpheus-gold-dark/10 block px-4 py-3 text-base font-medium transition-all duration-300 rounded"
                                     onClick={closeMobileMenu}
                                 >
