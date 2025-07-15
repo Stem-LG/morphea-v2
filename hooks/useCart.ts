@@ -30,7 +30,16 @@ export function useCart() {
                         yproduitid,
                         yproduitintitule,
                         imageurl,
-                        yproduitdetailstech
+                        yproduitdetailstech,
+                        yinfospotactions:yinfospotactionsidfk (
+                            yinfospotactionsid,
+                            ytitle,
+                            yboutique:yboutiqueidfk (
+                                yboutiqueid,
+                                yboutiqueintitule,
+                                yboutiquecode
+                            )
+                        )
                     )
                 `)
                 .eq('yuser_id', user.id)

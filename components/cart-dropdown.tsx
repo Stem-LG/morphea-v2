@@ -92,6 +92,11 @@ export function CartDropdown({ isOpen, onClose }: CartDropdownProps) {
                                     <h4 className="text-white text-sm font-medium truncate">
                                         {item.yproduit?.yproduitintitule || 'Unknown Product'}
                                     </h4>
+                                    {item.yproduit?.yinfospotactions?.yboutique && (
+                                        <p className="text-morpheus-gold-light text-xs font-medium">
+                                            {item.yproduit.yinfospotactions.yboutique.yboutiqueintitule || item.yproduit.yinfospotactions.yboutique.yboutiquecode}
+                                        </p>
+                                    )}
                                     {item.ycouleur && (
                                         <p className="text-gray-400 text-xs">
                                             {t('cart.color')}: {item.ycouleur}

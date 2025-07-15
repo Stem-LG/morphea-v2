@@ -42,7 +42,7 @@ export function WishlistDropdown({ isOpen, onClose }: WishlistDropdownProps) {
     if (!isOpen) return null;
 
     return (
-        <div 
+        <div
             ref={dropdownRef}
             className="absolute right-0 top-full mt-2 w-80 max-w-[90vw] bg-gradient-to-br from-morpheus-blue-dark via-morpheus-blue-dark/95 to-morpheus-blue-light/90 backdrop-blur-md shadow-2xl shadow-black/50 rounded-lg border border-morpheus-gold-dark/20 z-50"
         >
@@ -97,7 +97,12 @@ export function WishlistDropdown({ isOpen, onClose }: WishlistDropdownProps) {
                                     <h4 className="text-white text-sm font-medium truncate">
                                         {item.yproduit?.yproduitintitule || 'Unknown Product'}
                                     </h4>
-                                    
+                                    {item.yproduit?.yinfospotactions?.yboutique && (
+                                        <p className="text-morpheus-gold-light text-xs font-medium">
+                                            {item.yproduit.yinfospotactions.yboutique.yboutiqueintitule || item.yproduit.yinfospotactions.yboutique.yboutiquecode}
+                                        </p>
+                                    )}
+
                                     {item.yproduit?.yproduitdetailstech && (
                                         <p className="text-gray-400 text-xs line-clamp-1 mt-1">
                                             {item.yproduit.yproduitdetailstech}
@@ -124,7 +129,7 @@ export function WishlistDropdown({ isOpen, onClose }: WishlistDropdownProps) {
                                 </div>
                             </div>
                         ))}
-                        
+
                         {wishlist.length > 4 && (
                             <div className="text-center text-gray-400 text-xs py-2">
                                 +{wishlist.length - 4} more items
@@ -137,7 +142,7 @@ export function WishlistDropdown({ isOpen, onClose }: WishlistDropdownProps) {
             {/* Footer */}
             {wishlist.length > 0 && (
                 <div className="p-4 border-t border-morpheus-gold-dark/20">
-                    <button 
+                    <button
                         onClick={onClose}
                         className="w-full bg-morpheus-blue-dark/50 border border-morpheus-gold-dark/30 text-morpheus-gold-light py-2 px-4 font-medium rounded-lg hover:bg-morpheus-gold-dark/20 transition-all duration-300 text-sm"
                     >
