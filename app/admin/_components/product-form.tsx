@@ -141,10 +141,12 @@ export function ProductForm({ product, storeId, storeName, categoryId, categoryN
                 });
                 productId = updatedProduct.yproduitid;
             } else {
-                // Create new product
+                // Create new product with not_approved status
                 const newProduct = await createProduct.mutateAsync({
                     ...formData,
                     yinfospotactionsidfk: categoryId || storeId,
+                    ystatus: "not_approved", // Set initial status as not_approved for approval
+                    yaction: "insert", // Use 'insert' for new products
                 });
                 productId = newProduct.yproduitid;
             }
