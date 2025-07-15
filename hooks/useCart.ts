@@ -31,6 +31,7 @@ export function useCart() {
                         yproduitintitule,
                         imageurl,
                         yproduitdetailstech,
+                        yobjet3d (*),
                         yinfospotactions:yinfospotactionsidfk (
                             yinfospotactionsid,
                             ytitle,

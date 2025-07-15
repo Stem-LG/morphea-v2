@@ -8,6 +8,7 @@ import { useWishlist } from "@/hooks/useWishlist";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { CartDropdown } from "@/components/cart-dropdown";
 import { WishlistDropdown } from "@/components/wishlist-dropdown";
+import ProductDetailsPage from "@/components/product-details-page";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -15,6 +16,18 @@ export default function NavBar() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isCartOpen, setIsCartOpen] = useState(false);
     const [isWishlistOpen, setIsWishlistOpen] = useState(false);
+    const [selectedProduct, setSelectedProduct] = useState<{
+        id: number;
+        name: string;
+        description: string;
+        image: string;
+        backgroundColor?: string;
+        models: Array<{
+            url: string;
+            color: string;
+            id: number;
+        }>;
+    } | null>(null);
     const { t } = useLanguage();
 
     const { data: currentUser, isLoading } = useAuth();
@@ -22,6 +35,12 @@ export default function NavBar() {
     const { wishlist } = useWishlist();
 
     const closeMobileMenu = () => setIsMobileMenuOpen(false);
+    
+    const handleProductClick = (productData: typeof selectedProduct) => {
+        setSelectedProduct(productData);
+        setIsCartOpen(false);
+        setIsWishlistOpen(false);
+    };
     
     const totalCartItems = cart.reduce((sum, item) => sum + item.yquantite, 0);
     const totalWishlistItems = wishlist.length;
@@ -80,7 +99,11 @@ export default function NavBar() {
                                                 </span>
                                             )}
                                         </button>
-                                        <WishlistDropdown isOpen={isWishlistOpen} onClose={() => setIsWishlistOpen(false)} />
+                                        <WishlistDropdown 
+                                            isOpen={isWishlistOpen} 
+                                            onClose={() => setIsWishlistOpen(false)}
+                                            onProductClick={handleProductClick}
+                                        />
                                     </div>
                                     
                                     <div className="relative">
@@ -98,7 +121,11 @@ export default function NavBar() {
                                                 </span>
                                             )}
                                         </button>
-                                        <CartDropdown isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+                                        <CartDropdown 
+                                            isOpen={isCartOpen} 
+                                            onClose={() => setIsCartOpen(false)}
+                                            onProductClick={handleProductClick}
+                                        />
                                     </div>
                                 </>
                             )}
@@ -263,6 +290,24 @@ export default function NavBar() {
             </nav>
             <div className="h-16" />
             
+            {/* Product Details Dialog */}
+            {selectedProduct && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center">
+                    {/* Backdrop */}
+                    <div 
+                        className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+                        onClick={() => setSelectedProduct(null)}
+                    />
+                    
+                    {/* Dialog Content */}
+                    <div className="relative w-full h-full max-w-7xl max-h-[95vh] mx-4">
+                        <ProductDetailsPage 
+                            productData={selectedProduct}
+                            onClose={() => setSelectedProduct(null)}
+                        />
+                    </div>
+                </div>
+            )}
 
         </>
     );

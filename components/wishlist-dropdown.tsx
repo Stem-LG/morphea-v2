@@ -9,9 +9,21 @@ import { useEffect, useRef } from "react";
 interface WishlistDropdownProps {
     isOpen: boolean;
     onClose: () => void;
+    onProductClick?: (productData: {
+        id: number;
+        name: string;
+        description: string;
+        image: string;
+        backgroundColor?: string;
+        models: Array<{
+            url: string;
+            color: string;
+            id: number;
+        }>;
+    }) => void;
 }
 
-export function WishlistDropdown({ isOpen, onClose }: WishlistDropdownProps) {
+export function WishlistDropdown({ isOpen, onClose, onProductClick }: WishlistDropdownProps) {
     const { wishlist, removeFromWishlist, isLoading } = useWishlist();
     const { addToCart } = useCart();
     const { t } = useLanguage();
@@ -37,6 +49,30 @@ export function WishlistDropdown({ isOpen, onClose }: WishlistDropdownProps) {
     const handleMoveToCart = (productId: number) => {
         addToCart({ productId, quantity: 1 });
         removeFromWishlist(productId);
+    };
+
+    const handleProductClick = (item: any) => {
+        if (!onProductClick || !item.yproduit) return;
+
+        console.log('Wishlist item clicked:', item);
+        console.log('3D objects:', item.yproduit.yobjet3d);
+
+        // Transform the product data to match ProductDetailsPageProps
+        const productData = {
+            id: item.yproduit.yproduitid,
+            name: item.yproduit.yproduitintitule || 'Unknown Product',
+            description: item.yproduit.yproduitdetailstech || '',
+            image: item.yproduit.imageurl || '/placeholder-product.jpg',
+            backgroundColor: '#f0f0f0',
+            models: item.yproduit.yobjet3d?.map((obj: any, index: number) => ({
+                url: obj.url || '',
+                color: obj.couleur || 'default',
+                id: obj.id || index
+            })) || []
+        };
+
+        console.log('Transformed product data:', productData);
+        onProductClick(productData);
     };
 
     if (!isOpen) return null;
@@ -93,8 +129,11 @@ export function WishlistDropdown({ isOpen, onClose }: WishlistDropdownProps) {
                                 </div>
 
                                 {/* Product Details */}
-                                <div className="flex-1 min-w-0">
-                                    <h4 className="text-white text-sm font-medium truncate">
+                                <div
+                                    className="flex-1 min-w-0 cursor-pointer"
+                                    onClick={() => handleProductClick(item)}
+                                >
+                                    <h4 className="text-white text-sm font-medium truncate hover:text-morpheus-gold-light transition-colors">
                                         {item.yproduit?.yproduitintitule || 'Unknown Product'}
                                     </h4>
                                     {item.yproduit?.yinfospotactions?.yboutique && (
