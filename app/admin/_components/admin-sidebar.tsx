@@ -3,7 +3,7 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { BarChart3, Package, Menu, X } from "lucide-react";
+import { BarChart3, Package, Users, Menu, X } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
 
 interface AdminSidebarProps {
@@ -27,6 +27,12 @@ export function AdminSidebar({ isOpen, onToggle }: AdminSidebarProps) {
             label: t('admin.productManagement'),
             icon: Package,
             href: "/admin/products",
+        },
+        {
+            id: "users",
+            label: "User Management",
+            icon: Users,
+            href: "/admin/users",
         },
     ];
 

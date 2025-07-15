@@ -522,6 +522,7 @@ export type Database = {
           order: number | null
           produit_id: number | null
           url: string | null
+          yaction: string
         }
         Insert: {
           couleur?: string | null
@@ -530,6 +531,7 @@ export type Database = {
           order?: number | null
           produit_id?: number | null
           url?: string | null
+          yaction?: string
         }
         Update: {
           couleur?: string | null
@@ -538,11 +540,47 @@ export type Database = {
           order?: number | null
           produit_id?: number | null
           url?: string | null
+          yaction?: string
         }
         Relationships: [
           {
             foreignKeyName: "yobjet3d_produit_id_fkey"
             columns: ["produit_id"]
+            isOneToOne: false
+            referencedRelation: "yproduit"
+            referencedColumns: ["yproduitid"]
+          },
+        ]
+      }
+      ypanier: {
+        Row: {
+          created_at: string
+          id: number
+          ycouleur: string | null
+          yproduit_id: number
+          yquantite: number
+          yuser_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          ycouleur?: string | null
+          yproduit_id: number
+          yquantite: number
+          yuser_id?: string
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          ycouleur?: string | null
+          yproduit_id?: number
+          yquantite?: number
+          yuser_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ypanier_yproduit_id_fkey"
+            columns: ["yproduit_id"]
             isOneToOne: false
             referencedRelation: "yproduit"
             referencedColumns: ["yproduitid"]
@@ -592,6 +630,7 @@ export type Database = {
           sysadresseip: string | null
           sysdate: string | null
           sysuser: string | null
+          yaction: string
           yarriereplancouleur: string | null
           ydesigneuridfk: number | null
           yinfospotactionsidfk: string
@@ -599,6 +638,7 @@ export type Database = {
           yproduitdetailstech: string
           yproduitid: number
           yproduitintitule: string
+          ystatus: string
           yvideoidfk: number | null
         }
         Insert: {
@@ -607,6 +647,7 @@ export type Database = {
           sysadresseip?: string | null
           sysdate?: string | null
           sysuser?: string | null
+          yaction?: string
           yarriereplancouleur?: string | null
           ydesigneuridfk?: number | null
           yinfospotactionsidfk: string
@@ -614,6 +655,7 @@ export type Database = {
           yproduitdetailstech: string
           yproduitid?: number
           yproduitintitule: string
+          ystatus?: string
           yvideoidfk?: number | null
         }
         Update: {
@@ -622,6 +664,7 @@ export type Database = {
           sysadresseip?: string | null
           sysdate?: string | null
           sysuser?: string | null
+          yaction?: string
           yarriereplancouleur?: string | null
           ydesigneuridfk?: number | null
           yinfospotactionsidfk?: string
@@ -629,6 +672,7 @@ export type Database = {
           yproduitdetailstech?: string
           yproduitid?: number
           yproduitintitule?: string
+          ystatus?: string
           yvideoidfk?: number | null
         }
         Relationships: [
@@ -661,7 +705,7 @@ export type Database = {
           yid: string
           yname: string
           ypitch: number
-          ysceneid: string | null
+          ysceneid: string
           ytargetid: string
           yyaw: number
         }
@@ -670,7 +714,7 @@ export type Database = {
           yid?: string
           yname: string
           ypitch: number
-          ysceneid?: string | null
+          ysceneid: string
           ytargetid: string
           yyaw: number
         }
@@ -679,7 +723,7 @@ export type Database = {
           yid?: string
           yname?: string
           ypitch?: number
-          ysceneid?: string | null
+          ysceneid?: string
           ytargetid?: string
           yyaw?: number
         }
@@ -687,6 +731,13 @@ export type Database = {
           {
             foreignKeyName: "yscenelinks_ysceneid_fkey"
             columns: ["ysceneid"]
+            isOneToOne: false
+            referencedRelation: "yscenes"
+            referencedColumns: ["yid"]
+          },
+          {
+            foreignKeyName: "yscenelinks_ytargetid_fkey"
+            columns: ["ytargetid"]
             isOneToOne: false
             referencedRelation: "yscenes"
             referencedColumns: ["yid"]
@@ -887,6 +938,35 @@ export type Database = {
           yvisiteurtelephone?: string | null
         }
         Relationships: []
+      }
+      ywishlist: {
+        Row: {
+          created_at: string
+          id: number
+          yproduit_id: number
+          yuser_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          yproduit_id: number
+          yuser_id?: string
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          yproduit_id?: number
+          yuser_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ywishlist_yproduit_id_fkey"
+            columns: ["yproduit_id"]
+            isOneToOne: false
+            referencedRelation: "yproduit"
+            referencedColumns: ["yproduitid"]
+          },
+        ]
       }
     }
     Views: {
