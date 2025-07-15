@@ -181,5 +181,19 @@ export const frTranslations = {
     "variant": "Variante",
     "color": "Couleur",
     "view": "Vue"
+  },
+  "cart": {
+    "title": "Panier",
+    "empty": "Votre panier est vide",
+    "emptyDescription": "Ajoutez des produits pour commencer",
+    "color": "Couleur",
+    "checkout": "Procéder au paiement",
+    "items": "articles"
+  },
+  "wishlist": {
+    "title": "Liste de souhaits",
+    "empty": "Votre liste de souhaits est vide",
+    "emptyDescription": "Enregistrez les produits que vous aimez pour plus tard",
+    "moveToCart": "Ajouter au panier"
   }
 };

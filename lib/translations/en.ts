@@ -181,5 +181,19 @@ export const enTranslations = {
     "variant": "Variant",
     "color": "Color",
     "view": "View"
+  },
+  "cart": {
+    "title": "Shopping Cart",
+    "empty": "Your cart is empty",
+    "emptyDescription": "Add some products to get started",
+    "color": "Color",
+    "checkout": "Proceed to Checkout",
+    "items": "items"
+  },
+  "wishlist": {
+    "title": "Wishlist",
+    "empty": "Your wishlist is empty",
+    "emptyDescription": "Save products you love for later",
+    "moveToCart": "Add to Cart"
   }
 };

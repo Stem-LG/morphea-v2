@@ -549,6 +549,41 @@ export type Database = {
           },
         ]
       }
+      ypanier: {
+        Row: {
+          created_at: string
+          id: number
+          ycouleur: string | null
+          yproduit_id: number
+          yquantite: number
+          yuser_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          ycouleur?: string | null
+          yproduit_id: number
+          yquantite: number
+          yuser_id?: string
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          ycouleur?: string | null
+          yproduit_id?: number
+          yquantite?: number
+          yuser_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ypanier_yproduit_id_fkey"
+            columns: ["yproduit_id"]
+            isOneToOne: false
+            referencedRelation: "yproduit"
+            referencedColumns: ["yproduitid"]
+          },
+        ]
+      }
       yphoto: {
         Row: {
           sysaction: string | null
@@ -661,7 +696,7 @@ export type Database = {
           yid: string
           yname: string
           ypitch: number
-          ysceneid: string | null
+          ysceneid: string
           ytargetid: string
           yyaw: number
         }
@@ -670,7 +705,7 @@ export type Database = {
           yid?: string
           yname: string
           ypitch: number
-          ysceneid?: string | null
+          ysceneid: string
           ytargetid: string
           yyaw: number
         }
@@ -679,7 +714,7 @@ export type Database = {
           yid?: string
           yname?: string
           ypitch?: number
-          ysceneid?: string | null
+          ysceneid?: string
           ytargetid?: string
           yyaw?: number
         }
@@ -687,6 +722,13 @@ export type Database = {
           {
             foreignKeyName: "yscenelinks_ysceneid_fkey"
             columns: ["ysceneid"]
+            isOneToOne: false
+            referencedRelation: "yscenes"
+            referencedColumns: ["yid"]
+          },
+          {
+            foreignKeyName: "yscenelinks_ytargetid_fkey"
+            columns: ["ytargetid"]
             isOneToOne: false
             referencedRelation: "yscenes"
             referencedColumns: ["yid"]
@@ -887,6 +929,35 @@ export type Database = {
           yvisiteurtelephone?: string | null
         }
         Relationships: []
+      }
+      ywishlist: {
+        Row: {
+          created_at: string
+          id: number
+          yproduit_id: number
+          yuser_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          yproduit_id: number
+          yuser_id?: string
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          yproduit_id?: number
+          yuser_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ywishlist_yproduit_id_fkey"
+            columns: ["yproduit_id"]
+            isOneToOne: false
+            referencedRelation: "yproduit"
+            referencedColumns: ["yproduitid"]
+          },
+        ]
       }
     }
     Views: {
