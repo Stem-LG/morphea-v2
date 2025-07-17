@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle, Trash2, Eye, Package, ArrowLeft } from "lucide-react";
-import { useLanguage } from "@/hooks/useLanguage";
 import { usePendingProducts, useApproveProduct } from "@/hooks/useProductApprovals";
 import { useDeleteProduct } from "@/hooks/useProducts";
 import { ApprovalStats } from "./approval-stats";
@@ -18,8 +17,6 @@ interface ProductDetailsModalProps {
 }
 
 function ProductDetailsModal({ product, onClose, onApprove, onDelete }: ProductDetailsModalProps) {
-    const { t } = useLanguage();
-
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
@@ -131,7 +128,6 @@ function ProductDetailsModal({ product, onClose, onApprove, onDelete }: ProductD
 }
 
 export function ProductApprovals() {
-    const { t } = useLanguage();
     const [selectedProduct, setSelectedProduct] = useState<ProductWithObjects | null>(null);
     
     const { data: pendingProducts, isLoading, error } = usePendingProducts();

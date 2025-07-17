@@ -1,8 +1,7 @@
 "use client";
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { CheckCircle, Clock, XCircle, Package } from "lucide-react";
+import { CheckCircle, Clock, Package } from "lucide-react";
 import { useApprovalStats } from "@/hooks/useProductApprovals";
 
 export function ApprovalStats() {

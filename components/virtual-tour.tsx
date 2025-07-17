@@ -144,7 +144,7 @@ export default function VirtualTour({
         });
 
         return closestLink ? closestLink.nodeId : null;
-    }, [currentScene, currentPosition.yaw, tourData.scenes]);
+    }, [currentScene, currentPosition.yaw, tourData.scenes, angularDistance]);
 
     // Handle key press/release for smooth movement
     const handleKeyDown = useCallback((event: KeyboardEvent) => {
@@ -379,7 +379,7 @@ export default function VirtualTour({
                 viewerRef.current = null;
             }
         };
-    }, [showNavbar, isProductDetailsOpen, tourData, isLoading, startingYaw, startingPitch]);
+    }, [showNavbar, isProductDetailsOpen, isProductsListOpen, tourData, isLoading, startingYaw, startingPitch]);
 
     // Separate effect for scene transitions
     useEffect(() => {
@@ -455,7 +455,7 @@ export default function VirtualTour({
         };
 
         transitionToScene();
-    }, [currentScene, tourData, preloadedImages]);
+    }, [currentScene, tourData, preloadedImages, isInitialLoad]);
 
     // Effect to dynamically show/hide navbar based on modal states
     useEffect(() => {
@@ -602,7 +602,7 @@ export default function VirtualTour({
             console.log('Handling info spot action');
             handleInfoSpotAction(marker.data.action, marker.data.title || "", marker.data.text || "");
         }
-    }, [isTransitioning, setCurrentScene, setProductsList]);
+    }, [isTransitioning, handleInfoSpotAction]);
 
     if (isLoading) {
         return (

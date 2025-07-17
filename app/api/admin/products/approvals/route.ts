@@ -3,6 +3,7 @@ import { createAdminClient } from '@/lib/supabase-admin'
 import { createClient } from '@/lib/server'
 
 // Helper function to check if user has admin role
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function checkAdminRole(request: NextRequest) {
   const supabase = await createClient()
   

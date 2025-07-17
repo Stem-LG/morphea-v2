@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { UserRole, Store } from '@/lib/types/user'
 import { useUserManagement } from '@/hooks/useUserManagement'
 
@@ -280,7 +280,7 @@ export default function UsersManagementPage() {
   } = useUserManagement()
 
   // Fetch all users and stores
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     try {
       const [usersData, storesData] = await Promise.all([
         fetchUsers(),
@@ -291,7 +291,7 @@ export default function UsersManagementPage() {
     } catch (err) {
       console.error('Error loading data:', err)
     }
-  }
+  }, [fetchUsers, fetchStores])
 
   // Update user role
   const handleUpdateUserRole = async (email: string, newRole: 'user' | 'store_admin') => {
@@ -324,7 +324,7 @@ export default function UsersManagementPage() {
 
   useEffect(() => {
     loadData()
-  }, [])
+  }, [loadData])
 
   if (loading && users.length === 0) {
     return (
