@@ -52,14 +52,14 @@ export default function ProfilePage() {
 
         try {
             const result = await profileService.updateProfile(data);
-            
+
             if (result.success) {
                 setMessage({ type: 'success', text: result.message });
                 setIsEditing(false);
-                
+
                 // Refresh user data to show updated information
                 await refetch();
-                
+
                 // Also invalidate the auth query to ensure fresh data
                 queryClient.invalidateQueries({ queryKey: ['authUser'] });
             } else {
@@ -88,12 +88,12 @@ export default function ProfilePage() {
 
     // Handle password change success
     const handlePasswordChangeSuccess = () => {
-        setMessage({ 
-            type: 'success', 
-            text: 'Password changed successfully. You will need to sign in again with your new password.' 
+        setMessage({
+            type: 'success',
+            text: 'Password changed successfully. You will need to sign in again with your new password.'
         });
         setShowPasswordChange(false);
-        
+
         // Sign out user after successful password change
         setTimeout(() => {
             router.push('/auth/login');
@@ -125,10 +125,10 @@ export default function ProfilePage() {
     const handleAccountDeletion = async (password: string) => {
         try {
             const result = await profileService.deleteAccount(password);
-            
+
             if (result.success) {
                 setMessage({ type: 'success', text: result.message });
-                
+
                 // Sign out and redirect to home page after successful deletion
                 setTimeout(() => {
                     router.push('/');
@@ -148,7 +148,7 @@ export default function ProfilePage() {
             <div className="h-screen w-full relative overflow-hidden" style={{ height: 'calc(100vh - 4rem)' }}>
                 {/* Dark overlay for better readability */}
                 <div className="absolute inset-0 bg-black/40" />
-                
+
                 {/* Loading Content */}
                 <div className="relative z-10 flex h-full items-center justify-center p-6">
                     <div className="text-center space-y-4">
@@ -169,7 +169,7 @@ export default function ProfilePage() {
         <div className="min-h-screen w-full relative overflow-auto" style={{ minHeight: 'calc(100vh - 4rem)' }}>
             {/* Dark overlay for better readability */}
             <div className="absolute inset-0 bg-black/90" />
-            
+
             {/* Content */}
             <div className="relative z-10 p-3 sm:p-4 md:p-6 lg:p-10">
                 <div className="w-full max-w-7xl mx-auto">
@@ -187,11 +187,10 @@ export default function ProfilePage() {
 
                     {/* Success/Error Message */}
                     {message && (
-                        <div className={`mb-6 p-4 rounded-none border ${
-                            message.type === 'success' 
-                                ? 'bg-green-900/50 border-green-500 text-green-100' 
+                        <div className={`mb-6 p-4 rounded-none border ${message.type === 'success'
+                                ? 'bg-green-900/50 border-green-500 text-green-100'
                                 : 'bg-red-900/50 border-red-500 text-red-100'
-                        }`}>
+                            }`}>
                             <div className="flex items-center gap-3">
                                 {message.type === 'success' ? (
                                     <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -249,11 +248,10 @@ export default function ProfilePage() {
                                         setShowAccountDeletion(false);
                                         setMessage(null);
                                     }}
-                                    className={`px-4 lg:px-6 py-3 font-semibold transition-all duration-300 text-sm lg:text-base ${
-                                        activeTab === 'profile'
+                                    className={`px-4 lg:px-6 py-3 font-semibold transition-all duration-300 text-sm lg:text-base ${activeTab === 'profile'
                                             ? 'bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light text-white shadow-lg'
                                             : 'text-gray-300 hover:text-white hover:bg-morpheus-gold-dark/20'
-                                    }`}
+                                        }`}
                                 >
                                     <svg className="w-4 h-4 lg:w-5 lg:h-5 inline mr-1 lg:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -268,11 +266,10 @@ export default function ProfilePage() {
                                         setShowAccountDeletion(false);
                                         setMessage(null);
                                     }}
-                                    className={`px-4 lg:px-6 py-3 font-semibold transition-all duration-300 text-sm lg:text-base ${
-                                        activeTab === 'activity'
+                                    className={`px-4 lg:px-6 py-3 font-semibold transition-all duration-300 text-sm lg:text-base ${activeTab === 'activity'
                                             ? 'bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light text-white shadow-lg'
                                             : 'text-gray-300 hover:text-white hover:bg-morpheus-gold-dark/20'
-                                    }`}
+                                        }`}
                                 >
                                     <svg className="w-4 h-4 lg:w-5 lg:h-5 inline mr-1 lg:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -287,11 +284,10 @@ export default function ProfilePage() {
                                         setShowAccountDeletion(false);
                                         setMessage(null);
                                     }}
-                                    className={`px-4 lg:px-6 py-3 font-semibold transition-all duration-300 text-sm lg:text-base ${
-                                        activeTab === 'security'
+                                    className={`px-4 lg:px-6 py-3 font-semibold transition-all duration-300 text-sm lg:text-base ${activeTab === 'security'
                                             ? 'bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light text-white shadow-lg'
                                             : 'text-gray-300 hover:text-white hover:bg-morpheus-gold-dark/20'
-                                    }`}
+                                        }`}
                                 >
                                     <svg className="w-4 h-4 lg:w-5 lg:h-5 inline mr-1 lg:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -306,11 +302,10 @@ export default function ProfilePage() {
                                         setShowAccountDeletion(false);
                                         setMessage(null);
                                     }}
-                                    className={`px-4 lg:px-6 py-3 font-semibold transition-all duration-300 text-sm lg:text-base ${
-                                        activeTab === 'preferences'
+                                    className={`px-4 lg:px-6 py-3 font-semibold transition-all duration-300 text-sm lg:text-base ${activeTab === 'preferences'
                                             ? 'bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light text-white shadow-lg'
                                             : 'text-gray-300 hover:text-white hover:bg-morpheus-gold-dark/20'
-                                    }`}
+                                        }`}
                                 >
                                     <svg className="w-4 h-4 lg:w-5 lg:h-5 inline mr-1 lg:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
@@ -329,7 +324,7 @@ export default function ProfilePage() {
                                 {!isEditing ? (
                                     <>
                                         <ProfileInfoDisplay user={currentUser} />
-                                        
+
                                         {/* Action Buttons */}
                                         <div className="mt-8 pt-6 border-t border-morpheus-gold-dark/30">
                                             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -373,7 +368,7 @@ export default function ProfilePage() {
                                                 Manage your account security and password
                                             </p>
                                         </div>
-                                        
+
                                         <div className="space-y-6">
                                             {/* Password Change Section */}
                                             <div className="bg-morpheus-blue-dark/50 border border-morpheus-gold-dark/30 p-6 space-y-4">
@@ -428,7 +423,7 @@ export default function ProfilePage() {
                                             onSuccess={handlePasswordChangeSuccess}
                                             onError={handlePasswordChangeError}
                                         />
-                                        
+
                                         {/* Back Button */}
                                         <div className="mt-8 pt-6 border-t border-morpheus-gold-dark/30">
                                             <div className="flex justify-center">
@@ -450,7 +445,7 @@ export default function ProfilePage() {
                                             onDeleteAccount={handleAccountDeletion}
                                             isLoading={isUpdating}
                                         />
-                                        
+
                                         {/* Back Button */}
                                         <div className="mt-8 pt-6 border-t border-morpheus-gold-dark/30">
                                             <div className="flex justify-center">

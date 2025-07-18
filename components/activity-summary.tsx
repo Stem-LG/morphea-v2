@@ -3,9 +3,7 @@
 import { useWishlist } from "@/hooks/useWishlist";
 import { useCart } from "@/hooks/useCart";
 import { useLanguage } from "@/hooks/useLanguage";
-import { useState } from "react";
-import { WishlistDropdown } from "./wishlist-dropdown";
-import { CartDropdown } from "./cart-dropdown";
+import { useRouter } from "next/navigation";
 
 interface ActivitySummaryProps {
     onProductClick?: (productData: {
@@ -26,9 +24,7 @@ export function ActivitySummary({ onProductClick }: ActivitySummaryProps) {
     const { wishlist, isLoading: wishlistLoading } = useWishlist();
     const { cart, isLoading: cartLoading } = useCart();
     const { t } = useLanguage();
-    
-    const [showWishlistDropdown, setShowWishlistDropdown] = useState(false);
-    const [showCartDropdown, setShowCartDropdown] = useState(false);
+    const router = useRouter();
 
     const wishlistCount = wishlist.length;
     const cartItemCount = cart.reduce((sum, item) => sum + item.yquantite, 0);
@@ -39,13 +35,11 @@ export function ActivitySummary({ onProductClick }: ActivitySummaryProps) {
     const recentCartItems = cart.slice(0, 2);
 
     const handleViewWishlist = () => {
-        setShowWishlistDropdown(true);
-        setShowCartDropdown(false);
+        router.push('/wishlist');
     };
 
     const handleViewCart = () => {
-        setShowCartDropdown(true);
-        setShowWishlistDropdown(false);
+        router.push('/cart');
     };
 
     return (
@@ -117,12 +111,7 @@ export function ActivitySummary({ onProductClick }: ActivitySummaryProps) {
                         </div>
                     )}
 
-                    {/* Wishlist Dropdown */}
-                    <WishlistDropdown
-                        isOpen={showWishlistDropdown}
-                        onClose={() => setShowWishlistDropdown(false)}
-                        onProductClick={onProductClick}
-                    />
+
                 </div>
 
                 {/* Cart Card */}
@@ -192,12 +181,7 @@ export function ActivitySummary({ onProductClick }: ActivitySummaryProps) {
                         </div>
                     )}
 
-                    {/* Cart Dropdown */}
-                    <CartDropdown
-                        isOpen={showCartDropdown}
-                        onClose={() => setShowCartDropdown(false)}
-                        onProductClick={onProductClick}
-                    />
+
                 </div>
             </div>
 
