@@ -3,15 +3,17 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { BarChart3, Package, Users, Menu, X, CheckCircle, Eye } from "lucide-react";
+import { BarChart3, Package, Users, Menu, X, CheckCircle, Eye, ChevronLeft, ChevronRight } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
 
 interface AdminSidebarProps {
     isOpen: boolean;
+    isCollapsed: boolean;
     onToggle: () => void;
+    onCollapse: () => void;
 }
 
-export function AdminSidebar({ isOpen, onToggle }: AdminSidebarProps) {
+export function AdminSidebar({ isOpen, isCollapsed, onToggle, onCollapse }: AdminSidebarProps) {
     const { t } = useLanguage();
     const pathname = usePathname();
     
@@ -64,13 +66,35 @@ export function AdminSidebar({ isOpen, onToggle }: AdminSidebarProps) {
             <div
                 className={`
                 fixed lg:sticky inset-y-0 left-0 z-50
-                w-64 h-screen bg-gray-900 text-white p-4
+                ${isCollapsed ? 'w-16' : 'w-64'} h-screen bg-gray-900 text-white p-4
                 transform ${isOpen ? "translate-x-0" : "-translate-x-full"}
-                lg:translate-x-0 transition-transform duration-200 ease-in-out
+                lg:translate-x-0 transition-all duration-200 ease-in-out
             `}
             >
-                <div className="mb-8 pt-8 lg:pt-0">
-                    <h1 className="text-2xl font-bold">{t('admin.adminPanel')}</h1>
+                <div className="mb-8 pt-8 lg:pt-0 flex justify-between items-center">
+                    {!isCollapsed && <h1 className="text-2xl font-bold">{t('admin.adminPanel')}</h1>}
+                    <div className="flex gap-1">
+                        {/* Collapse/Expand button - only visible on desktop */}
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={onCollapse}
+                            className="hidden lg:flex text-gray-400 hover:text-white hover:bg-gray-800 p-1"
+                            aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+                        >
+                            {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+                        </Button>
+                        {/* Close button - only visible on mobile */}
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={onToggle}
+                            className="lg:hidden text-gray-400 hover:text-white hover:bg-gray-800 p-1"
+                            aria-label="Close sidebar"
+                        >
+                            <X className="h-4 w-4" />
+                        </Button>
+                    </div>
                 </div>
 
                 <nav className="space-y-2">
@@ -81,14 +105,15 @@ export function AdminSidebar({ isOpen, onToggle }: AdminSidebarProps) {
                             <Link key={item.id} href={item.href}>
                                 <Button
                                     variant={isActive ? "secondary" : "ghost"}
-                                    className={`w-full justify-start text-left ${
+                                    className={`w-full ${isCollapsed ? 'justify-center px-2' : 'justify-start'} text-left ${
                                         isActive
                                             ? "bg-gray-700 text-white"
                                             : "text-gray-300 hover:text-white hover:bg-gray-800"
                                     }`}
+                                    title={isCollapsed ? item.label : undefined}
                                 >
-                                    <Icon className="mr-3 h-4 w-4" />
-                                    {item.label}
+                                    <Icon className={`h-4 w-4 ${isCollapsed ? '' : 'mr-3'}`} />
+                                    {!isCollapsed && item.label}
                                 </Button>
                             </Link>
                         );
