@@ -3,7 +3,7 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { BarChart3, Package, Users, Menu, X, CheckCircle } from "lucide-react";
+import { BarChart3, Package, Users, Menu, X, CheckCircle, Eye } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
 
 interface AdminSidebarProps {
@@ -39,6 +39,12 @@ export function AdminSidebar({ isOpen, onToggle }: AdminSidebarProps) {
             label: "User Management",
             icon: Users,
             href: "/admin/users",
+        },
+        {
+            id: "tour",
+            label: "Virtual Tour Admin",
+            icon: Eye,
+            href: "/admin/tour",
         },
     ];
 
