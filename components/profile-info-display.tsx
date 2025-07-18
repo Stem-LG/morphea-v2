@@ -1,14 +1,14 @@
 "use client";
 
 import { User } from '@supabase/supabase-js';
-import { useLanguage } from "@/hooks/useLanguage";
+// import { useLanguage } from "@/hooks/useLanguage";
 
 interface ProfileInfoDisplayProps {
   user: User;
 }
 
 export function ProfileInfoDisplay({ user }: ProfileInfoDisplayProps) {
-  const { t } = useLanguage();
+  // const { t } = useLanguage();
 
   const formatDate = (dateString: string | null | undefined) => {
     if (!dateString) return 'N/A';

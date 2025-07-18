@@ -206,19 +206,6 @@ export class ProfileService {
       // Sign out the temporary session
       await tempSupabase.auth.signOut();
 
-      // Try to delete user data from custom tables first (if any exist)
-      // This would typically include user profiles, preferences, etc.
-      try {
-        // Delete from profiles table if it exists
-        await this.supabase
-          .from('profiles')
-          .delete()
-          .eq('id', currentUser.user.id);
-      } catch (profileError) {
-        // Profiles table might not exist, continue with account deletion
-        console.warn('Could not delete from profiles table:', profileError);
-      }
-
       // For Supabase, we need to use the admin API to delete users
       // Since we can't do this from client-side, we'll implement a workaround
       // by signing out the user and providing appropriate feedback

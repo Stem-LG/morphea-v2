@@ -1,7 +1,6 @@
 "use client";
 
 import { useLanguage } from "@/hooks/useLanguage";
-import { Button } from "@/components/ui/button";
 import { useState } from "react";
 
 interface PreferencesManagementProps {
@@ -10,7 +9,7 @@ interface PreferencesManagementProps {
 }
 
 export function PreferencesManagement({ onSuccess, onError }: PreferencesManagementProps) {
-  const { language, setLanguage, t } = useLanguage();
+  const { language, setLanguage } = useLanguage();
   const [isUpdating, setIsUpdating] = useState(false);
 
   const handleLanguageChange = async (newLanguage: 'en' | 'fr') => {

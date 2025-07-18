@@ -2,22 +2,22 @@
 
 import { useWishlist } from "@/hooks/useWishlist";
 import { useCart } from "@/hooks/useCart";
-import { useLanguage } from "@/hooks/useLanguage";
+// import { useLanguage } from "@/hooks/useLanguage";
 import { useState } from "react";
 import Link from "next/link";
 
 export default function WishlistPage() {
     const { wishlist, removeFromWishlist, isLoading } = useWishlist();
     const { addToCart } = useCart();
-    const { t } = useLanguage();
+    // const { t } = useLanguage();
     const [processingItems, setProcessingItems] = useState<Set<number>>(new Set());
 
     const handleRemoveFromWishlist = async (itemId: number) => {
-        setProcessingItems(prev => new Set(prev).add(itemId));
+        setProcessingItems((prev) => new Set(prev).add(itemId));
         try {
             await removeFromWishlist(itemId);
         } finally {
-            setProcessingItems(prev => {
+            setProcessingItems((prev) => {
                 const newSet = new Set(prev);
                 newSet.delete(itemId);
                 return newSet;
@@ -26,13 +26,13 @@ export default function WishlistPage() {
     };
 
     const handleAddToCart = async (productId: number, itemId: number) => {
-        setProcessingItems(prev => new Set(prev).add(itemId));
+        setProcessingItems((prev) => new Set(prev).add(itemId));
         try {
-            await addToCart(productId, 1);
+            await addToCart({ productId, quantity: 1 });
             // Optionally remove from wishlist after adding to cart
             // await removeFromWishlist(itemId);
         } finally {
-            setProcessingItems(prev => {
+            setProcessingItems((prev) => {
                 const newSet = new Set(prev);
                 newSet.delete(itemId);
                 return newSet;
@@ -41,12 +41,12 @@ export default function WishlistPage() {
     };
 
     const handleMoveToCart = async (productId: number, itemId: number) => {
-        setProcessingItems(prev => new Set(prev).add(itemId));
+        setProcessingItems((prev) => new Set(prev).add(itemId));
         try {
-            await addToCart(productId, 1);
+            await addToCart({ productId, quantity: 1 });
             await removeFromWishlist(itemId);
         } finally {
-            setProcessingItems(prev => {
+            setProcessingItems((prev) => {
                 const newSet = new Set(prev);
                 newSet.delete(itemId);
                 return newSet;
@@ -75,7 +75,7 @@ export default function WishlistPage() {
                         My Wishlist
                     </h1>
                     <p className="text-gray-300">
-                        {wishlist.length} {wishlist.length === 1 ? 'item' : 'items'} saved for later
+                        {wishlist.length} {wishlist.length === 1 ? "item" : "items"} saved for later
                     </p>
                 </div>
 
@@ -106,20 +106,30 @@ export default function WishlistPage() {
                             >
                                 {/* Product Image */}
                                 <div className="relative aspect-square bg-gradient-to-br from-morpheus-gold-dark/10 to-morpheus-gold-light/10">
-                                    {item.yproduit?.yproduitimage ? (
+                                    {item.yproduit?.imageurl ? (
                                         <img
-                                            src={item.yproduit.yproduitimage}
-                                            alt={item.yproduit.yproduitintitule || 'Product'}
+                                            src={item.yproduit.imageurl}
+                                            alt={item.yproduit.yproduitintitule || "Product"}
                                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                                         />
                                     ) : (
                                         <div className="w-full h-full flex items-center justify-center">
-                                            <svg className="w-16 h-16 text-morpheus-gold-light/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                            <svg
+                                                className="w-16 h-16 text-morpheus-gold-light/50"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth={2}
+                                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                                />
                                             </svg>
                                         </div>
                                     )}
-                                    
+
                                     {/* Remove from Wishlist Button */}
                                     <button
                                         onClick={() => handleRemoveFromWishlist(item.id)}
@@ -130,8 +140,18 @@ export default function WishlistPage() {
                                         {processingItems.has(item.id) ? (
                                             <div className="w-4 h-4 border-2 border-white border-t-transparent animate-spin rounded-full"></div>
                                         ) : (
-                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                            <svg
+                                                className="w-4 h-4"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth={2}
+                                                    d="M6 18L18 6M6 6l12 12"
+                                                />
                                             </svg>
                                         )}
                                     </button>
@@ -145,32 +165,27 @@ export default function WishlistPage() {
                                 {/* Product Details */}
                                 <div className="p-4">
                                     <h3 className="text-white font-semibold text-lg mb-2 line-clamp-2">
-                                        {item.yproduit?.yproduitintitule || 'Unknown Product'}
+                                        {item.yproduit?.yproduitintitule || "Unknown Product"}
                                     </h3>
-                                    
-                                    {item.yproduit?.yproduitdescription && (
+
+                                    {item.yproduit?.yproduitdetailstech && (
                                         <p className="text-gray-300 text-sm mb-3 line-clamp-3">
-                                            {item.yproduit.yproduitdescription}
+                                            {item.yproduit.yproduitdetailstech}
                                         </p>
                                     )}
 
                                     {/* Price */}
                                     <div className="flex items-center gap-2 mb-4">
                                         <span className="text-morpheus-gold-light font-bold text-lg">
-                                            ${(item.yproduit?.yproduitprix || 0).toFixed(2)}
+                                            ${(99).toFixed(2)}
                                         </span>
-                                        {item.yproduit?.yproduitprixpromo && (
-                                            <span className="text-gray-400 line-through text-sm">
-                                                ${item.yproduit.yproduitprixpromo.toFixed(2)}
-                                            </span>
-                                        )}
                                     </div>
 
                                     {/* Action Buttons */}
                                     <div className="space-y-2">
                                         <button
-                                            onClick={() => handleAddToCart(item.yproduit?.id || 0, item.id)}
-                                            disabled={processingItems.has(item.id) || !item.yproduit?.id}
+                                            onClick={() => handleAddToCart(item.yproduit?.yproduitid || 0, item.id)}
+                                            disabled={processingItems.has(item.id) || !item.yproduit?.yproduitid}
                                             className="w-full bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light text-white py-2 px-4 font-medium hover:from-morpheus-gold-light hover:to-morpheus-gold-dark transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                                         >
                                             {processingItems.has(item.id) ? (
@@ -179,13 +194,13 @@ export default function WishlistPage() {
                                                     Processing...
                                                 </div>
                                             ) : (
-                                                'Add to Cart'
+                                                "Add to Cart"
                                             )}
                                         </button>
-                                        
+
                                         <button
-                                            onClick={() => handleMoveToCart(item.yproduit?.id || 0, item.id)}
-                                            disabled={processingItems.has(item.id) || !item.yproduit?.id}
+                                            onClick={() => handleMoveToCart(item.yproduit?.yproduitid || 0, item.id)}
+                                            disabled={processingItems.has(item.id) || !item.yproduit?.yproduitid}
                                             className="w-full bg-gradient-to-r from-morpheus-gold-dark/20 to-morpheus-gold-light/20 border border-morpheus-gold-dark/40 text-morpheus-gold-light py-2 px-4 font-medium hover:from-morpheus-gold-dark/30 hover:to-morpheus-gold-light/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                                         >
                                             Move to Cart

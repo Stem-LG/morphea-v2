@@ -208,7 +208,7 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                 displayName: getColorName(model.color)
             };
         });
-    }, [productData.models]);
+    }, [productData.models, t]);
 
     const selectedModel = productData.models[selectedModelIndex];
 

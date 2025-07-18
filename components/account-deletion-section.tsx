@@ -151,7 +151,7 @@ export function AccountDeletionSection({ onDeleteAccount, isLoading = false }: A
 
           <div className="space-y-2">
             <Label htmlFor="delete-confirmation" className="text-white font-semibold">
-              Type "DELETE" to confirm
+              {"Type \"DELETE\" to confirm"}
             </Label>
             <Input
               id="delete-confirmation"

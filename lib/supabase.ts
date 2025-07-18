@@ -522,6 +522,7 @@ export type Database = {
           order: number | null
           produit_id: number | null
           url: string | null
+          yaction: string
         }
         Insert: {
           couleur?: string | null
@@ -530,6 +531,7 @@ export type Database = {
           order?: number | null
           produit_id?: number | null
           url?: string | null
+          yaction?: string
         }
         Update: {
           couleur?: string | null
@@ -538,6 +540,7 @@ export type Database = {
           order?: number | null
           produit_id?: number | null
           url?: string | null
+          yaction?: string
         }
         Relationships: [
           {
@@ -627,6 +630,7 @@ export type Database = {
           sysadresseip: string | null
           sysdate: string | null
           sysuser: string | null
+          yaction: string
           yarriereplancouleur: string | null
           ydesigneuridfk: number | null
           yinfospotactionsidfk: string
@@ -634,6 +638,7 @@ export type Database = {
           yproduitdetailstech: string
           yproduitid: number
           yproduitintitule: string
+          ystatus: string
           yvideoidfk: number | null
         }
         Insert: {
@@ -642,6 +647,7 @@ export type Database = {
           sysadresseip?: string | null
           sysdate?: string | null
           sysuser?: string | null
+          yaction?: string
           yarriereplancouleur?: string | null
           ydesigneuridfk?: number | null
           yinfospotactionsidfk: string
@@ -649,6 +655,7 @@ export type Database = {
           yproduitdetailstech: string
           yproduitid?: number
           yproduitintitule: string
+          ystatus?: string
           yvideoidfk?: number | null
         }
         Update: {
@@ -657,6 +664,7 @@ export type Database = {
           sysadresseip?: string | null
           sysdate?: string | null
           sysuser?: string | null
+          yaction?: string
           yarriereplancouleur?: string | null
           ydesigneuridfk?: number | null
           yinfospotactionsidfk?: string
@@ -664,6 +672,7 @@ export type Database = {
           yproduitdetailstech?: string
           yproduitid?: number
           yproduitintitule?: string
+          ystatus?: string
           yvideoidfk?: number | null
         }
         Relationships: [

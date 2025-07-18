@@ -1,7 +1,7 @@
 "use client";
 
 import { User } from '@supabase/supabase-js';
-import { useLanguage } from "@/hooks/useLanguage";
+// import { useLanguage } from "@/hooks/useLanguage";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -25,7 +25,7 @@ interface ValidationErrors {
 }
 
 export function ProfileInfoEdit({ user, onSave, onCancel, isLoading }: ProfileInfoEditProps) {
-  const { t } = useLanguage();
+  // const { t } = useLanguage();
   
   // Form state
   const [formData, setFormData] = useState<ProfileUpdateData>({
