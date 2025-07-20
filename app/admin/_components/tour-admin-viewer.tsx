@@ -108,97 +108,9 @@ export default function TourAdminViewer({
     }
   }, [scenes, initialSceneId, currentScene, searchParams, router])
 
-  // Initialize Photo Sphere Viewer
+  // Initialize Photo Sphere Viewer (only once)
   useEffect(() => {
-    if (!containerElement || !currentScene || loading || isViewerInitializing) return
-
-    // Add global handlers for marker clicks - use refs to get current values
-    (window as any).handleSceneLinkClick = (linkId: string, targetId: string) => {
-      console.log('Global scene link click handler called:', linkId, targetId)
-      
-      // Use multiple checks to ensure we get the correct current mode
-      const checkAndExecute = () => {
-        const currentMode = adminMode
-        const currentScenelinks = scenelinks
-        const currentScenes = scenes
-        
-        console.log('Scene link click - current mode:', currentMode, 'adminMode state:', adminMode)
-        
-        if (currentMode === 'edit') {
-          console.log('Edit mode detected - opening inline edit for scene link')
-          // Edit mode: Open inline edit (force stop any transitions)
-          setForceStopTransitions(true)
-          setIsTransitioning(false)
-          
-          const sceneLink = currentScenelinks.find(link => link.yid === linkId)
-          if (sceneLink) {
-            setInlineEditingSceneLink(sceneLink)
-            setPreviewMarkerPosition({ yaw: sceneLink.yyaw, pitch: sceneLink.ypitch })
-          }
-        } else {
-          console.log('View mode detected - navigating to target scene')
-          // View mode: Navigate to target scene (only if not force stopped)
-          if (!forceStopTransitions) {
-            const targetScene = currentScenes.find(s => s.yid === targetId)
-            if (targetScene) {
-              console.log('Navigating to scene via global handler:', targetScene.yname)
-              setIsTransitioning(true)
-              setCurrentScene(targetScene)
-              
-              // Update URL with new scene ID
-              const newUrl = new URL(window.location.href)
-              newUrl.searchParams.set('sceneId', targetScene.yid)
-              router.replace(newUrl.pathname + newUrl.search)
-              
-              // Update panorama and markers
-              if (viewerInstance) {
-                viewerInstance.setPanorama(targetScene.ypanorama, {
-                  transition: true,
-                  showLoader: true,
-                }).then(() => {
-                  setTimeout(() => {
-                    addMarkers() // Update markers for new scene
-                    setIsTransitioning(false)
-                  }, 500)
-                })
-              }
-            }
-          }
-        }
-      }
-      
-      // Try immediately first
-      checkAndExecute()
-    }
-
-    (window as any).handleInfospotClick = (infospotId: string, title: string, text: string) => {
-      console.log('Global infospot click handler called:', infospotId)
-      
-      // Use multiple checks to ensure we get the correct current mode
-      const checkAndExecute = () => {
-        const currentMode = adminMode
-        const currentInfospots = infospots
-        
-        console.log('Infospot click - current mode:', currentMode, 'adminMode state:', adminMode)
-        
-        if (currentMode === 'edit') {
-          console.log('Edit mode detected - opening inline edit for infospot')
-          // Edit mode: Open inline edit
-          const infospot = currentInfospots.find(spot => spot.yid === infospotId)
-          if (infospot) {
-            setInlineEditingInfospot(infospot)
-            setPreviewMarkerPosition({ yaw: infospot.yyaw, pitch: infospot.ypitch })
-          }
-        } else {
-          console.log('View mode detected - showing infospot alert')
-          // View mode: Show infospot information
-          alert(`${title}\n\n${text}`)
-        }
-      }
-      
-      // Try immediately first
-      checkAndExecute()
-    }
+    if (!containerElement || !currentScene || loading || isViewerInitializing || viewerInstance) return
 
     const initializeViewer = () => {
       setIsViewerInitializing(true)
@@ -252,68 +164,123 @@ export default function TourAdminViewer({
       }
     }
 
-    // Only destroy and recreate if we don't have a viewer or if container/scene changed
-    if (!viewerInstance || viewerInstance.container !== containerElement) {
-      if (viewerInstance) {
-        try {
-          console.log('Destroying existing viewer')
-          viewerInstance.destroy()
-        } catch (error) {
-          console.warn('Error destroying viewer:', error)
-        } finally {
-          setViewerInstance(null)
-        }
-      }
-      
-      // Add a small delay to ensure cleanup is complete
-      setTimeout(() => {
-        try {
-          initializeViewer()
-        } catch (error) {
-          console.error('Error initializing viewer:', error)
-        }
-      }, 50)
-    } else if (viewerInstance && currentScene) {
-      // If viewer exists but scene changed, just update the panorama
-      console.log('Updating panorama for existing viewer to:', currentScene.yname)
-      try {
-        viewerInstance.setPanorama(currentScene.ypanorama, {
-          transition: true,
-          showLoader: true,
-        }).then(() => {
-          console.log('Panorama updated successfully')
-          addMarkers()
-        }).catch((error) => {
-          console.error('Error updating panorama:', error)
-        })
-      } catch (error) {
-        console.error('Error setting panorama:', error)
-        // If panorama update fails, try to reinitialize
-        try {
-          viewerInstance.destroy()
-        } catch (destroyError) {
-          console.warn('Error destroying viewer after panorama failure:', destroyError)
-        } finally {
-          setViewerInstance(null)
-          setTimeout(() => {
-            initializeViewer()
-          }, 100)
-        }
-      }
-    }
+    initializeViewer()
 
     return () => {
       if (viewerInstance) {
         try {
           console.log('Cleaning up viewer in useEffect cleanup')
-          viewerInstance.destroy()
+          // Check if viewer is still attached to DOM before destroying
+          if (viewerInstance.container && viewerInstance.container.parentNode) {
+            viewerInstance.destroy()
+          } else {
+            console.log('Viewer container already detached, skipping destroy')
+          }
         } catch (error) {
           console.warn('Error destroying viewer in cleanup:', error)
         } finally {
           setViewerInstance(null)
         }
       }
+    }
+  }, [containerElement, loading])
+
+  // Separate effect for scene transitions (like virtual-tour.tsx)
+  useEffect(() => {
+    if (!viewerInstance || !currentScene || loading) return
+
+    const transitionToScene = async () => {
+      try {
+        console.log('Starting smooth transition to scene:', currentScene.yid, currentScene.yname)
+        
+        setIsTransitioning(true)
+        
+        // Use setPanorama for smooth transitions (like virtual-tour.tsx)
+        await viewerInstance.setPanorama(currentScene.ypanorama, {
+          transition: true,
+          showLoader: true,
+        })
+
+        // Update markers after transition with reduced delay
+        setTimeout(() => {
+          console.log('Transition completed, updating markers')
+          addMarkers()
+          setIsTransitioning(false)
+        }, 200) // Reduced delay for faster feel
+      } catch (error) {
+        console.error("Error transitioning to scene:", error)
+        setIsTransitioning(false)
+      }
+    }
+
+    transitionToScene()
+  }, [currentScene, viewerInstance, loading])
+
+  // Global handlers setup (separate from viewer initialization)
+  useEffect(() => {
+    // Add global handlers for marker clicks - use refs to get current values
+    (window as any).handleSceneLinkClick = (linkId: string, targetId: string) => {
+      console.log('Global scene link click handler called:', linkId, targetId)
       
+      const currentMode = adminModeRef.current
+      const currentScenelinks = scenelinks
+      const currentScenes = scenes
+      
+      console.log('Scene link click - current mode:', currentMode)
+      
+      if (currentMode === 'edit') {
+        console.log('Edit mode detected - opening inline edit for scene link')
+        // Edit mode: Open inline edit (force stop any transitions)
+        setForceStopTransitions(true)
+        setIsTransitioning(false)
+        
+        const sceneLink = currentScenelinks.find(link => link.yid === linkId)
+        if (sceneLink) {
+          setInlineEditingSceneLink(sceneLink)
+          setPreviewMarkerPosition({ yaw: sceneLink.yyaw, pitch: sceneLink.ypitch })
+        }
+      } else {
+        console.log('View mode detected - navigating to target scene')
+        // View mode: Navigate to target scene (only if not force stopped)
+        if (!forceStopTransitionsRef.current) {
+          const targetScene = currentScenes.find(s => s.yid === targetId)
+          if (targetScene) {
+            console.log('Navigating to scene via global handler:', targetScene.yname)
+            setCurrentScene(targetScene)
+            
+            // Update URL with new scene ID
+            const newUrl = new URL(window.location.href)
+            newUrl.searchParams.set('sceneId', targetScene.yid)
+            router.replace(newUrl.pathname + newUrl.search)
+          }
+        }
+      }
+    }
+
+    (window as any).handleInfospotClick = (infospotId: string, title: string, text: string) => {
+      console.log('Global infospot click handler called:', infospotId)
+      
+      const currentMode = adminModeRef.current
+      const currentInfospots = infospots
+      
+      console.log('Infospot click - current mode:', currentMode)
+      
+      if (currentMode === 'edit') {
+        console.log('Edit mode detected - opening inline edit for infospot')
+        // Edit mode: Open inline edit
+        const infospot = currentInfospots.find(spot => spot.yid === infospotId)
+        if (infospot) {
+          setInlineEditingInfospot(infospot)
+          setPreviewMarkerPosition({ yaw: infospot.yyaw, pitch: infospot.ypitch })
+        }
+      } else {
+        console.log('View mode detected - showing infospot alert')
+        // View mode: Show infospot information
+        alert(`${title}\n\n${text}`)
+      }
+    }
+
+    return () => {
       // Clean up global handlers
       try {
         delete (window as any).handleSceneLinkClick
@@ -322,73 +289,8 @@ export default function TourAdminViewer({
         console.warn('Error cleaning up global handlers:', error)
       }
     }
-  }, [containerElement, currentScene, loading])
+  }, [scenelinks, scenes, infospots, router])
 
-  // Update global handlers when adminMode changes
-  useEffect(() => {
-    if (!viewerInstance) return
-
-    // Debug: Updating global handlers
-    if (typeof console !== 'undefined' && console.log) {
-      console.log('Updating global handlers - adminMode:', adminMode, 'forceStopTransitions:', forceStopTransitions)
-    }
-
-    // Create handlers that capture current state at call time
-    (window as any).handleSceneLinkClick = (linkId: string, targetId: string) => {
-      console.log('Global scene link click handler called:', linkId, targetId)
-      console.log('Handler state check - adminMode:', adminMode, 'forceStopTransitions:', forceStopTransitions)
-      
-      if (adminMode === 'edit') {
-        console.log('Edit mode detected - opening inline edit for scene link')
-        setForceStopTransitions(true)
-        setIsTransitioning(false)
-        
-        const sceneLink = scenelinks.find(link => link.yid === linkId)
-        if (sceneLink) {
-          setInlineEditingSceneLink(sceneLink)
-          setPreviewMarkerPosition({ yaw: sceneLink.yyaw, pitch: sceneLink.ypitch })
-        }
-      } else {
-        console.log('View mode detected - navigating to target scene, forceStop:', forceStopTransitions)
-        if (!forceStopTransitions) {
-          const targetScene = scenes.find(s => s.yid === targetId)
-          if (targetScene) {
-            console.log('Navigating to scene via global handler:', targetScene.yname)
-            setIsTransitioning(true)
-            setCurrentScene(targetScene)
-            
-            const newUrl = new URL(window.location.href)
-            newUrl.searchParams.set('sceneId', targetScene.yid)
-            router.replace(newUrl.pathname + newUrl.search)
-            
-            // Let the useEffect handle the panorama change and marker updates
-            setTimeout(() => {
-              setIsTransitioning(false)
-            }, 1000)
-          }
-        } else {
-          console.log('Navigation blocked by forceStopTransitions')
-        }
-      }
-    }
-
-    (window as any).handleInfospotClick = (infospotId: string, title: string, text: string) => {
-      console.log('Global infospot click handler called:', infospotId)
-      console.log('Infospot handler state check - adminMode:', adminMode)
-      
-      if (adminMode === 'edit') {
-        console.log('Edit mode detected - opening inline edit for infospot')
-        const infospot = infospots.find(spot => spot.yid === infospotId)
-        if (infospot) {
-          setInlineEditingInfospot(infospot)
-          setPreviewMarkerPosition({ yaw: infospot.yyaw, pitch: infospot.ypitch })
-        }
-      } else {
-        console.log('View mode detected - showing infospot alert')
-        alert(`${title}\n\n${text}`)
-      }
-    }
-  }, [adminMode, scenelinks, scenes, infospots, viewerInstance, forceStopTransitions, router])
 
   // Update markers when data changes or admin mode changes
   useEffect(() => {
@@ -577,9 +479,16 @@ export default function TourAdminViewer({
 
     const markersPluginInstance = viewerInstance.getPlugin(MarkersPlugin) as MarkersPlugin
     if (!markersPluginInstance) {
-      console.log('Cannot add markers - markers plugin not found')
+      console.log('Markers plugin not available yet')
       return
     }
+
+    console.log('Adding markers for scene:', currentScene.yid, currentScene.yname)
+    addMarkersWithPlugin(markersPluginInstance)
+  }, [viewerInstance, currentScene])
+
+  const addMarkersWithPlugin = useCallback((markersPluginInstance: MarkersPlugin) => {
+    if (!currentScene) return
 
     console.log('Adding markers for scene:', currentScene.yid, currentScene.yname)
     markersPluginInstance.clearMarkers()
@@ -616,7 +525,7 @@ export default function TourAdminViewer({
         html: markerHtml,
         anchor: "center center",
         tooltip: {
-          content: adminMode === 'edit'
+          content: adminModeRef.current === 'edit'
             ? `Click to edit: ${link.yname} → ${targetScene?.yname || 'Unknown Scene'}`
             : `${link.yname} → ${targetScene?.yname || 'Unknown Scene'}`,
           position: "top center",
@@ -677,7 +586,7 @@ export default function TourAdminViewer({
         html: infospotHtml,
         anchor: "center center",
         tooltip: {
-          content: adminMode === 'edit'
+          content: adminModeRef.current === 'edit'
             ? `Click to edit: ${spot.ytitle}`
             : spot.ytitle,
           position: "top center",
@@ -694,7 +603,7 @@ export default function TourAdminViewer({
 
     console.log('Finished adding markers. Total markers added:', currentSceneLinks.length + currentInfospots.length)
 
-  }, [viewerInstance, currentScene, scenelinks, infospots, scenes, actions, adminMode])
+  }, [currentScene, scenelinks, infospots, scenes, actions, adminModeRef])
 
 
   const handleMarkerClick = useCallback((e: any) => {
@@ -1626,7 +1535,7 @@ export default function TourAdminViewer({
       )}
 
       {/* Transition Overlay */}
-      {(isTransitioning || isModeTransitioning) && (
+      {/* {(isTransitioning || isModeTransitioning) && (
         <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-30">
           <div className="bg-white rounded-lg p-4 flex items-center gap-3">
             <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
@@ -1635,7 +1544,7 @@ export default function TourAdminViewer({
             </span>
           </div>
         </div>
-      )}
+      )} */}
     </div>
   )
 }
