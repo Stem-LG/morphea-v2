@@ -11,7 +11,7 @@ export default function AdminLayout({
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
     return (
-        <div className="flex min-h-screen bg-gray-50">
+        <div className="flex min-h-[calc(100vh-4rem)] bg-gray-50">
             <AdminSidebar
                 isOpen={sidebarOpen}
                 isCollapsed={sidebarCollapsed}

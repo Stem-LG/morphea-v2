@@ -1123,14 +1123,113 @@ export default function TourAdminViewer({
       {/* Inline Editing Panel */}
       {(inlineEditingInfospot || inlineEditingSceneLink) && (
         <div className="absolute top-1/2 right-4 transform -translate-y-1/2 z-30">
-          <Card className="bg-white/95 backdrop-blur-sm shadow-xl border-2 border-blue-500">
+          <Card className="bg-white/95 backdrop-blur-sm shadow-xl border-2 border-blue-500 max-w-sm">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm flex items-center gap-2">
                 <Edit className="w-4 h-4" />
                 {inlineEditingInfospot ? 'Edit InfoSpot' : 'Edit Scene Link'}
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent className="space-y-3 max-h-96 overflow-y-auto">
+              {/* InfoSpot-specific fields */}
+              {inlineEditingInfospot && (
+                <div className="space-y-2">
+                  <div>
+                    <label className="text-xs font-medium">Title:</label>
+                    <input
+                      type="text"
+                      value={inlineEditingInfospot.ytitle}
+                      onChange={(e) => setInlineEditingInfospot(prev => prev ? {...prev, ytitle: e.target.value} : null)}
+                      className="w-full px-2 py-1 text-xs border rounded"
+                      placeholder="InfoSpot title"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium">Description:</label>
+                    <textarea
+                      value={inlineEditingInfospot.ytext}
+                      onChange={(e) => setInlineEditingInfospot(prev => prev ? {...prev, ytext: e.target.value} : null)}
+                      className="w-full px-2 py-1 text-xs border rounded h-16 resize-none"
+                      placeholder="InfoSpot description"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium">InfoSpot Action:</label>
+                    <select
+                      value={inlineEditingInfospot.yinfospotactionsidfk || ''}
+                      onChange={(e) => setInlineEditingInfospot(prev => prev ? {...prev, yinfospotactionsidfk: e.target.value || null} : null)}
+                      className="w-full px-2 py-1 text-xs border rounded"
+                    >
+                      <option value="">No Action</option>
+                      {actions.map(action => (
+                        <option key={action.yinfospotactionsid} value={action.yinfospotactionsid}>
+                          {action.ytitle || action.ytype} - {action.ytype}
+                        </option>
+                      ))}
+                    </select>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        const actionTitle = prompt('Enter action title:')
+                        const actionType = prompt('Enter action type (e.g., modal, navigation, custom):')
+                        const actionDescription = prompt('Enter action description (optional):')
+                        
+                        if (actionTitle && actionType) {
+                          // Create new action using the hook
+                          const { createAction } = useInfoactions()
+                          createAction({
+                            id: crypto.randomUUID(),
+                            type: actionType,
+                            title: actionTitle,
+                            description: actionDescription || null
+                          }).then(newAction => {
+                            if (newAction) {
+                              // Auto-assign the new action to this infospot
+                              setInlineEditingInfospot(prev => prev ? {...prev, yinfospotactionsidfk: newAction.yinfospotactionsid} : null)
+                            }
+                          })
+                        }
+                      }}
+                      className="w-full mt-1 text-xs h-6"
+                    >
+                      <Plus className="w-3 h-3 mr-1" />
+                      Add New Action
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {/* Scene Link-specific fields */}
+              {inlineEditingSceneLink && (
+                <div className="space-y-2">
+                  <div>
+                    <label className="text-xs font-medium">Name:</label>
+                    <input
+                      type="text"
+                      value={inlineEditingSceneLink.yname}
+                      onChange={(e) => setInlineEditingSceneLink(prev => prev ? {...prev, yname: e.target.value} : null)}
+                      className="w-full px-2 py-1 text-xs border rounded"
+                      placeholder="Scene link name"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium">Target Scene:</label>
+                    <select
+                      value={inlineEditingSceneLink.ytargetid}
+                      onChange={(e) => setInlineEditingSceneLink(prev => prev ? {...prev, ytargetid: e.target.value} : null)}
+                      className="w-full px-2 py-1 text-xs border rounded"
+                    >
+                      {scenes.filter(s => s.yid !== currentScene?.yid).map(scene => (
+                        <option key={scene.yid} value={scene.yid}>
+                          {scene.yname}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              )}
+
               {/* Position Display */}
               {previewMarkerPosition && (
                 <div className="text-xs bg-blue-50 p-2 rounded">
@@ -1177,16 +1276,21 @@ export default function TourAdminViewer({
                     
                     try {
                       if (inlineEditingInfospot) {
-                        // Update infospot position using hook
+                        // Update infospot with all fields
                         const result = await updateInfospot(inlineEditingInfospot.yid, {
+                          title: inlineEditingInfospot.ytitle,
+                          text: inlineEditingInfospot.ytext,
                           yaw: previewMarkerPosition.yaw,
                           pitch: previewMarkerPosition.pitch,
+                          actionId: inlineEditingInfospot.yinfospotactionsidfk,
                         })
                         
                         if (!result) throw new Error('Failed to update infospot')
                       } else if (inlineEditingSceneLink) {
-                        // Update scene link position using hook
+                        // Update scene link with all fields
                         const result = await updateSceneLink(inlineEditingSceneLink.yid, {
+                          name: inlineEditingSceneLink.yname,
+                          targetId: inlineEditingSceneLink.ytargetid,
                           yaw: previewMarkerPosition.yaw,
                           pitch: previewMarkerPosition.pitch,
                         })
@@ -1417,6 +1521,7 @@ export default function TourAdminViewer({
                       if (inlineAddingInfospot) {
                         const titleInput = document.getElementById('adding-infospot-title') as HTMLInputElement
                         const textInput = document.getElementById('adding-infospot-text') as HTMLTextAreaElement
+                        const actionSelect = document.getElementById('adding-infospot-action') as HTMLSelectElement
                         
                         if (!titleInput.value.trim()) {
                           alert('Please enter a title for the InfoSpot')
@@ -1435,7 +1540,7 @@ export default function TourAdminViewer({
                           text: textInput.value.trim() || '',
                           yaw: addingMarkerPosition.yaw,
                           pitch: addingMarkerPosition.pitch,
-                          actionId: null // Default no action
+                          actionId: actionSelect.value || null
                         })
                         
                         if (!result) throw new Error('Failed to create InfoSpot')

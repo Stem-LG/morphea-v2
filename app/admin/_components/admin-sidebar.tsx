@@ -65,8 +65,8 @@ export function AdminSidebar({ isOpen, isCollapsed, onToggle, onCollapse }: Admi
             {/* Sidebar */}
             <div
                 className={`
-                fixed lg:sticky inset-y-0 left-0 z-50
-                ${isCollapsed ? 'w-16' : 'w-64'} h-screen bg-gray-900 text-white p-4
+                fixed lg:sticky top-16 lg:top-0 left-0 z-50
+                ${isCollapsed ? 'w-16' : 'w-64'} h-[calc(100vh-4rem)] lg:min-h-[calc(100vh-4rem)] bg-gray-900 text-white p-4
                 transform ${isOpen ? "translate-x-0" : "-translate-x-full"}
                 lg:translate-x-0 transition-all duration-200 ease-in-out
             `}
