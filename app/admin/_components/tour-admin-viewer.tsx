@@ -60,6 +60,27 @@ export default function TourAdminViewer({
   const [inlineAddingSceneLink, setInlineAddingSceneLink] = useState<boolean>(false)
   const [addingMarkerPosition, setAddingMarkerPosition] = useState<{ yaw: number; pitch: number } | null>(null)
   
+  // State for viewing infospot details
+  const [viewingInfospot, setViewingInfospot] = useState<InfoSpot | null>(null)
+  
+  // State for adding new action
+  const [isAddingAction, setIsAddingAction] = useState<boolean>(false)
+  const [newActionForm, setNewActionForm] = useState({
+    title: '',
+    type: '',
+    description: ''
+  })
+  
+  // State for adding new scene
+  const [isAddingScene, setIsAddingScene] = useState<boolean>(false)
+  const [newSceneForm, setNewSceneForm] = useState({
+    name: '',
+    panorama: '',
+    yaw: 0,
+    pitch: 0,
+    fov: 50
+  })
+  
   // Refs to store current state values to avoid stale closure issues
   const adminModeRef = useRef(adminMode)
   const isTransitioningRef = useRef(isTransitioning)
@@ -274,9 +295,12 @@ export default function TourAdminViewer({
           setPreviewMarkerPosition({ yaw: infospot.yyaw, pitch: infospot.ypitch })
         }
       } else {
-        console.log('View mode detected - showing infospot alert')
-        // View mode: Show infospot information
-        alert(`${title}\n\n${text}`)
+        console.log('View mode detected - showing infospot details')
+        // View mode: Show infospot information in modal
+        const infospot = currentInfospots.find(spot => spot.yid === infospotId)
+        if (infospot) {
+          setViewingInfospot(infospot)
+        }
       }
     }
 
@@ -700,8 +724,11 @@ export default function TourAdminViewer({
             setTimeout(() => setIsTransitioning(false), 1000)
           }
         } else if (data.type === 'infospot') {
-          // Show infospot information
-          alert(`${data.title}\n\n${data.text}`)
+          // Show infospot information in modal
+          const infospot = infospots.find(spot => spot.yid === data.id)
+          if (infospot) {
+            setViewingInfospot(infospot)
+          }
         }
       }
     }
@@ -710,13 +737,16 @@ export default function TourAdminViewer({
   const handleSceneChange = (sceneId: string) => {
     const scene = scenes.find(s => s.yid === sceneId)
     if (scene && scene.yid !== currentScene?.yid) {
-      // Close any open edit panels when changing scenes
+      // Close any open edit panels and modals when changing scenes
       setInlineEditingInfospot(null)
       setInlineEditingSceneLink(null)
       setPreviewMarkerPosition(null)
       setInlineAddingInfospot(false)
       setInlineAddingSceneLink(false)
       setAddingMarkerPosition(null)
+      setViewingInfospot(null)
+      setIsAddingAction(false)
+      setIsAddingScene(false)
       
       // Allow manual scene changes from dropdown even in edit mode
       setIsTransitioning(true)
@@ -797,13 +827,16 @@ export default function TourAdminViewer({
                     console.log('Switching to view mode')
                     setIsModeTransitioning(true)
                     
-                    // Close any open edit panels when switching to view mode
+                    // Close any open edit panels and modals when switching to view mode
                     setInlineEditingInfospot(null)
                     setInlineEditingSceneLink(null)
                     setPreviewMarkerPosition(null)
                     setInlineAddingInfospot(false)
                     setInlineAddingSceneLink(false)
                     setAddingMarkerPosition(null)
+                    setViewingInfospot(null)
+                    setIsAddingAction(false) // Close any open add action modal
+                    setIsAddingScene(false) // Close any open add scene modal
                     
                     // Set force stop transitions FIRST, then admin mode
                     // This ensures the state is properly synchronized
@@ -853,6 +886,9 @@ export default function TourAdminViewer({
                     console.log('Switching to edit mode')
                     setIsModeTransitioning(true)
                     setIsTransitioning(false)
+                    setViewingInfospot(null) // Close any open infospot details modal
+                    setIsAddingAction(false) // Close any open add action modal
+                    setIsAddingScene(false) // Close any open add scene modal
                     
                     // Set force stop transitions FIRST, then admin mode
                     // This ensures the state is properly synchronized
@@ -1024,62 +1060,84 @@ export default function TourAdminViewer({
               <Badge variant="outline">{currentScene.yid}</Badge>
             </div>
             
-            {/* Delete Scene Button - Only show in edit mode and if there are multiple scenes */}
-            {adminMode === 'edit' && scenes.length > 1 && (
-              <div className="mt-2">
+            {/* Scene Management Buttons - Only show in edit mode */}
+            {adminMode === 'edit' && (
+              <div className="mt-2 space-y-2">
                 <Button
                   size="sm"
-                  variant="destructive"
-                  onClick={async () => {
-                    if (!confirm(`Are you sure you want to delete the scene &quot;${currentScene.yname}&quot;?\n\nThis will also delete all infospots and scene links associated with this scene.\n\nThis action cannot be undone.`)) {
-                      return
-                    }
-                    
-                    try {
-                      // Delete the scene
-                      const success = await deleteScene(currentScene.yid)
-                      if (!success) throw new Error('Failed to delete scene')
-                      
-                      // Refresh scenes data
-                      await refreshScenes()
-                      
-                      // Navigate to the first available scene
-                      const remainingScenes = scenes.filter(s => s.yid !== currentScene.yid)
-                      if (remainingScenes.length > 0) {
-                        const nextScene = remainingScenes[0]
-                        setCurrentScene(nextScene)
-                        
-                        // Update URL with new scene ID
-                        const newUrl = new URL(window.location.href)
-                        newUrl.searchParams.set('sceneId', nextScene.yid)
-                        router.replace(newUrl.pathname + newUrl.search)
-                        
-                        // Update panorama
-                        if (viewerInstance) {
-                          viewerInstance.setPanorama(nextScene.ypanorama, {
-                            transition: true,
-                            showLoader: true,
-                          }).then(() => {
-                            setTimeout(() => {
-                              addMarkers()
-                            }, 500)
-                          })
-                        }
-                      }
-                      
-                      // Data will be automatically refreshed by the hooks
-                      // No need for manual refresh calls
-                      
-                    } catch (error) {
-                      console.error('Error deleting scene:', error)
-                      alert('Failed to delete scene. Please try again.')
-                    }
+                  variant="outline"
+                  onClick={() => {
+                    setIsAddingScene(true)
+                    setNewSceneForm({
+                      name: '',
+                      panorama: '',
+                      yaw: 0,
+                      pitch: 0,
+                      fov: 50
+                    })
                   }}
                   className="w-full"
                 >
-                  <Trash2 className="w-4 h-4 mr-1" />
-                  Delete Scene
+                  <Plus className="w-4 h-4 mr-1" />
+                  Add New Scene
                 </Button>
+                
+                {/* Delete Scene Button - Only show if there are multiple scenes */}
+                {scenes.length > 1 && (
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    onClick={async () => {
+                      if (!confirm(`Are you sure you want to delete the scene &quot;${currentScene.yname}&quot;?\n\nThis will also delete all infospots and scene links associated with this scene.\n\nThis action cannot be undone.`)) {
+                        return
+                      }
+                      
+                      try {
+                        // Delete the scene
+                        const success = await deleteScene(currentScene.yid)
+                        if (!success) throw new Error('Failed to delete scene')
+                        
+                        // Refresh scenes data
+                        await refreshScenes()
+                        
+                        // Navigate to the first available scene
+                        const remainingScenes = scenes.filter(s => s.yid !== currentScene.yid)
+                        if (remainingScenes.length > 0) {
+                          const nextScene = remainingScenes[0]
+                          setCurrentScene(nextScene)
+                          
+                          // Update URL with new scene ID
+                          const newUrl = new URL(window.location.href)
+                          newUrl.searchParams.set('sceneId', nextScene.yid)
+                          router.replace(newUrl.pathname + newUrl.search)
+                          
+                          // Update panorama
+                          if (viewerInstance) {
+                            viewerInstance.setPanorama(nextScene.ypanorama, {
+                              transition: true,
+                              showLoader: true,
+                            }).then(() => {
+                              setTimeout(() => {
+                                addMarkers()
+                              }, 500)
+                            })
+                          }
+                        }
+                        
+                        // Data will be automatically refreshed by the hooks
+                        // No need for manual refresh calls
+                        
+                      } catch (error) {
+                        console.error('Error deleting scene:', error)
+                        alert('Failed to delete scene. Please try again.')
+                      }
+                    }}
+                    className="w-full"
+                  >
+                    <Trash2 className="w-4 h-4 mr-1" />
+                    Delete Scene
+                  </Button>
+                )}
               </div>
             )}
           </CardContent>
@@ -1171,25 +1229,8 @@ export default function TourAdminViewer({
                       size="sm"
                       variant="outline"
                       onClick={() => {
-                        const actionTitle = prompt('Enter action title:')
-                        const actionType = prompt('Enter action type (e.g., modal, navigation, custom):')
-                        const actionDescription = prompt('Enter action description (optional):')
-                        
-                        if (actionTitle && actionType) {
-                          // Create new action using the hook
-                          const { createAction } = useInfoactions()
-                          createAction({
-                            id: crypto.randomUUID(),
-                            type: actionType,
-                            title: actionTitle,
-                            description: actionDescription || null
-                          }).then(newAction => {
-                            if (newAction) {
-                              // Auto-assign the new action to this infospot
-                              setInlineEditingInfospot(prev => prev ? {...prev, yinfospotactionsidfk: newAction.yinfospotactionsid} : null)
-                            }
-                          })
-                        }
+                        setIsAddingAction(true)
+                        setNewActionForm({ title: '', type: '', description: '' })
                       }}
                       className="w-full mt-1 text-xs h-6"
                     >
@@ -1243,27 +1284,49 @@ export default function TourAdminViewer({
               <div className="space-y-2">
                 <div>
                   <label className="text-xs font-medium">Yaw:</label>
-                  <input
-                    type="range"
-                    min="-3.14159"
-                    max="3.14159"
-                    step="0.01"
-                    value={previewMarkerPosition?.yaw || 0}
-                    onChange={(e) => setPreviewMarkerPosition(prev => prev ? {...prev, yaw: parseFloat(e.target.value)} : null)}
-                    className="w-full"
-                  />
+                  <div className="flex gap-2 items-center">
+                    <input
+                      type="range"
+                      min="-3.14159"
+                      max="3.14159"
+                      step="0.01"
+                      value={previewMarkerPosition?.yaw || 0}
+                      onChange={(e) => setPreviewMarkerPosition(prev => prev ? {...prev, yaw: parseFloat(e.target.value)} : null)}
+                      className="flex-1"
+                    />
+                    <input
+                      type="number"
+                      min="-3.14159"
+                      max="3.14159"
+                      step="0.01"
+                      value={previewMarkerPosition?.yaw || 0}
+                      onChange={(e) => setPreviewMarkerPosition(prev => prev ? {...prev, yaw: parseFloat(e.target.value) || 0} : null)}
+                      className="w-20 px-2 py-1 text-xs border rounded"
+                    />
+                  </div>
                 </div>
                 <div>
                   <label className="text-xs font-medium">Pitch:</label>
-                  <input
-                    type="range"
-                    min="-1.5708"
-                    max="1.5708"
-                    step="0.01"
-                    value={previewMarkerPosition?.pitch || 0}
-                    onChange={(e) => setPreviewMarkerPosition(prev => prev ? {...prev, pitch: parseFloat(e.target.value)} : null)}
-                    className="w-full"
-                  />
+                  <div className="flex gap-2 items-center">
+                    <input
+                      type="range"
+                      min="-1.5708"
+                      max="1.5708"
+                      step="0.01"
+                      value={previewMarkerPosition?.pitch || 0}
+                      onChange={(e) => setPreviewMarkerPosition(prev => prev ? {...prev, pitch: parseFloat(e.target.value)} : null)}
+                      className="flex-1"
+                    />
+                    <input
+                      type="number"
+                      min="-1.5708"
+                      max="1.5708"
+                      step="0.01"
+                      value={previewMarkerPosition?.pitch || 0}
+                      onChange={(e) => setPreviewMarkerPosition(prev => prev ? {...prev, pitch: parseFloat(e.target.value) || 0} : null)}
+                      className="w-20 px-2 py-1 text-xs border rounded"
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -1437,27 +1500,49 @@ export default function TourAdminViewer({
               <div className="space-y-2">
                 <div>
                   <label className="text-xs font-medium">Yaw:</label>
-                  <input
-                    type="range"
-                    min="-3.14159"
-                    max="3.14159"
-                    step="0.01"
-                    value={addingMarkerPosition.yaw}
-                    onChange={(e) => setAddingMarkerPosition(prev => prev ? {...prev, yaw: parseFloat(e.target.value)} : null)}
-                    className="w-full"
-                  />
+                  <div className="flex gap-2 items-center">
+                    <input
+                      type="range"
+                      min="-3.14159"
+                      max="3.14159"
+                      step="0.01"
+                      value={addingMarkerPosition.yaw}
+                      onChange={(e) => setAddingMarkerPosition(prev => prev ? {...prev, yaw: parseFloat(e.target.value)} : null)}
+                      className="flex-1"
+                    />
+                    <input
+                      type="number"
+                      min="-3.14159"
+                      max="3.14159"
+                      step="0.01"
+                      value={addingMarkerPosition.yaw}
+                      onChange={(e) => setAddingMarkerPosition(prev => prev ? {...prev, yaw: parseFloat(e.target.value) || 0} : null)}
+                      className="w-20 px-2 py-1 text-xs border rounded"
+                    />
+                  </div>
                 </div>
                 <div>
                   <label className="text-xs font-medium">Pitch:</label>
-                  <input
-                    type="range"
-                    min="-1.5708"
-                    max="1.5708"
-                    step="0.01"
-                    value={addingMarkerPosition.pitch}
-                    onChange={(e) => setAddingMarkerPosition(prev => prev ? {...prev, pitch: parseFloat(e.target.value)} : null)}
-                    className="w-full"
-                  />
+                  <div className="flex gap-2 items-center">
+                    <input
+                      type="range"
+                      min="-1.5708"
+                      max="1.5708"
+                      step="0.01"
+                      value={addingMarkerPosition.pitch}
+                      onChange={(e) => setAddingMarkerPosition(prev => prev ? {...prev, pitch: parseFloat(e.target.value)} : null)}
+                      className="flex-1"
+                    />
+                    <input
+                      type="number"
+                      min="-1.5708"
+                      max="1.5708"
+                      step="0.01"
+                      value={addingMarkerPosition.pitch}
+                      onChange={(e) => setAddingMarkerPosition(prev => prev ? {...prev, pitch: parseFloat(e.target.value) || 0} : null)}
+                      className="w-20 px-2 py-1 text-xs border rounded"
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -1629,6 +1714,459 @@ export default function TourAdminViewer({
               </div>
             </CardContent>
           </Card>
+        </div>
+      )}
+
+      {/* InfoSpot Details Modal */}
+      {viewingInfospot && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 max-h-[80vh] overflow-hidden">
+            {/* Modal Header */}
+            <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold">{viewingInfospot.ytitle}</h2>
+                <button
+                  onClick={() => setViewingInfospot(null)}
+                  className="text-white hover:text-gray-200 transition-colors"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            
+            {/* Modal Content */}
+            <div className="p-4 overflow-y-auto max-h-96">
+              {viewingInfospot.ytext && (
+                <div className="mb-4">
+                  <h3 className="text-sm font-medium text-gray-700 mb-2">Description</h3>
+                  <p className="text-gray-600 leading-relaxed whitespace-pre-wrap">
+                    {viewingInfospot.ytext}
+                  </p>
+                </div>
+              )}
+              
+              {/* Show action information if available */}
+              {viewingInfospot.yinfospotactionsidfk && (
+                <div className="mb-4">
+                  <h3 className="text-sm font-medium text-gray-700 mb-2">Action</h3>
+                  {(() => {
+                    const action = actions.find(a => a.yinfospotactionsid === viewingInfospot.yinfospotactionsidfk)
+                    return action ? (
+                      <div className="bg-gray-50 p-3 rounded">
+                        <div className="flex items-center gap-2 mb-1">
+                          <Badge variant="outline">{action.ytype}</Badge>
+                          <span className="text-sm font-medium">{action.ytitle}</span>
+                        </div>
+                        {action.ydescription && (
+                          <p className="text-sm text-gray-600">{action.ydescription}</p>
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-gray-500">Action not found</p>
+                    )
+                  })()}
+                </div>
+              )}
+              
+              {/* Technical details for admin */}
+              <div className="border-t pt-4 mt-4">
+                <h3 className="text-sm font-medium text-gray-700 mb-2">Technical Details</h3>
+                <div className="grid grid-cols-2 gap-2 text-xs text-gray-500">
+                  <div>
+                    <span className="font-medium">Position:</span>
+                    <div>Yaw: {viewingInfospot.yyaw.toFixed(3)}</div>
+                    <div>Pitch: {viewingInfospot.ypitch.toFixed(3)}</div>
+                  </div>
+                  <div>
+                    <span className="font-medium">Scene:</span>
+                    <div>{currentScene?.yname}</div>
+                    <span className="font-medium">ID:</span>
+                    <div className="font-mono">{viewingInfospot.yid}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Modal Footer */}
+            <div className="bg-gray-50 px-4 py-3 flex justify-end">
+              <Button
+                size="sm"
+                onClick={() => setViewingInfospot(null)}
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                Close
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add New Action Modal */}
+      {isAddingAction && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            {/* Modal Header */}
+            <div className="bg-gradient-to-r from-green-600 to-green-700 text-white p-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold">Add New Action</h2>
+                <button
+                  onClick={() => {
+                    setIsAddingAction(false)
+                    setNewActionForm({ title: '', type: '', description: '' })
+                  }}
+                  className="text-white hover:text-gray-200 transition-colors"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            
+            {/* Modal Content */}
+            <div className="p-4">
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Action Title *
+                  </label>
+                  <input
+                    type="text"
+                    value={newActionForm.title}
+                    onChange={(e) => setNewActionForm(prev => ({ ...prev, title: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    placeholder="Enter action title"
+                    autoFocus
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Action Type *
+                  </label>
+                  <select
+                    value={newActionForm.type}
+                    onChange={(e) => setNewActionForm(prev => ({ ...prev, type: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  >
+                    <option value="">Select action type</option>
+                    <option value="modal">Modal</option>
+                    <option value="navigation">Navigation</option>
+                    <option value="custom">Custom</option>
+                    <option value="link">Link</option>
+                    <option value="popup">Popup</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Description (Optional)
+                  </label>
+                  <textarea
+                    value={newActionForm.description}
+                    onChange={(e) => setNewActionForm(prev => ({ ...prev, description: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
+                    rows={3}
+                    placeholder="Enter action description (optional)"
+                  />
+                </div>
+              </div>
+            </div>
+            
+            {/* Modal Footer */}
+            <div className="bg-gray-50 px-4 py-3 flex justify-end gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  setIsAddingAction(false)
+                  setNewActionForm({ title: '', type: '', description: '' })
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                size="sm"
+                onClick={async () => {
+                  if (!newActionForm.title.trim()) {
+                    alert('Please enter an action title')
+                    return
+                  }
+                  
+                  if (!newActionForm.type) {
+                    alert('Please select an action type')
+                    return
+                  }
+                  
+                  try {
+                    // Create new action using the hook
+                    const { createAction } = useInfoactions()
+                    const newAction = await createAction({
+                      id: crypto.randomUUID(),
+                      type: newActionForm.type,
+                      title: newActionForm.title.trim(),
+                      description: newActionForm.description.trim() || null
+                    })
+                    
+                    if (newAction && inlineEditingInfospot) {
+                      // Auto-assign the new action to the currently editing infospot
+                      setInlineEditingInfospot(prev => prev ? {...prev, yinfospotactionsidfk: newAction.yinfospotactionsid} : null)
+                    }
+                    
+                    // Close the modal
+                    setIsAddingAction(false)
+                    setNewActionForm({ title: '', type: '', description: '' })
+                    
+                  } catch (error) {
+                    console.error('Error creating action:', error)
+                    alert('Failed to create action. Please try again.')
+                  }
+                }}
+                className="bg-green-600 hover:bg-green-700 text-white"
+                disabled={!newActionForm.title.trim() || !newActionForm.type}
+              >
+                <Plus className="w-4 h-4 mr-1" />
+                Create Action
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add New Scene Modal */}
+      {isAddingScene && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-lg w-full mx-4 max-h-[90vh] overflow-hidden">
+            {/* Modal Header */}
+            <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white p-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold">Add New Scene</h2>
+                <button
+                  onClick={() => {
+                    setIsAddingScene(false)
+                    setNewSceneForm({
+                      name: '',
+                      panorama: '',
+                      yaw: 0,
+                      pitch: 0,
+                      fov: 50
+                    })
+                  }}
+                  className="text-white hover:text-gray-200 transition-colors"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            
+            {/* Modal Content */}
+            <div className="p-4 overflow-y-auto max-h-96">
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Scene Name *
+                  </label>
+                  <input
+                    type="text"
+                    value={newSceneForm.name}
+                    onChange={(e) => setNewSceneForm(prev => ({ ...prev, name: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    placeholder="Enter scene name"
+                    autoFocus
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Panorama URL *
+                  </label>
+                  <input
+                    type="url"
+                    value={newSceneForm.panorama}
+                    onChange={(e) => setNewSceneForm(prev => ({ ...prev, panorama: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    placeholder="https://example.com/panorama.jpg"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    URL to the 360° panoramic image (JPG, PNG, or other supported formats)
+                  </p>
+                </div>
+                
+                <div className="grid grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Initial Yaw
+                    </label>
+                    <input
+                      type="number"
+                      value={newSceneForm.yaw}
+                      onChange={(e) => setNewSceneForm(prev => ({ ...prev, yaw: parseFloat(e.target.value) || 0 }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      step="0.1"
+                      min="-3.14159"
+                      max="3.14159"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Horizontal rotation</p>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Initial Pitch
+                    </label>
+                    <input
+                      type="number"
+                      value={newSceneForm.pitch}
+                      onChange={(e) => setNewSceneForm(prev => ({ ...prev, pitch: parseFloat(e.target.value) || 0 }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      step="0.1"
+                      min="-1.5708"
+                      max="1.5708"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Vertical rotation</p>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Field of View
+                    </label>
+                    <input
+                      type="number"
+                      value={newSceneForm.fov}
+                      onChange={(e) => setNewSceneForm(prev => ({ ...prev, fov: parseFloat(e.target.value) || 50 }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      step="1"
+                      min="30"
+                      max="120"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Zoom level</p>
+                  </div>
+                </div>
+                
+                {/* Preview Section */}
+                {newSceneForm.panorama && (
+                  <div className="border-t pt-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Panorama Preview
+                    </label>
+                    <div className="relative">
+                      <img
+                        src={newSceneForm.panorama}
+                        alt="Panorama preview"
+                        className="w-full h-32 object-cover rounded-md border"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement
+                          target.style.display = 'none'
+                          const errorDiv = target.nextElementSibling as HTMLDivElement
+                          if (errorDiv) errorDiv.style.display = 'flex'
+                        }}
+                      />
+                      <div
+                        className="hidden w-full h-32 bg-gray-100 rounded-md border items-center justify-center text-gray-500 text-sm"
+                      >
+                        Failed to load panorama image
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            {/* Modal Footer */}
+            <div className="bg-gray-50 px-4 py-3 flex justify-end gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  setIsAddingScene(false)
+                  setNewSceneForm({
+                    name: '',
+                    panorama: '',
+                    yaw: 0,
+                    pitch: 0,
+                    fov: 50
+                  })
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                size="sm"
+                onClick={async () => {
+                  if (!newSceneForm.name.trim()) {
+                    alert('Please enter a scene name')
+                    return
+                  }
+                  
+                  if (!newSceneForm.panorama.trim()) {
+                    alert('Please enter a panorama URL')
+                    return
+                  }
+                  
+                  try {
+                    // Create new scene using the hook
+                    const { createScene } = useScenes()
+                    const newScene = await createScene({
+                      id: crypto.randomUUID(),
+                      name: newSceneForm.name.trim(),
+                      panorama: newSceneForm.panorama.trim(),
+                      yaw: newSceneForm.yaw,
+                      pitch: newSceneForm.pitch,
+                      fov: newSceneForm.fov
+                    })
+                    
+                    if (newScene) {
+                      // Close the modal
+                      setIsAddingScene(false)
+                      setNewSceneForm({
+                        name: '',
+                        panorama: '',
+                        yaw: 0,
+                        pitch: 0,
+                        fov: 50
+                      })
+                      
+                      // Navigate to the new scene to preview it
+                      setCurrentScene(newScene)
+                      
+                      // Update URL with new scene ID
+                      const newUrl = new URL(window.location.href)
+                      newUrl.searchParams.set('sceneId', newScene.yid)
+                      router.replace(newUrl.pathname + newUrl.search)
+                      
+                      // Update panorama in viewer
+                      if (viewerInstance) {
+                        setIsTransitioning(true)
+                        viewerInstance.setPanorama(newScene.ypanorama, {
+                          transition: true,
+                          showLoader: true,
+                        }).then(() => {
+                          setTimeout(() => {
+                            addMarkers()
+                            setIsTransitioning(false)
+                          }, 500)
+                        }).catch(() => {
+                          setIsTransitioning(false)
+                        })
+                      }
+                    }
+                    
+                  } catch (error) {
+                    console.error('Error creating scene:', error)
+                    alert('Failed to create scene. Please try again.')
+                  }
+                }}
+                className="bg-purple-600 hover:bg-purple-700 text-white"
+                disabled={!newSceneForm.name.trim() || !newSceneForm.panorama.trim()}
+              >
+                <Plus className="w-4 h-4 mr-1" />
+                Create & Preview Scene
+              </Button>
+            </div>
+          </div>
         </div>
       )}
 
