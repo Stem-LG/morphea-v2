@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Viewer } from '@photo-sphere-viewer/core'
 import { MarkersPlugin } from '@photo-sphere-viewer/markers-plugin'
@@ -35,7 +35,6 @@ export default function TourAdminViewer({
   const searchParams = useSearchParams()
   const [containerElement, setContainerElement] = useState<HTMLDivElement | null>(null)
   const [viewerInstance, setViewerInstance] = useState<Viewer | null>(null)
-  const [markersPlugin, setMarkersPlugin] = useState<MarkersPlugin | null>(null)
 
   const { scenes, loading: scenesLoading, deleteScene, refreshScenes } = useScenes()
   const { infospots, loading: infospotsLoading, createInfospot, updateInfospot, deleteInfospot, refreshInfospots } = useInfospots()
@@ -45,10 +44,10 @@ export default function TourAdminViewer({
   const [currentScene, setCurrentScene] = useState<Scene | null>(null)
   const [isTransitioning, setIsTransitioning] = useState(false)
   const [selectedMarkerPosition, setSelectedMarkerPosition] = useState<{ yaw: number; pitch: number } | null>(null)
-  const [adminMode, setAdminMode] = useState<'view' | 'edit'>('edit')
+  const [adminMode, setAdminMode] = useState<'view' | 'edit'>('view')
   const [isHandlingEdit, setIsHandlingEdit] = useState(false)
   const [isModeTransitioning, setIsModeTransitioning] = useState(false)
-  const [forceStopTransitions, setForceStopTransitions] = useState(true)
+  const [forceStopTransitions, setForceStopTransitions] = useState(false)
   const [isViewerInitializing, setIsViewerInitializing] = useState(false)
   
   // Inline editing states
@@ -61,7 +60,28 @@ export default function TourAdminViewer({
   const [inlineAddingSceneLink, setInlineAddingSceneLink] = useState<boolean>(false)
   const [addingMarkerPosition, setAddingMarkerPosition] = useState<{ yaw: number; pitch: number } | null>(null)
   
-  // Keep only essential refs for DOM elements and viewer instances
+  // Refs to store current state values to avoid stale closure issues
+  const adminModeRef = useRef(adminMode)
+  const isTransitioningRef = useRef(isTransitioning)
+  const isHandlingEditRef = useRef(isHandlingEdit)
+  const forceStopTransitionsRef = useRef(forceStopTransitions)
+  
+  // Update refs whenever state changes
+  useEffect(() => {
+    adminModeRef.current = adminMode
+  }, [adminMode])
+  
+  useEffect(() => {
+    isTransitioningRef.current = isTransitioning
+  }, [isTransitioning])
+  
+  useEffect(() => {
+    isHandlingEditRef.current = isHandlingEdit
+  }, [isHandlingEdit])
+  
+  useEffect(() => {
+    forceStopTransitionsRef.current = forceStopTransitions
+  }, [forceStopTransitions])
 
   const loading = scenesLoading || infospotsLoading || scenelinksLoading
 
@@ -203,7 +223,6 @@ export default function TourAdminViewer({
         })
 
         const plugin = viewer.getPlugin(MarkersPlugin) as MarkersPlugin
-        setMarkersPlugin(plugin)
         setViewerInstance(viewer)
 
         viewer.addEventListener("ready", () => {
@@ -243,7 +262,6 @@ export default function TourAdminViewer({
           console.warn('Error destroying viewer:', error)
         } finally {
           setViewerInstance(null)
-          setMarkersPlugin(null)
         }
       }
       
@@ -277,7 +295,6 @@ export default function TourAdminViewer({
           console.warn('Error destroying viewer after panorama failure:', destroyError)
         } finally {
           setViewerInstance(null)
-          setMarkersPlugin(null)
           setTimeout(() => {
             initializeViewer()
           }, 100)
@@ -294,7 +311,6 @@ export default function TourAdminViewer({
           console.warn('Error destroying viewer in cleanup:', error)
         } finally {
           setViewerInstance(null)
-          setMarkersPlugin(null)
         }
       }
       
@@ -312,9 +328,15 @@ export default function TourAdminViewer({
   useEffect(() => {
     if (!viewerInstance) return
 
-    // Update global handlers with current adminMode
+    // Debug: Updating global handlers
+    if (typeof console !== 'undefined' && console.log) {
+      console.log('Updating global handlers - adminMode:', adminMode, 'forceStopTransitions:', forceStopTransitions)
+    }
+
+    // Create handlers that capture current state at call time
     (window as any).handleSceneLinkClick = (linkId: string, targetId: string) => {
-      console.log('Global scene link click handler called:', linkId, targetId, 'current adminMode:', adminMode)
+      console.log('Global scene link click handler called:', linkId, targetId)
+      console.log('Handler state check - adminMode:', adminMode, 'forceStopTransitions:', forceStopTransitions)
       
       if (adminMode === 'edit') {
         console.log('Edit mode detected - opening inline edit for scene link')
@@ -327,7 +349,7 @@ export default function TourAdminViewer({
           setPreviewMarkerPosition({ yaw: sceneLink.yyaw, pitch: sceneLink.ypitch })
         }
       } else {
-        console.log('View mode detected - navigating to target scene')
+        console.log('View mode detected - navigating to target scene, forceStop:', forceStopTransitions)
         if (!forceStopTransitions) {
           const targetScene = scenes.find(s => s.yid === targetId)
           if (targetScene) {
@@ -340,17 +362,19 @@ export default function TourAdminViewer({
             router.replace(newUrl.pathname + newUrl.search)
             
             // Let the useEffect handle the panorama change and marker updates
-            // This prevents DOM manipulation conflicts
             setTimeout(() => {
               setIsTransitioning(false)
             }, 1000)
           }
+        } else {
+          console.log('Navigation blocked by forceStopTransitions')
         }
       }
     }
 
     (window as any).handleInfospotClick = (infospotId: string, title: string, text: string) => {
-      console.log('Global infospot click handler called:', infospotId, 'current adminMode:', adminMode)
+      console.log('Global infospot click handler called:', infospotId)
+      console.log('Infospot handler state check - adminMode:', adminMode)
       
       if (adminMode === 'edit') {
         console.log('Edit mode detected - opening inline edit for infospot')
@@ -674,9 +698,15 @@ export default function TourAdminViewer({
 
 
   const handleMarkerClick = useCallback((e: any) => {
-    console.log('Marker clicked:', e, 'Admin mode:', adminMode, 'Is transitioning:', isTransitioning, 'Is handling edit:', isHandlingEdit, 'Force stop:', forceStopTransitions)
+    // Use refs to get current state values to avoid stale closure issues
+    const currentAdminMode = adminModeRef.current
+    const currentIsTransitioning = isTransitioningRef.current
+    const currentIsHandlingEdit = isHandlingEditRef.current
+    const currentForceStopTransitions = forceStopTransitionsRef.current
     
-    if ((isTransitioning && !forceStopTransitions) || isHandlingEdit) return
+    console.log('Marker clicked:', e, 'Admin mode:', currentAdminMode, 'Is transitioning:', currentIsTransitioning, 'Is handling edit:', currentIsHandlingEdit, 'Force stop:', currentForceStopTransitions)
+    
+    if ((currentIsTransitioning && !currentForceStopTransitions) || currentIsHandlingEdit) return
 
     const marker = e.marker
     const data = marker.data
@@ -689,7 +719,7 @@ export default function TourAdminViewer({
     }
 
     // In edit mode, always edit
-    if (adminMode === 'edit') {
+    if (currentAdminMode === 'edit') {
       console.log('Edit mode - opening edit form for:', data.type, data.id)
       setIsHandlingEdit(true)
       
@@ -747,11 +777,19 @@ export default function TourAdminViewer({
         
         setIsHandlingEdit(false)
       } else {
-        // Normal view mode functionality - only if not handling edit
+        // Normal view mode functionality - only if not handling edit and not in edit mode
         console.log('Normal click in view mode for:', data.type, data.id)
         
+        // Double-check current mode to prevent navigation in edit mode
+        const finalAdminMode = adminModeRef.current
+        const finalForceStopTransitions = forceStopTransitionsRef.current
+        if (finalAdminMode === 'edit' || finalForceStopTransitions) {
+          console.log('Navigation blocked - current mode:', finalAdminMode, 'forceStop:', finalForceStopTransitions)
+          return
+        }
+        
         if (data.type === 'scenelink') {
-          // Navigate to target scene
+          // Navigate to target scene only if we're truly in view mode
           const targetScene = scenes.find(s => s.yid === data.targetId)
           if (targetScene) {
             console.log('Navigating to scene:', targetScene.yname)
@@ -854,9 +892,8 @@ export default function TourAdminViewer({
                 variant={adminMode === 'view' ? 'default' : 'outline'}
                 onClick={async () => {
                   if (adminMode !== 'view') {
+                    console.log('Switching to view mode')
                     setIsModeTransitioning(true)
-                    setAdminMode('view')
-                    setForceStopTransitions(false) // Reset force stop when switching to view mode
                     
                     // Close any open edit panels when switching to view mode
                     setInlineEditingInfospot(null)
@@ -865,6 +902,15 @@ export default function TourAdminViewer({
                     setInlineAddingInfospot(false)
                     setInlineAddingSceneLink(false)
                     setAddingMarkerPosition(null)
+                    
+                    // Set force stop transitions FIRST, then admin mode
+                    // This ensures the state is properly synchronized
+                    setForceStopTransitions(false)
+                    
+                    // Use setTimeout to ensure state update is processed
+                    setTimeout(() => {
+                      setAdminMode('view')
+                    }, 0)
                     
                     // Add a smooth transition effect
                     if (viewerInstance && currentScene) {
@@ -884,9 +930,11 @@ export default function TourAdminViewer({
                       setTimeout(() => {
                         addMarkers()
                         setIsModeTransitioning(false)
+                        console.log('View mode transition complete')
                       }, 700)
                     } else {
                       setIsModeTransitioning(false)
+                      console.log('View mode set (no viewer)')
                     }
                   }
                 }}
@@ -900,11 +948,18 @@ export default function TourAdminViewer({
                 variant={adminMode === 'edit' ? 'default' : 'outline'}
                 onClick={async () => {
                   if (adminMode !== 'edit') {
-                    // Force stop any ongoing transitions when entering edit mode
-                    setForceStopTransitions(true)
-                    setIsTransitioning(false)
+                    console.log('Switching to edit mode')
                     setIsModeTransitioning(true)
-                    setAdminMode('edit')
+                    setIsTransitioning(false)
+                    
+                    // Set force stop transitions FIRST, then admin mode
+                    // This ensures the state is properly synchronized
+                    setForceStopTransitions(true)
+                    
+                    // Use setTimeout to ensure state update is processed
+                    setTimeout(() => {
+                      setAdminMode('edit')
+                    }, 0)
                     
                     // Add a smooth transition effect when entering edit mode
                     if (viewerInstance && currentScene) {
@@ -924,11 +979,11 @@ export default function TourAdminViewer({
                       setTimeout(() => {
                         addMarkers()
                         setIsModeTransitioning(false)
-                        setForceStopTransitions(false) // Reset force stop after mode transition
+                        console.log('Edit mode transition complete')
                       }, 700)
                     } else {
                       setIsModeTransitioning(false)
-                      setForceStopTransitions(false)
+                      console.log('Edit mode set (no viewer)')
                     }
                   }
                 }}
