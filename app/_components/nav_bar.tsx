@@ -35,13 +35,13 @@ export default function NavBar() {
     const { wishlist } = useWishlist();
 
     const closeMobileMenu = () => setIsMobileMenuOpen(false);
-    
+
     const handleProductClick = (productData: typeof selectedProduct) => {
         setSelectedProduct(productData);
         setIsCartOpen(false);
         setIsWishlistOpen(false);
     };
-    
+
     const totalCartItems = cart.reduce((sum, item) => sum + item.yquantite, 0);
     const totalWishlistItems = wishlist.length;
 
@@ -50,7 +50,7 @@ export default function NavBar() {
             <nav className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-morpheus-blue-dark via-morpheus-blue-dark/95 to-morpheus-blue-light/90 backdrop-blur-md shadow-lg shadow-black/30">
                 {/* Top accent line */}
                 <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-morpheus-gold-dark via-morpheus-gold-light to-morpheus-gold-dark"></div>
-                
+
                 <div className="mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between h-16">
                         {/* Logo */}
@@ -72,7 +72,7 @@ export default function NavBar() {
                                 {t("nav.virtualTours")}
                                 <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light group-hover:w-full transition-all duration-300"></span>
                             </Link>
-                            
+
                             <Link
                                 href="/admin"
                                 className="relative text-gray-300 hover:text-morpheus-gold-light transition-all duration-300 font-medium group"
@@ -99,13 +99,13 @@ export default function NavBar() {
                                                 </span>
                                             )}
                                         </button>
-                                        <WishlistDropdown 
-                                            isOpen={isWishlistOpen} 
+                                        <WishlistDropdown
+                                            isOpen={isWishlistOpen}
                                             onClose={() => setIsWishlistOpen(false)}
                                             onProductClick={handleProductClick}
                                         />
                                     </div>
-                                    
+
                                     <div className="relative">
                                         <button
                                             onClick={() => setIsCartOpen(!isCartOpen)}
@@ -121,8 +121,8 @@ export default function NavBar() {
                                                 </span>
                                             )}
                                         </button>
-                                        <CartDropdown 
-                                            isOpen={isCartOpen} 
+                                        <CartDropdown
+                                            isOpen={isCartOpen}
                                             onClose={() => setIsCartOpen(false)}
                                             onProductClick={handleProductClick}
                                         />
@@ -143,7 +143,19 @@ export default function NavBar() {
                                     <span className="text-gray-300 text-sm">{t("nav.loading")}</span>
                                 </div>
                             ) : currentUser ? (
-                                <LogoutButton />
+                                <div className="flex items-center space-x-4">
+                                    <Link
+                                        href="/profile"
+                                        className="relative p-2 text-gray-300 hover:text-morpheus-gold-light transition-all duration-300 group"
+                                        title="Profile"
+                                    >
+                                        <div className="absolute inset-0 bg-morpheus-gold-light/20 rounded-full scale-0 group-hover:scale-100 transition-transform duration-300"></div>
+                                        <svg className="relative w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                        </svg>
+                                    </Link>
+                                    <LogoutButton />
+                                </div>
                             ) : (
                                 <>
                                     <Link
@@ -195,7 +207,7 @@ export default function NavBar() {
                                 >
                                     {t("nav.virtualTours")}
                                 </Link>
-                                
+
                                 <Link
                                     href="/admin"
                                     className="text-gray-300 hover:text-morpheus-gold-light hover:bg-morpheus-gold-dark/10 block px-4 py-3 text-base font-medium transition-all duration-300 rounded"
@@ -224,7 +236,7 @@ export default function NavBar() {
                                                 </span>
                                             )}
                                         </button>
-                                        
+
                                         <button
                                             onClick={() => {
                                                 setIsCartOpen(true);
@@ -258,8 +270,20 @@ export default function NavBar() {
                                             <span className="text-gray-300 text-sm ml-2">{t("nav.loading")}</span>
                                         </div>
                                     ) : currentUser ? (
-                                        <div className="px-4 py-3">
-                                            <LogoutButton />
+                                        <div className="space-y-2">
+                                            <Link
+                                                href="/profile"
+                                                className="text-gray-300 hover:text-morpheus-gold-light hover:bg-morpheus-gold-dark/10 flex items-center px-4 py-3 text-base font-medium transition-all duration-300 rounded"
+                                                onClick={closeMobileMenu}
+                                            >
+                                                <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                                </svg>
+                                                Profile
+                                            </Link>
+                                            <div className="px-4 py-3">
+                                                <LogoutButton />
+                                            </div>
                                         </div>
                                     ) : (
                                         <>
@@ -284,24 +308,24 @@ export default function NavBar() {
                         </div>
                     )}
                 </div>
-                
+
                 {/* Bottom accent line */}
                 <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-morpheus-gold-dark/50 to-transparent"></div>
             </nav>
             <div className="h-16" />
-            
+
             {/* Product Details Dialog */}
             {selectedProduct && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center">
                     {/* Backdrop */}
-                    <div 
+                    <div
                         className="absolute inset-0 bg-black/80 backdrop-blur-sm"
                         onClick={() => setSelectedProduct(null)}
                     />
-                    
+
                     {/* Dialog Content */}
                     <div className="relative w-full h-full max-w-7xl max-h-[95vh] mx-4">
-                        <ProductDetailsPage 
+                        <ProductDetailsPage
                             productData={selectedProduct}
                             onClose={() => setSelectedProduct(null)}
                         />

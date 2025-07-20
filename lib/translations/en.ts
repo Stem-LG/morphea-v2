@@ -4,6 +4,7 @@ export const enTranslations = {
     "virtualTours": "Virtual Tour",
     "products3d": "3D Products",
     "administration": "Administration",
+    "profile": "Profile",
     "login": "Login",
     "signup": "Get Started",
     "loading": "Loading..."
