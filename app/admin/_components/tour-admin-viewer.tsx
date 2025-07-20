@@ -36,10 +36,10 @@ export default function TourAdminViewer({
   const [containerElement, setContainerElement] = useState<HTMLDivElement | null>(null)
   const [viewerInstance, setViewerInstance] = useState<Viewer | null>(null)
 
-  const { scenes, loading: scenesLoading, deleteScene, refreshScenes } = useScenes()
-  const { infospots, loading: infospotsLoading, createInfospot, updateInfospot, deleteInfospot, refreshInfospots } = useInfospots()
-  const { scenelinks, loading: scenelinksLoading, createSceneLink, updateSceneLink, deleteSceneLink, refreshSceneLinks } = useSceneLinks()
-  const { actions } = useInfoactions()
+  const { scenes, loading: scenesLoading, deleteScene, refreshScenes, createScene } = useScenes()
+  const { infospots, loading: infospotsLoading, createInfospot, updateInfospot, deleteInfospot } = useInfospots()
+  const { scenelinks, loading: scenelinksLoading, createSceneLink, updateSceneLink, deleteSceneLink } = useSceneLinks()
+  const { actions, createAction } = useInfoactions()
 
   const [currentScene, setCurrentScene] = useState<Scene | null>(null)
   const [isTransitioning, setIsTransitioning] = useState(false)
@@ -278,7 +278,7 @@ export default function TourAdminViewer({
       }
     }
 
-    (window as any).handleInfospotClick = (infospotId: string, title: string, text: string) => {
+    (window as any).handleInfospotClick = (infospotId: string) => {
       console.log('Global infospot click handler called:', infospotId)
       
       const currentMode = adminModeRef.current
@@ -397,7 +397,7 @@ export default function TourAdminViewer({
         }
       }
     }
-  }, [previewMarkerPosition, inlineEditingInfospot?.yid, inlineEditingSceneLink?.yid, viewerInstance])
+  }, [previewMarkerPosition, inlineEditingInfospot, inlineEditingSceneLink, viewerInstance])
 
   // Update adding preview marker in real-time when position changes (for adding)
   useEffect(() => {
@@ -490,7 +490,7 @@ export default function TourAdminViewer({
         }
       }
     }
-  }, [adminMode, inlineEditingInfospot, inlineEditingSceneLink, inlineAddingInfospot, inlineAddingSceneLink])
+  }, [adminMode, inlineEditingInfospot, inlineEditingSceneLink, inlineAddingInfospot, inlineAddingSceneLink, viewerInstance])
 
   const addMarkers = useCallback(() => {
     if (!viewerInstance || !currentScene) {
@@ -584,7 +584,7 @@ export default function TourAdminViewer({
           "
           data-marker-type="infospot"
           data-marker-id="${spot.yid}"
-          onclick="event.stopPropagation(); event.preventDefault(); window.handleInfospotClick('${spot.yid}', '${spot.ytitle.replace(/'/g, "\\'")}', '${spot.ytext.replace(/'/g, "\\'")}');"
+          onclick="event.stopPropagation(); event.preventDefault(); window.handleInfospotClick('${spot.yid}');"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
@@ -621,7 +621,7 @@ export default function TourAdminViewer({
     })
 
     console.log('Finished adding markers. Total markers added:', currentSceneLinks.length + currentInfospots.length)
-  }, [viewerInstance, currentScene?.yid, scenelinks, infospots, scenes, actions])
+  }, [viewerInstance, currentScene, scenelinks, infospots, scenes, actions])
 
 
   const handleMarkerClick = useCallback((e: any) => {
@@ -732,7 +732,7 @@ export default function TourAdminViewer({
         }
       }
     }
-  }, [adminMode, isTransitioning, isHandlingEdit, scenes, scenelinks, infospots])
+  }, [scenes, scenelinks, infospots])
 
   const handleSceneChange = (sceneId: string) => {
     const scene = scenes.find(s => s.yid === sceneId)
@@ -1901,8 +1901,7 @@ export default function TourAdminViewer({
                   }
                   
                   try {
-                    // Create new action using the hook
-                    const { createAction } = useInfoactions()
+                    // Create new action using the hook function
                     const newAction = await createAction({
                       id: crypto.randomUUID(),
                       type: newActionForm.type,
@@ -2107,8 +2106,7 @@ export default function TourAdminViewer({
                   }
                   
                   try {
-                    // Create new scene using the hook
-                    const { createScene } = useScenes()
+                    // Create new scene using the hook function
                     const newScene = await createScene({
                       id: crypto.randomUUID(),
                       name: newSceneForm.name.trim(),
