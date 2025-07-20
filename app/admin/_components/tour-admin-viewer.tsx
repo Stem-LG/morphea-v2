@@ -183,7 +183,7 @@ export default function TourAdminViewer({
         }
       }
     }
-  }, [containerElement, loading])
+  }, [containerElement, currentScene?.yid, loading])
 
   // Separate effect for scene transitions (like virtual-tour.tsx)
   useEffect(() => {
@@ -214,7 +214,7 @@ export default function TourAdminViewer({
     }
 
     transitionToScene()
-  }, [currentScene, viewerInstance, loading])
+  }, [currentScene?.yid, viewerInstance, loading])
 
   // Global handlers setup (separate from viewer initialization)
   useEffect(() => {
@@ -309,7 +309,7 @@ export default function TourAdminViewer({
         addMarkers()
       }, 100)
     }
-  }, [infospots, scenelinks, currentScene, adminMode, viewerInstance])
+  }, [infospots, scenelinks, currentScene?.yid, adminMode, viewerInstance])
 
   // Update preview marker in real-time when position changes (for editing)
   useEffect(() => {
@@ -373,7 +373,7 @@ export default function TourAdminViewer({
         }
       }
     }
-  }, [previewMarkerPosition, inlineEditingInfospot, inlineEditingSceneLink])
+  }, [previewMarkerPosition, inlineEditingInfospot?.yid, inlineEditingSceneLink?.yid, viewerInstance])
 
   // Update adding preview marker in real-time when position changes (for adding)
   useEffect(() => {
@@ -437,7 +437,7 @@ export default function TourAdminViewer({
         }
       }
     }
-  }, [addingMarkerPosition, inlineAddingInfospot, inlineAddingSceneLink])
+  }, [addingMarkerPosition, inlineAddingInfospot, inlineAddingSceneLink, viewerInstance])
 
   const handleViewerClick = useCallback((e: any) => {
     console.log('Viewer clicked:', e, 'Admin mode:', adminMode)
@@ -484,13 +484,8 @@ export default function TourAdminViewer({
     }
 
     console.log('Adding markers for scene:', currentScene.yid, currentScene.yname)
-    addMarkersWithPlugin(markersPluginInstance)
-  }, [viewerInstance, currentScene])
-
-  const addMarkersWithPlugin = useCallback((markersPluginInstance: MarkersPlugin) => {
-    if (!currentScene) return
-
-    console.log('Adding markers for scene:', currentScene.yid, currentScene.yname)
+    
+    // Inline the marker adding logic to avoid circular dependency
     markersPluginInstance.clearMarkers()
 
     // Add scene link markers - filter by current scene ID
@@ -602,8 +597,7 @@ export default function TourAdminViewer({
     })
 
     console.log('Finished adding markers. Total markers added:', currentSceneLinks.length + currentInfospots.length)
-
-  }, [currentScene, scenelinks, infospots, scenes, actions, adminModeRef])
+  }, [viewerInstance, currentScene?.yid, scenelinks, infospots, scenes, actions])
 
 
   const handleMarkerClick = useCallback((e: any) => {
@@ -614,7 +608,6 @@ export default function TourAdminViewer({
     const currentForceStopTransitions = forceStopTransitionsRef.current
     
     console.log('Marker clicked:', e, 'Admin mode:', currentAdminMode, 'Is transitioning:', currentIsTransitioning, 'Is handling edit:', currentIsHandlingEdit, 'Force stop:', currentForceStopTransitions)
-    
     if ((currentIsTransitioning && !currentForceStopTransitions) || currentIsHandlingEdit) return
 
     const marker = e.marker
@@ -1074,11 +1067,8 @@ export default function TourAdminViewer({
                         }
                       }
                       
-                      // Refresh all related data
-                      await Promise.all([
-                        refreshInfospots(),
-                        refreshSceneLinks()
-                      ])
+                      // Data will be automatically refreshed by the hooks
+                      // No need for manual refresh calls
                       
                     } catch (error) {
                       console.error('Error deleting scene:', error)
@@ -1209,14 +1199,15 @@ export default function TourAdminViewer({
                       setInlineEditingSceneLink(null)
                       setPreviewMarkerPosition(null)
                       
-                      // Auto-switch to view mode after saving
+                      // Auto-switch to view mode after saving and reset force stop flag
+                      setForceStopTransitions(false)
                       setAdminMode('view')
                       
                       // Refetch data from server to ensure we have latest data
-                      await Promise.all([
-                        refreshInfospots(),
-                        refreshSceneLinks()
-                      ])
+                      // await Promise.all([
+                      //   refreshInfospots(),
+                      //   refreshSceneLinks()
+                      // ])
                       
                       // Force immediate marker refresh with fresh data
                       if (viewerInstance && currentScene) {
@@ -1268,14 +1259,15 @@ export default function TourAdminViewer({
                       setInlineEditingSceneLink(null)
                       setPreviewMarkerPosition(null)
                       
-                      // Auto-switch to view mode after deleting
+                      // Auto-switch to view mode after deleting and reset force stop flag
+                      setForceStopTransitions(false)
                       setAdminMode('view')
                       
                       // Refetch data from server to ensure we have latest data
-                      await Promise.all([
-                        refreshInfospots(),
-                        refreshSceneLinks()
-                      ])
+                      // await Promise.all([
+                      //   refreshInfospots(),
+                      //   refreshSceneLinks()
+                      // ])
                       
                       // Force immediate marker refresh with fresh data
                       if (viewerInstance && currentScene) {
@@ -1484,14 +1476,15 @@ export default function TourAdminViewer({
                       setInlineAddingSceneLink(false)
                       setAddingMarkerPosition(null)
                       
-                      // Auto-switch to view mode after adding
+                      // Auto-switch to view mode after adding and reset force stop flag
+                      setForceStopTransitions(false)
                       setAdminMode('view')
                       
                       // Refetch data from server to ensure we have latest data
-                      await Promise.all([
-                        refreshInfospots(),
-                        refreshSceneLinks()
-                      ])
+                      // await Promise.all([
+                      //   refreshInfospots(),
+                      //   refreshSceneLinks()
+                      // ])
                       
                       // Force immediate marker refresh with fresh data
                       if (viewerInstance && currentScene) {
@@ -1535,8 +1528,9 @@ export default function TourAdminViewer({
       )}
 
       {/* Transition Overlay */}
-      {/* {(isTransitioning || isModeTransitioning) && (
+      {(isModeTransitioning) && (
         <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-30">
+
           <div className="bg-white rounded-lg p-4 flex items-center gap-3">
             <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
             <span>
@@ -1544,7 +1538,7 @@ export default function TourAdminViewer({
             </span>
           </div>
         </div>
-      )} */}
+      )}
     </div>
   )
 }
