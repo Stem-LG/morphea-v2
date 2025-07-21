@@ -15,6 +15,7 @@ interface StoreAssignmentModalProps {
 }
 
 function StoreAssignmentModal({ user, stores, isOpen, onClose, onAssign, loading }: StoreAssignmentModalProps) {
+  const { t } = useLanguage()
   const [selectedStoreIds, setSelectedStoreIds] = useState<number[]>([])
   const [searchTerm, setSearchTerm] = useState('')
 
@@ -60,9 +61,9 @@ function StoreAssignmentModal({ user, stores, isOpen, onClose, onAssign, loading
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[80vh] flex flex-col">
         <h2 className="text-xl font-bold mb-4">
-          Assign Boutiques to {user.email}
+          {t('admin.users.assignBoutiques')} {user.email}
           <span className="text-sm font-normal text-gray-600 ml-2">
-            ({selectedStoreIds.length} selected)
+            ({selectedStoreIds.length} {t('admin.users.selected')})
           </span>
         </h2>
         
@@ -71,7 +72,7 @@ function StoreAssignmentModal({ user, stores, isOpen, onClose, onAssign, loading
           <div className="mb-4 space-y-2">
             <input
               type="text"
-              placeholder="Search boutiques by name, code, or address..."
+              placeholder={t('admin.users.searchBoutiques')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -82,14 +83,14 @@ function StoreAssignmentModal({ user, stores, isOpen, onClose, onAssign, loading
                 onClick={selectAllStores}
                 className="text-sm bg-green-100 hover:bg-green-200 text-green-800 px-3 py-1 rounded"
               >
-                Select All ({filteredStores.length})
+                {t('admin.users.selectAll')} ({filteredStores.length})
               </button>
               <button
                 type="button"
                 onClick={clearAllStores}
                 className="text-sm bg-red-100 hover:bg-red-200 text-red-800 px-3 py-1 rounded"
               >
-                Clear All
+                {t('admin.users.clearAll')}
               </button>
             </div>
           </div>
@@ -98,7 +99,7 @@ function StoreAssignmentModal({ user, stores, isOpen, onClose, onAssign, loading
           <div className="flex-1 overflow-y-auto border border-gray-200 rounded-md p-3 space-y-2 max-h-96">
             {filteredStores.length === 0 ? (
               <div className="text-center text-gray-500 py-4">
-                {searchTerm ? 'No boutiques found matching your search.' : 'No boutiques available.'}
+                {searchTerm ? t('admin.users.noBoutiquesFound') : t('admin.users.noBoutiquesAvailable')}
               </div>
             ) : (
               filteredStores.map((store) => (
@@ -134,7 +135,7 @@ function StoreAssignmentModal({ user, stores, isOpen, onClose, onAssign, loading
           {/* Action buttons */}
           <div className="flex justify-between items-center mt-4 pt-4 border-t">
             <div className="text-sm text-gray-600">
-              {selectedStoreIds.length} boutique{selectedStoreIds.length !== 1 ? 's' : ''} selected
+              {selectedStoreIds.length} {selectedStoreIds.length !== 1 ? t('admin.users.boutiquesSelected') : t('admin.users.boutiqueSelected')} {t('admin.users.selected')}
             </div>
             <div className="flex space-x-2">
               <button
@@ -142,14 +143,14 @@ function StoreAssignmentModal({ user, stores, isOpen, onClose, onAssign, loading
                 onClick={onClose}
                 className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
               >
-                Cancel
+                {t('common.cancel')}
               </button>
               <button
                 type="submit"
                 disabled={loading}
                 className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
               >
-                {loading ? 'Assigning...' : `Assign ${selectedStoreIds.length} Boutique${selectedStoreIds.length !== 1 ? 's' : ''}`}
+                {loading ? t('admin.users.assigning') : `${t('admin.users.assign')} ${selectedStoreIds.length} ${selectedStoreIds.length !== 1 ? t('admin.users.boutiquesSelected') : t('admin.users.boutiqueSelected')}`}
               </button>
             </div>
           </div>
@@ -167,6 +168,7 @@ interface QuickAssignProps {
 }
 
 function QuickAssignSection({ users, stores, onAssign, loading }: QuickAssignProps) {
+  const { t } = useLanguage()
   const [selectedUser, setSelectedUser] = useState('')
   const [selectedStores, setSelectedStores] = useState<number[]>([])
   const [isExpanded, setIsExpanded] = useState(false)
@@ -196,7 +198,7 @@ function QuickAssignSection({ users, stores, onAssign, loading }: QuickAssignPro
         onClick={() => setIsExpanded(!isExpanded)}
         className="flex items-center justify-between w-full text-left"
       >
-        <h2 className="text-lg font-semibold text-gray-900">Quick Boutique Assignment</h2>
+        <h2 className="text-lg font-semibold text-gray-900">{t('admin.users.quickBoutiqueAssignment')}</h2>
         <span className="text-gray-500">
           {isExpanded ? '▼' : '▶'}
         </span>
@@ -208,7 +210,7 @@ function QuickAssignSection({ users, stores, onAssign, loading }: QuickAssignPro
             {/* User selection */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Select Store Admin User
+                {t('admin.users.selectStoreAdminUser')}
               </label>
               <select
                 value={selectedUser}
@@ -216,10 +218,10 @@ function QuickAssignSection({ users, stores, onAssign, loading }: QuickAssignPro
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               >
-                <option value="">Choose a store admin...</option>
+                <option value="">{t('admin.users.chooseStoreAdmin')}</option>
                 {storeAdminUsers.map((user) => (
                   <option key={user.id} value={user.email}>
-                    {user.email} ({user.assigned_stores?.length || 0} boutiques assigned)
+                    {user.email} ({user.assigned_stores?.length || 0} {t('admin.users.boutiquesAssigned')})
                   </option>
                 ))}
               </select>
@@ -228,7 +230,7 @@ function QuickAssignSection({ users, stores, onAssign, loading }: QuickAssignPro
             {/* Store selection */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Select Boutiques ({selectedStores.length} selected)
+                {t('admin.users.selectBoutiques')} ({selectedStores.length} {t('admin.users.selected')})
               </label>
               <div className="max-h-32 overflow-y-auto border border-gray-300 rounded-md p-2 space-y-1">
                 {stores.map((store) => (
@@ -254,7 +256,7 @@ function QuickAssignSection({ users, stores, onAssign, loading }: QuickAssignPro
               disabled={loading || !selectedUser || selectedStores.length === 0}
               className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
             >
-              {loading ? 'Assigning...' : `Quick Assign ${selectedStores.length} Boutique${selectedStores.length !== 1 ? 's' : ''}`}
+              {loading ? t('admin.users.assigning') : `${t('admin.users.quickAssign')} ${selectedStores.length} ${selectedStores.length !== 1 ? t('admin.users.boutiquesSelected') : t('admin.users.boutiqueSelected')}`}
             </button>
           </div>
         </form>
@@ -365,19 +367,19 @@ export default function UsersManagementPage() {
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Email
+                {t('admin.users.email')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Roles
+                {t('admin.users.roles')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Assigned Stores
+                {t('admin.users.assignedStores')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Created At
+                {t('admin.users.createdAt')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Actions
+                {t('admin.users.actions')}
               </th>
             </tr>
           </thead>
@@ -415,7 +417,7 @@ export default function UsersManagementPage() {
                       ))}
                     </div>
                   ) : (
-                    <span className="text-gray-400">No stores assigned</span>
+                    <span className="text-gray-400">{t('admin.users.noStoresAssigned')}</span>
                   )}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -431,13 +433,13 @@ export default function UsersManagementPage() {
                             disabled={updating === user.email}
                             className="text-red-600 hover:text-red-900 disabled:opacity-50"
                           >
-                            {updating === user.email ? 'Updating...' : 'Remove Store Admin'}
+                            {updating === user.email ? t('admin.users.updating') : t('admin.users.removeStoreAdmin')}
                           </button>
                           <button
                             onClick={() => openStoreModal(user)}
                             className="text-green-600 hover:text-green-900"
                           >
-                            Assign Stores
+                            {t('admin.users.assignStores')}
                           </button>
                         </>
                       ) : (
@@ -446,7 +448,7 @@ export default function UsersManagementPage() {
                           disabled={updating === user.email}
                           className="text-blue-600 hover:text-blue-900 disabled:opacity-50"
                         >
-                          {updating === user.email ? 'Updating...' : 'Make Store Admin'}
+                          {updating === user.email ? t('admin.users.updating') : t('admin.users.makeStoreAdmin')}
                         </button>
                       )}
                     </div>
@@ -464,7 +466,7 @@ export default function UsersManagementPage() {
           disabled={loading}
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
         >
-          {loading ? 'Refreshing...' : 'Refresh Data'}
+          {loading ? t('admin.users.refreshing') : t('admin.users.refreshData')}
         </button>
       </div>
 
