@@ -10,12 +10,12 @@ export default function Home() {
     const router = useRouter();
 
     useEffect(() => {
-        supabase.auth.onAuthStateChange(async (event, session) => {
+        supabase.auth.onAuthStateChange(async (event) => {
             if (event == "PASSWORD_RECOVERY") {
                 router.push("/auth/update-password");
             }
         });
-    }, []);
+    }, [router, supabase.auth]);
 
     return (
         <section className="relative w-full">
