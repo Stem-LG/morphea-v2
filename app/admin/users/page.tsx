@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { UserRole, Store } from '@/lib/types/user'
 import { useUserManagement } from '@/hooks/useUserManagement'
+import { useLanguage } from '@/hooks/useLanguage'
 
 interface StoreAssignmentModalProps {
   user: UserRole | null
@@ -263,20 +264,21 @@ function QuickAssignSection({ users, stores, onAssign, loading }: QuickAssignPro
 }
 
 export default function UsersManagementPage() {
+  const { t } = useLanguage()
   const [users, setUsers] = useState<UserRole[]>([])
   const [stores, setStores] = useState<Store[]>([])
   const [updating, setUpdating] = useState<string | null>(null)
   const [selectedUser, setSelectedUser] = useState<UserRole | null>(null)
   const [showStoreModal, setShowStoreModal] = useState(false)
 
-  const { 
-    fetchUsers, 
-    updateUserRole, 
-    fetchStores, 
-    assignStores, 
-    loading, 
-    error, 
-    clearError 
+  const {
+    fetchUsers,
+    updateUserRole,
+    fetchStores,
+    assignStores,
+    loading,
+    error,
+    clearError
   } = useUserManagement()
 
   // Fetch all users and stores
@@ -291,7 +293,7 @@ export default function UsersManagementPage() {
     } catch (err) {
       console.error('Error loading data:', err)
     }
-  }, [fetchUsers, fetchStores])
+  }, [])
 
   // Update user role
   const handleUpdateUserRole = async (email: string, newRole: 'user' | 'store_admin') => {
@@ -329,15 +331,15 @@ export default function UsersManagementPage() {
   if (loading && users.length === 0) {
     return (
       <div className="p-6">
-        <h1 className="text-2xl font-bold mb-6">User Management</h1>
-        <div className="text-center">Loading users...</div>
+        <h1 className="text-2xl font-bold mb-6">{t('admin.userManagement')}</h1>
+        <div className="text-center">{t('common.loading')}</div>
       </div>
     )
   }
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">User Management</h1>
+      <h1 className="text-2xl font-bold mb-6">{t('admin.userManagement')}</h1>
       
       {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
