@@ -32,19 +32,19 @@ export function AdminSidebar({ isOpen, isCollapsed, onToggle, onCollapse }: Admi
         },
         {
             id: "approvals",
-            label: "Product Approvals",
+            label: t('admin.productApprovals'),
             icon: CheckCircle,
             href: "/admin/approvals",
         },
         {
             id: "users",
-            label: "User Management",
+            label: t('admin.userManagement'),
             icon: Users,
             href: "/admin/users",
         },
         {
             id: "tour",
-            label: "Virtual Tour Admin",
+            label: t('admin.virtualTourAdmin'),
             icon: Eye,
             href: "/admin/tour",
         },

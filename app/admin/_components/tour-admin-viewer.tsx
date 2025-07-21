@@ -12,6 +12,7 @@ import { useScenes } from '@/hooks/useScenes'
 import { useInfospots } from '@/hooks/useInfospots'
 import { useSceneLinks } from '@/hooks/useSceneLinks'
 import { useInfoactions } from '@/hooks/useInfoactions'
+import { useLanguage } from '@/hooks/useLanguage'
 import { Database } from '@/lib/supabase'
 
 type Scene = Database['morpheus']['Tables']['yscenes']['Row']
@@ -33,6 +34,7 @@ export default function TourAdminViewer({
 }: TourAdminViewerProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const { t } = useLanguage()
   const [containerElement, setContainerElement] = useState<HTMLDivElement | null>(null)
   const [viewerInstance, setViewerInstance] = useState<Viewer | null>(null)
 
@@ -799,7 +801,7 @@ export default function TourAdminViewer({
       <div className={`relative ${className} flex items-center justify-center bg-gray-100`} style={{ height, width }}>
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading virtual tour...</p>
+          <p className="text-gray-600">{t('admin.tour.loadingVirtualTour')}</p>
         </div>
       </div>
     )
@@ -814,7 +816,7 @@ export default function TourAdminViewer({
           <CardHeader className="pb-2">
             <CardTitle className="text-sm flex items-center gap-2">
               <Settings className="w-4 h-4" />
-              Admin Controls
+              {t('admin.tour.adminControls')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
@@ -876,7 +878,7 @@ export default function TourAdminViewer({
                 disabled={isModeTransitioning}
               >
                 <Eye className="w-4 h-4 mr-1" />
-                View
+                {t('admin.tour.view')}
               </Button>
               <Button
                 size="sm"
@@ -928,7 +930,7 @@ export default function TourAdminViewer({
                 disabled={isModeTransitioning}
               >
                 <Edit className="w-4 h-4 mr-1" />
-                Edit
+                {t('admin.tour.edit')}
               </Button>
             </div>
             
@@ -956,7 +958,7 @@ export default function TourAdminViewer({
                   className="w-full"
                 >
                   <Plus className="w-4 h-4 mr-1" />
-                  {inlineAddingInfospot ? 'Cancel InfoSpot' : 'Add InfoSpot'}
+                  {inlineAddingInfospot ? t('admin.tour.cancelInfoSpot') : t('admin.tour.addInfoSpot')}
                 </Button>
                 <Button
                   size="sm"
@@ -980,16 +982,16 @@ export default function TourAdminViewer({
                   className="w-full"
                 >
                   <Plus className="w-4 h-4 mr-1" />
-                  {inlineAddingSceneLink ? 'Cancel Scene Link' : 'Add Scene Link'}
+                  {inlineAddingSceneLink ? t('admin.tour.cancelSceneLink') : t('admin.tour.addSceneLink')}
                 </Button>
                 
                 {(inlineAddingInfospot || inlineAddingSceneLink) && addingMarkerPosition && (
                   <div className="text-xs text-green-600 p-2 bg-green-50 rounded">
-                    Adding position:<br/>
-                    Yaw: {addingMarkerPosition.yaw.toFixed(3)}<br/>
-                    Pitch: {addingMarkerPosition.pitch.toFixed(3)}
+                    {t('admin.tour.addingPosition')}:<br/>
+                    {t('admin.tour.yaw')}: {addingMarkerPosition.yaw.toFixed(3)}<br/>
+                    {t('admin.tour.pitch')}: {addingMarkerPosition.pitch.toFixed(3)}
                     <div className="text-xs text-gray-600 mt-1">
-                      Click on panorama to change position
+                      {t('admin.tour.clickToChangePosition')}
                     </div>
                   </div>
                 )}
@@ -1008,25 +1010,25 @@ export default function TourAdminViewer({
                       }}
                       className="w-full text-xs"
                     >
-                      Use Current View
+                      {t('admin.tour.useCurrentView')}
                     </Button>
                     {selectedMarkerPosition ? (
                       <div className="text-xs text-gray-600 p-2 bg-blue-50 rounded">
-                        Position selected:<br/>
-                        Yaw: {selectedMarkerPosition.yaw.toFixed(3)}<br/>
-                        Pitch: {selectedMarkerPosition.pitch.toFixed(3)}
+                        {t('admin.tour.positionSelected')}:<br/>
+                        {t('admin.tour.yaw')}: {selectedMarkerPosition.yaw.toFixed(3)}<br/>
+                        {t('admin.tour.pitch')}: {selectedMarkerPosition.pitch.toFixed(3)}
                         <Button
                           size="sm"
                           variant="ghost"
                           onClick={() => setSelectedMarkerPosition(null)}
                           className="w-full mt-1 h-6 text-xs"
                         >
-                          Clear Selection
+                          {t('admin.tour.clearSelection')}
                         </Button>
                       </div>
                     ) : (
                       <div className="text-xs text-gray-500 p-2 bg-gray-50 rounded">
-                        Click on panorama or use &quot;Use Current View&quot; to select position
+                        {t('admin.tour.clickOrUseCurrentView')}
                       </div>
                     )}
                   </>
@@ -1041,7 +1043,7 @@ export default function TourAdminViewer({
       <div className="absolute top-4 right-4 z-20">
         <Card className="bg-white/90 backdrop-blur-sm">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm">Current Scene</CardTitle>
+            <CardTitle className="text-sm">{t('admin.tour.currentScene')}</CardTitle>
           </CardHeader>
           <CardContent>
             <select
@@ -1079,7 +1081,7 @@ export default function TourAdminViewer({
                   className="w-full"
                 >
                   <Plus className="w-4 h-4 mr-1" />
-                  Add New Scene
+                  {t('admin.tour.addNewScene')}
                 </Button>
                 
                 {/* Delete Scene Button - Only show if there are multiple scenes */}
@@ -1088,7 +1090,7 @@ export default function TourAdminViewer({
                     size="sm"
                     variant="destructive"
                     onClick={async () => {
-                      if (!confirm(`Are you sure you want to delete the scene &quot;${currentScene.yname}&quot;?\n\nThis will also delete all infospots and scene links associated with this scene.\n\nThis action cannot be undone.`)) {
+                      if (!confirm(`${t('admin.tour.confirmDeleteScene')} "${currentScene.yname}"?\n\n${t('admin.tour.confirmDeleteSceneWarning')}\n\n${t('admin.tour.actionCannotBeUndone')}`)) {
                         return
                       }
                       
@@ -1135,7 +1137,7 @@ export default function TourAdminViewer({
                     className="w-full"
                   >
                     <Trash2 className="w-4 h-4 mr-1" />
-                    Delete Scene
+                    {t('admin.tour.deleteScene')}
                   </Button>
                 )}
               </div>
@@ -1150,24 +1152,24 @@ export default function TourAdminViewer({
           <CardContent className="p-3">
             <h3 className="font-semibold">{currentScene.yname}</h3>
             <p className="text-sm opacity-75">
-              {scenes.findIndex(s => s.yid === currentScene.yid) + 1} of {scenes.length} scenes
+              {scenes.findIndex(s => s.yid === currentScene.yid) + 1} {t('admin.tour.of')} {scenes.length} {t('admin.tour.scenes')}
             </p>
             {adminMode === 'edit' ? (
               <div className="text-xs mt-1 space-y-1">
                 <p className="text-yellow-300">
-                  Click on panorama to select position for new markers
+                  {t('admin.tour.clickPanoramaToSelectPosition')}
                 </p>
                 <p className="text-blue-300">
-                  Click on existing markers to edit them
+                  {t('admin.tour.clickMarkersToEdit')}
                 </p>
               </div>
             ) : (
               <div className="text-xs mt-1 space-y-1">
                 <p className="text-green-300">
-                  Click markers to interact with them
+                  {t('admin.tour.clickMarkersToInteract')}
                 </p>
                 <p className="text-blue-300">
-                  Ctrl+Click markers to edit them
+                  {t('admin.tour.ctrlClickToEdit')}
                 </p>
               </div>
             )}
@@ -1185,7 +1187,7 @@ export default function TourAdminViewer({
             <CardHeader className="pb-2">
               <CardTitle className="text-sm flex items-center gap-2">
                 <Edit className="w-4 h-4" />
-                {inlineEditingInfospot ? 'Edit InfoSpot' : 'Edit Scene Link'}
+                {inlineEditingInfospot ? t('admin.tour.editInfoSpot') : t('admin.tour.editSceneLink')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 max-h-96 overflow-y-auto">
@@ -1193,32 +1195,32 @@ export default function TourAdminViewer({
               {inlineEditingInfospot && (
                 <div className="space-y-2">
                   <div>
-                    <label className="text-xs font-medium">Title:</label>
+                    <label className="text-xs font-medium">{t('admin.tour.title')}:</label>
                     <input
                       type="text"
                       value={inlineEditingInfospot.ytitle}
                       onChange={(e) => setInlineEditingInfospot(prev => prev ? {...prev, ytitle: e.target.value} : null)}
                       className="w-full px-2 py-1 text-xs border rounded"
-                      placeholder="InfoSpot title"
+                      placeholder={t('admin.tour.infospotTitlePlaceholder')}
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-medium">Description:</label>
+                    <label className="text-xs font-medium">{t('admin.tour.description')}:</label>
                     <textarea
                       value={inlineEditingInfospot.ytext}
                       onChange={(e) => setInlineEditingInfospot(prev => prev ? {...prev, ytext: e.target.value} : null)}
                       className="w-full px-2 py-1 text-xs border rounded h-16 resize-none"
-                      placeholder="InfoSpot description"
+                      placeholder={t('admin.tour.infospotDescriptionPlaceholder')}
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-medium">InfoSpot Action:</label>
+                    <label className="text-xs font-medium">{t('admin.tour.infospotAction')}:</label>
                     <select
                       value={inlineEditingInfospot.yinfospotactionsidfk || ''}
                       onChange={(e) => setInlineEditingInfospot(prev => prev ? {...prev, yinfospotactionsidfk: e.target.value || null} : null)}
                       className="w-full px-2 py-1 text-xs border rounded"
                     >
-                      <option value="">No Action</option>
+                      <option value="">{t('admin.tour.noAction')}</option>
                       {actions.map(action => (
                         <option key={action.yinfospotactionsid} value={action.yinfospotactionsid}>
                           {action.ytitle || action.ytype} - {action.ytype}
@@ -1235,7 +1237,7 @@ export default function TourAdminViewer({
                       className="w-full mt-1 text-xs h-6"
                     >
                       <Plus className="w-3 h-3 mr-1" />
-                      Add New Action
+                      {t('admin.tour.addNewAction')}
                     </Button>
                   </div>
                 </div>
@@ -1245,17 +1247,17 @@ export default function TourAdminViewer({
               {inlineEditingSceneLink && (
                 <div className="space-y-2">
                   <div>
-                    <label className="text-xs font-medium">Name:</label>
+                    <label className="text-xs font-medium">{t('admin.tour.name')}:</label>
                     <input
                       type="text"
                       value={inlineEditingSceneLink.yname}
                       onChange={(e) => setInlineEditingSceneLink(prev => prev ? {...prev, yname: e.target.value} : null)}
                       className="w-full px-2 py-1 text-xs border rounded"
-                      placeholder="Scene link name"
+                      placeholder={t('admin.tour.sceneLinkNamePlaceholder')}
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-medium">Target Scene:</label>
+                    <label className="text-xs font-medium">{t('admin.tour.targetScene')}:</label>
                     <select
                       value={inlineEditingSceneLink.ytargetid}
                       onChange={(e) => setInlineEditingSceneLink(prev => prev ? {...prev, ytargetid: e.target.value} : null)}
@@ -1274,16 +1276,16 @@ export default function TourAdminViewer({
               {/* Position Display */}
               {previewMarkerPosition && (
                 <div className="text-xs bg-blue-50 p-2 rounded">
-                  <div className="font-semibold text-blue-800">Current Position:</div>
-                  <div>Yaw: {previewMarkerPosition.yaw.toFixed(3)}</div>
-                  <div>Pitch: {previewMarkerPosition.pitch.toFixed(3)}</div>
+                  <div className="font-semibold text-blue-800">{t('admin.tour.currentPosition')}:</div>
+                  <div>{t('admin.tour.yaw')}: {previewMarkerPosition.yaw.toFixed(3)}</div>
+                  <div>{t('admin.tour.pitch')}: {previewMarkerPosition.pitch.toFixed(3)}</div>
                 </div>
               )}
               
               {/* Position Controls */}
               <div className="space-y-2">
                 <div>
-                  <label className="text-xs font-medium">Yaw:</label>
+                  <label className="text-xs font-medium">{t('admin.tour.yaw')}:</label>
                   <div className="flex gap-2 items-center">
                     <input
                       type="range"
@@ -1306,7 +1308,7 @@ export default function TourAdminViewer({
                   </div>
                 </div>
                 <div>
-                  <label className="text-xs font-medium">Pitch:</label>
+                  <label className="text-xs font-medium">{t('admin.tour.pitch')}:</label>
                   <div className="flex gap-2 items-center">
                     <input
                       type="range"
@@ -1397,7 +1399,7 @@ export default function TourAdminViewer({
                   }}
                   className="flex-1"
                 >
-                  Save
+                  {t('admin.tour.save')}
                 </Button>
                 <Button
                   size="sm"
@@ -1458,7 +1460,7 @@ export default function TourAdminViewer({
                   className="flex-1"
                 >
                   <Trash2 className="w-4 h-4 mr-1" />
-                  Delete
+                  {t('admin.tour.delete')}
                 </Button>
                 <Button
                   size="sm"
@@ -1470,7 +1472,7 @@ export default function TourAdminViewer({
                   }}
                   className="flex-1"
                 >
-                  Cancel
+                  {t('admin.tour.cancel')}
                 </Button>
               </div>
             </CardContent>
@@ -1485,21 +1487,21 @@ export default function TourAdminViewer({
             <CardHeader className="pb-2">
               <CardTitle className="text-sm flex items-center gap-2">
                 <Plus className="w-4 h-4" />
-                {inlineAddingInfospot ? 'Add New InfoSpot' : 'Add New Scene Link'}
+                {inlineAddingInfospot ? t('admin.tour.addNewInfoSpot') : t('admin.tour.addNewSceneLink')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               {/* Position Display */}
               <div className="text-xs bg-green-50 p-2 rounded">
-                <div className="font-semibold text-green-800">Position:</div>
-                <div>Yaw: {addingMarkerPosition.yaw.toFixed(3)}</div>
-                <div>Pitch: {addingMarkerPosition.pitch.toFixed(3)}</div>
+                <div className="font-semibold text-green-800">{t('admin.tour.position')}:</div>
+                <div>{t('admin.tour.yaw')}: {addingMarkerPosition.yaw.toFixed(3)}</div>
+                <div>{t('admin.tour.pitch')}: {addingMarkerPosition.pitch.toFixed(3)}</div>
               </div>
               
               {/* Position Controls */}
               <div className="space-y-2">
                 <div>
-                  <label className="text-xs font-medium">Yaw:</label>
+                  <label className="text-xs font-medium">{t('admin.tour.yaw')}:</label>
                   <div className="flex gap-2 items-center">
                     <input
                       type="range"
@@ -1522,7 +1524,7 @@ export default function TourAdminViewer({
                   </div>
                 </div>
                 <div>
-                  <label className="text-xs font-medium">Pitch:</label>
+                  <label className="text-xs font-medium">{t('admin.tour.pitch')}:</label>
                   <div className="flex gap-2 items-center">
                     <input
                       type="range"
@@ -1550,21 +1552,47 @@ export default function TourAdminViewer({
               {inlineAddingInfospot && (
                 <div className="space-y-2">
                   <div>
-                    <label className="text-xs font-medium">Title:</label>
+                    <label className="text-xs font-medium">{t('admin.tour.title')}:</label>
                     <input
                       type="text"
-                      placeholder="InfoSpot title"
+                      placeholder={t('admin.tour.infospotTitlePlaceholder')}
                       className="w-full px-2 py-1 text-xs border rounded"
                       id="adding-infospot-title"
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-medium">Text:</label>
+                    <label className="text-xs font-medium">{t('admin.tour.text')}:</label>
                     <textarea
-                      placeholder="InfoSpot description"
+                      placeholder={t('admin.tour.infospotDescriptionPlaceholder')}
                       className="w-full px-2 py-1 text-xs border rounded h-16 resize-none"
                       id="adding-infospot-text"
                     />
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium">{t('admin.tour.infospotAction')}:</label>
+                    <select
+                      className="w-full px-2 py-1 text-xs border rounded"
+                      id="adding-infospot-action"
+                    >
+                      <option value="">{t('admin.tour.noAction')}</option>
+                      {actions.map(action => (
+                        <option key={action.yinfospotactionsid} value={action.yinfospotactionsid}>
+                          {action.ytitle || action.ytype} - {action.ytype}
+                        </option>
+                      ))}
+                    </select>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        setIsAddingAction(true)
+                        setNewActionForm({ title: '', type: '', description: '' })
+                      }}
+                      className="w-full mt-1 text-xs h-6"
+                    >
+                      <Plus className="w-3 h-3 mr-1" />
+                      {t('admin.tour.addNewAction')}
+                    </Button>
                   </div>
                 </div>
               )}
@@ -1572,21 +1600,21 @@ export default function TourAdminViewer({
               {inlineAddingSceneLink && (
                 <div className="space-y-2">
                   <div>
-                    <label className="text-xs font-medium">Name:</label>
+                    <label className="text-xs font-medium">{t('admin.tour.name')}:</label>
                     <input
                       type="text"
-                      placeholder="Scene link name"
+                      placeholder={t('admin.tour.sceneLinkNamePlaceholder')}
                       className="w-full px-2 py-1 text-xs border rounded"
                       id="adding-scenelink-name"
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-medium">Target Scene:</label>
+                    <label className="text-xs font-medium">{t('admin.tour.targetScene')}:</label>
                     <select
                       className="w-full px-2 py-1 text-xs border rounded"
                       id="adding-scenelink-target"
                     >
-                      <option value="">Select target scene</option>
+                      <option value="">{t('admin.tour.selectTargetScene')}</option>
                       {scenes.filter(s => s.yid !== currentScene?.yid).map(scene => (
                         <option key={scene.yid} value={scene.yid}>
                           {scene.yname}
@@ -1608,13 +1636,13 @@ export default function TourAdminViewer({
                         const textInput = document.getElementById('adding-infospot-text') as HTMLTextAreaElement
                         const actionSelect = document.getElementById('adding-infospot-action') as HTMLSelectElement
                         
-                        if (!titleInput.value.trim()) {
-                          alert('Please enter a title for the InfoSpot')
+                        if (!titleInput || !titleInput.value.trim()) {
+                          alert(t('admin.tour.pleaseEnterInfospotTitle'))
                           return
                         }
                         
                         if (!currentScene?.yid) {
-                          alert('No current scene selected')
+                          alert(t('admin.tour.noCurrentSceneSelected'))
                           return
                         }
                         
@@ -1622,10 +1650,10 @@ export default function TourAdminViewer({
                         const result = await createInfospot({
                           sceneId: currentScene.yid,
                           title: titleInput.value.trim(),
-                          text: textInput.value.trim() || '',
+                          text: textInput?.value.trim() || '',
                           yaw: addingMarkerPosition.yaw,
                           pitch: addingMarkerPosition.pitch,
-                          actionId: actionSelect.value || null
+                          actionId: actionSelect?.value || null
                         })
                         
                         if (!result) throw new Error('Failed to create InfoSpot')
@@ -1635,17 +1663,17 @@ export default function TourAdminViewer({
                         const targetSelect = document.getElementById('adding-scenelink-target') as HTMLSelectElement
                         
                         if (!nameInput.value.trim()) {
-                          alert('Please enter a name for the Scene Link')
+                          alert(t('admin.tour.pleaseEnterSceneLinkName'))
                           return
                         }
                         
                         if (!targetSelect.value) {
-                          alert('Please select a target scene')
+                          alert(t('admin.tour.pleaseSelectTargetScene'))
                           return
                         }
                         
                         if (!currentScene?.yid) {
-                          alert('No current scene selected')
+                          alert(t('admin.tour.noCurrentSceneSelected'))
                           return
                         }
                         
@@ -1697,7 +1725,7 @@ export default function TourAdminViewer({
                   }}
                   className="flex-1"
                 >
-                  Create
+                  {t('admin.tour.create')}
                 </Button>
                 <Button
                   size="sm"
@@ -1709,7 +1737,7 @@ export default function TourAdminViewer({
                   }}
                   className="flex-1"
                 >
-                  Cancel
+                  {t('admin.tour.cancel')}
                 </Button>
               </div>
             </CardContent>
@@ -1740,7 +1768,7 @@ export default function TourAdminViewer({
             <div className="p-4 overflow-y-auto max-h-96">
               {viewingInfospot.ytext && (
                 <div className="mb-4">
-                  <h3 className="text-sm font-medium text-gray-700 mb-2">Description</h3>
+                  <h3 className="text-sm font-medium text-gray-700 mb-2">{t('admin.tour.description')}</h3>
                   <p className="text-gray-600 leading-relaxed whitespace-pre-wrap">
                     {viewingInfospot.ytext}
                   </p>
@@ -1750,7 +1778,7 @@ export default function TourAdminViewer({
               {/* Show action information if available */}
               {viewingInfospot.yinfospotactionsidfk && (
                 <div className="mb-4">
-                  <h3 className="text-sm font-medium text-gray-700 mb-2">Action</h3>
+                  <h3 className="text-sm font-medium text-gray-700 mb-2">{t('admin.tour.action')}</h3>
                   {(() => {
                     const action = actions.find(a => a.yinfospotactionsid === viewingInfospot.yinfospotactionsidfk)
                     return action ? (
@@ -1764,7 +1792,7 @@ export default function TourAdminViewer({
                         )}
                       </div>
                     ) : (
-                      <p className="text-sm text-gray-500">Action not found</p>
+                      <p className="text-sm text-gray-500">{t('admin.tour.actionNotFound')}</p>
                     )
                   })()}
                 </div>
@@ -1772,17 +1800,17 @@ export default function TourAdminViewer({
               
               {/* Technical details for admin */}
               <div className="border-t pt-4 mt-4">
-                <h3 className="text-sm font-medium text-gray-700 mb-2">Technical Details</h3>
+                <h3 className="text-sm font-medium text-gray-700 mb-2">{t('admin.tour.technicalDetails')}</h3>
                 <div className="grid grid-cols-2 gap-2 text-xs text-gray-500">
                   <div>
-                    <span className="font-medium">Position:</span>
-                    <div>Yaw: {viewingInfospot.yyaw.toFixed(3)}</div>
-                    <div>Pitch: {viewingInfospot.ypitch.toFixed(3)}</div>
+                    <span className="font-medium">{t('admin.tour.position')}:</span>
+                    <div>{t('admin.tour.yaw')}: {viewingInfospot.yyaw.toFixed(3)}</div>
+                    <div>{t('admin.tour.pitch')}: {viewingInfospot.ypitch.toFixed(3)}</div>
                   </div>
                   <div>
-                    <span className="font-medium">Scene:</span>
+                    <span className="font-medium">{t('admin.tour.scene')}:</span>
                     <div>{currentScene?.yname}</div>
-                    <span className="font-medium">ID:</span>
+                    <span className="font-medium">{t('admin.tour.id')}:</span>
                     <div className="font-mono">{viewingInfospot.yid}</div>
                   </div>
                 </div>
@@ -1796,7 +1824,7 @@ export default function TourAdminViewer({
                 onClick={() => setViewingInfospot(null)}
                 className="bg-blue-600 hover:bg-blue-700 text-white"
               >
-                Close
+                {t('admin.tour.close')}
               </Button>
             </div>
           </div>
@@ -1810,7 +1838,7 @@ export default function TourAdminViewer({
             {/* Modal Header */}
             <div className="bg-gradient-to-r from-green-600 to-green-700 text-white p-4">
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold">Add New Action</h2>
+                <h2 className="text-lg font-semibold">{t('admin.tour.addNewAction')}</h2>
                 <button
                   onClick={() => {
                     setIsAddingAction(false)
@@ -1830,46 +1858,46 @@ export default function TourAdminViewer({
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Action Title *
+                    {t('admin.tour.actionTitle')} *
                   </label>
                   <input
                     type="text"
                     value={newActionForm.title}
                     onChange={(e) => setNewActionForm(prev => ({ ...prev, title: e.target.value }))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                    placeholder="Enter action title"
+                    placeholder={t('admin.tour.enterActionTitle')}
                     autoFocus
                   />
                 </div>
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Action Type *
+                    {t('admin.tour.actionType')} *
                   </label>
                   <select
                     value={newActionForm.type}
                     onChange={(e) => setNewActionForm(prev => ({ ...prev, type: e.target.value }))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   >
-                    <option value="">Select action type</option>
-                    <option value="modal">Modal</option>
-                    <option value="navigation">Navigation</option>
-                    <option value="custom">Custom</option>
-                    <option value="link">Link</option>
-                    <option value="popup">Popup</option>
+                    <option value="">{t('admin.tour.selectActionType')}</option>
+                    <option value="modal">{t('admin.tour.modal')}</option>
+                    <option value="navigation">{t('admin.tour.navigation')}</option>
+                    <option value="custom">{t('admin.tour.custom')}</option>
+                    <option value="link">{t('admin.tour.link')}</option>
+                    <option value="popup">{t('admin.tour.popup')}</option>
                   </select>
                 </div>
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Description (Optional)
+                    {t('admin.tour.descriptionOptional')}
                   </label>
                   <textarea
                     value={newActionForm.description}
                     onChange={(e) => setNewActionForm(prev => ({ ...prev, description: e.target.value }))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
                     rows={3}
-                    placeholder="Enter action description (optional)"
+                    placeholder={t('admin.tour.enterActionDescription')}
                   />
                 </div>
               </div>
@@ -1885,18 +1913,18 @@ export default function TourAdminViewer({
                   setNewActionForm({ title: '', type: '', description: '' })
                 }}
               >
-                Cancel
+                {t('admin.tour.cancel')}
               </Button>
               <Button
                 size="sm"
                 onClick={async () => {
                   if (!newActionForm.title.trim()) {
-                    alert('Please enter an action title')
+                    alert(t('admin.tour.pleaseEnterActionTitle'))
                     return
                   }
                   
                   if (!newActionForm.type) {
-                    alert('Please select an action type')
+                    alert(t('admin.tour.pleaseSelectActionType'))
                     return
                   }
                   
@@ -1909,9 +1937,17 @@ export default function TourAdminViewer({
                       description: newActionForm.description.trim() || null
                     })
                     
-                    if (newAction && inlineEditingInfospot) {
-                      // Auto-assign the new action to the currently editing infospot
-                      setInlineEditingInfospot(prev => prev ? {...prev, yinfospotactionsidfk: newAction.yinfospotactionsid} : null)
+                    if (newAction) {
+                      if (inlineEditingInfospot) {
+                        // Auto-assign the new action to the currently editing infospot
+                        setInlineEditingInfospot(prev => prev ? {...prev, yinfospotactionsidfk: newAction.yinfospotactionsid} : null)
+                      } else if (inlineAddingInfospot) {
+                        // Auto-assign the new action to the adding infospot form
+                        const actionSelect = document.getElementById('adding-infospot-action') as HTMLSelectElement
+                        if (actionSelect) {
+                          actionSelect.value = newAction.yinfospotactionsid
+                        }
+                      }
                     }
                     
                     // Close the modal
@@ -1927,7 +1963,7 @@ export default function TourAdminViewer({
                 disabled={!newActionForm.title.trim() || !newActionForm.type}
               >
                 <Plus className="w-4 h-4 mr-1" />
-                Create Action
+                {t('admin.tour.createAction')}
               </Button>
             </div>
           </div>
@@ -1941,7 +1977,7 @@ export default function TourAdminViewer({
             {/* Modal Header */}
             <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white p-4">
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold">Add New Scene</h2>
+                <h2 className="text-lg font-semibold">{t('admin.tour.addNewScene')}</h2>
                 <button
                   onClick={() => {
                     setIsAddingScene(false)
@@ -1967,38 +2003,38 @@ export default function TourAdminViewer({
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Scene Name *
+                    {t('admin.tour.sceneName')} *
                   </label>
                   <input
                     type="text"
                     value={newSceneForm.name}
                     onChange={(e) => setNewSceneForm(prev => ({ ...prev, name: e.target.value }))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                    placeholder="Enter scene name"
+                    placeholder={t('admin.tour.enterSceneName')}
                     autoFocus
                   />
                 </div>
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Panorama URL *
+                    {t('admin.tour.panoramaUrl')} *
                   </label>
                   <input
                     type="url"
                     value={newSceneForm.panorama}
                     onChange={(e) => setNewSceneForm(prev => ({ ...prev, panorama: e.target.value }))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                    placeholder="https://example.com/panorama.jpg"
+                    placeholder={t('admin.tour.panoramaUrlPlaceholder')}
                   />
                   <p className="text-xs text-gray-500 mt-1">
-                    URL to the 360° panoramic image (JPG, PNG, or other supported formats)
+                    {t('admin.tour.panoramaUrlDescription')}
                   </p>
                 </div>
                 
                 <div className="grid grid-cols-3 gap-3">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Initial Yaw
+                      {t('admin.tour.initialYaw')}
                     </label>
                     <input
                       type="number"
@@ -2009,12 +2045,12 @@ export default function TourAdminViewer({
                       min="-3.14159"
                       max="3.14159"
                     />
-                    <p className="text-xs text-gray-500 mt-1">Horizontal rotation</p>
+                    <p className="text-xs text-gray-500 mt-1">{t('admin.tour.horizontalRotation')}</p>
                   </div>
                   
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Initial Pitch
+                      {t('admin.tour.initialPitch')}
                     </label>
                     <input
                       type="number"
@@ -2025,12 +2061,12 @@ export default function TourAdminViewer({
                       min="-1.5708"
                       max="1.5708"
                     />
-                    <p className="text-xs text-gray-500 mt-1">Vertical rotation</p>
+                    <p className="text-xs text-gray-500 mt-1">{t('admin.tour.verticalRotation')}</p>
                   </div>
                   
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Field of View
+                      {t('admin.tour.fieldOfView')}
                     </label>
                     <input
                       type="number"
@@ -2041,7 +2077,7 @@ export default function TourAdminViewer({
                       min="30"
                       max="120"
                     />
-                    <p className="text-xs text-gray-500 mt-1">Zoom level</p>
+                    <p className="text-xs text-gray-500 mt-1">{t('admin.tour.zoomLevel')}</p>
                   </div>
                 </div>
                 
@@ -2049,7 +2085,7 @@ export default function TourAdminViewer({
                 {newSceneForm.panorama && (
                   <div className="border-t pt-4">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Panorama Preview
+                      {t('admin.tour.panoramaPreview')}
                     </label>
                     <div className="relative">
                       <img
@@ -2066,7 +2102,7 @@ export default function TourAdminViewer({
                       <div
                         className="hidden w-full h-32 bg-gray-100 rounded-md border items-center justify-center text-gray-500 text-sm"
                       >
-                        Failed to load panorama image
+                        {t('admin.tour.failedToLoadPanorama')}
                       </div>
                     </div>
                   </div>
@@ -2090,18 +2126,18 @@ export default function TourAdminViewer({
                   })
                 }}
               >
-                Cancel
+                {t('admin.tour.cancel')}
               </Button>
               <Button
                 size="sm"
                 onClick={async () => {
                   if (!newSceneForm.name.trim()) {
-                    alert('Please enter a scene name')
+                    alert(t('admin.tour.pleaseEnterSceneName'))
                     return
                   }
                   
                   if (!newSceneForm.panorama.trim()) {
-                    alert('Please enter a panorama URL')
+                    alert(t('admin.tour.pleaseEnterPanoramaUrl'))
                     return
                   }
                   
@@ -2161,7 +2197,7 @@ export default function TourAdminViewer({
                 disabled={!newSceneForm.name.trim() || !newSceneForm.panorama.trim()}
               >
                 <Plus className="w-4 h-4 mr-1" />
-                Create & Preview Scene
+                {t('admin.tour.createAndPreviewScene')}
               </Button>
             </div>
           </div>
@@ -2175,7 +2211,7 @@ export default function TourAdminViewer({
           <div className="bg-white rounded-lg p-4 flex items-center gap-3">
             <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
             <span>
-              {isTransitioning ? 'Transitioning to scene...' : `Switching to ${adminMode} mode...`}
+              {isTransitioning ? t('admin.tour.transitioningToScene') : `${t('admin.tour.switchingTo')} ${t(`admin.tour.${adminMode}`)} ${t('admin.tour.mode')}...`}
             </span>
           </div>
         </div>
