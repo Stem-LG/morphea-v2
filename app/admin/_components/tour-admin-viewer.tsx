@@ -7,6 +7,7 @@ import { MarkersPlugin } from '@photo-sphere-viewer/markers-plugin'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Switch } from '@/components/ui/switch'
 import { Edit, Plus, Trash2, Eye, Settings } from 'lucide-react'
 import { useScenes } from '@/hooks/useScenes'
 import { useInfospots } from '@/hooks/useInfospots'
@@ -820,33 +821,48 @@ export default function TourAdminViewer({
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            <div className="flex gap-2">
-              <Button
-                size="sm"
-                variant={adminMode === 'view' ? 'default' : 'outline'}
-                onClick={async () => {
-                  if (adminMode !== 'view') {
-                    console.log('Switching to view mode')
+            {/* Mode Switcher */}
+            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div className="flex items-center gap-3">
+                <Eye className={`w-4 h-4 ${adminMode === 'view' ? 'text-blue-600' : 'text-gray-400'}`} />
+                <span className={`text-sm font-medium ${adminMode === 'view' ? 'text-blue-600' : 'text-gray-600'}`}>
+                  {t('admin.tour.view')}
+                </span>
+              </div>
+              
+              <div className="mx-4">
+                <Switch
+                  checked={adminMode === 'edit'}
+                  onCheckedChange={async (checked) => {
+                  const newMode = checked ? 'edit' : 'view'
+                  if (adminMode !== newMode) {
+                    console.log(`Switching to ${newMode} mode`)
                     setIsModeTransitioning(true)
                     
-                    // Close any open edit panels and modals when switching to view mode
-                    setInlineEditingInfospot(null)
-                    setInlineEditingSceneLink(null)
-                    setPreviewMarkerPosition(null)
-                    setInlineAddingInfospot(false)
-                    setInlineAddingSceneLink(false)
-                    setAddingMarkerPosition(null)
-                    setViewingInfospot(null)
-                    setIsAddingAction(false) // Close any open add action modal
-                    setIsAddingScene(false) // Close any open add scene modal
-                    
-                    // Set force stop transitions FIRST, then admin mode
-                    // This ensures the state is properly synchronized
-                    setForceStopTransitions(false)
+                    if (newMode === 'view') {
+                      // Close any open edit panels and modals when switching to view mode
+                      setInlineEditingInfospot(null)
+                      setInlineEditingSceneLink(null)
+                      setPreviewMarkerPosition(null)
+                      setInlineAddingInfospot(false)
+                      setInlineAddingSceneLink(false)
+                      setAddingMarkerPosition(null)
+                      setViewingInfospot(null)
+                      setIsAddingAction(false)
+                      setIsAddingScene(false)
+                      setForceStopTransitions(false)
+                    } else {
+                      // Edit mode
+                      setIsTransitioning(false)
+                      setViewingInfospot(null)
+                      setIsAddingAction(false)
+                      setIsAddingScene(false)
+                      setForceStopTransitions(true)
+                    }
                     
                     // Use setTimeout to ensure state update is processed
                     setTimeout(() => {
-                      setAdminMode('view')
+                      setAdminMode(newMode)
                     }, 0)
                     
                     // Add a smooth transition effect
@@ -867,71 +883,25 @@ export default function TourAdminViewer({
                       setTimeout(() => {
                         addMarkers()
                         setIsModeTransitioning(false)
-                        console.log('View mode transition complete')
+                        console.log(`${newMode} mode transition complete`)
                       }, 700)
                     } else {
                       setIsModeTransitioning(false)
-                      console.log('View mode set (no viewer)')
+                      console.log(`${newMode} mode set (no viewer)`)
                     }
                   }
                 }}
                 disabled={isModeTransitioning}
-              >
-                <Eye className="w-4 h-4 mr-1" />
-                {t('admin.tour.view')}
-              </Button>
-              <Button
-                size="sm"
-                variant={adminMode === 'edit' ? 'default' : 'outline'}
-                onClick={async () => {
-                  if (adminMode !== 'edit') {
-                    console.log('Switching to edit mode')
-                    setIsModeTransitioning(true)
-                    setIsTransitioning(false)
-                    setViewingInfospot(null) // Close any open infospot details modal
-                    setIsAddingAction(false) // Close any open add action modal
-                    setIsAddingScene(false) // Close any open add scene modal
-                    
-                    // Set force stop transitions FIRST, then admin mode
-                    // This ensures the state is properly synchronized
-                    setForceStopTransitions(true)
-                    
-                    // Use setTimeout to ensure state update is processed
-                    setTimeout(() => {
-                      setAdminMode('edit')
-                    }, 0)
-                    
-                    // Add a smooth transition effect when entering edit mode
-                    if (viewerInstance && currentScene) {
-                      // Clear all markers first to ensure clean state
-                      const markersPluginInstance = viewerInstance.getPlugin(MarkersPlugin) as MarkersPlugin
-                      if (markersPluginInstance) {
-                        markersPluginInstance.clearMarkers()
-                      }
-                      
-                      // Refresh the panorama with a subtle transition to indicate mode change
-                      await viewerInstance.setPanorama(currentScene.ypanorama, {
-                        transition: true,
-                        showLoader: false,
-                      })
-                      
-                      // Update markers after transition to show edit-mode tooltips
-                      setTimeout(() => {
-                        addMarkers()
-                        setIsModeTransitioning(false)
-                        console.log('Edit mode transition complete')
-                      }, 700)
-                    } else {
-                      setIsModeTransitioning(false)
-                      console.log('Edit mode set (no viewer)')
-                    }
-                  }
-                }}
-                disabled={isModeTransitioning}
-              >
-                <Edit className="w-4 h-4 mr-1" />
-                {t('admin.tour.edit')}
-              </Button>
+                className="data-[state=checked]:bg-orange-500"
+                />
+              </div>
+              
+              <div className="flex items-center gap-3">
+                <span className={`text-sm font-medium ${adminMode === 'edit' ? 'text-orange-600' : 'text-gray-600'}`}>
+                  {t('admin.tour.edit')}
+                </span>
+                <Edit className={`w-4 h-4 ${adminMode === 'edit' ? 'text-orange-600' : 'text-gray-400'}`} />
+              </div>
             </div>
             
             {adminMode === 'edit' && (
