@@ -1,7 +1,7 @@
 "use client";
 
 import { User } from '@supabase/supabase-js';
-// import { useLanguage } from "@/hooks/useLanguage";
+import { useLanguage } from "@/hooks/useLanguage";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -25,7 +25,7 @@ interface ValidationErrors {
 }
 
 export function ProfileInfoEdit({ user, onSave, onCancel, isLoading }: ProfileInfoEditProps) {
-  // const { t } = useLanguage();
+  const { t } = useLanguage();
   
   // Form state
   const [formData, setFormData] = useState<ProfileUpdateData>({
@@ -55,14 +55,14 @@ export function ProfileInfoEdit({ user, onSave, onCancel, isLoading }: ProfileIn
 
     // Name validation - required field
     if (!formData.name?.trim()) {
-      newErrors.name = 'Name is required';
+      newErrors.name = t('profile.nameIsRequired');
     }
 
     // Email validation - required and format
     if (!formData.email?.trim()) {
-      newErrors.email = 'Email is required';
+      newErrors.email = t('profile.emailIsRequired');
     } else if (!emailRegex.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email address';
+      newErrors.email = t('profile.pleaseEnterValidEmail');
     }
 
     setErrors(newErrors);
@@ -120,10 +120,10 @@ export function ProfileInfoEdit({ user, onSave, onCancel, isLoading }: ProfileIn
       {/* Header */}
       <div className="text-center pb-6 border-b border-morpheus-gold-dark/30">
         <h2 className="text-2xl font-bold text-white mb-2">
-          Edit Profile Information
+          {t('profile.editProfileInformation')}
         </h2>
         <p className="text-gray-300">
-          Update your account details and information
+          {t('profile.updateAccountDetails')}
         </p>
       </div>
 
@@ -133,12 +133,12 @@ export function ProfileInfoEdit({ user, onSave, onCancel, isLoading }: ProfileIn
           {/* Name Field */}
           <div className="space-y-2">
             <Label htmlFor="name" className="text-white text-lg font-medium">
-              Full Name
+              {t('profile.fullName')}
             </Label>
             <Input
               id="name"
               type="text"
-              placeholder="Enter your full name"
+              placeholder={t('profile.enterYourFullName')}
               required
               value={formData.name || ''}
               onChange={(e) => handleInputChange('name', e.target.value)}
@@ -158,12 +158,12 @@ export function ProfileInfoEdit({ user, onSave, onCancel, isLoading }: ProfileIn
           {/* Email Field */}
           <div className="space-y-2">
             <Label htmlFor="email" className="text-white text-lg font-medium">
-              Email Address
+              {t('profile.emailAddress')}
             </Label>
             <Input
               id="email"
               type="email"
-              placeholder="Enter your email address"
+              placeholder={t('profile.enterYourEmailAddress')}
               required
               value={formData.email || ''}
               onChange={(e) => handleInputChange('email', e.target.value)}
@@ -183,7 +183,7 @@ export function ProfileInfoEdit({ user, onSave, onCancel, isLoading }: ProfileIn
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                Changing your email will require confirmation via email
+                {t('profile.changingEmailRequiresConfirmation')}
               </div>
             )}
           </div>
@@ -198,10 +198,10 @@ export function ProfileInfoEdit({ user, onSave, onCancel, isLoading }: ProfileIn
               {isSubmitting || isLoading ? (
                 <div className="flex items-center gap-2">
                   <img src="/loading.gif" alt="Loading" className="h-5 w-5" />
-                  Saving Changes...
+                  {t('profile.savingChanges')}
                 </div>
               ) : (
-                'Save Changes'
+                t('profile.saveChanges')
               )}
             </Button>
             
@@ -211,7 +211,7 @@ export function ProfileInfoEdit({ user, onSave, onCancel, isLoading }: ProfileIn
               disabled={isSubmitting || isLoading}
               className="flex-1 bg-slate-600 hover:bg-slate-500 text-white h-12 text-lg font-semibold shadow-2xl transition-all duration-300 hover:scale-105 rounded-none disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
-              Cancel
+              {t('profile.cancel')}
             </Button>
           </div>
         </form>
@@ -224,11 +224,11 @@ export function ProfileInfoEdit({ user, onSave, onCancel, isLoading }: ProfileIn
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <div className="text-gray-300 text-sm">
-            <p className="font-medium mb-1">Important Notes:</p>
+            <p className="font-medium mb-1">{t('profile.importantNotes')}</p>
             <ul className="space-y-1 text-xs">
-              <li>• Changes to your email address will require verification</li>
-              <li>• You will receive a confirmation email at your new address</li>
-              <li>• Your name will be updated immediately after saving</li>
+              <li>• {t('profile.emailChangeRequiresVerification')}</li>
+              <li>• {t('profile.confirmationEmailSent')}</li>
+              <li>• {t('profile.nameUpdatedImmediately')}</li>
             </ul>
           </div>
         </div>

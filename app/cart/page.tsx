@@ -1,13 +1,13 @@
 "use client";
 
 import { useCart } from "@/hooks/useCart";
-// import { useLanguage } from "@/hooks/useLanguage";
+import { useLanguage } from "@/hooks/useLanguage";
 import { useState } from "react";
 import Link from "next/link";
 
 export default function CartPage() {
     const { cart, updateQuantity, removeFromCart, isLoading } = useCart();
-    // const { t } = useLanguage();
+    const { t } = useLanguage();
     const [updatingItems, setUpdatingItems] = useState<Set<number>>(new Set());
 
     const totalItems = cart.reduce((sum, item) => sum + item.yquantite, 0);
@@ -62,10 +62,10 @@ export default function CartPage() {
                 {/* Header */}
                 <div className="text-center mb-8">
                     <h1 className="text-4xl font-bold font-parisienne bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light bg-clip-text text-transparent mb-4">
-                        Shopping Cart
+                        {t('cart.title')}
                     </h1>
                     <p className="text-gray-300">
-                        {totalItems} {totalItems === 1 ? "item" : "items"} in your cart
+                        {totalItems} {totalItems === 1 ? t('cart.oneItem') : t('cart.multipleItems')} {t('cart.inYourCart')}
                     </p>
                 </div>
 
@@ -82,13 +82,13 @@ export default function CartPage() {
                                 />
                             </svg>
                         </div>
-                        <h2 className="text-2xl font-semibold text-white mb-4">Your cart is empty</h2>
-                        <p className="text-gray-300 mb-8">Start shopping to add items to your cart</p>
+                        <h2 className="text-2xl font-semibold text-white mb-4">{t('cart.empty')}</h2>
+                        <p className="text-gray-300 mb-8">{t('cart.emptyDescription')}</p>
                         <Link
                             href="/main"
                             className="inline-block bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light text-white px-8 py-3 font-semibold hover:from-morpheus-gold-light hover:to-morpheus-gold-dark transition-all duration-300"
                         >
-                            Continue Shopping
+                            {t('cart.continueShopping')}
                         </Link>
                     </div>
                 ) : (
@@ -129,7 +129,7 @@ export default function CartPage() {
                                         {/* Product Details */}
                                         <div className="flex-1">
                                             <h3 className="text-white font-semibold text-lg mb-1">
-                                                {item.yproduit?.yproduitintitule || "Unknown Product"}
+                                                {item.yproduit?.yproduitintitule || t('cart.unknownProduct')}
                                             </h3>
                                             {item.yproduit?.yproduitdetailstech && (
                                                 <p className="text-gray-300 text-sm mb-2 line-clamp-2">
@@ -173,7 +173,7 @@ export default function CartPage() {
                                             onClick={() => handleRemoveItem(item.id)}
                                             disabled={updatingItems.has(item.id)}
                                             className="text-red-400 hover:text-red-300 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                                            title="Remove from cart"
+                                            title={t('cart.removeFromCart')}
                                         >
                                             <svg
                                                 className="w-5 h-5"
@@ -194,7 +194,7 @@ export default function CartPage() {
                                     {/* Item Total */}
                                     <div className="mt-4 pt-4 border-t border-morpheus-gold-dark/30">
                                         <div className="flex justify-between items-center">
-                                            <span className="text-gray-300">Item Total:</span>
+                                            <span className="text-gray-300">{t('cart.itemTotal')}:</span>
                                             <span className="text-morpheus-gold-light font-semibold">
                                                 ${(99 * item.yquantite).toFixed(2)}
                                             </span>
@@ -207,24 +207,24 @@ export default function CartPage() {
                         {/* Order Summary */}
                         <div className="lg:col-span-1">
                             <div className="bg-gradient-to-br from-morpheus-blue-dark/60 to-morpheus-blue-light/40 border border-morpheus-gold-dark/30 p-6 backdrop-blur-sm sticky top-4">
-                                <h2 className="text-xl font-semibold text-white mb-6">Order Summary</h2>
+                                <h2 className="text-xl font-semibold text-white mb-6">{t('cart.orderSummary')}</h2>
 
                                 <div className="space-y-4 mb-6">
                                     <div className="flex justify-between items-center">
-                                        <span className="text-gray-300">Items ({totalItems}):</span>
+                                        <span className="text-gray-300">{t('cart.items')} ({totalItems}):</span>
                                         <span className="text-white">${totalPrice.toFixed(2)}</span>
                                     </div>
                                     <div className="flex justify-between items-center">
-                                        <span className="text-gray-300">Shipping:</span>
-                                        <span className="text-white">Free</span>
+                                        <span className="text-gray-300">{t('cart.shipping')}:</span>
+                                        <span className="text-white">{t('cart.free')}</span>
                                     </div>
                                     <div className="flex justify-between items-center">
-                                        <span className="text-gray-300">Tax:</span>
-                                        <span className="text-white">Calculated at checkout</span>
+                                        <span className="text-gray-300">{t('cart.tax')}:</span>
+                                        <span className="text-white">{t('cart.calculatedAtCheckout')}</span>
                                     </div>
                                     <div className="border-t border-morpheus-gold-dark/30 pt-4">
                                         <div className="flex justify-between items-center">
-                                            <span className="text-lg font-semibold text-white">Total:</span>
+                                            <span className="text-lg font-semibold text-white">{t('cart.total')}:</span>
                                             <span className="text-xl font-bold text-morpheus-gold-light">
                                                 ${totalPrice.toFixed(2)}
                                             </span>
@@ -233,14 +233,14 @@ export default function CartPage() {
                                 </div>
 
                                 <button className="w-full bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light text-white py-3 px-6 font-semibold hover:from-morpheus-gold-light hover:to-morpheus-gold-dark transition-all duration-300 mb-4">
-                                    Proceed to Checkout
+                                    {t('cart.proceedToCheckout')}
                                 </button>
 
                                 <Link
                                     href="/main"
                                     className="block w-full text-center bg-gradient-to-r from-morpheus-gold-dark/20 to-morpheus-gold-light/20 border border-morpheus-gold-dark/40 text-morpheus-gold-light py-3 px-6 font-medium hover:from-morpheus-gold-dark/30 hover:to-morpheus-gold-light/30 transition-all duration-300"
                                 >
-                                    Continue Shopping
+                                    {t('cart.continueShopping')}
                                 </Link>
                             </div>
                         </div>

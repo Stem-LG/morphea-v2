@@ -2,14 +2,14 @@
 
 import { useWishlist } from "@/hooks/useWishlist";
 import { useCart } from "@/hooks/useCart";
-// import { useLanguage } from "@/hooks/useLanguage";
+import { useLanguage } from "@/hooks/useLanguage";
 import { useState } from "react";
 import Link from "next/link";
 
 export default function WishlistPage() {
     const { wishlist, removeFromWishlist, isLoading } = useWishlist();
     const { addToCart } = useCart();
-    // const { t } = useLanguage();
+    const { t } = useLanguage();
     const [processingItems, setProcessingItems] = useState<Set<number>>(new Set());
 
     const handleRemoveFromWishlist = async (itemId: number) => {
@@ -72,10 +72,10 @@ export default function WishlistPage() {
                 {/* Header */}
                 <div className="text-center mb-8">
                     <h1 className="text-4xl font-bold font-parisienne bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light bg-clip-text text-transparent mb-4">
-                        My Wishlist
+                        {t('wishlist.title')}
                     </h1>
                     <p className="text-gray-300">
-                        {wishlist.length} {wishlist.length === 1 ? "item" : "items"} saved for later
+                        {wishlist.length} {wishlist.length === 1 ? t('wishlist.oneItem') : t('wishlist.multipleItems')} {t('wishlist.savedForLater')}
                     </p>
                 </div>
 
@@ -87,13 +87,13 @@ export default function WishlistPage() {
                                 <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                             </svg>
                         </div>
-                        <h2 className="text-2xl font-semibold text-white mb-4">Your wishlist is empty</h2>
-                        <p className="text-gray-300 mb-8">Save items you love to your wishlist</p>
+                        <h2 className="text-2xl font-semibold text-white mb-4">{t('wishlist.empty')}</h2>
+                        <p className="text-gray-300 mb-8">{t('wishlist.emptyDescription')}</p>
                         <Link
                             href="/main"
                             className="inline-block bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light text-white px-8 py-3 font-semibold hover:from-morpheus-gold-light hover:to-morpheus-gold-dark transition-all duration-300"
                         >
-                            Start Shopping
+                            {t('wishlist.startShopping')}
                         </Link>
                     </div>
                 ) : (
@@ -135,7 +135,7 @@ export default function WishlistPage() {
                                         onClick={() => handleRemoveFromWishlist(item.id)}
                                         disabled={processingItems.has(item.id)}
                                         className="absolute top-2 right-2 w-8 h-8 bg-red-500/80 hover:bg-red-500 text-white rounded-full flex items-center justify-center transition-all duration-300 opacity-0 group-hover:opacity-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                                        title="Remove from wishlist"
+                                        title={t('wishlist.removeFromWishlist')}
                                     >
                                         {processingItems.has(item.id) ? (
                                             <div className="w-4 h-4 border-2 border-white border-t-transparent animate-spin rounded-full"></div>
@@ -158,14 +158,14 @@ export default function WishlistPage() {
 
                                     {/* Date Added Badge */}
                                     <div className="absolute bottom-2 left-2 bg-morpheus-blue-dark/80 text-white text-xs px-2 py-1 rounded">
-                                        Added {new Date(item.created_at).toLocaleDateString()}
+                                        {t('wishlist.added')} {new Date(item.created_at).toLocaleDateString()}
                                     </div>
                                 </div>
 
                                 {/* Product Details */}
                                 <div className="p-4">
                                     <h3 className="text-white font-semibold text-lg mb-2 line-clamp-2">
-                                        {item.yproduit?.yproduitintitule || "Unknown Product"}
+                                        {item.yproduit?.yproduitintitule || t('wishlist.unknownProduct')}
                                     </h3>
 
                                     {item.yproduit?.yproduitdetailstech && (
@@ -191,10 +191,10 @@ export default function WishlistPage() {
                                             {processingItems.has(item.id) ? (
                                                 <div className="flex items-center justify-center gap-2">
                                                     <div className="w-4 h-4 border-2 border-white border-t-transparent animate-spin rounded-full"></div>
-                                                    Processing...
+                                                    {t('wishlist.processing')}
                                                 </div>
                                             ) : (
-                                                "Add to Cart"
+                                                t('wishlist.addToCart')
                                             )}
                                         </button>
 
@@ -203,7 +203,7 @@ export default function WishlistPage() {
                                             disabled={processingItems.has(item.id) || !item.yproduit?.yproduitid}
                                             className="w-full bg-gradient-to-r from-morpheus-gold-dark/20 to-morpheus-gold-light/20 border border-morpheus-gold-dark/40 text-morpheus-gold-light py-2 px-4 font-medium hover:from-morpheus-gold-dark/30 hover:to-morpheus-gold-light/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                                         >
-                                            Move to Cart
+                                            {t('wishlist.moveToCart')}
                                         </button>
                                     </div>
                                 </div>
@@ -219,7 +219,7 @@ export default function WishlistPage() {
                             href="/main"
                             className="inline-block bg-gradient-to-r from-morpheus-gold-dark/20 to-morpheus-gold-light/20 border border-morpheus-gold-dark/40 text-morpheus-gold-light px-8 py-3 font-medium hover:from-morpheus-gold-dark/30 hover:to-morpheus-gold-light/30 transition-all duration-300"
                         >
-                            Continue Shopping
+                            {t('wishlist.continueShopping')}
                         </Link>
                     </div>
                 )}
