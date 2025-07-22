@@ -1,17 +1,17 @@
 "use client";
 
 import { User } from '@supabase/supabase-js';
-// import { useLanguage } from "@/hooks/useLanguage";
+import { useLanguage } from "@/hooks/useLanguage";
 
 interface ProfileInfoDisplayProps {
   user: User;
 }
 
 export function ProfileInfoDisplay({ user }: ProfileInfoDisplayProps) {
-  // const { t } = useLanguage();
+  const { t } = useLanguage();
 
   const formatDate = (dateString: string | null | undefined) => {
-    if (!dateString) return 'N/A';
+    if (!dateString) return t('profile.notAvailable');
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
@@ -26,10 +26,10 @@ export function ProfileInfoDisplay({ user }: ProfileInfoDisplayProps) {
       {/* Profile Header */}
       <div className="text-center pb-6 border-b border-morpheus-gold-dark/30">
         <h2 className="text-2xl font-bold text-white mb-2">
-          Profile Information
+          {t('profile.profileInformation')}
         </h2>
         <p className="text-gray-300">
-          Your account details and information
+          {t('profile.yourAccountDetails')}
         </p>
       </div>
 
@@ -38,7 +38,7 @@ export function ProfileInfoDisplay({ user }: ProfileInfoDisplayProps) {
         {/* Email Address */}
         <div className="space-y-2">
           <label className="text-white text-lg font-medium">
-            Email Address
+            {t('profile.emailAddress')}
           </label>
           <div className="bg-slate-700/50 border border-slate-600 text-white p-4 rounded-none">
             <div className="flex items-center gap-3">
@@ -63,7 +63,7 @@ export function ProfileInfoDisplay({ user }: ProfileInfoDisplayProps) {
         {/* Account Created */}
         <div className="space-y-2">
           <label className="text-white text-lg font-medium">
-            Account Created
+            {t('profile.accountCreated')}
           </label>
           <div className="bg-slate-700/50 border border-slate-600 text-white p-4 rounded-none">
             <div className="flex items-center gap-3">
@@ -88,7 +88,7 @@ export function ProfileInfoDisplay({ user }: ProfileInfoDisplayProps) {
         {/* Last Login */}
         <div className="space-y-2">
           <label className="text-white text-lg font-medium">
-            Last Login
+            {t('profile.lastLogin')}
           </label>
           <div className="bg-slate-700/50 border border-slate-600 text-white p-4 rounded-none">
             <div className="flex items-center gap-3">
@@ -113,7 +113,7 @@ export function ProfileInfoDisplay({ user }: ProfileInfoDisplayProps) {
         {/* User ID (for reference) */}
         <div className="space-y-2">
           <label className="text-white text-lg font-medium">
-            User ID
+            {t('profile.userId')}
           </label>
           <div className="bg-slate-700/50 border border-slate-600 text-white p-4 rounded-none">
             <div className="flex items-center gap-3">
@@ -140,7 +140,7 @@ export function ProfileInfoDisplay({ user }: ProfileInfoDisplayProps) {
       {(user.user_metadata && Object.keys(user.user_metadata).length > 0) && (
         <div className="space-y-2">
           <label className="text-white text-lg font-medium">
-            Additional Information
+            {t('profile.additionalInformation')}
           </label>
           <div className="bg-slate-700/50 border border-slate-600 text-white p-4 rounded-none">
             <div className="space-y-2">
@@ -160,7 +160,7 @@ export function ProfileInfoDisplay({ user }: ProfileInfoDisplayProps) {
                     />
                   </svg>
                   <span>
-                    <span className="text-gray-300">Name:</span> {user.user_metadata.full_name}
+                    <span className="text-gray-300">{t('profile.name')}:</span> {user.user_metadata.full_name}
                   </span>
                 </div>
               )}
@@ -180,7 +180,7 @@ export function ProfileInfoDisplay({ user }: ProfileInfoDisplayProps) {
                     />
                   </svg>
                   <span>
-                    <span className="text-gray-300">Avatar:</span> Available
+                    <span className="text-gray-300">{t('profile.avatar')}:</span> {t('profile.available')}
                   </span>
                 </div>
               )}

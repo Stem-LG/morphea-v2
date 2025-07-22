@@ -2,6 +2,7 @@
 
 import { useWishlist } from "@/hooks/useWishlist";
 import { useCart } from "@/hooks/useCart";
+import { useLanguage } from "@/hooks/useLanguage";
 import { useRouter } from "next/navigation";
 
 interface ActivitySummaryProps {
@@ -22,6 +23,7 @@ interface ActivitySummaryProps {
 export function ActivitySummary({}: ActivitySummaryProps) {
     const { wishlist, isLoading: wishlistLoading } = useWishlist();
     const { cart, isLoading: cartLoading } = useCart();
+    const { t } = useLanguage();
     const router = useRouter();
 
     const wishlistCount = wishlist.length;
@@ -45,9 +47,9 @@ export function ActivitySummary({}: ActivitySummaryProps) {
             {/* Activity Summary Header */}
             <div className="text-center space-y-2">
                 <h2 className="text-2xl font-bold font-parisienne bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light bg-clip-text text-transparent">
-                    Activity Summary
+                    {t('activity.title')}
                 </h2>
-                <p className="text-gray-300 text-sm">Your recent shopping activity and saved items</p>
+                <p className="text-gray-300 text-sm">{t('activity.subtitle')}</p>
             </div>
 
             {/* Activity Cards */}
@@ -62,8 +64,8 @@ export function ActivitySummary({}: ActivitySummaryProps) {
                                 </svg>
                             </div>
                             <div>
-                                <h3 className="text-white font-semibold">Wishlist</h3>
-                                <p className="text-gray-300 text-sm">Saved for later</p>
+                                <h3 className="text-white font-semibold">{t('activity.wishlist')}</h3>
+                                <p className="text-gray-300 text-sm">{t('activity.savedForLater')}</p>
                             </div>
                         </div>
                         <div className="text-right">
@@ -72,19 +74,19 @@ export function ActivitySummary({}: ActivitySummaryProps) {
                             ) : (
                                 <span className="text-2xl font-bold text-morpheus-gold-light">{wishlistCount}</span>
                             )}
-                            <p className="text-gray-400 text-xs">items</p>
+                            <p className="text-gray-400 text-xs">{t('activity.items')}</p>
                         </div>
                     </div>
 
                     {/* Recent Wishlist Items */}
                     {recentWishlistItems.length > 0 && (
                         <div className="space-y-2 mb-4">
-                            <p className="text-gray-300 text-xs font-medium">Recent additions:</p>
+                            <p className="text-gray-300 text-xs font-medium">{t('activity.recentAdditions')}</p>
                             {recentWishlistItems.map((item) => (
                                 <div key={item.id} className="flex items-center gap-2 text-xs">
                                     <div className="w-2 h-2 bg-morpheus-gold-light rounded-full flex-shrink-0"></div>
                                     <span className="text-gray-300 truncate">
-                                        {item.yproduit?.yproduitintitule || "Unknown Product"}
+                                        {item.yproduit?.yproduitintitule || t('activity.unknownProduct')}
                                     </span>
                                 </div>
                             ))}
@@ -97,10 +99,10 @@ export function ActivitySummary({}: ActivitySummaryProps) {
                             onClick={handleViewWishlist}
                             className="w-full bg-gradient-to-r from-morpheus-gold-dark/20 to-morpheus-gold-light/20 border border-morpheus-gold-dark/40 text-morpheus-gold-light py-2 px-4 font-medium hover:from-morpheus-gold-dark/30 hover:to-morpheus-gold-light/30 transition-all duration-300 text-sm"
                         >
-                            View All Items
+                            {t('activity.viewAllItems')}
                         </button>
                     ) : (
-                        <div className="text-center text-gray-400 text-sm py-2">No items in wishlist yet</div>
+                        <div className="text-center text-gray-400 text-sm py-2">{t('activity.noItemsInWishlist')}</div>
                     )}
                 </div>
 
@@ -124,8 +126,8 @@ export function ActivitySummary({}: ActivitySummaryProps) {
                                 </svg>
                             </div>
                             <div>
-                                <h3 className="text-white font-semibold">Shopping Cart</h3>
-                                <p className="text-gray-300 text-sm">Ready to purchase</p>
+                                <h3 className="text-white font-semibold">{t('activity.shoppingCart')}</h3>
+                                <p className="text-gray-300 text-sm">{t('activity.readyToPurchase')}</p>
                             </div>
                         </div>
                         <div className="text-right">
@@ -135,23 +137,23 @@ export function ActivitySummary({}: ActivitySummaryProps) {
                                 <>
                                     <span className="text-2xl font-bold text-morpheus-gold-light">{cartItemCount}</span>
                                     {cartUniqueCount !== cartItemCount && (
-                                        <div className="text-xs text-gray-400">({cartUniqueCount} unique)</div>
+                                        <div className="text-xs text-gray-400">({cartUniqueCount} {t('activity.unique')})</div>
                                     )}
                                 </>
                             )}
-                            <p className="text-gray-400 text-xs">items</p>
+                            <p className="text-gray-400 text-xs">{t('activity.items')}</p>
                         </div>
                     </div>
 
                     {/* Recent Cart Items */}
                     {recentCartItems.length > 0 && (
                         <div className="space-y-2 mb-4">
-                            <p className="text-gray-300 text-xs font-medium">Recent additions:</p>
+                            <p className="text-gray-300 text-xs font-medium">{t('activity.recentAdditions')}</p>
                             {recentCartItems.map((item) => (
                                 <div key={item.id} className="flex items-center gap-2 text-xs">
                                     <div className="w-2 h-2 bg-morpheus-gold-light rounded-full flex-shrink-0"></div>
                                     <span className="text-gray-300 truncate">
-                                        {item.yproduit?.yproduitintitule || "Unknown Product"}
+                                        {item.yproduit?.yproduitintitule || t('activity.unknownProduct')}
                                         {item.yquantite > 1 && (
                                             <span className="text-morpheus-gold-light ml-1">(×{item.yquantite})</span>
                                         )}
@@ -167,10 +169,10 @@ export function ActivitySummary({}: ActivitySummaryProps) {
                             onClick={handleViewCart}
                             className="w-full bg-gradient-to-r from-morpheus-gold-dark/20 to-morpheus-gold-light/20 border border-morpheus-gold-dark/40 text-morpheus-gold-light py-2 px-4 font-medium hover:from-morpheus-gold-dark/30 hover:to-morpheus-gold-light/30 transition-all duration-300 text-sm"
                         >
-                            View Cart
+                            {t('activity.viewCart')}
                         </button>
                     ) : (
-                        <div className="text-center text-gray-400 text-sm py-2">No items in cart yet</div>
+                        <div className="text-center text-gray-400 text-sm py-2">{t('activity.noItemsInCart')}</div>
                     )}
                 </div>
             </div>
@@ -191,11 +193,11 @@ export function ActivitySummary({}: ActivitySummaryProps) {
                             d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                         />
                     </svg>
-                    Recent Activity
+                    {t('activity.recentActivity')}
                 </h3>
 
                 {recentWishlistItems.length === 0 && recentCartItems.length === 0 ? (
-                    <div className="text-center text-gray-400 text-sm py-4">No recent activity to display</div>
+                    <div className="text-center text-gray-400 text-sm py-4">{t('activity.noRecentActivity')}</div>
                 ) : (
                     <div className="space-y-3">
                         {/* Recent wishlist additions */}
@@ -208,11 +210,11 @@ export function ActivitySummary({}: ActivitySummaryProps) {
                                 </div>
                                 <div className="flex-1">
                                     <p className="text-white">
-                                        Added{" "}
+                                        {t('activity.added')}{" "}
                                         <span className="text-morpheus-gold-light font-medium">
-                                            {item.yproduit?.yproduitintitule || "Unknown Product"}
+                                            {item.yproduit?.yproduitintitule || t('activity.unknownProduct')}
                                         </span>{" "}
-                                        to wishlist
+                                        {t('activity.addedToWishlist')}
                                     </p>
                                     <p className="text-gray-400 text-xs">
                                         {new Date(item.created_at).toLocaleDateString()}
@@ -241,11 +243,11 @@ export function ActivitySummary({}: ActivitySummaryProps) {
                                 </div>
                                 <div className="flex-1">
                                     <p className="text-white">
-                                        Added{" "}
+                                        {t('activity.added')}{" "}
                                         <span className="text-morpheus-gold-light font-medium">
-                                            {item.yproduit?.yproduitintitule || "Unknown Product"}
+                                            {item.yproduit?.yproduitintitule || t('activity.unknownProduct')}
                                         </span>{" "}
-                                        to cart
+                                        {t('activity.addedToCart')}
                                         {item.yquantite > 1 && (
                                             <span className="text-gray-300"> (×{item.yquantite})</span>
                                         )}
