@@ -13,33 +13,33 @@ interface UseInfospots {
   loading: boolean
   error: string | null
   createInfospot: (infospotData: {
-    id?: string
-    sceneId: string
+    id?: number
+    sceneId: number
     title: string
     text: string
     yaw: number
     pitch: number
-    actionId?: string | null
+    actionId?: number | null
   }) => Promise<InfoSpot | null>
-  updateInfospot: (id: string, updateData: {
-    sceneId?: string
+  updateInfospot: (id: number, updateData: {
+    sceneId?: number
     title?: string
     text?: string
     yaw?: number
     pitch?: number
-    actionId?: string | null
+    actionId?: number | null
   }) => Promise<InfoSpot | null>
-  deleteInfospot: (id: string) => Promise<boolean>
-  refreshInfospots: (sceneId?: string) => Promise<void>
-  getInfospotsByScene: (sceneId: string) => InfoSpot[]
+  deleteInfospot: (id: number) => Promise<boolean>
+  refreshInfospots: (sceneId?: number) => Promise<void>
+  getInfospotsByScene: (sceneId: number) => InfoSpot[]
 }
 
-export function useInfospots(initialSceneId?: string): UseInfospots {
+export function useInfospots(initialSceneId?: number): UseInfospots {
   const [infospots, setInfospots] = useState<InfoSpot[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const fetchInfospots = async (sceneId?: string) => {
+  const fetchInfospots = async (sceneId?: number) => {
     try {
       setLoading(true)
       setError(null)
@@ -55,7 +55,7 @@ export function useInfospots(initialSceneId?: string): UseInfospots {
         `)
       
       if (sceneId) {
-        query = query.eq('ysceneid', sceneId)
+        query = query.eq('yscenesidfk', sceneId)
       }
       
       const { data, error } = await query
@@ -74,13 +74,13 @@ export function useInfospots(initialSceneId?: string): UseInfospots {
   }
 
   const createInfospot = async (infospotData: {
-    id?: string
-    sceneId: string
+    id?: number
+    sceneId: number
     title: string
     text: string
     yaw: number
     pitch: number
-    actionId?: string | null
+    actionId?: number | null
   }): Promise<InfoSpot | null> => {
     try {
       setError(null)
@@ -88,13 +88,13 @@ export function useInfospots(initialSceneId?: string): UseInfospots {
       const supabase = createClient()
       
       const insertData = {
-        yid: infospotData.id || crypto.randomUUID(),
-        ysceneid: infospotData.sceneId,
-        ytitle: infospotData.title,
-        ytext: infospotData.text,
-        yyaw: infospotData.yaw,
-        ypitch: infospotData.pitch,
-        yinfospotactionsidfk: infospotData.actionId,
+        yinfospotsid: infospotData.id || Date.now(),
+        yscenesidfk: infospotData.sceneId,
+        yinfospotstitle: infospotData.title,
+        yinfospotstext: infospotData.text,
+        yinfospotsaxexyaw: infospotData.yaw,
+        yinfospotsaxeypitch: infospotData.pitch,
+        yinfospotactionidfk: infospotData.actionId,
       }
       
       const { data, error } = await supabase
@@ -121,13 +121,13 @@ export function useInfospots(initialSceneId?: string): UseInfospots {
     }
   }
 
-  const updateInfospot = async (id: string, updateData: {
-    sceneId?: string
+  const updateInfospot = async (id: number, updateData: {
+    sceneId?: number
     title?: string
     text?: string
     yaw?: number
     pitch?: number
-    actionId?: string | null
+    actionId?: number | null
   }): Promise<InfoSpot | null> => {
     try {
       setError(null)
@@ -135,18 +135,18 @@ export function useInfospots(initialSceneId?: string): UseInfospots {
       const supabase = createClient()
       
       const updateFields: any = {}
-      if (updateData.sceneId !== undefined) updateFields.ysceneid = updateData.sceneId
-      if (updateData.title !== undefined) updateFields.ytitle = updateData.title
-      if (updateData.text !== undefined) updateFields.ytext = updateData.text
-      if (updateData.yaw !== undefined) updateFields.yyaw = updateData.yaw
-      if (updateData.pitch !== undefined) updateFields.ypitch = updateData.pitch
-      if (updateData.actionId !== undefined) updateFields.yinfospotactionsidfk = updateData.actionId
+      if (updateData.sceneId !== undefined) updateFields.yscenesidfk = updateData.sceneId
+      if (updateData.title !== undefined) updateFields.yinfospotstitle = updateData.title
+      if (updateData.text !== undefined) updateFields.yinfospotstext = updateData.text
+      if (updateData.yaw !== undefined) updateFields.yinfospotsaxexyaw = updateData.yaw
+      if (updateData.pitch !== undefined) updateFields.yinfospotsaxeypitch = updateData.pitch
+      if (updateData.actionId !== undefined) updateFields.yinfospotactionidfk = updateData.actionId
       
       const { data, error } = await supabase
         .schema('morpheus')
         .from('yinfospots')
         .update(updateFields)
-        .eq('yid', id)
+        .eq('yinfospotsid', id)
         .select(`
           *,
           yinfospotactions (*)
@@ -159,7 +159,7 @@ export function useInfospots(initialSceneId?: string): UseInfospots {
       
       const updatedInfospot = data
       setInfospots(prev => prev.map(infospot =>
-        infospot.yid === id ? updatedInfospot : infospot
+        infospot.yinfospotsid === id ? updatedInfospot : infospot
       ))
       return updatedInfospot
     } catch (err) {
@@ -169,7 +169,7 @@ export function useInfospots(initialSceneId?: string): UseInfospots {
     }
   }
 
-  const deleteInfospot = async (id: string): Promise<boolean> => {
+  const deleteInfospot = async (id: number): Promise<boolean> => {
     try {
       setError(null)
       
@@ -179,13 +179,13 @@ export function useInfospots(initialSceneId?: string): UseInfospots {
         .schema('morpheus')
         .from('yinfospots')
         .delete()
-        .eq('yid', id)
+        .eq('yinfospotsid', id)
       
       if (error) {
         throw new Error(error.message || 'Failed to delete infospot')
       }
       
-      setInfospots(prev => prev.filter(infospot => infospot.yid !== id))
+      setInfospots(prev => prev.filter(infospot => infospot.yinfospotsid !== id))
       return true
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')
@@ -194,12 +194,12 @@ export function useInfospots(initialSceneId?: string): UseInfospots {
     }
   }
 
-  const refreshInfospots = async (sceneId?: string) => {
+  const refreshInfospots = async (sceneId?: number) => {
     await fetchInfospots(sceneId)
   }
 
-  const getInfospotsByScene = (sceneId: string): InfoSpot[] => {
-    return infospots.filter(infospot => infospot.ysceneid === sceneId)
+  const getInfospotsByScene = (sceneId: number): InfoSpot[] => {
+    return infospots.filter(infospot => infospot.yscenesidfk === sceneId)
   }
 
   useEffect(() => {

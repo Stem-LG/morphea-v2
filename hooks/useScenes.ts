@@ -11,21 +11,21 @@ interface UseScenes {
   loading: boolean
   error: string | null
   createScene: (sceneData: {
-    id: string
+    id: number
     name: string
     panorama: string
     yaw?: number
     pitch?: number
     fov?: number
   }) => Promise<Scene | null>
-  updateScene: (id: string, updateData: {
+  updateScene: (id: number, updateData: {
     name?: string
     panorama?: string
     yaw?: number
     pitch?: number
     fov?: number
   }) => Promise<Scene | null>
-  deleteScene: (id: string) => Promise<boolean>
+  deleteScene: (id: number) => Promise<boolean>
   refreshScenes: () => Promise<void>
 }
 
@@ -45,7 +45,7 @@ export function useScenes(): UseScenes {
         .schema('morpheus')
         .from('yscenes')
         .select('*')
-        .order('yname')
+        .order('yscenesname')
       
       if (error) {
         throw new Error(error.message || 'Failed to fetch scenes')
@@ -61,7 +61,7 @@ export function useScenes(): UseScenes {
   }
 
   const createScene = async (sceneData: {
-    id: string
+    id: number
     name: string
     panorama: string
     yaw?: number
@@ -74,12 +74,12 @@ export function useScenes(): UseScenes {
       const supabase = createClient()
       
       const insertData = {
-        yid: sceneData.id,
-        yname: sceneData.name,
-        ypanorama: sceneData.panorama,
-        yyaw: sceneData.yaw || 0,
-        ypitch: sceneData.pitch || 0,
-        yfov: sceneData.fov || 75,
+        yscenesid: sceneData.id,
+        yscenesname: sceneData.name,
+        yscenespanorama: sceneData.panorama,
+        yscenesaxexyaw: sceneData.yaw || 0,
+        yscenesaxeypitch: sceneData.pitch || 0,
+        ysceneszoomfov: sceneData.fov || 75,
       }
       
       const { data, error } = await supabase
@@ -103,7 +103,7 @@ export function useScenes(): UseScenes {
     }
   }
 
-  const updateScene = async (id: string, updateData: {
+  const updateScene = async (id: number, updateData: {
     name?: string
     panorama?: string
     yaw?: number
@@ -116,17 +116,17 @@ export function useScenes(): UseScenes {
       const supabase = createClient()
       
       const updateFields: any = {}
-      if (updateData.name !== undefined) updateFields.yname = updateData.name
-      if (updateData.panorama !== undefined) updateFields.ypanorama = updateData.panorama
-      if (updateData.yaw !== undefined) updateFields.yyaw = updateData.yaw
-      if (updateData.pitch !== undefined) updateFields.ypitch = updateData.pitch
-      if (updateData.fov !== undefined) updateFields.yfov = updateData.fov
+      if (updateData.name !== undefined) updateFields.yscenesname = updateData.name
+      if (updateData.panorama !== undefined) updateFields.yscenespanorama = updateData.panorama
+      if (updateData.yaw !== undefined) updateFields.yscenesaxexyaw = updateData.yaw
+      if (updateData.pitch !== undefined) updateFields.yscenesaxeypitch = updateData.pitch
+      if (updateData.fov !== undefined) updateFields.ysceneszoomfov = updateData.fov
       
       const { data, error } = await supabase
         .schema('morpheus')
         .from('yscenes')
         .update(updateFields)
-        .eq('yid', id)
+        .eq('yscenesid', id)
         .select('*')
         .single()
       
@@ -136,7 +136,7 @@ export function useScenes(): UseScenes {
       
       const updatedScene = data
       setScenes(prev => prev.map(scene =>
-        scene.yid === id ? updatedScene : scene
+        scene.yscenesid === id ? updatedScene : scene
       ))
       return updatedScene
     } catch (err) {
@@ -146,7 +146,7 @@ export function useScenes(): UseScenes {
     }
   }
 
-  const deleteScene = async (id: string): Promise<boolean> => {
+  const deleteScene = async (id: number): Promise<boolean> => {
     try {
       setError(null)
       
@@ -156,13 +156,13 @@ export function useScenes(): UseScenes {
         .schema('morpheus')
         .from('yscenes')
         .delete()
-        .eq('yid', id)
+        .eq('yscenesid', id)
       
       if (error) {
         throw new Error(error.message || 'Failed to delete scene')
       }
       
-      setScenes(prev => prev.filter(scene => scene.yid !== id))
+      setScenes(prev => prev.filter(scene => scene.yscenesid !== id))
       return true
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')

@@ -115,10 +115,10 @@ export default function TourAdminViewer({
     if (scenes.length > 0 && !currentScene) {
       // Check URL for scene ID first, then initialSceneId prop, then default to first scene
       const urlSceneId = searchParams.get('sceneId')
-      const targetSceneId = urlSceneId || initialSceneId
+      const targetSceneId = urlSceneId ? parseInt(urlSceneId) : initialSceneId
       
       const initialScene = targetSceneId
-        ? scenes.find(s => s.yid === targetSceneId) || scenes[0]
+        ? scenes.find(s => s.yscenesid === targetSceneId) || scenes[0]
         : scenes[0]
       
       setCurrentScene(initialScene)
@@ -126,7 +126,7 @@ export default function TourAdminViewer({
       // Update URL if scene ID is not already in URL
       if (initialScene && !urlSceneId) {
         const newUrl = new URL(window.location.href)
-        newUrl.searchParams.set('sceneId', initialScene.yid)
+        newUrl.searchParams.set('sceneId', initialScene.yscenesid.toString())
         router.replace(newUrl.pathname + newUrl.search)
       }
     }
@@ -142,7 +142,7 @@ export default function TourAdminViewer({
       try {
         const viewer = new Viewer({
           container: containerElement!,
-          panorama: currentScene.ypanorama,
+          panorama: currentScene.yscenespanorama,
           minFov: 30,
           maxFov: 120,
           loadingImg: "/loading.gif",
@@ -207,7 +207,7 @@ export default function TourAdminViewer({
         }
       }
     }
-  }, [containerElement, currentScene?.yid, loading])
+  }, [containerElement, currentScene?.yscenesid, loading])
 
   // Separate effect for scene transitions (like virtual-tour.tsx)
   useEffect(() => {
@@ -215,12 +215,12 @@ export default function TourAdminViewer({
 
     const transitionToScene = async () => {
       try {
-        console.log('Starting smooth transition to scene:', currentScene.yid, currentScene.yname)
+        console.log('Starting smooth transition to scene:', currentScene.yscenesid, currentScene.yscenesname)
         
         setIsTransitioning(true)
         
         // Use setPanorama for smooth transitions (like virtual-tour.tsx)
-        await viewerInstance.setPanorama(currentScene.ypanorama, {
+        await viewerInstance.setPanorama(currentScene.yscenespanorama, {
           transition: true,
           showLoader: true,
         })
@@ -238,7 +238,7 @@ export default function TourAdminViewer({
     }
 
     transitionToScene()
-  }, [currentScene?.yid, viewerInstance, loading])
+  }, [currentScene?.yscenesid, viewerInstance, loading])
 
   // Global handlers setup (separate from viewer initialization)
   useEffect(() => {
@@ -258,23 +258,23 @@ export default function TourAdminViewer({
         setForceStopTransitions(true)
         setIsTransitioning(false)
         
-        const sceneLink = currentScenelinks.find(link => link.yid === linkId)
+        const sceneLink = currentScenelinks.find(link => link.yscenelinksid === linkId)
         if (sceneLink) {
           setInlineEditingSceneLink(sceneLink)
-          setPreviewMarkerPosition({ yaw: sceneLink.yyaw, pitch: sceneLink.ypitch })
+          setPreviewMarkerPosition({ yaw: sceneLink.yscenelinksaxexyaw, pitch: sceneLink.yscenelinksaxeypitch })
         }
       } else {
         console.log('View mode detected - navigating to target scene')
         // View mode: Navigate to target scene (only if not force stopped)
         if (!forceStopTransitionsRef.current) {
-          const targetScene = currentScenes.find(s => s.yid === targetId)
+          const targetScene = currentScenes.find(s => s.yscenesid === targetId)
           if (targetScene) {
-            console.log('Navigating to scene via global handler:', targetScene.yname)
+            console.log('Navigating to scene via global handler:', targetScene.yscenesname)
             setCurrentScene(targetScene)
             
             // Update URL with new scene ID
             const newUrl = new URL(window.location.href)
-            newUrl.searchParams.set('sceneId', targetScene.yid)
+            newUrl.searchParams.set('sceneId', targetScene.yscenesid.toString())
             router.replace(newUrl.pathname + newUrl.search)
           }
         }
@@ -292,15 +292,15 @@ export default function TourAdminViewer({
       if (currentMode === 'edit') {
         console.log('Edit mode detected - opening inline edit for infospot')
         // Edit mode: Open inline edit
-        const infospot = currentInfospots.find(spot => spot.yid === infospotId)
+        const infospot = currentInfospots.find(spot => spot.yinfospotsid === infospotId)
         if (infospot) {
           setInlineEditingInfospot(infospot)
-          setPreviewMarkerPosition({ yaw: infospot.yyaw, pitch: infospot.ypitch })
+          setPreviewMarkerPosition({ yaw: infospot.yinfospotsaxexyaw, pitch: infospot.yinfospotsaxeypitch })
         }
       } else {
         console.log('View mode detected - showing infospot details')
         // View mode: Show infospot information in modal
-        const infospot = currentInfospots.find(spot => spot.yid === infospotId)
+        const infospot = currentInfospots.find(spot => spot.yinfospotsid === infospotId)
         if (infospot) {
           setViewingInfospot(infospot)
         }
@@ -322,7 +322,7 @@ export default function TourAdminViewer({
   // Update markers when data changes or admin mode changes
   useEffect(() => {
     if (viewerInstance && currentScene) {
-      console.log('Updating markers due to data/mode/scene change, admin mode:', adminMode, 'current scene:', currentScene.yid, currentScene.yname)
+      console.log('Updating markers due to data/mode/scene change, admin mode:', adminMode, 'current scene:', currentScene.yscenesid, currentScene.yscenesname)
       
       // Force clear all markers first to ensure clean state
       const markersPluginInstance = viewerInstance.getPlugin(MarkersPlugin) as MarkersPlugin
@@ -332,11 +332,11 @@ export default function TourAdminViewer({
       
       // Add a small delay to ensure admin mode ref is updated and markers are cleared
       setTimeout(() => {
-        console.log('Calling addMarkers after delay for scene:', currentScene.yid)
+        console.log('Calling addMarkers after delay for scene:', currentScene.yscenesid)
         addMarkers()
       }, 100)
     }
-  }, [infospots, scenelinks, currentScene?.yid, adminMode, viewerInstance])
+  }, [infospots, scenelinks, currentScene?.yscenesid, adminMode, viewerInstance])
 
   // Update preview marker in real-time when position changes (for editing)
   useEffect(() => {
@@ -499,7 +499,7 @@ export default function TourAdminViewer({
     if (!viewerInstance || !currentScene) {
       console.log('Cannot add markers - missing viewer or current scene:', {
         hasViewer: !!viewerInstance,
-        currentScene: currentScene?.yid
+        currentScene: currentScene?.yscenesid
       })
       return
     }
@@ -510,17 +510,17 @@ export default function TourAdminViewer({
       return
     }
 
-    console.log('Adding markers for scene:', currentScene.yid, currentScene.yname)
+    console.log('Adding markers for scene:', currentScene.yscenesid, currentScene.yscenesname)
     
     // Inline the marker adding logic to avoid circular dependency
     markersPluginInstance.clearMarkers()
 
     // Add scene link markers - filter by current scene ID
-    const currentSceneLinks = scenelinks.filter(link => link.ysceneid === currentScene.yid)
-    console.log('Scene links for current scene:', currentSceneLinks.length, currentSceneLinks.map(l => l.yname))
+    const currentSceneLinks = scenelinks.filter(link => link.yscenesidfkactuelle === currentScene.yscenesid)
+    console.log('Scene links for current scene:', currentSceneLinks.length, currentSceneLinks.map(l => l.yscenelinksname))
     
     currentSceneLinks.forEach((link) => {
-      const targetScene = scenes.find(s => s.yid === link.ytargetid)
+      const targetScene = scenes.find(s => s.yscenesid === link.yscenesidfktarget)
       
       // Create custom HTML for scene link markers with click handling
       const markerHtml = `
@@ -535,37 +535,37 @@ export default function TourAdminViewer({
             position: relative;
           "
           data-marker-type="scenelink"
-          data-marker-id="${link.yid}"
-          data-target-id="${link.ytargetid}"
-          onclick="event.stopPropagation(); event.preventDefault(); window.handleSceneLinkClick('${link.yid}', '${link.ytargetid}');"
+          data-marker-id="${link.yscenelinksid}"
+          data-target-id="${link.yscenesidfktarget}"
+          onclick="event.stopPropagation(); event.preventDefault(); window.handleSceneLinkClick('${link.yscenelinksid}', '${link.yscenesidfktarget}');"
         ></div>
       `
       
       markersPluginInstance.addMarker({
-        id: `link-${link.yid}`,
-        position: { yaw: link.yyaw, pitch: link.ypitch },
+        id: `link-${link.yscenelinksid}`,
+        position: { yaw: link.yscenelinksaxexyaw, pitch: link.yscenelinksaxeypitch },
         html: markerHtml,
         anchor: "center center",
         tooltip: {
           content: adminModeRef.current === 'edit'
-            ? `Click to edit: ${link.yname} → ${targetScene?.yname || 'Unknown Scene'}`
-            : `${link.yname} → ${targetScene?.yname || 'Unknown Scene'}`,
+            ? `Click to edit: ${link.yscenelinksname} → ${targetScene?.yscenesname || 'Unknown Scene'}`
+            : `${link.yscenelinksname} → ${targetScene?.yscenesname || 'Unknown Scene'}`,
           position: "top center",
         },
         data: {
           type: 'scenelink',
-          id: link.yid,
-          targetId: link.ytargetid,
+          id: link.yscenelinksid,
+          targetId: link.yscenesidfktarget,
         },
       })
     })
 
     // Add infospot markers - filter by current scene ID
-    const currentInfospots = infospots.filter(spot => spot.ysceneid === currentScene.yid)
-    console.log('Infospots for current scene:', currentInfospots.length, currentInfospots.map(s => s.ytitle))
+    const currentInfospots = infospots.filter(spot => spot.yscenesidfk === currentScene.yscenesid)
+    console.log('Infospots for current scene:', currentInfospots.length, currentInfospots.map(s => s.yinfospotstitle))
     
     currentInfospots.forEach((spot) => {
-      const action = actions.find(a => a.yinfospotactionsid === spot.yinfospotactionsidfk)
+      const action = actions.find(a => a.yinfospotactionsid === spot.yinfospotactionidfk)
       
       const infospotHtml = `
         <div
@@ -586,8 +586,8 @@ export default function TourAdminViewer({
             box-shadow: 0 2px 8px rgba(0,0,0,0.3);
           "
           data-marker-type="infospot"
-          data-marker-id="${spot.yid}"
-          onclick="event.stopPropagation(); event.preventDefault(); window.handleInfospotClick('${spot.yid}');"
+          data-marker-id="${spot.yinfospotsid}"
+          onclick="event.stopPropagation(); event.preventDefault(); window.handleInfospotClick('${spot.yinfospotsid}');"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
@@ -603,21 +603,21 @@ export default function TourAdminViewer({
       `
       
       markersPluginInstance.addMarker({
-        id: `infospot-${spot.yid}`,
-        position: { yaw: spot.yyaw, pitch: spot.ypitch },
+        id: `infospot-${spot.yinfospotsid}`,
+        position: { yaw: spot.yinfospotsaxexyaw, pitch: spot.yinfospotsaxeypitch },
         html: infospotHtml,
         anchor: "center center",
         tooltip: {
           content: adminModeRef.current === 'edit'
-            ? `Click to edit: ${spot.ytitle}`
-            : spot.ytitle,
+            ? `Click to edit: ${spot.yinfospotstitle}`
+            : spot.yinfospotstitle,
           position: "top center",
         },
         data: {
           type: 'infospot',
-          id: spot.yid,
-          title: spot.ytitle,
-          text: spot.ytext,
+          id: spot.yinfospotsid,
+          title: spot.yinfospotstitle,
+          text: spot.yinfospotstext,
           action: action,
         },
       })
@@ -653,21 +653,21 @@ export default function TourAdminViewer({
       setIsHandlingEdit(true)
       
       if (data.type === 'scenelink') {
-        const sceneLink = scenelinks.find(link => link.yid === data.id)
+        const sceneLink = scenelinks.find(link => link.yscenelinksid === data.id)
         console.log('Found scene link for editing:', sceneLink)
         if (sceneLink) {
           setInlineEditingSceneLink(sceneLink)
-          setPreviewMarkerPosition({ yaw: sceneLink.yyaw, pitch: sceneLink.ypitch })
+          setPreviewMarkerPosition({ yaw: sceneLink.yscenelinksaxexyaw, pitch: sceneLink.yscenelinksaxeypitch })
           // Reset flag after a delay
           setTimeout(() => setIsHandlingEdit(false), 100)
           return // Exit early to prevent any navigation
         }
       } else if (data.type === 'infospot') {
-        const infospot = infospots.find(spot => spot.yid === data.id)
+        const infospot = infospots.find(spot => spot.yinfospotsid === data.id)
         console.log('Found infospot for editing:', infospot)
         if (infospot) {
           setInlineEditingInfospot(infospot)
-          setPreviewMarkerPosition({ yaw: infospot.yyaw, pitch: infospot.ypitch })
+          setPreviewMarkerPosition({ yaw: infospot.yinfospotsaxexyaw, pitch: infospot.yinfospotsaxeypitch })
           // Reset flag after a delay
           setTimeout(() => setIsHandlingEdit(false), 100)
           return // Exit early to prevent any navigation
@@ -685,20 +685,20 @@ export default function TourAdminViewer({
         setIsHandlingEdit(true)
         
         if (data.type === 'scenelink') {
-          const sceneLink = scenelinks.find(link => link.yid === data.id)
+          const sceneLink = scenelinks.find(link => link.yscenelinksid === data.id)
           console.log('Found scene link for editing (ctrl+click):', sceneLink)
           if (sceneLink) {
             setInlineEditingSceneLink(sceneLink)
-            setPreviewMarkerPosition({ yaw: sceneLink.yyaw, pitch: sceneLink.ypitch })
+            setPreviewMarkerPosition({ yaw: sceneLink.yscenelinksaxexyaw, pitch: sceneLink.yscenelinksaxeypitch })
             setTimeout(() => setIsHandlingEdit(false), 100)
             return
           }
         } else if (data.type === 'infospot') {
-          const infospot = infospots.find(spot => spot.yid === data.id)
+          const infospot = infospots.find(spot => spot.yinfospotsid === data.id)
           console.log('Found infospot for editing (ctrl+click):', infospot)
           if (infospot) {
             setInlineEditingInfospot(infospot)
-            setPreviewMarkerPosition({ yaw: infospot.yyaw, pitch: infospot.ypitch })
+            setPreviewMarkerPosition({ yaw: infospot.yinfospotsaxexyaw, pitch: infospot.yinfospotsaxeypitch })
             setTimeout(() => setIsHandlingEdit(false), 100)
             return
           }
@@ -719,16 +719,16 @@ export default function TourAdminViewer({
         
         if (data.type === 'scenelink') {
           // Navigate to target scene only if we're truly in view mode
-          const targetScene = scenes.find(s => s.yid === data.targetId)
+          const targetScene = scenes.find(s => s.yscenesid === data.targetId)
           if (targetScene) {
-            console.log('Navigating to scene:', targetScene.yname)
+            console.log('Navigating to scene:', targetScene.yscenesname)
             setIsTransitioning(true)
             setCurrentScene(targetScene)
             setTimeout(() => setIsTransitioning(false), 1000)
           }
         } else if (data.type === 'infospot') {
           // Show infospot information in modal
-          const infospot = infospots.find(spot => spot.yid === data.id)
+          const infospot = infospots.find(spot => spot.yinfospotsid === data.id)
           if (infospot) {
             setViewingInfospot(infospot)
           }
@@ -738,8 +738,8 @@ export default function TourAdminViewer({
   }, [scenes, scenelinks, infospots])
 
   const handleSceneChange = (sceneId: string) => {
-    const scene = scenes.find(s => s.yid === sceneId)
-    if (scene && scene.yid !== currentScene?.yid) {
+    const scene = scenes.find(s => s.yscenesid === parseInt(sceneId))
+    if (scene && scene.yscenesid !== currentScene?.yscenesid) {
       // Close any open edit panels and modals when changing scenes
       setInlineEditingInfospot(null)
       setInlineEditingSceneLink(null)
@@ -756,12 +756,12 @@ export default function TourAdminViewer({
       
       // Update URL with new scene ID
       const newUrl = new URL(window.location.href)
-      newUrl.searchParams.set('sceneId', scene.yid)
+      newUrl.searchParams.set('sceneId', scene.yscenesid.toString())
       router.replace(newUrl.pathname + newUrl.search)
       
       // Update panorama
       if (viewerInstance) {
-        viewerInstance.setPanorama(scene.ypanorama, {
+        viewerInstance.setPanorama(scene.yscenespanorama, {
           transition: true,
           showLoader: true,
         }).then(() => {
@@ -874,7 +874,7 @@ export default function TourAdminViewer({
                       }
                       
                       // Refresh the panorama with a subtle transition
-                      await viewerInstance.setPanorama(currentScene.ypanorama, {
+                      await viewerInstance.setPanorama(currentScene.yscenespanorama, {
                         transition: true,
                         showLoader: false,
                       })
@@ -1017,19 +1017,19 @@ export default function TourAdminViewer({
           </CardHeader>
           <CardContent>
             <select
-              value={currentScene.yid}
+              value={currentScene.yscenesid.toString()}
               onChange={(e) => handleSceneChange(e.target.value)}
               disabled={isTransitioning}
               className="w-full px-2 py-1 text-sm border rounded"
             >
               {scenes.map((scene) => (
-                <option key={scene.yid} value={scene.yid}>
-                  {scene.yname}
+                <option key={scene.yscenesid} value={scene.yscenesid.toString()}>
+                  {scene.yscenesname}
                 </option>
               ))}
             </select>
             <div className="mt-2 text-xs text-gray-600">
-              <Badge variant="outline">{currentScene.yid}</Badge>
+              <Badge variant="outline">{currentScene.yscenesid}</Badge>
             </div>
             
             {/* Scene Management Buttons - Only show in edit mode */}
@@ -1060,32 +1060,32 @@ export default function TourAdminViewer({
                     size="sm"
                     variant="destructive"
                     onClick={async () => {
-                      if (!confirm(`${t('admin.tour.confirmDeleteScene')} "${currentScene.yname}"?\n\n${t('admin.tour.confirmDeleteSceneWarning')}\n\n${t('admin.tour.actionCannotBeUndone')}`)) {
+                      if (!confirm(`${t('admin.tour.confirmDeleteScene')} "${currentScene.yscenesname}"?\n\n${t('admin.tour.confirmDeleteSceneWarning')}\n\n${t('admin.tour.actionCannotBeUndone')}`)) {
                         return
                       }
                       
                       try {
                         // Delete the scene
-                        const success = await deleteScene(currentScene.yid)
+                        const success = await deleteScene(currentScene.yscenesid)
                         if (!success) throw new Error('Failed to delete scene')
                         
                         // Refresh scenes data
                         await refreshScenes()
                         
                         // Navigate to the first available scene
-                        const remainingScenes = scenes.filter(s => s.yid !== currentScene.yid)
+                        const remainingScenes = scenes.filter(s => s.yscenesid !== currentScene.yscenesid)
                         if (remainingScenes.length > 0) {
                           const nextScene = remainingScenes[0]
                           setCurrentScene(nextScene)
                           
                           // Update URL with new scene ID
                           const newUrl = new URL(window.location.href)
-                          newUrl.searchParams.set('sceneId', nextScene.yid)
+                          newUrl.searchParams.set('sceneId', nextScene.yscenesid.toString())
                           router.replace(newUrl.pathname + newUrl.search)
                           
                           // Update panorama
                           if (viewerInstance) {
-                            viewerInstance.setPanorama(nextScene.ypanorama, {
+                            viewerInstance.setPanorama(nextScene.yscenespanorama, {
                               transition: true,
                               showLoader: true,
                             }).then(() => {
@@ -1120,9 +1120,9 @@ export default function TourAdminViewer({
       <div className="absolute bottom-4 left-4 z-20">
         <Card className="bg-black/70 text-white">
           <CardContent className="p-3">
-            <h3 className="font-semibold">{currentScene.yname}</h3>
+            <h3 className="font-semibold">{currentScene.yscenesname}</h3>
             <p className="text-sm opacity-75">
-              {scenes.findIndex(s => s.yid === currentScene.yid) + 1} {t('admin.tour.of')} {scenes.length} {t('admin.tour.scenes')}
+              {scenes.findIndex(s => s.yscenesid === currentScene.yscenesid) + 1} {t('admin.tour.of')} {scenes.length} {t('admin.tour.scenes')}
             </p>
             {adminMode === 'edit' ? (
               <div className="text-xs mt-1 space-y-1">
@@ -1168,8 +1168,8 @@ export default function TourAdminViewer({
                     <label className="text-xs font-medium">{t('admin.tour.title')}:</label>
                     <input
                       type="text"
-                      value={inlineEditingInfospot.ytitle}
-                      onChange={(e) => setInlineEditingInfospot(prev => prev ? {...prev, ytitle: e.target.value} : null)}
+                      value={inlineEditingInfospot.yinfospotstitle}
+                      onChange={(e) => setInlineEditingInfospot(prev => prev ? {...prev, yinfospotstitle: e.target.value} : null)}
                       className="w-full px-2 py-1 text-xs border rounded"
                       placeholder={t('admin.tour.infospotTitlePlaceholder')}
                     />
@@ -1177,8 +1177,8 @@ export default function TourAdminViewer({
                   <div>
                     <label className="text-xs font-medium">{t('admin.tour.description')}:</label>
                     <textarea
-                      value={inlineEditingInfospot.ytext}
-                      onChange={(e) => setInlineEditingInfospot(prev => prev ? {...prev, ytext: e.target.value} : null)}
+                      value={inlineEditingInfospot.yinfospotstext}
+                      onChange={(e) => setInlineEditingInfospot(prev => prev ? {...prev, yinfospotstext: e.target.value} : null)}
                       className="w-full px-2 py-1 text-xs border rounded h-16 resize-none"
                       placeholder={t('admin.tour.infospotDescriptionPlaceholder')}
                     />
@@ -1186,14 +1186,14 @@ export default function TourAdminViewer({
                   <div>
                     <label className="text-xs font-medium">{t('admin.tour.infospotAction')}:</label>
                     <select
-                      value={inlineEditingInfospot.yinfospotactionsidfk || ''}
-                      onChange={(e) => setInlineEditingInfospot(prev => prev ? {...prev, yinfospotactionsidfk: e.target.value || null} : null)}
+                      value={inlineEditingInfospot.yinfospotactionidfk || ''}
+                      onChange={(e) => setInlineEditingInfospot(prev => prev ? {...prev, yinfospotactionidfk: e.target.value || null} : null)}
                       className="w-full px-2 py-1 text-xs border rounded"
                     >
                       <option value="">{t('admin.tour.noAction')}</option>
                       {actions.map(action => (
                         <option key={action.yinfospotactionsid} value={action.yinfospotactionsid}>
-                          {action.ytitle || action.ytype} - {action.ytype}
+                          {action.yinfospotactionstitle || action.yinfospotactionstype} - {action.yinfospotactionstype}
                         </option>
                       ))}
                     </select>
@@ -1220,8 +1220,8 @@ export default function TourAdminViewer({
                     <label className="text-xs font-medium">{t('admin.tour.name')}:</label>
                     <input
                       type="text"
-                      value={inlineEditingSceneLink.yname}
-                      onChange={(e) => setInlineEditingSceneLink(prev => prev ? {...prev, yname: e.target.value} : null)}
+                      value={inlineEditingSceneLink.yscenelinksname}
+                      onChange={(e) => setInlineEditingSceneLink(prev => prev ? {...prev, yscenelinksname: e.target.value} : null)}
                       className="w-full px-2 py-1 text-xs border rounded"
                       placeholder={t('admin.tour.sceneLinkNamePlaceholder')}
                     />
@@ -1229,13 +1229,13 @@ export default function TourAdminViewer({
                   <div>
                     <label className="text-xs font-medium">{t('admin.tour.targetScene')}:</label>
                     <select
-                      value={inlineEditingSceneLink.ytargetid}
-                      onChange={(e) => setInlineEditingSceneLink(prev => prev ? {...prev, ytargetid: e.target.value} : null)}
+                      value={inlineEditingSceneLink.yscenesidfktarget}
+                      onChange={(e) => setInlineEditingSceneLink(prev => prev ? {...prev, yscenesidfktarget: e.target.value} : null)}
                       className="w-full px-2 py-1 text-xs border rounded"
                     >
-                      {scenes.filter(s => s.yid !== currentScene?.yid).map(scene => (
-                        <option key={scene.yid} value={scene.yid}>
-                          {scene.yname}
+                      {scenes.filter(s => s.yscenesid !== currentScene?.yscenesid).map(scene => (
+                        <option key={scene.yscenesid} value={scene.yscenesid.toString()}>
+                          {scene.yscenesname}
                         </option>
                       ))}
                     </select>
@@ -1312,20 +1312,20 @@ export default function TourAdminViewer({
                     try {
                       if (inlineEditingInfospot) {
                         // Update infospot with all fields
-                        const result = await updateInfospot(inlineEditingInfospot.yid, {
-                          title: inlineEditingInfospot.ytitle,
-                          text: inlineEditingInfospot.ytext,
+                        const result = await updateInfospot(inlineEditingInfospot.yinfospotsid, {
+                          title: inlineEditingInfospot.yinfospotstitle,
+                          text: inlineEditingInfospot.yinfospotstext,
                           yaw: previewMarkerPosition.yaw,
                           pitch: previewMarkerPosition.pitch,
-                          actionId: inlineEditingInfospot.yinfospotactionsidfk,
+                          actionId: inlineEditingInfospot.yinfospotactionidfk,
                         })
                         
                         if (!result) throw new Error('Failed to update infospot')
                       } else if (inlineEditingSceneLink) {
                         // Update scene link with all fields
-                        const result = await updateSceneLink(inlineEditingSceneLink.yid, {
-                          name: inlineEditingSceneLink.yname,
-                          targetId: inlineEditingSceneLink.ytargetid,
+                        const result = await updateSceneLink(inlineEditingSceneLink.yscenelinksid, {
+                          name: inlineEditingSceneLink.yscenelinksname,
+                          targetId: inlineEditingSceneLink.yscenesidfktarget,
                           yaw: previewMarkerPosition.yaw,
                           pitch: previewMarkerPosition.pitch,
                         })
@@ -1376,7 +1376,7 @@ export default function TourAdminViewer({
                   variant="destructive"
                   onClick={async () => {
                     const itemType = inlineEditingInfospot ? 'InfoSpot' : 'Scene Link'
-                    const itemName = inlineEditingInfospot ? inlineEditingInfospot.ytitle : inlineEditingSceneLink?.yname
+                    const itemName = inlineEditingInfospot ? inlineEditingInfospot.yinfospotstitle : inlineEditingSceneLink?.yscenelinksname
                     
                     if (!confirm(`Are you sure you want to delete this ${itemType}: &quot;${itemName}&quot;?\n\nThis action cannot be undone.`)) {
                       return
@@ -1385,11 +1385,11 @@ export default function TourAdminViewer({
                     try {
                       if (inlineEditingInfospot) {
                         // Delete infospot using hook
-                        const success = await deleteInfospot(inlineEditingInfospot.yid)
+                        const success = await deleteInfospot(inlineEditingInfospot.yinfospotsid)
                         if (!success) throw new Error('Failed to delete infospot')
                       } else if (inlineEditingSceneLink) {
                         // Delete scene link using hook
-                        const success = await deleteSceneLink(inlineEditingSceneLink.yid)
+                        const success = await deleteSceneLink(inlineEditingSceneLink.yscenelinksid)
                         if (!success) throw new Error('Failed to delete scene link')
                       }
                       
@@ -1585,9 +1585,9 @@ export default function TourAdminViewer({
                       id="adding-scenelink-target"
                     >
                       <option value="">{t('admin.tour.selectTargetScene')}</option>
-                      {scenes.filter(s => s.yid !== currentScene?.yid).map(scene => (
-                        <option key={scene.yid} value={scene.yid}>
-                          {scene.yname}
+                      {scenes.filter(s => s.yscenesid !== currentScene?.yscenesid).map(scene => (
+                        <option key={scene.yscenesid} value={scene.yscenesid.toString()}>
+                          {scene.yscenesname}
                         </option>
                       ))}
                     </select>
@@ -1611,14 +1611,14 @@ export default function TourAdminViewer({
                           return
                         }
                         
-                        if (!currentScene?.yid) {
+                        if (!currentScene?.yscenesid) {
                           alert(t('admin.tour.noCurrentSceneSelected'))
                           return
                         }
                         
                         // Create new infospot using hook
                         const result = await createInfospot({
-                          sceneId: currentScene.yid,
+                          sceneId: currentScene.yscenesid,
                           title: titleInput.value.trim(),
                           text: textInput?.value.trim() || '',
                           yaw: addingMarkerPosition.yaw,
@@ -1642,14 +1642,14 @@ export default function TourAdminViewer({
                           return
                         }
                         
-                        if (!currentScene?.yid) {
+                        if (!currentScene?.yscenesid) {
                           alert(t('admin.tour.noCurrentSceneSelected'))
                           return
                         }
                         
                         // Create new scene link using hook
                         const result = await createSceneLink({
-                          sceneId: currentScene.yid,
+                          sceneId: currentScene.yscenesid,
                           targetId: targetSelect.value,
                           name: nameInput.value.trim(),
                           yaw: addingMarkerPosition.yaw,
@@ -1722,7 +1722,7 @@ export default function TourAdminViewer({
             {/* Modal Header */}
             <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4">
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold">{viewingInfospot.ytitle}</h2>
+                <h2 className="text-lg font-semibold">{viewingInfospot.yinfospotstitle}</h2>
                 <button
                   onClick={() => setViewingInfospot(null)}
                   className="text-white hover:text-gray-200 transition-colors"
@@ -1736,29 +1736,29 @@ export default function TourAdminViewer({
             
             {/* Modal Content */}
             <div className="p-4 overflow-y-auto max-h-96">
-              {viewingInfospot.ytext && (
+              {viewingInfospot.yinfospotstext && (
                 <div className="mb-4">
                   <h3 className="text-sm font-medium text-gray-700 mb-2">{t('admin.tour.description')}</h3>
                   <p className="text-gray-600 leading-relaxed whitespace-pre-wrap">
-                    {viewingInfospot.ytext}
+                    {viewingInfospot.yinfospotstext}
                   </p>
                 </div>
               )}
               
               {/* Show action information if available */}
-              {viewingInfospot.yinfospotactionsidfk && (
+              {viewingInfospot.yinfospotactionidfk && (
                 <div className="mb-4">
                   <h3 className="text-sm font-medium text-gray-700 mb-2">{t('admin.tour.action')}</h3>
                   {(() => {
-                    const action = actions.find(a => a.yinfospotactionsid === viewingInfospot.yinfospotactionsidfk)
+                    const action = actions.find(a => a.yinfospotactionsid === viewingInfospot.yinfospotactionidfk)
                     return action ? (
                       <div className="bg-gray-50 p-3 rounded">
                         <div className="flex items-center gap-2 mb-1">
-                          <Badge variant="outline">{action.ytype}</Badge>
-                          <span className="text-sm font-medium">{action.ytitle}</span>
+                          <Badge variant="outline">{action.yinfospotactionstype}</Badge>
+                          <span className="text-sm font-medium">{action.yinfospotactionstitle}</span>
                         </div>
                         {action.ydescription && (
-                          <p className="text-sm text-gray-600">{action.ydescription}</p>
+                          <p className="text-sm text-gray-600">{action.yinfospotactionsdescription}</p>
                         )}
                       </div>
                     ) : (
@@ -1774,14 +1774,14 @@ export default function TourAdminViewer({
                 <div className="grid grid-cols-2 gap-2 text-xs text-gray-500">
                   <div>
                     <span className="font-medium">{t('admin.tour.position')}:</span>
-                    <div>{t('admin.tour.yaw')}: {viewingInfospot.yyaw.toFixed(3)}</div>
-                    <div>{t('admin.tour.pitch')}: {viewingInfospot.ypitch.toFixed(3)}</div>
+                    <div>{t('admin.tour.yaw')}: {viewingInfospot.yinfospotsaxexyaw.toFixed(3)}</div>
+                    <div>{t('admin.tour.pitch')}: {viewingInfospot.yinfospotsaxeypitch.toFixed(3)}</div>
                   </div>
                   <div>
                     <span className="font-medium">{t('admin.tour.scene')}:</span>
-                    <div>{currentScene?.yname}</div>
+                    <div>{currentScene?.yscenesname}</div>
                     <span className="font-medium">{t('admin.tour.id')}:</span>
-                    <div className="font-mono">{viewingInfospot.yid}</div>
+                    <div className="font-mono">{viewingInfospot.yinfospotsid}</div>
                   </div>
                 </div>
               </div>
@@ -1901,7 +1901,7 @@ export default function TourAdminViewer({
                   try {
                     // Create new action using the hook function
                     const newAction = await createAction({
-                      id: crypto.randomUUID(),
+                      id: Date.now(),
                       type: newActionForm.type,
                       title: newActionForm.title.trim(),
                       description: newActionForm.description.trim() || null
@@ -1910,12 +1910,12 @@ export default function TourAdminViewer({
                     if (newAction) {
                       if (inlineEditingInfospot) {
                         // Auto-assign the new action to the currently editing infospot
-                        setInlineEditingInfospot(prev => prev ? {...prev, yinfospotactionsidfk: newAction.yinfospotactionsid} : null)
+                        setInlineEditingInfospot(prev => prev ? {...prev, yinfospotactionidfk: newAction.yinfospotactionsid} : null)
                       } else if (inlineAddingInfospot) {
                         // Auto-assign the new action to the adding infospot form
                         const actionSelect = document.getElementById('adding-infospot-action') as HTMLSelectElement
                         if (actionSelect) {
-                          actionSelect.value = newAction.yinfospotactionsid
+                          actionSelect.value = newAction.yinfospotactionsid.toString()
                         }
                       }
                     }
@@ -2114,7 +2114,7 @@ export default function TourAdminViewer({
                   try {
                     // Create new scene using the hook function
                     const newScene = await createScene({
-                      id: crypto.randomUUID(),
+                      id: Date.now(),
                       name: newSceneForm.name.trim(),
                       panorama: newSceneForm.panorama.trim(),
                       yaw: newSceneForm.yaw,
@@ -2138,13 +2138,13 @@ export default function TourAdminViewer({
                       
                       // Update URL with new scene ID
                       const newUrl = new URL(window.location.href)
-                      newUrl.searchParams.set('sceneId', newScene.yid)
+                      newUrl.searchParams.set('sceneId', newScene.yscenesid.toString())
                       router.replace(newUrl.pathname + newUrl.search)
                       
                       // Update panorama in viewer
                       if (viewerInstance) {
                         setIsTransitioning(true)
-                        viewerInstance.setPanorama(newScene.ypanorama, {
+                        viewerInstance.setPanorama(newScene.yscenespanorama, {
                           transition: true,
                           showLoader: true,
                         }).then(() => {

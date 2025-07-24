@@ -11,31 +11,31 @@ interface UseSceneLinks {
   loading: boolean
   error: string | null
   createSceneLink: (scenelinkData: {
-    id?: string
-    sceneId: string
-    targetId: string
+    id?: number
+    sceneId: number
+    targetId: number
     name: string
     yaw: number
     pitch: number
   }) => Promise<SceneLink | null>
-  updateSceneLink: (id: string, updateData: {
-    sceneId?: string
-    targetId?: string
+  updateSceneLink: (id: number, updateData: {
+    sceneId?: number
+    targetId?: number
     name?: string
     yaw?: number
     pitch?: number
   }) => Promise<SceneLink | null>
-  deleteSceneLink: (id: string) => Promise<boolean>
-  refreshSceneLinks: (sceneId?: string) => Promise<void>
-  getSceneLinksByScene: (sceneId: string) => SceneLink[]
+  deleteSceneLink: (id: number) => Promise<boolean>
+  refreshSceneLinks: (sceneId?: number) => Promise<void>
+  getSceneLinksByScene: (sceneId: number) => SceneLink[]
 }
 
-export function useSceneLinks(initialSceneId?: string): UseSceneLinks {
+export function useSceneLinks(initialSceneId?: number): UseSceneLinks {
   const [scenelinks, setSceneLinks] = useState<SceneLink[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const fetchSceneLinks = async (sceneId?: string) => {
+  const fetchSceneLinks = async (sceneId?: number) => {
     try {
       setLoading(true)
       setError(null)
@@ -48,7 +48,7 @@ export function useSceneLinks(initialSceneId?: string): UseSceneLinks {
         .select('*')
       
       if (sceneId) {
-        query = query.eq('ysceneid', sceneId)
+        query = query.eq('yscenesidfkactuelle', sceneId)
       }
       
       const { data, error } = await query
@@ -67,9 +67,9 @@ export function useSceneLinks(initialSceneId?: string): UseSceneLinks {
   }
 
   const createSceneLink = async (scenelinkData: {
-    id?: string
-    sceneId: string
-    targetId: string
+    id?: number
+    sceneId: number
+    targetId: number
     name: string
     yaw: number
     pitch: number
@@ -80,12 +80,12 @@ export function useSceneLinks(initialSceneId?: string): UseSceneLinks {
       const supabase = createClient()
       
       const insertData = {
-        yid: scenelinkData.id || crypto.randomUUID(),
-        ysceneid: scenelinkData.sceneId,
-        ytargetid: scenelinkData.targetId,
-        yname: scenelinkData.name,
-        yyaw: scenelinkData.yaw,
-        ypitch: scenelinkData.pitch,
+        yscenelinksid: scenelinkData.id || Date.now(),
+        yscenesidfkactuelle: scenelinkData.sceneId,
+        yscenesidfktarget: scenelinkData.targetId,
+        yscenelinksname: scenelinkData.name,
+        yscenelinksaxexyaw: scenelinkData.yaw,
+        yscenelinksaxeypitch: scenelinkData.pitch,
       }
       
       const { data, error } = await supabase
@@ -109,9 +109,9 @@ export function useSceneLinks(initialSceneId?: string): UseSceneLinks {
     }
   }
 
-  const updateSceneLink = async (id: string, updateData: {
-    sceneId?: string
-    targetId?: string
+  const updateSceneLink = async (id: number, updateData: {
+    sceneId?: number
+    targetId?: number
     name?: string
     yaw?: number
     pitch?: number
@@ -122,17 +122,17 @@ export function useSceneLinks(initialSceneId?: string): UseSceneLinks {
       const supabase = createClient()
       
       const updateFields: any = {}
-      if (updateData.sceneId !== undefined) updateFields.ysceneid = updateData.sceneId
-      if (updateData.targetId !== undefined) updateFields.ytargetid = updateData.targetId
-      if (updateData.name !== undefined) updateFields.yname = updateData.name
-      if (updateData.yaw !== undefined) updateFields.yyaw = updateData.yaw
-      if (updateData.pitch !== undefined) updateFields.ypitch = updateData.pitch
+      if (updateData.sceneId !== undefined) updateFields.yscenesidfkactuelle = updateData.sceneId
+      if (updateData.targetId !== undefined) updateFields.yscenesidfktarget = updateData.targetId
+      if (updateData.name !== undefined) updateFields.yscenelinksname = updateData.name
+      if (updateData.yaw !== undefined) updateFields.yscenelinksaxexyaw = updateData.yaw
+      if (updateData.pitch !== undefined) updateFields.yscenelinksaxeypitch = updateData.pitch
       
       const { data, error } = await supabase
         .schema('morpheus')
         .from('yscenelinks')
         .update(updateFields)
-        .eq('yid', id)
+        .eq('yscenelinksid', id)
         .select('*')
         .single()
       
@@ -142,7 +142,7 @@ export function useSceneLinks(initialSceneId?: string): UseSceneLinks {
       
       const updatedSceneLink = data
       setSceneLinks(prev => prev.map(scenelink =>
-        scenelink.yid === id ? updatedSceneLink : scenelink
+        scenelink.yscenelinksid === id ? updatedSceneLink : scenelink
       ))
       return updatedSceneLink
     } catch (err) {
@@ -152,7 +152,7 @@ export function useSceneLinks(initialSceneId?: string): UseSceneLinks {
     }
   }
 
-  const deleteSceneLink = async (id: string): Promise<boolean> => {
+  const deleteSceneLink = async (id: number): Promise<boolean> => {
     try {
       setError(null)
       
@@ -162,13 +162,13 @@ export function useSceneLinks(initialSceneId?: string): UseSceneLinks {
         .schema('morpheus')
         .from('yscenelinks')
         .delete()
-        .eq('yid', id)
+        .eq('yscenelinksid', id)
       
       if (error) {
         throw new Error(error.message || 'Failed to delete scene link')
       }
       
-      setSceneLinks(prev => prev.filter(scenelink => scenelink.yid !== id))
+      setSceneLinks(prev => prev.filter(scenelink => scenelink.yscenelinksid !== id))
       return true
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')
@@ -177,12 +177,12 @@ export function useSceneLinks(initialSceneId?: string): UseSceneLinks {
     }
   }
 
-  const refreshSceneLinks = async (sceneId?: string) => {
+  const refreshSceneLinks = async (sceneId?: number) => {
     await fetchSceneLinks(sceneId)
   }
 
-  const getSceneLinksByScene = (sceneId: string): SceneLink[] => {
-    return scenelinks.filter(scenelink => scenelink.ysceneid === sceneId)
+  const getSceneLinksByScene = (sceneId: number): SceneLink[] => {
+    return scenelinks.filter(scenelink => scenelink.yscenesidfkactuelle === sceneId)
   }
 
   useEffect(() => {

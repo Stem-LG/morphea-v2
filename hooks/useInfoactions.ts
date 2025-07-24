@@ -11,7 +11,7 @@ interface UseInfoactions {
   loading: boolean
   error: string | null
   createAction: (actionData: {
-    id?: string
+    id?: number
     type: string
     title?: string | null
     description?: string | null
@@ -19,7 +19,7 @@ interface UseInfoactions {
     customHandler?: string | null
     boutiqueId?: number | null
   }) => Promise<InfoSpotAction | null>
-  updateAction: (id: string, updateData: {
+  updateAction: (id: number, updateData: {
     type?: string
     title?: string | null
     description?: string | null
@@ -27,7 +27,7 @@ interface UseInfoactions {
     customHandler?: string | null
     boutiqueId?: number | null
   }) => Promise<InfoSpotAction | null>
-  deleteAction: (id: string) => Promise<boolean>
+  deleteAction: (id: number) => Promise<boolean>
   refreshActions: () => Promise<void>
 }
 
@@ -63,7 +63,7 @@ export function useInfoactions(): UseInfoactions {
   }
 
   const createAction = async (actionData: {
-    id?: string
+    id?: number
     type: string
     title?: string | null
     description?: string | null
@@ -78,12 +78,12 @@ export function useInfoactions(): UseInfoactions {
         .schema('morpheus')
         .from('yinfospotactions')
         .insert([{
-          yinfospotactionsid: actionData.id,
-          ytype: actionData.type,
-          ytitle: actionData.title,
-          ydescription: actionData.description,
-          ymodaltype: actionData.modalType,
-          ycustomhandler: actionData.customHandler,
+          yinfospotactionsid: actionData.id || Date.now(),
+          yinfospotactionstype: actionData.type,
+          yinfospotactionstitle: actionData.title,
+          yinfospotactionsdescription: actionData.description,
+          yinfospotactionsmodaltype: actionData.modalType,
+          yinfospotactionscustomhandler: actionData.customHandler,
           yboutiqueidfk: actionData.boutiqueId,
         }])
         .select()
@@ -103,7 +103,7 @@ export function useInfoactions(): UseInfoactions {
     }
   }
 
-  const updateAction = async (id: string, updateData: {
+  const updateAction = async (id: number, updateData: {
     type?: string
     title?: string | null
     description?: string | null
@@ -118,11 +118,11 @@ export function useInfoactions(): UseInfoactions {
         .schema('morpheus')
         .from('yinfospotactions')
         .update({
-          ...(updateData.type !== undefined && { ytype: updateData.type }),
-          ...(updateData.title !== undefined && { ytitle: updateData.title }),
-          ...(updateData.description !== undefined && { ydescription: updateData.description }),
-          ...(updateData.modalType !== undefined && { ymodaltype: updateData.modalType }),
-          ...(updateData.customHandler !== undefined && { ycustomhandler: updateData.customHandler }),
+          ...(updateData.type !== undefined && { yinfospotactionstype: updateData.type }),
+          ...(updateData.title !== undefined && { yinfospotactionstitle: updateData.title }),
+          ...(updateData.description !== undefined && { yinfospotactionsdescription: updateData.description }),
+          ...(updateData.modalType !== undefined && { yinfospotactionsmodaltype: updateData.modalType }),
+          ...(updateData.customHandler !== undefined && { yinfospotactionscustomhandler: updateData.customHandler }),
           ...(updateData.boutiqueId !== undefined && { yboutiqueidfk: updateData.boutiqueId }),
         })
         .eq('yinfospotactionsid', id)
@@ -145,7 +145,7 @@ export function useInfoactions(): UseInfoactions {
     }
   }
 
-  const deleteAction = async (id: string): Promise<boolean> => {
+  const deleteAction = async (id: number): Promise<boolean> => {
     try {
       setError(null)
       

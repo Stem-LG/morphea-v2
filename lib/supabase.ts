@@ -39,6 +39,153 @@ export type Database = {
   }
   morpheus: {
     Tables: {
+      xcategprod: {
+        Row: {
+          sysaction: string | null
+          sysadresseip: string | null
+          sysdate: string | null
+          sysuser: string | null
+          xcategprodcode: string
+          xcategprodid: number
+          xcategprodinfobulle: string
+          xcategprodintitule: string
+        }
+        Insert: {
+          sysaction?: string | null
+          sysadresseip?: string | null
+          sysdate?: string | null
+          sysuser?: string | null
+          xcategprodcode: string
+          xcategprodid: number
+          xcategprodinfobulle: string
+          xcategprodintitule: string
+        }
+        Update: {
+          sysaction?: string | null
+          sysadresseip?: string | null
+          sysdate?: string | null
+          sysuser?: string | null
+          xcategprodcode?: string
+          xcategprodid?: number
+          xcategprodinfobulle?: string
+          xcategprodintitule?: string
+        }
+        Relationships: []
+      }
+      xcouleur: {
+        Row: {
+          sysaction: string | null
+          sysadresseip: string | null
+          sysdate: string | null
+          sysuser: string | null
+          xcouleurcode: string
+          xcouleurhexa: string
+          xcouleurid: number
+          xcouleurintitule: string
+          xcouleurrvb: string
+        }
+        Insert: {
+          sysaction?: string | null
+          sysadresseip?: string | null
+          sysdate?: string | null
+          sysuser?: string | null
+          xcouleurcode: string
+          xcouleurhexa: string
+          xcouleurid: number
+          xcouleurintitule: string
+          xcouleurrvb: string
+        }
+        Update: {
+          sysaction?: string | null
+          sysadresseip?: string | null
+          sysdate?: string | null
+          sysuser?: string | null
+          xcouleurcode?: string
+          xcouleurhexa?: string
+          xcouleurid?: number
+          xcouleurintitule?: string
+          xcouleurrvb?: string
+        }
+        Relationships: []
+      }
+      xdevise: {
+        Row: {
+          sysaction: string | null
+          sysadresseip: string | null
+          sysdate: string | null
+          sysuser: string | null
+          xdeviseboolautorisepaiement: string
+          xdevisecodealpha: string
+          xdevisecodenum: string
+          xdeviseid: number
+          xdeviseintitule: string
+          xdevisenbrdec: number
+        }
+        Insert: {
+          sysaction?: string | null
+          sysadresseip?: string | null
+          sysdate?: string | null
+          sysuser?: string | null
+          xdeviseboolautorisepaiement: string
+          xdevisecodealpha: string
+          xdevisecodenum: string
+          xdeviseid: number
+          xdeviseintitule: string
+          xdevisenbrdec: number
+        }
+        Update: {
+          sysaction?: string | null
+          sysadresseip?: string | null
+          sysdate?: string | null
+          sysuser?: string | null
+          xdeviseboolautorisepaiement?: string
+          xdevisecodealpha?: string
+          xdevisecodenum?: string
+          xdeviseid?: number
+          xdeviseintitule?: string
+          xdevisenbrdec?: number
+        }
+        Relationships: []
+      }
+      xtaille: {
+        Row: {
+          sysaction: string | null
+          sysadresseip: string | null
+          sysdate: string | null
+          sysuser: string | null
+          xtaillecode: string
+          xtailleeur: string | null
+          xtailleid: number
+          xtailleintitule: string
+          xtailleus: string | null
+          xtaillex: string | null
+        }
+        Insert: {
+          sysaction?: string | null
+          sysadresseip?: string | null
+          sysdate?: string | null
+          sysuser?: string | null
+          xtaillecode: string
+          xtailleeur?: string | null
+          xtailleid: number
+          xtailleintitule: string
+          xtailleus?: string | null
+          xtaillex?: string | null
+        }
+        Update: {
+          sysaction?: string | null
+          sysadresseip?: string | null
+          sysdate?: string | null
+          sysuser?: string | null
+          xtaillecode?: string
+          xtailleeur?: string | null
+          xtailleid?: number
+          xtailleintitule?: string
+          xtailleus?: string | null
+          xtaillex?: string | null
+        }
+        Relationships: []
+      }
       yboutique: {
         Row: {
           sysaction: string | null
@@ -75,7 +222,7 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "fk_ymall"
+            foreignKeyName: "yboutique_ymallidfk_fkey"
             columns: ["ymallidfk"]
             isOneToOne: false
             referencedRelation: "ymall"
@@ -83,84 +230,128 @@ export type Database = {
           },
         ]
       }
-      ydesigneur: {
+      ycompte: {
         Row: {
           sysaction: string | null
           sysadresseip: string | null
           sysdate: string | null
           sysuser: string | null
-          ydesigneuractivitedate: string | null
-          ydesigneurcode: string
-          ydesigneurcontactemail: string
-          ydesigneurcontactpersonne: string
-          ydesigneurcontacttelephone: string
-          ydesigneurcouleur1codehexa: string | null
-          ydesigneurcouleur1codervb: string | null
-          ydesigneurcouleur1dsg: string | null
-          ydesigneurcouleur2codehexa: string | null
-          ydesigneurcouleur2codervb: string | null
-          ydesigneurcouleur2dsg: string | null
-          ydesigneurcouleur3codehexa: string | null
-          ydesigneurcouleur3codervb: string | null
-          ydesigneurcouleur3dsg: string | null
-          ydesigneurid: number
-          ydesigneurmarque: string
-          ydesigneurmorpheusdate: string
-          ydesigneurnom: string
-          ydesigneurpays: string
-          ydesigneurspecialite: string
+          ycomptecreationdate: string
+          ycompteid: number
+          ycompteno: string
+          ycomptestatut: string
+          yvisiteuridfk: number
         }
         Insert: {
           sysaction?: string | null
           sysadresseip?: string | null
           sysdate?: string | null
           sysuser?: string | null
-          ydesigneuractivitedate?: string | null
-          ydesigneurcode: string
-          ydesigneurcontactemail: string
-          ydesigneurcontactpersonne: string
-          ydesigneurcontacttelephone: string
-          ydesigneurcouleur1codehexa?: string | null
-          ydesigneurcouleur1codervb?: string | null
-          ydesigneurcouleur1dsg?: string | null
-          ydesigneurcouleur2codehexa?: string | null
-          ydesigneurcouleur2codervb?: string | null
-          ydesigneurcouleur2dsg?: string | null
-          ydesigneurcouleur3codehexa?: string | null
-          ydesigneurcouleur3codervb?: string | null
-          ydesigneurcouleur3dsg?: string | null
-          ydesigneurid: number
-          ydesigneurmarque: string
-          ydesigneurmorpheusdate: string
-          ydesigneurnom: string
-          ydesigneurpays: string
-          ydesigneurspecialite: string
+          ycomptecreationdate: string
+          ycompteid: number
+          ycompteno: string
+          ycomptestatut: string
+          yvisiteuridfk: number
         }
         Update: {
           sysaction?: string | null
           sysadresseip?: string | null
           sysdate?: string | null
           sysuser?: string | null
-          ydesigneuractivitedate?: string | null
-          ydesigneurcode?: string
-          ydesigneurcontactemail?: string
-          ydesigneurcontactpersonne?: string
-          ydesigneurcontacttelephone?: string
-          ydesigneurcouleur1codehexa?: string | null
-          ydesigneurcouleur1codervb?: string | null
-          ydesigneurcouleur1dsg?: string | null
-          ydesigneurcouleur2codehexa?: string | null
-          ydesigneurcouleur2codervb?: string | null
-          ydesigneurcouleur2dsg?: string | null
-          ydesigneurcouleur3codehexa?: string | null
-          ydesigneurcouleur3codervb?: string | null
-          ydesigneurcouleur3dsg?: string | null
-          ydesigneurid?: number
-          ydesigneurmarque?: string
-          ydesigneurmorpheusdate?: string
-          ydesigneurnom?: string
-          ydesigneurpays?: string
-          ydesigneurspecialite?: string
+          ycomptecreationdate?: string
+          ycompteid?: number
+          ycompteno?: string
+          ycomptestatut?: string
+          yvisiteuridfk?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ycompte_yvisiteuridfk_fkey"
+            columns: ["yvisiteuridfk"]
+            isOneToOne: false
+            referencedRelation: "yvisiteur"
+            referencedColumns: ["yvisiteurid"]
+          },
+        ]
+      }
+      ydesign: {
+        Row: {
+          sysaction: string | null
+          sysadresseip: string | null
+          sysdate: string | null
+          sysuser: string | null
+          ydesignactivitedate: string | null
+          ydesigncode: string
+          ydesigncontactemail: string
+          ydesigncontactpersonne: string
+          ydesigncontacttelephone: string
+          ydesigncouleur1codehexa: string | null
+          ydesigncouleur1codervb: string | null
+          ydesigncouleur1dsg: string | null
+          ydesigncouleur2codehexa: string | null
+          ydesigncouleur2codervb: string | null
+          ydesigncouleur2dsg: string | null
+          ydesigncouleur3codehexa: string | null
+          ydesigncouleur3codervb: string | null
+          ydesigncouleur3dsg: string | null
+          ydesignid: number
+          ydesignmarque: string
+          ydesignmorpheusdate: string
+          ydesignnom: string
+          ydesignpays: string
+          ydesignspecialite: string
+        }
+        Insert: {
+          sysaction?: string | null
+          sysadresseip?: string | null
+          sysdate?: string | null
+          sysuser?: string | null
+          ydesignactivitedate?: string | null
+          ydesigncode: string
+          ydesigncontactemail: string
+          ydesigncontactpersonne: string
+          ydesigncontacttelephone: string
+          ydesigncouleur1codehexa?: string | null
+          ydesigncouleur1codervb?: string | null
+          ydesigncouleur1dsg?: string | null
+          ydesigncouleur2codehexa?: string | null
+          ydesigncouleur2codervb?: string | null
+          ydesigncouleur2dsg?: string | null
+          ydesigncouleur3codehexa?: string | null
+          ydesigncouleur3codervb?: string | null
+          ydesigncouleur3dsg?: string | null
+          ydesignid: number
+          ydesignmarque: string
+          ydesignmorpheusdate: string
+          ydesignnom: string
+          ydesignpays: string
+          ydesignspecialite: string
+        }
+        Update: {
+          sysaction?: string | null
+          sysadresseip?: string | null
+          sysdate?: string | null
+          sysuser?: string | null
+          ydesignactivitedate?: string | null
+          ydesigncode?: string
+          ydesigncontactemail?: string
+          ydesigncontactpersonne?: string
+          ydesigncontacttelephone?: string
+          ydesigncouleur1codehexa?: string | null
+          ydesigncouleur1codervb?: string | null
+          ydesigncouleur1dsg?: string | null
+          ydesigncouleur2codehexa?: string | null
+          ydesigncouleur2codervb?: string | null
+          ydesigncouleur2dsg?: string | null
+          ydesigncouleur3codehexa?: string | null
+          ydesigncouleur3codervb?: string | null
+          ydesigncouleur3dsg?: string | null
+          ydesignid?: number
+          ydesignmarque?: string
+          ydesignmorpheusdate?: string
+          ydesignnom?: string
+          ydesignpays?: string
+          ydesignspecialite?: string
         }
         Relationships: []
       }
@@ -171,11 +362,11 @@ export type Database = {
           sysdate: string | null
           sysuser: string | null
           yboutiqueidfk: number | null
-          ydesigneuridfk: number | null
+          ydesignidfk: number | null
           ydetailseventid: number
           yeventidfk: number
           ymallidfk: number
-          yproduitidfk: number | null
+          yprodidfk: number | null
         }
         Insert: {
           sysaction?: string | null
@@ -183,11 +374,11 @@ export type Database = {
           sysdate?: string | null
           sysuser?: string | null
           yboutiqueidfk?: number | null
-          ydesigneuridfk?: number | null
+          ydesignidfk?: number | null
           ydetailseventid: number
           yeventidfk: number
           ymallidfk: number
-          yproduitidfk?: number | null
+          yprodidfk?: number | null
         }
         Update: {
           sysaction?: string | null
@@ -195,47 +386,47 @@ export type Database = {
           sysdate?: string | null
           sysuser?: string | null
           yboutiqueidfk?: number | null
-          ydesigneuridfk?: number | null
+          ydesignidfk?: number | null
           ydetailseventid?: number
           yeventidfk?: number
           ymallidfk?: number
-          yproduitidfk?: number | null
+          yprodidfk?: number | null
         }
         Relationships: [
           {
-            foreignKeyName: "fk_yboutique"
+            foreignKeyName: "ydetailsevent_yboutiqueidfk_fkey"
             columns: ["yboutiqueidfk"]
             isOneToOne: false
             referencedRelation: "yboutique"
             referencedColumns: ["yboutiqueid"]
           },
           {
-            foreignKeyName: "fk_ydesigneur"
-            columns: ["ydesigneuridfk"]
+            foreignKeyName: "ydetailsevent_ydesignidfk_fkey"
+            columns: ["ydesignidfk"]
             isOneToOne: false
-            referencedRelation: "ydesigneur"
-            referencedColumns: ["ydesigneurid"]
+            referencedRelation: "ydesign"
+            referencedColumns: ["ydesignid"]
           },
           {
-            foreignKeyName: "fk_yevent"
+            foreignKeyName: "ydetailsevent_yeventidfk_fkey"
             columns: ["yeventidfk"]
-            isOneToOne: true
+            isOneToOne: false
             referencedRelation: "yevent"
             referencedColumns: ["yeventid"]
           },
           {
-            foreignKeyName: "fk_ymall"
+            foreignKeyName: "ydetailsevent_ymallidfk_fkey"
             columns: ["ymallidfk"]
             isOneToOne: false
             referencedRelation: "ymall"
             referencedColumns: ["ymallid"]
           },
           {
-            foreignKeyName: "fk_yproduit"
-            columns: ["yproduitidfk"]
+            foreignKeyName: "ydetailsevent_yprodidfk_fkey"
+            columns: ["yprodidfk"]
             isOneToOne: false
-            referencedRelation: "yproduit"
-            referencedColumns: ["yproduitid"]
+            referencedRelation: "yprod"
+            referencedColumns: ["yprodid"]
           },
         ]
       }
@@ -250,7 +441,7 @@ export type Database = {
           yeventdatefin: string
           yeventid: number
           yeventintitule: string
-          yvideoidfk: number
+          ymediaidfk: number
         }
         Insert: {
           sysaction?: string | null
@@ -262,7 +453,7 @@ export type Database = {
           yeventdatefin: string
           yeventid: number
           yeventintitule: string
-          yvideoidfk: number
+          ymediaidfk: number
         }
         Update: {
           sysaction?: string | null
@@ -274,48 +465,49 @@ export type Database = {
           yeventdatefin?: string
           yeventid?: number
           yeventintitule?: string
-          yvideoidfk?: number
+          ymediaidfk?: number
         }
-        Relationships: [
-          {
-            foreignKeyName: "fk_yvideo"
-            columns: ["yvideoidfk"]
-            isOneToOne: false
-            referencedRelation: "yvideo"
-            referencedColumns: ["yvideoid"]
-          },
-        ]
+        Relationships: []
       }
       yinfospotactions: {
         Row: {
-          yboutiqueidfk: number | null
-          ycreatedat: string | null
-          ycustomhandler: string | null
-          ydescription: string | null
-          yinfospotactionsid: string
-          ymodaltype: string | null
-          ytitle: string | null
-          ytype: string
+          sysaction: string | null
+          sysadresseip: string | null
+          sysdate: string | null
+          sysuser: string | null
+          yboutiqueidfk: number
+          yinfospotactionscustomhandler: string
+          yinfospotactionsdescription: string
+          yinfospotactionsid: number
+          yinfospotactionsmodaltype: string
+          yinfospotactionstitle: string
+          yinfospotactionstype: string
         }
         Insert: {
-          yboutiqueidfk?: number | null
-          ycreatedat?: string | null
-          ycustomhandler?: string | null
-          ydescription?: string | null
-          yinfospotactionsid: string
-          ymodaltype?: string | null
-          ytitle?: string | null
-          ytype: string
+          sysaction?: string | null
+          sysadresseip?: string | null
+          sysdate?: string | null
+          sysuser?: string | null
+          yboutiqueidfk: number
+          yinfospotactionscustomhandler: string
+          yinfospotactionsdescription: string
+          yinfospotactionsid: number
+          yinfospotactionsmodaltype: string
+          yinfospotactionstitle: string
+          yinfospotactionstype: string
         }
         Update: {
-          yboutiqueidfk?: number | null
-          ycreatedat?: string | null
-          ycustomhandler?: string | null
-          ydescription?: string | null
-          yinfospotactionsid?: string
-          ymodaltype?: string | null
-          ytitle?: string | null
-          ytype?: string
+          sysaction?: string | null
+          sysadresseip?: string | null
+          sysdate?: string | null
+          sysuser?: string | null
+          yboutiqueidfk?: number
+          yinfospotactionscustomhandler?: string
+          yinfospotactionsdescription?: string
+          yinfospotactionsid?: number
+          yinfospotactionsmodaltype?: string
+          yinfospotactionstitle?: string
+          yinfospotactionstype?: string
         }
         Relationships: [
           {
@@ -329,49 +521,58 @@ export type Database = {
       }
       yinfospots: {
         Row: {
-          ycreatedat: string | null
-          yid: string
-          yinfospotactionsidfk: string | null
-          ypitch: number
-          ysceneid: string | null
-          ytext: string
-          ytitle: string
-          yyaw: number
+          sysaction: string | null
+          sysadresseip: string | null
+          sysdate: string | null
+          sysuser: string | null
+          yinfospotactionidfk: number
+          yinfospotsaxexyaw: number
+          yinfospotsaxeypitch: number
+          yinfospotsid: number
+          yinfospotstext: string
+          yinfospotstitle: string
+          yscenesidfk: number
         }
         Insert: {
-          ycreatedat?: string | null
-          yid?: string
-          yinfospotactionsidfk?: string | null
-          ypitch: number
-          ysceneid?: string | null
-          ytext: string
-          ytitle: string
-          yyaw: number
+          sysaction?: string | null
+          sysadresseip?: string | null
+          sysdate?: string | null
+          sysuser?: string | null
+          yinfospotactionidfk: number
+          yinfospotsaxexyaw: number
+          yinfospotsaxeypitch: number
+          yinfospotsid: number
+          yinfospotstext: string
+          yinfospotstitle: string
+          yscenesidfk: number
         }
         Update: {
-          ycreatedat?: string | null
-          yid?: string
-          yinfospotactionsidfk?: string | null
-          ypitch?: number
-          ysceneid?: string | null
-          ytext?: string
-          ytitle?: string
-          yyaw?: number
+          sysaction?: string | null
+          sysadresseip?: string | null
+          sysdate?: string | null
+          sysuser?: string | null
+          yinfospotactionidfk?: number
+          yinfospotsaxexyaw?: number
+          yinfospotsaxeypitch?: number
+          yinfospotsid?: number
+          yinfospotstext?: string
+          yinfospotstitle?: string
+          yscenesidfk?: number
         }
         Relationships: [
           {
-            foreignKeyName: "yinfospots_yinfospotactionsidfk_fkey"
-            columns: ["yinfospotactionsidfk"]
+            foreignKeyName: "yinfospots_yinfospotactionidfk_fkey"
+            columns: ["yinfospotactionidfk"]
             isOneToOne: false
             referencedRelation: "yinfospotactions"
             referencedColumns: ["yinfospotactionsid"]
           },
           {
-            foreignKeyName: "yinfospots_ysceneid_fkey"
-            columns: ["ysceneid"]
+            foreignKeyName: "yinfospots_yscenesidfk_fkey"
+            columns: ["yscenesidfk"]
             isOneToOne: false
             referencedRelation: "yscenes"
-            referencedColumns: ["yid"]
+            referencedColumns: ["yscenesid"]
           },
         ]
       }
@@ -379,7 +580,7 @@ export type Database = {
         Row: {
           sysaction: string | null
           sysadresseip: string | null
-          sysdate: string
+          sysdate: string | null
           sysuser: string | null
           ymalladresse: string
           ymallcode: string
@@ -393,7 +594,7 @@ export type Database = {
         Insert: {
           sysaction?: string | null
           sysadresseip?: string | null
-          sysdate: string
+          sysdate?: string | null
           sysuser?: string | null
           ymalladresse: string
           ymallcode: string
@@ -407,7 +608,7 @@ export type Database = {
         Update: {
           sysaction?: string | null
           sysadresseip?: string | null
-          sysdate?: string
+          sysdate?: string | null
           sysuser?: string | null
           ymalladresse?: string
           ymallcode?: string
@@ -456,7 +657,7 @@ export type Database = {
         }
         Relationships: []
       }
-      ymannequinproduit: {
+      ymannequinprod: {
         Row: {
           sysaction: string | null
           sysadresseip: string | null
@@ -464,9 +665,9 @@ export type Database = {
           sysuser: string | null
           yeventidfk: number
           ymannequinidfk: number
-          ymannequinproduitdate: string
-          ymannequinproduitid: number
-          yproduitidfk: number
+          ymannequinproddate: string
+          ymannequinprodid: number
+          yprodidfk: number
         }
         Insert: {
           sysaction?: string | null
@@ -475,9 +676,9 @@ export type Database = {
           sysuser?: string | null
           yeventidfk: number
           ymannequinidfk: number
-          ymannequinproduitdate: string
-          ymannequinproduitid: number
-          yproduitidfk: number
+          ymannequinproddate: string
+          ymannequinprodid: number
+          yprodidfk: number
         }
         Update: {
           sysaction?: string | null
@@ -486,335 +687,457 @@ export type Database = {
           sysuser?: string | null
           yeventidfk?: number
           ymannequinidfk?: number
-          ymannequinproduitdate?: string
-          ymannequinproduitid?: number
-          yproduitidfk?: number
+          ymannequinproddate?: string
+          ymannequinprodid?: number
+          yprodidfk?: number
         }
         Relationships: [
           {
-            foreignKeyName: "fk_yevent"
+            foreignKeyName: "ymannequinprod_yeventidfk_fkey"
             columns: ["yeventidfk"]
-            isOneToOne: true
+            isOneToOne: false
             referencedRelation: "yevent"
             referencedColumns: ["yeventid"]
           },
           {
-            foreignKeyName: "fk_ymannequin"
+            foreignKeyName: "ymannequinprod_ymannequinidfk_fkey"
             columns: ["ymannequinidfk"]
             isOneToOne: false
             referencedRelation: "ymannequin"
             referencedColumns: ["ymannequinid"]
           },
           {
-            foreignKeyName: "fk_yproduit"
-            columns: ["yproduitidfk"]
+            foreignKeyName: "ymannequinprod_yprodidfk_fkey"
+            columns: ["yprodidfk"]
             isOneToOne: false
-            referencedRelation: "yproduit"
-            referencedColumns: ["yproduitid"]
+            referencedRelation: "yprod"
+            referencedColumns: ["yprodid"]
           },
         ]
       }
-      yobjet3d: {
+      ymedia: {
         Row: {
-          couleur: string | null
-          created_at: string
-          id: number
-          order: number | null
-          produit_id: number | null
-          url: string | null
-          yaction: string
+          sysaction: string | null
+          sysadresseip: string | null
+          sysdate: string | null
+          sysuser: string | null
+          ymediaboolphotoevent: string
+          ymediaboolphotoprod: string
+          ymediaboolvideocapsule: string
+          ymediacode: string
+          ymediadate: string
+          ymediaid: number
+          ymediaintitule: string
         }
         Insert: {
-          couleur?: string | null
-          created_at?: string
-          id?: number
-          order?: number | null
-          produit_id?: number | null
-          url?: string | null
-          yaction?: string
+          sysaction?: string | null
+          sysadresseip?: string | null
+          sysdate?: string | null
+          sysuser?: string | null
+          ymediaboolphotoevent: string
+          ymediaboolphotoprod: string
+          ymediaboolvideocapsule: string
+          ymediacode: string
+          ymediadate: string
+          ymediaid: number
+          ymediaintitule: string
         }
         Update: {
-          couleur?: string | null
-          created_at?: string
-          id?: number
-          order?: number | null
-          produit_id?: number | null
-          url?: string | null
-          yaction?: string
+          sysaction?: string | null
+          sysadresseip?: string | null
+          sysdate?: string | null
+          sysuser?: string | null
+          ymediaboolphotoevent?: string
+          ymediaboolphotoprod?: string
+          ymediaboolvideocapsule?: string
+          ymediacode?: string
+          ymediadate?: string
+          ymediaid?: number
+          ymediaintitule?: string
+        }
+        Relationships: []
+      }
+      yobjet3d: {
+        Row: {
+          sysaction: string | null
+          sysadresseip: string | null
+          sysdate: string | null
+          sysuser: string | null
+          yobjet3daction: string
+          yobjet3dcouleur: string
+          yobjet3did: number
+          yobjet3dorder: number
+          yobjet3durl: string
+          yvarprodidfk: number
+        }
+        Insert: {
+          sysaction?: string | null
+          sysadresseip?: string | null
+          sysdate?: string | null
+          sysuser?: string | null
+          yobjet3daction: string
+          yobjet3dcouleur: string
+          yobjet3did: number
+          yobjet3dorder: number
+          yobjet3durl: string
+          yvarprodidfk: number
+        }
+        Update: {
+          sysaction?: string | null
+          sysadresseip?: string | null
+          sysdate?: string | null
+          sysuser?: string | null
+          yobjet3daction?: string
+          yobjet3dcouleur?: string
+          yobjet3did?: number
+          yobjet3dorder?: number
+          yobjet3durl?: string
+          yvarprodidfk?: number
         }
         Relationships: [
           {
-            foreignKeyName: "yobjet3d_produit_id_fkey"
-            columns: ["produit_id"]
+            foreignKeyName: "yobjet3d_yvarprodidfk_fkey"
+            columns: ["yvarprodidfk"]
             isOneToOne: false
-            referencedRelation: "yproduit"
-            referencedColumns: ["yproduitid"]
+            referencedRelation: "yvarprod"
+            referencedColumns: ["yvarprodid"]
           },
         ]
       }
       ypanier: {
         Row: {
-          created_at: string
-          id: number
-          ycouleur: string | null
-          yproduit_id: number
-          yquantite: number
-          yuser_id: string
+          sysaction: string | null
+          sysadresseip: string | null
+          sysdate: string | null
+          sysuser: string | null
+          ycompteidfk: number
+          ypanierid: number
+          ypanierqte: number
+          yvarprodidfk: number
         }
         Insert: {
-          created_at?: string
-          id?: number
-          ycouleur?: string | null
-          yproduit_id: number
-          yquantite: number
-          yuser_id?: string
+          sysaction?: string | null
+          sysadresseip?: string | null
+          sysdate?: string | null
+          sysuser?: string | null
+          ycompteidfk: number
+          ypanierid: number
+          ypanierqte: number
+          yvarprodidfk: number
         }
         Update: {
-          created_at?: string
-          id?: number
-          ycouleur?: string | null
-          yproduit_id?: number
-          yquantite?: number
-          yuser_id?: string
+          sysaction?: string | null
+          sysadresseip?: string | null
+          sysdate?: string | null
+          sysuser?: string | null
+          ycompteidfk?: number
+          ypanierid?: number
+          ypanierqte?: number
+          yvarprodidfk?: number
         }
         Relationships: [
           {
-            foreignKeyName: "ypanier_yproduit_id_fkey"
-            columns: ["yproduit_id"]
+            foreignKeyName: "ypanier_ycompteidfk_fkey"
+            columns: ["ycompteidfk"]
             isOneToOne: false
-            referencedRelation: "yproduit"
-            referencedColumns: ["yproduitid"]
+            referencedRelation: "ycompte"
+            referencedColumns: ["ycompteid"]
+          },
+          {
+            foreignKeyName: "ypanier_yvarprodidfk_fkey"
+            columns: ["yvarprodidfk"]
+            isOneToOne: false
+            referencedRelation: "yvarprod"
+            referencedColumns: ["yvarprodid"]
           },
         ]
       }
-      yphoto: {
+      yprod: {
         Row: {
           sysaction: string | null
           sysadresseip: string | null
           sysdate: string | null
           sysuser: string | null
-          yphotobooleditoriale: string
-          yphotocode: string
-          yphotodate: string
-          yphotoid: number
-          yphotointitule: string
+          xcategprodidfk: number | null
+          ydesignidfk: number
+          yprodcode: string
+          yproddetailstech: string
+          yprodid: number
+          yprodinfobulle: string
+          yprodintitule: string
+          yprodstatut: string
         }
         Insert: {
           sysaction?: string | null
           sysadresseip?: string | null
           sysdate?: string | null
           sysuser?: string | null
-          yphotobooleditoriale: string
-          yphotocode: string
-          yphotodate: string
-          yphotoid: number
-          yphotointitule: string
+          xcategprodidfk?: number | null
+          ydesignidfk: number
+          yprodcode: string
+          yproddetailstech: string
+          yprodid: number
+          yprodinfobulle: string
+          yprodintitule: string
+          yprodstatut: string
         }
         Update: {
           sysaction?: string | null
           sysadresseip?: string | null
           sysdate?: string | null
           sysuser?: string | null
-          yphotobooleditoriale?: string
-          yphotocode?: string
-          yphotodate?: string
-          yphotoid?: number
-          yphotointitule?: string
-        }
-        Relationships: []
-      }
-      yproduit: {
-        Row: {
-          imageurl: string | null
-          sysaction: string | null
-          sysadresseip: string | null
-          sysdate: string | null
-          sysuser: string | null
-          yaction: string
-          yarriereplancouleur: string | null
-          ydesigneuridfk: number | null
-          yinfospotactionsidfk: string
-          yproduitcode: string
-          yproduitdetailstech: string
-          yproduitid: number
-          yproduitintitule: string
-          ystatus: string
-          yvideoidfk: number | null
-        }
-        Insert: {
-          imageurl?: string | null
-          sysaction?: string | null
-          sysadresseip?: string | null
-          sysdate?: string | null
-          sysuser?: string | null
-          yaction?: string
-          yarriereplancouleur?: string | null
-          ydesigneuridfk?: number | null
-          yinfospotactionsidfk: string
-          yproduitcode: string
-          yproduitdetailstech: string
-          yproduitid?: number
-          yproduitintitule: string
-          ystatus?: string
-          yvideoidfk?: number | null
-        }
-        Update: {
-          imageurl?: string | null
-          sysaction?: string | null
-          sysadresseip?: string | null
-          sysdate?: string | null
-          sysuser?: string | null
-          yaction?: string
-          yarriereplancouleur?: string | null
-          ydesigneuridfk?: number | null
-          yinfospotactionsidfk?: string
-          yproduitcode?: string
-          yproduitdetailstech?: string
-          yproduitid?: number
-          yproduitintitule?: string
-          ystatus?: string
-          yvideoidfk?: number | null
+          xcategprodidfk?: number | null
+          ydesignidfk?: number
+          yprodcode?: string
+          yproddetailstech?: string
+          yprodid?: number
+          yprodinfobulle?: string
+          yprodintitule?: string
+          yprodstatut?: string
         }
         Relationships: [
           {
-            foreignKeyName: "fk_ydesigneur"
-            columns: ["ydesigneuridfk"]
+            foreignKeyName: "yprod_xcategprodidfk_fkey"
+            columns: ["xcategprodidfk"]
             isOneToOne: false
-            referencedRelation: "ydesigneur"
-            referencedColumns: ["ydesigneurid"]
+            referencedRelation: "xcategprod"
+            referencedColumns: ["xcategprodid"]
           },
           {
-            foreignKeyName: "fk_yvideo"
-            columns: ["yvideoidfk"]
+            foreignKeyName: "yprod_ydesignidfk_fkey"
+            columns: ["ydesignidfk"]
             isOneToOne: false
-            referencedRelation: "yvideo"
-            referencedColumns: ["yvideoid"]
-          },
-          {
-            foreignKeyName: "yproduit_yinfospotactionsidfk_fkey"
-            columns: ["yinfospotactionsidfk"]
-            isOneToOne: false
-            referencedRelation: "yinfospotactions"
-            referencedColumns: ["yinfospotactionsid"]
+            referencedRelation: "ydesign"
+            referencedColumns: ["ydesignid"]
           },
         ]
       }
       yscenelinks: {
         Row: {
-          ycreatedat: string | null
-          yid: string
-          yname: string
-          ypitch: number
-          ysceneid: string
-          ytargetid: string
-          yyaw: number
+          sysaction: string | null
+          sysadresseip: string | null
+          sysdate: string | null
+          sysuser: string | null
+          yscenelinksaxexyaw: number
+          yscenelinksaxeypitch: number
+          yscenelinksid: number
+          yscenelinksname: string
+          yscenesidfkactuelle: number | null
+          yscenesidfktarget: number
         }
         Insert: {
-          ycreatedat?: string | null
-          yid?: string
-          yname: string
-          ypitch: number
-          ysceneid: string
-          ytargetid: string
-          yyaw: number
+          sysaction?: string | null
+          sysadresseip?: string | null
+          sysdate?: string | null
+          sysuser?: string | null
+          yscenelinksaxexyaw: number
+          yscenelinksaxeypitch: number
+          yscenelinksid: number
+          yscenelinksname: string
+          yscenesidfkactuelle?: number | null
+          yscenesidfktarget: number
         }
         Update: {
-          ycreatedat?: string | null
-          yid?: string
-          yname?: string
-          ypitch?: number
-          ysceneid?: string
-          ytargetid?: string
-          yyaw?: number
+          sysaction?: string | null
+          sysadresseip?: string | null
+          sysdate?: string | null
+          sysuser?: string | null
+          yscenelinksaxexyaw?: number
+          yscenelinksaxeypitch?: number
+          yscenelinksid?: number
+          yscenelinksname?: string
+          yscenesidfkactuelle?: number | null
+          yscenesidfktarget?: number
         }
         Relationships: [
           {
-            foreignKeyName: "yscenelinks_ysceneid_fkey"
-            columns: ["ysceneid"]
+            foreignKeyName: "yscenelinks_yscenesidfkactuelle_fkey"
+            columns: ["yscenesidfkactuelle"]
             isOneToOne: false
             referencedRelation: "yscenes"
-            referencedColumns: ["yid"]
+            referencedColumns: ["yscenesid"]
           },
           {
-            foreignKeyName: "yscenelinks_ytargetid_fkey"
-            columns: ["ytargetid"]
+            foreignKeyName: "yscenelinks_yscenesidfktarget_fkey"
+            columns: ["yscenesidfktarget"]
             isOneToOne: false
             referencedRelation: "yscenes"
-            referencedColumns: ["yid"]
+            referencedColumns: ["yscenesid"]
           },
         ]
       }
       yscenes: {
         Row: {
-          ycreatedat: string | null
-          yfov: number
-          yid: string
-          yname: string
-          ypanorama: string
-          ypitch: number
-          yyaw: number
+          sysaction: string | null
+          sysadresseip: string | null
+          sysdate: string | null
+          sysuser: string | null
+          yscenesaxexyaw: number
+          yscenesaxeypitch: number
+          yscenesid: number
+          yscenesname: string
+          yscenespanorama: string
+          ysceneszoomfov: number
         }
         Insert: {
-          ycreatedat?: string | null
-          yfov: number
-          yid: string
-          yname: string
-          ypanorama: string
-          ypitch: number
-          yyaw: number
+          sysaction?: string | null
+          sysadresseip?: string | null
+          sysdate?: string | null
+          sysuser?: string | null
+          yscenesaxexyaw: number
+          yscenesaxeypitch: number
+          yscenesid: number
+          yscenesname: string
+          yscenespanorama: string
+          ysceneszoomfov: number
         }
         Update: {
-          ycreatedat?: string | null
-          yfov?: number
-          yid?: string
-          yname?: string
-          ypanorama?: string
-          ypitch?: number
-          yyaw?: number
+          sysaction?: string | null
+          sysadresseip?: string | null
+          sysdate?: string | null
+          sysuser?: string | null
+          yscenesaxexyaw?: number
+          yscenesaxeypitch?: number
+          yscenesid?: number
+          yscenesname?: string
+          yscenespanorama?: string
+          ysceneszoomfov?: number
         }
         Relationships: []
       }
-      yvideo: {
+      yvarprod: {
         Row: {
           sysaction: string | null
           sysadresseip: string | null
           sysdate: string | null
           sysuser: string | null
-          yvideoboolcapsule: string
-          yvideoboolevent: string
-          yvideoboolproduit: string
-          yvideocode: string
-          yvideodate: string
-          yvideoid: number
-          yvideointitule: string
+          xcouleuridfk: number
+          xdeviseidfk: number
+          xtailleidfk: number
+          yprodidfk: number | null
+          yvarprodcode: string
+          yvarprodgenre: string
+          yvarprodid: number
+          yvarprodintitule: string
+          yvarprodnbrjourlivraison: number
+          yvarprodprixcatalogue: number
+          yvarprodprixpromotion: number | null
+          yvarprodpromotiondatedeb: string | null
+          yvarprodpromotiondatefin: string | null
         }
         Insert: {
           sysaction?: string | null
           sysadresseip?: string | null
           sysdate?: string | null
           sysuser?: string | null
-          yvideoboolcapsule: string
-          yvideoboolevent: string
-          yvideoboolproduit: string
-          yvideocode: string
-          yvideodate: string
-          yvideoid: number
-          yvideointitule: string
+          xcouleuridfk: number
+          xdeviseidfk: number
+          xtailleidfk: number
+          yprodidfk?: number | null
+          yvarprodcode: string
+          yvarprodgenre: string
+          yvarprodid: number
+          yvarprodintitule: string
+          yvarprodnbrjourlivraison: number
+          yvarprodprixcatalogue: number
+          yvarprodprixpromotion?: number | null
+          yvarprodpromotiondatedeb?: string | null
+          yvarprodpromotiondatefin?: string | null
         }
         Update: {
           sysaction?: string | null
           sysadresseip?: string | null
           sysdate?: string | null
           sysuser?: string | null
-          yvideoboolcapsule?: string
-          yvideoboolevent?: string
-          yvideoboolproduit?: string
-          yvideocode?: string
-          yvideodate?: string
-          yvideoid?: number
-          yvideointitule?: string
+          xcouleuridfk?: number
+          xdeviseidfk?: number
+          xtailleidfk?: number
+          yprodidfk?: number | null
+          yvarprodcode?: string
+          yvarprodgenre?: string
+          yvarprodid?: number
+          yvarprodintitule?: string
+          yvarprodnbrjourlivraison?: number
+          yvarprodprixcatalogue?: number
+          yvarprodprixpromotion?: number | null
+          yvarprodpromotiondatedeb?: string | null
+          yvarprodpromotiondatefin?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "yvarprod_xcouleuridfk_fkey"
+            columns: ["xcouleuridfk"]
+            isOneToOne: false
+            referencedRelation: "xcouleur"
+            referencedColumns: ["xcouleurid"]
+          },
+          {
+            foreignKeyName: "yvarprod_xdeviseidfk_fkey"
+            columns: ["xdeviseidfk"]
+            isOneToOne: false
+            referencedRelation: "xdevise"
+            referencedColumns: ["xdeviseid"]
+          },
+          {
+            foreignKeyName: "yvarprod_xtailleidfk_fkey"
+            columns: ["xtailleidfk"]
+            isOneToOne: false
+            referencedRelation: "xtaille"
+            referencedColumns: ["xtailleid"]
+          },
+          {
+            foreignKeyName: "yvarprod_yprodidfk_fkey"
+            columns: ["yprodidfk"]
+            isOneToOne: false
+            referencedRelation: "yprod"
+            referencedColumns: ["yprodid"]
+          },
+        ]
+      }
+      yvarprodmedia: {
+        Row: {
+          sysaction: string | null
+          sysadresseip: string | null
+          sysdate: string | null
+          sysuser: string | null
+          ymediaidfk: number
+          yvarprodidfk: number
+          yvarprodmediaid: number
+        }
+        Insert: {
+          sysaction?: string | null
+          sysadresseip?: string | null
+          sysdate?: string | null
+          sysuser?: string | null
+          ymediaidfk: number
+          yvarprodidfk: number
+          yvarprodmediaid: number
+        }
+        Update: {
+          sysaction?: string | null
+          sysadresseip?: string | null
+          sysdate?: string | null
+          sysuser?: string | null
+          ymediaidfk?: number
+          yvarprodidfk?: number
+          yvarprodmediaid?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "yvarprodmedia_ymediaidfk_fkey"
+            columns: ["ymediaidfk"]
+            isOneToOne: false
+            referencedRelation: "ymedia"
+            referencedColumns: ["ymediaid"]
+          },
+          {
+            foreignKeyName: "yvarprodmedia_yvarprodidfk_fkey"
+            columns: ["yvarprodidfk"]
+            isOneToOne: false
+            referencedRelation: "yvarprod"
+            referencedColumns: ["yvarprodid"]
+          },
+        ]
       }
       yvisite: {
         Row: {
@@ -824,7 +1147,7 @@ export type Database = {
           sysuser: string | null
           ydetailseventidfk: number
           yvisiteid: number
-          yvisiteuridfk: number | null
+          yvisiteuridfk: number
         }
         Insert: {
           sysaction?: string | null
@@ -833,7 +1156,7 @@ export type Database = {
           sysuser?: string | null
           ydetailseventidfk: number
           yvisiteid: number
-          yvisiteuridfk?: number | null
+          yvisiteuridfk: number
         }
         Update: {
           sysaction?: string | null
@@ -842,18 +1165,18 @@ export type Database = {
           sysuser?: string | null
           ydetailseventidfk?: number
           yvisiteid?: number
-          yvisiteuridfk?: number | null
+          yvisiteuridfk?: number
         }
         Relationships: [
           {
-            foreignKeyName: "fk_ydetailevent"
+            foreignKeyName: "yvisite_ydetailseventidfk_fkey"
             columns: ["ydetailseventidfk"]
             isOneToOne: false
             referencedRelation: "ydetailsevent"
             referencedColumns: ["ydetailseventid"]
           },
           {
-            foreignKeyName: "fk_yvisiteur"
+            foreignKeyName: "yvisite_yvisiteuridfk_fkey"
             columns: ["yvisiteuridfk"]
             isOneToOne: false
             referencedRelation: "yvisiteur"
@@ -941,30 +1264,109 @@ export type Database = {
       }
       ywishlist: {
         Row: {
-          created_at: string
-          id: number
-          yproduit_id: number
-          yuser_id: string
+          sysaction: string
+          sysadresseip: string | null
+          sysdate: string | null
+          sysuser: string
+          ycompteidfk: number
+          yvarprodidfk: number
+          ywishlistid: number
         }
         Insert: {
-          created_at?: string
-          id?: number
-          yproduit_id: number
-          yuser_id?: string
+          sysaction: string
+          sysadresseip?: string | null
+          sysdate?: string | null
+          sysuser: string
+          ycompteidfk: number
+          yvarprodidfk: number
+          ywishlistid: number
         }
         Update: {
-          created_at?: string
-          id?: number
-          yproduit_id?: number
-          yuser_id?: string
+          sysaction?: string
+          sysadresseip?: string | null
+          sysdate?: string | null
+          sysuser?: string
+          ycompteidfk?: number
+          yvarprodidfk?: number
+          ywishlistid?: number
         }
         Relationships: [
           {
-            foreignKeyName: "ywishlist_yproduit_id_fkey"
-            columns: ["yproduit_id"]
+            foreignKeyName: "ywishlist_ycompteidfk_fkey"
+            columns: ["ycompteidfk"]
             isOneToOne: false
-            referencedRelation: "yproduit"
-            referencedColumns: ["yproduitid"]
+            referencedRelation: "ycompte"
+            referencedColumns: ["ycompteid"]
+          },
+          {
+            foreignKeyName: "ywishlist_yvarprodidfk_fkey"
+            columns: ["yvarprodidfk"]
+            isOneToOne: false
+            referencedRelation: "yvarprod"
+            referencedColumns: ["yvarprodid"]
+          },
+        ]
+      }
+      zdetailscommande: {
+        Row: {
+          sysaction: string | null
+          sysadresseip: string | null
+          sysdate: string | null
+          sysuser: string | null
+          ycompteidfk: number | null
+          yvarprodidfk: number
+          zcommandedate: string
+          zcommandeid: number
+          zcommandeligneno: number
+          zcommandelivraisondate: string
+          zcommandeno: string
+          zcommandequantite: number
+          zcommandestatut: string
+        }
+        Insert: {
+          sysaction?: string | null
+          sysadresseip?: string | null
+          sysdate?: string | null
+          sysuser?: string | null
+          ycompteidfk?: number | null
+          yvarprodidfk: number
+          zcommandedate: string
+          zcommandeid: number
+          zcommandeligneno: number
+          zcommandelivraisondate: string
+          zcommandeno: string
+          zcommandequantite: number
+          zcommandestatut: string
+        }
+        Update: {
+          sysaction?: string | null
+          sysadresseip?: string | null
+          sysdate?: string | null
+          sysuser?: string | null
+          ycompteidfk?: number | null
+          yvarprodidfk?: number
+          zcommandedate?: string
+          zcommandeid?: number
+          zcommandeligneno?: number
+          zcommandelivraisondate?: string
+          zcommandeno?: string
+          zcommandequantite?: number
+          zcommandestatut?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "zdetailscommande_ycompteidfk_fkey"
+            columns: ["ycompteidfk"]
+            isOneToOne: false
+            referencedRelation: "ycompte"
+            referencedColumns: ["ycompteid"]
+          },
+          {
+            foreignKeyName: "zdetailscommande_yvarprodidfk_fkey"
+            columns: ["yvarprodidfk"]
+            isOneToOne: false
+            referencedRelation: "yvarprod"
+            referencedColumns: ["yvarprodid"]
           },
         ]
       }
