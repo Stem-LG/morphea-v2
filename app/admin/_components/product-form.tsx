@@ -35,11 +35,11 @@ interface Object3DForm {
 export function ProductForm({ product, storeId, storeName, categoryId, categoryName, onBack, onSave }: ProductFormProps) {
     const { t } = useLanguage();
     const [formData, setFormData] = useState({
-        yproduitintitule: "",
-        yproduitcode: "",
-        yproduitdetailstech: "",
-        imageurl: "",
-        yarriereplancouleur: "",
+        yprodintitule: "",
+        yprodcode: "",
+        yproddetailstech: "",
+        yprodinfobulle: "",
+        yprodstatut: "not_approved",
     });
 
     const [objects3D, setObjects3D] = useState<Object3DForm[]>([]);
@@ -54,19 +54,19 @@ export function ProductForm({ product, storeId, storeName, categoryId, categoryN
     useEffect(() => {
         if (product) {
             setFormData({
-                yproduitintitule: product.yproduitintitule,
-                yproduitcode: product.yproduitcode,
-                yproduitdetailstech: product.yproduitdetailstech,
-                imageurl: product.imageurl || "",
-                yarriereplancouleur: product.yarriereplancouleur || "",
+                yprodintitule: product.yprodintitule,
+                yprodcode: product.yprodcode,
+                yproddetailstech: product.yproddetailstech,
+                yprodinfobulle: product.yprodinfobulle,
+                yprodstatut: product.yprodstatut,
             });
 
             setObjects3D(
                 product.yobjet3d?.map((obj, index) => ({
-                    id: obj.id,
-                    url: obj.url || "",
-                    couleur: obj.couleur || "",
-                    order: obj.order ?? index,
+                    id: obj.yobjet3did,
+                    url: obj.yobjet3durl || "",
+                    couleur: obj.yobjet3dcouleur || "",
+                    order: obj.yobjet3dorder ?? index,
                 })) || []
             );
         }
@@ -133,22 +133,22 @@ export function ProductForm({ product, storeId, storeName, categoryId, categoryN
             if (product) {
                 // Update existing product
                 const updatedProduct = await updateProduct.mutateAsync({
-                    id: product.yproduitid,
+                    id: product.yprodid,
                     updates: {
                         ...formData,
-                        yinfospotactionsidfk: categoryId || storeId,
+                        ydesignidfk: parseInt(categoryId || storeId),
                     },
                 });
-                productId = updatedProduct.yproduitid;
+                productId = updatedProduct.yprodid;
             } else {
                 // Create new product with not_approved status
                 const newProduct = await createProduct.mutateAsync({
                     ...formData,
-                    yinfospotactionsidfk: categoryId || storeId,
-                    ystatus: "not_approved", // Set initial status as not_approved for approval
-                    yaction: "insert", // Use 'insert' for new products
+                    ydesignidfk: parseInt(categoryId || storeId),
+                    yprodid: Date.now(), // Generate a unique ID
+                    yprodstatut: "not_approved", // Set initial status as not_approved for approval
                 });
-                productId = newProduct.yproduitid;
+                productId = newProduct.yprodid;
             }
 
             // Handle 3D objects
@@ -158,19 +158,21 @@ export function ProductForm({ product, storeId, storeName, categoryId, categoryN
                     await update3DObject.mutateAsync({
                         id: obj.id,
                         updates: {
-                            url: obj.url,
-                            couleur: obj.couleur,
-                            order: index,
-                            produit_id: productId,
+                            yobjet3durl: obj.url,
+                            yobjet3dcouleur: obj.couleur,
+                            yobjet3dorder: index,
+                            yvarprodidfk: productId,
                         },
                     });
                 } else if (obj.url.trim()) {
                     // Create new 3D object (only if URL is provided)
                     await create3DObject.mutateAsync({
-                        url: obj.url,
-                        couleur: obj.couleur,
-                        order: index,
-                        produit_id: productId,
+                        yobjet3durl: obj.url,
+                        yobjet3dcouleur: obj.couleur,
+                        yobjet3dorder: index,
+                        yvarprodidfk: productId,
+                        yobjet3daction: "insert",
+                        yobjet3did: Date.now() + index, // Generate a unique ID
                     });
                 }
             }
@@ -217,8 +219,8 @@ export function ProductForm({ product, storeId, storeName, categoryId, categoryN
                                 </Label>
                                 <Input
                                     id="name"
-                                    value={formData.yproduitintitule}
-                                    onChange={(e) => handleInputChange("yproduitintitule", e.target.value)}
+                                    value={formData.yprodintitule}
+                                    onChange={(e) => handleInputChange("yprodintitule", e.target.value)}
                                     required
                                     className="mt-1"
                                 />
@@ -229,8 +231,8 @@ export function ProductForm({ product, storeId, storeName, categoryId, categoryN
                                 </Label>
                                 <Input
                                     id="code"
-                                    value={formData.yproduitcode}
-                                    onChange={(e) => handleInputChange("yproduitcode", e.target.value)}
+                                    value={formData.yprodcode}
+                                    onChange={(e) => handleInputChange("yprodcode", e.target.value)}
                                     required
                                     className="mt-1"
                                 />
@@ -245,41 +247,39 @@ export function ProductForm({ product, storeId, storeName, categoryId, categoryN
                                 id="description"
                                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mt-1"
                                 rows={3}
-                                value={formData.yproduitdetailstech}
-                                onChange={(e) => handleInputChange("yproduitdetailstech", e.target.value)}
+                                value={formData.yproddetailstech}
+                                onChange={(e) => handleInputChange("yproddetailstech", e.target.value)}
                                 required
                             />
                         </div>
 
                         <div>
-                            <Label htmlFor="image" className="text-sm lg:text-base">
-                                {t('admin.imageUrl')}
+                            <Label htmlFor="infobulle" className="text-sm lg:text-base">
+                                {t('admin.infoTooltip')}
                             </Label>
                             <Input
-                                id="image"
-                                type="url"
-                                value={formData.imageurl}
-                                onChange={(e) => handleInputChange("imageurl", e.target.value)}
-                                placeholder={t('admin.imageUrlPlaceholder')}
+                                id="infobulle"
+                                value={formData.yprodinfobulle}
+                                onChange={(e) => handleInputChange("yprodinfobulle", e.target.value)}
+                                placeholder={t('admin.infoTooltipPlaceholder')}
                                 className="mt-1"
                             />
                         </div>
 
                         <div>
-                            <Label htmlFor="backgroundColor" className="text-sm lg:text-base">
-                                {t('admin.backgroundColorLabel')}
+                            <Label htmlFor="status" className="text-sm lg:text-base">
+                                {t('admin.status')}
                             </Label>
-                            <Input
-                                id="backgroundColor"
-                                type="text"
-                                value={formData.yarriereplancouleur}
-                                onChange={(e) => handleInputChange("yarriereplancouleur", e.target.value)}
-                                placeholder={t('admin.backgroundColorPlaceholder')}
-                                className="mt-1"
-                            />
-                            <p className="text-xs text-gray-500 mt-1">
-                                {t('admin.backgroundColorHelp')}
-                            </p>
+                            <select
+                                id="status"
+                                value={formData.yprodstatut}
+                                onChange={(e) => handleInputChange("yprodstatut", e.target.value)}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mt-1"
+                            >
+                                <option value="not_approved">Not Approved</option>
+                                <option value="approved">Approved</option>
+                                <option value="rejected">Rejected</option>
+                            </select>
                         </div>
                     </CardContent>
                 </Card>

@@ -38,12 +38,12 @@ export async function GET(request: NextRequest) {
     
     const { data: products, error: productsError } = await adminSupabase
       .schema('morpheus')
-      .from('yproduit')
+      .from('yprod')
       .select(`
         *,
         yobjet3d(*)
       `)
-      .eq('ystatus', 'not_approved')
+      .eq('yprodstatut', 'not_approved')
       .order('sysdate', { ascending: false })
 
     if (productsError) {
@@ -104,14 +104,14 @@ export async function PATCH(request: NextRequest) {
       
       const { data: updatedProduct, error: updateError } = await adminSupabase
         .schema('morpheus')
-        .from('yproduit')
+        .from('yprod')
         .update({
-          ystatus: 'approved',
+          yprodstatut: 'approved',
           sysdate: currentTime,
           sysaction: 'update',
           sysuser: user?.email || 'admin'
         })
-        .eq('yproduitid', productId)
+        .eq('yprodid', productId)
         .select()
         .single()
 

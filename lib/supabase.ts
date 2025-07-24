@@ -1232,7 +1232,7 @@ export type Database = {
           yvisiteurboolvip: string
           yvisiteurcode: string
           yvisiteuremail?: string | null
-          yvisiteurid: number
+          yvisiteurid?: number
           yvisiteurnom: string
           yvisiteurtelephone?: string | null
         }

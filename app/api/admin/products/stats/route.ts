@@ -38,8 +38,8 @@ export async function GET(request: NextRequest) {
     
     const { data: products, error: productsError } = await adminSupabase
       .schema('morpheus')
-      .from('yproduit')
-      .select('ystatus')
+      .from('yprod')
+      .select('yprodstatut')
 
     if (productsError) {
       console.error('Error fetching product statistics:', productsError)
@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
 
     // Count products by status
     const stats = (products || []).reduce((acc: Record<string, number>, product) => {
-      const status = product.ystatus || 'unknown'
+      const status = product.yprodstatut || 'unknown'
       acc[status] = (acc[status] || 0) + 1
       return acc
     }, {})

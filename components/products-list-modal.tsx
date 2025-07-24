@@ -21,17 +21,13 @@ export default function ProductsListModal({ isOpen, onClose, onProductDetailsCha
 
     const productsList = useMemo(() => {
         return productsData?.map((product) => ({
-            id: product.yproduitid,
-            name: product.yproduitintitule,
-            model: product.yobjet3d.length > 0 ? product.yobjet3d[0].url : "",
-            image: product.imageurl,
-            description: product.yproduitdetailstech,
-            backgroundColor: product.yarriereplancouleur,
-            models: product.yobjet3d.map((obj3d: { url: string; couleur?: string; id: number }) => ({
-                url: obj3d.url,
-                color: obj3d.couleur || "Default",
-                id: obj3d.id,
-            })),
+            id: product.yprodid,
+            name: product.yprodintitule,
+            model: "", // No 3D models available from current query
+            image: "/logo.png", // Default image since imageurl doesn't exist in schema
+            description: product.yproddetailstech,
+            backgroundColor: "#f0f0f0", // Default background since yarriereplancouleur doesn't exist
+            models: [], // No 3D models available from current query
             properties: {},
             features: [],
         }));

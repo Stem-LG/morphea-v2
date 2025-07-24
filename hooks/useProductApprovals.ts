@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Database } from "@/lib/supabase";
 import type { ProductWithObjects } from "./useProducts";
 
-type Product = Database['morpheus']['Tables']['yproduit']['Row'];
+type Product = Database['morpheus']['Tables']['yprod']['Row'];
 
 // Hook to fetch pending products (products with status 'not_approved')
 export function usePendingProducts() {
@@ -65,8 +65,8 @@ export function useProductsWithStatus() {
         queryFn: async () => {
             const { data, error } = await supabase
                 .schema("morpheus")
-                .from("yproduit")
-                .select("*, yobjet3d(*)")
+                .from("yprod")
+                .select("*")
                 .order("sysdate", { ascending: false });
 
             if (error) {
@@ -74,7 +74,13 @@ export function useProductsWithStatus() {
                 throw error;
             }
 
-            return data as ProductWithObjects[] || [];
+            // Add empty yobjet3d array to match ProductWithObjects interface
+            const productsWithObjects = data?.map(product => ({
+                ...product,
+                yobjet3d: []
+            })) || [];
+
+            return productsWithObjects as ProductWithObjects[];
         },
     });
 }

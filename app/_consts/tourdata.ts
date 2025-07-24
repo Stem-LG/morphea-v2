@@ -48,7 +48,7 @@ export async function getTourData(): Promise<TourData> {
             .schema('morpheus')
             .from('yscenes')
             .select('*')
-            .order('yid')
+            .order('yscenesid')
         
         if (scenesError) {
             console.error('Error fetching scenes:', scenesError)
@@ -64,7 +64,7 @@ export async function getTourData(): Promise<TourData> {
             .schema('morpheus')
             .from('yscenelinks')
             .select('*')
-            .order('ycreatedat')
+            .order('yscenelinksid')
         
         if (linksError) {
             console.error('Error fetching scene links:', linksError)
@@ -79,7 +79,7 @@ export async function getTourData(): Promise<TourData> {
                 *,
                 yinfospotactions (*)
             `)
-            .order('ycreatedat')
+            .order('yinfospotsid')
         
         if (infospotsError) {
             console.error('Error fetching info spots:', infospotsError)
@@ -89,47 +89,47 @@ export async function getTourData(): Promise<TourData> {
         // Transform the data to match the expected format
         const scenes: Scene[] = scenesData.map(scene => {
             // Get links for this scene
-            const sceneLinks = linksData?.filter(link => link.ysceneid === scene.yid) || []
+            const sceneLinks = linksData?.filter(link => link.yscenesidfkactuelle === scene.yscenesid) || []
             const links: SceneLink[] = sceneLinks.map(link => ({
-                nodeId: link.ytargetid,
-                position: { yaw: link.yyaw, pitch: link.ypitch },
-                name: link.yname
+                nodeId: link.yscenesidfktarget.toString(),
+                position: { yaw: link.yscenelinksaxexyaw, pitch: link.yscenelinksaxeypitch },
+                name: link.yscenelinksname
             }))
             
             // Get info spots for this scene
-            const sceneInfoSpots = infospotsData?.filter(infospot => infospot.ysceneid === scene.yid) || []
+            const sceneInfoSpots = infospotsData?.filter(infospot => infospot.yscenesidfk === scene.yscenesid) || []
             const infoSpots: InfoSpot[] = sceneInfoSpots.map(infospot => {
                 const action: InfoSpotAction = {
-                    type: (infospot.yinfospotactions?.ytype as "alert" | "modal" | "custom") || "alert",
+                    type: (infospot.yinfospotactions?.yinfospotactionstype as "alert" | "modal" | "custom") || "alert",
                 }
                 
                 // Add optional action properties if they exist
                 if (infospot.yinfospotactions?.yinfospotactionsid) {
-                    action.id = infospot.yinfospotactions.yinfospotactionsid
+                    action.id = infospot.yinfospotactions.yinfospotactionsid.toString()
                 }
-                if (infospot.yinfospotactions?.ymodaltype) {
-                    action.modalType = infospot.yinfospotactions.ymodaltype
+                if (infospot.yinfospotactions?.yinfospotactionsmodaltype) {
+                    action.modalType = infospot.yinfospotactions.yinfospotactionsmodaltype
                 }
-                if (infospot.yinfospotactions?.ycustomhandler) {
-                    action.customHandler = infospot.yinfospotactions.ycustomhandler
+                if (infospot.yinfospotactions?.yinfospotactionscustomhandler) {
+                    action.customHandler = infospot.yinfospotactions.yinfospotactionscustomhandler
                 }
                 
                 return {
-                    position: { yaw: infospot.yyaw, pitch: infospot.ypitch },
-                    title: infospot.ytitle,
-                    text: infospot.ytext,
+                    position: { yaw: infospot.yinfospotsaxexyaw, pitch: infospot.yinfospotsaxeypitch },
+                    title: infospot.yinfospotstitle,
+                    text: infospot.yinfospotstext,
                     action
                 }
             })
             
             return {
-                id: scene.yid,
-                name: scene.yname,
-                panorama: scene.ypanorama,
+                id: scene.yscenesid.toString(),
+                name: scene.yscenesname,
+                panorama: scene.yscenespanorama,
                 initialView: {
-                    yaw: scene.yyaw,
-                    pitch: scene.ypitch,
-                    fov: scene.yfov
+                    yaw: scene.yscenesaxexyaw,
+                    pitch: scene.yscenesaxeypitch,
+                    fov: scene.ysceneszoomfov
                 },
                 links,
                 infoSpots

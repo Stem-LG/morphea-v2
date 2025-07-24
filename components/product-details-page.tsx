@@ -215,8 +215,7 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
     const handleAddToCart = () => {
         addToCart({
             productId: productId,
-            quantity,
-            color: selectedModel?.color
+            quantity
         });
     };
 

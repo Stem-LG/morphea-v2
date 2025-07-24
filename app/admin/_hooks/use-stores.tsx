@@ -14,16 +14,7 @@ export function useStores() {
                 .select(`
                     *,
                     yinfospotactions!yinfospotactions_yboutiqueidfk_fkey (
-                        *,
-                        yproduit!yproduit_yinfospotactionsidfk_fkey (
-                            *,
-                            ydesigneur (*),
-                            yobjet3d (*)
-                        ),
-                        yinfospots!yinfospots_yinfospotactionsidfk_fkey (
-                            *,
-                            yscenes!yinfospots_ysceneid_fkey (*)
-                        )
+                        *
                     )
                 `)
                 .order('yboutiqueid');
@@ -37,13 +28,13 @@ export function useStores() {
                 // Transform yinfospotactions into categories
                 const categories = boutique.yinfospotactions?.map((action: any) => ({
                     id: action.yinfospotactionsid,
-                    name: action.ytitle || action.yinfospotactionsid, // Use ytitle as the display name
-                    type: action.ytype,
-                    modalType: action.ymodaltype,
-                    customHandler: action.ycustomhandler,
-                    createdAt: action.ycreatedat,
-                    products: action.yproduit || [],
-                    infospots: action.yinfospots || []
+                    name: action.yinfospotactionstitle || action.yinfospotactionsid, // Use correct field name
+                    type: action.yinfospotactionstype,
+                    modalType: action.yinfospotactionsmodaltype,
+                    customHandler: action.yinfospotactionscustomhandler,
+                    description: action.yinfospotactionsdescription,
+                    products: [], // Products will be fetched separately when needed
+                    infospots: [] // Infospots will be fetched separately when needed
                 })) || [];
 
                 return {

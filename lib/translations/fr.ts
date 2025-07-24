@@ -187,6 +187,9 @@ export const frTranslations = {
     "failedToDelete3DObject": "Échec de la suppression de l'objet 3D. Veuillez réessayer.",
     "imageUrlPlaceholder": "https://exemple.com/image.jpg",
     "saveProductFailed": "Échec de l'enregistrement du produit. Veuillez réessayer.",
+    "infoTooltip": "Info-bulle",
+    "infoTooltipPlaceholder": "Entrez les informations de l'info-bulle",
+    "status": "Statut",
     "tour": {
       "adminControls": "Contrôles d'administration",
       "view": "Voir",

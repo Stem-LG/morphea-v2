@@ -35,32 +35,22 @@ function ProductDetailsModal({ product, onClose, onApprove, onDelete }: ProductD
                             <div className="space-y-3">
                                 <div>
                                     <label className="text-sm font-medium text-gray-600">Product Name</label>
-                                    <p className="text-gray-900">{product.yproduitintitule}</p>
+                                    <p className="text-gray-900">{product.yprodintitule}</p>
                                 </div>
                                 <div>
                                     <label className="text-sm font-medium text-gray-600">Product Code</label>
-                                    <p className="text-gray-900">{product.yproduitcode}</p>
+                                    <p className="text-gray-900">{product.yprodcode}</p>
                                 </div>
                                 <div>
                                     <label className="text-sm font-medium text-gray-600">Status</label>
-                                    <Badge variant={product.ystatus === 'not_approved' ? 'secondary' : 'default'}>
-                                        {product.ystatus === 'not_approved' ? 'Pending Approval' : product.ystatus}
+                                    <Badge variant={product.yprodstatut === 'not_approved' ? 'secondary' : 'default'}>
+                                        {product.yprodstatut === 'not_approved' ? 'Pending Approval' : product.yprodstatut}
                                     </Badge>
                                 </div>
                                 <div>
                                     <label className="text-sm font-medium text-gray-600">Technical Details</label>
-                                    <p className="text-gray-900">{product.yproduitdetailstech}</p>
+                                    <p className="text-gray-900">{product.yproddetailstech}</p>
                                 </div>
-                                {product.imageurl && (
-                                    <div>
-                                        <label className="text-sm font-medium text-gray-600">Product Image</label>
-                                        <img 
-                                            src={product.imageurl} 
-                                            alt={product.yproduitintitule}
-                                            className="mt-2 max-w-full h-48 object-cover rounded-lg"
-                                        />
-                                    </div>
-                                )}
                             </div>
                         </div>
 
@@ -68,24 +58,24 @@ function ProductDetailsModal({ product, onClose, onApprove, onDelete }: ProductD
                             <h3 className="text-lg font-semibold mb-4">3D Objects ({product.yobjet3d?.length || 0})</h3>
                             <div className="space-y-3">
                                 {product.yobjet3d?.map((obj, index) => (
-                                    <Card key={obj.id} className="p-4">
+                                    <Card key={obj.yobjet3did} className="p-4">
                                         <div className="space-y-2">
                                             <div className="flex items-center justify-between">
                                                 <span className="font-medium">Object {index + 1}</span>
-                                                <Badge variant="outline">Order: {obj.order || 'N/A'}</Badge>
+                                                <Badge variant="outline">Order: {obj.yobjet3dorder || 'N/A'}</Badge>
                                             </div>
-                                            {obj.couleur && (
+                                            {obj.yobjet3dcouleur && (
                                                 <div>
                                                     <span className="text-sm text-gray-600">Color: </span>
-                                                    <span className="text-sm">{obj.couleur}</span>
+                                                    <span className="text-sm">{obj.yobjet3dcouleur}</span>
                                                 </div>
                                             )}
-                                            {obj.url && (
+                                            {obj.yobjet3durl && (
                                                 <div>
                                                     <span className="text-sm text-gray-600">URL: </span>
-                                                    <a 
-                                                        href={obj.url} 
-                                                        target="_blank" 
+                                                    <a
+                                                        href={obj.yobjet3durl}
+                                                        target="_blank"
                                                         rel="noopener noreferrer"
                                                         className="text-sm text-blue-600 hover:underline"
                                                     >
@@ -95,7 +85,7 @@ function ProductDetailsModal({ product, onClose, onApprove, onDelete }: ProductD
                                             )}
                                             <div>
                                                 <span className="text-sm text-gray-600">Action: </span>
-                                                <span className="text-sm">{obj.yaction}</span>
+                                                <span className="text-sm">{obj.yobjet3daction}</span>
                                             </div>
                                         </div>
                                     </Card>
@@ -107,14 +97,14 @@ function ProductDetailsModal({ product, onClose, onApprove, onDelete }: ProductD
                     <div className="flex justify-end space-x-4 mt-8 pt-6 border-t">
                         <Button
                             variant="outline"
-                            onClick={() => onDelete(product.yproduitid)}
+                            onClick={() => onDelete(product.yprodid)}
                             className="text-red-600 border-red-600 hover:bg-red-50"
                         >
                             <Trash2 className="h-4 w-4 mr-2" />
                             Delete Product
                         </Button>
                         <Button
-                            onClick={() => onApprove(product.yproduitid)}
+                            onClick={() => onApprove(product.yprodid)}
                             className="bg-green-600 hover:bg-green-700"
                         >
                             <CheckCircle className="h-4 w-4 mr-2" />
@@ -193,32 +183,25 @@ export function ProductApprovals() {
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {pendingProducts?.map((product) => (
-                        <Card key={product.yproduitid} className="p-6">
+                        <Card key={product.yprodid} className="p-6">
                             <div className="space-y-4">
                                 <div>
                                     <h3 className="text-lg font-semibold text-gray-900 truncate">
-                                        {product.yproduitintitule}
+                                        {product.yprodintitule}
                                     </h3>
-                                    <p className="text-sm text-gray-600">{product.yproduitcode}</p>
+                                    <p className="text-sm text-gray-600">{product.yprodcode}</p>
                                 </div>
 
-                                {product.imageurl && (
-                                    <img 
-                                        src={product.imageurl} 
-                                        alt={product.yproduitintitule}
-                                        className="w-full h-32 object-cover rounded-lg"
-                                    />
-                                )}
 
                                 <div>
                                     <Badge variant="secondary">
-                                        Status: {product.ystatus === 'not_approved' ? 'Pending Approval' : product.ystatus}
+                                        Status: {product.yprodstatut === 'not_approved' ? 'Pending Approval' : product.yprodstatut}
                                     </Badge>
                                 </div>
 
                                 <div>
                                     <p className="text-sm text-gray-600 line-clamp-2">
-                                        {product.yproduitdetailstech}
+                                        {product.yproddetailstech}
                                     </p>
                                 </div>
 
@@ -242,7 +225,7 @@ export function ProductApprovals() {
                                     <Button
                                         variant="outline"
                                         size="sm"
-                                        onClick={() => handleDelete(product.yproduitid)}
+                                        onClick={() => handleDelete(product.yprodid)}
                                         disabled={deleteProductMutation.isPending}
                                         className="flex-1 text-red-600 border-red-600 hover:bg-red-50"
                                     >
@@ -251,7 +234,7 @@ export function ProductApprovals() {
                                     </Button>
                                     <Button
                                         size="sm"
-                                        onClick={() => handleApprove(product.yproduitid)}
+                                        onClick={() => handleApprove(product.yprodid)}
                                         disabled={approveProductMutation.isPending}
                                         className="flex-1 bg-green-600 hover:bg-green-700"
                                     >

@@ -12,43 +12,43 @@ export default function WishlistPage() {
     const { t } = useLanguage();
     const [processingItems, setProcessingItems] = useState<Set<number>>(new Set());
 
-    const handleRemoveFromWishlist = async (itemId: number) => {
-        setProcessingItems((prev) => new Set(prev).add(itemId));
+    const handleRemoveFromWishlist = async (productId: number) => {
+        setProcessingItems((prev) => new Set(prev).add(productId));
         try {
-            await removeFromWishlist(itemId);
+            await removeFromWishlist(productId);
         } finally {
             setProcessingItems((prev) => {
                 const newSet = new Set(prev);
-                newSet.delete(itemId);
+                newSet.delete(productId);
                 return newSet;
             });
         }
     };
 
-    const handleAddToCart = async (productId: number, itemId: number) => {
-        setProcessingItems((prev) => new Set(prev).add(itemId));
+    const handleAddToCart = async (productId: number) => {
+        setProcessingItems((prev) => new Set(prev).add(productId));
         try {
             await addToCart({ productId, quantity: 1 });
             // Optionally remove from wishlist after adding to cart
-            // await removeFromWishlist(itemId);
+            // await removeFromWishlist(productId);
         } finally {
             setProcessingItems((prev) => {
                 const newSet = new Set(prev);
-                newSet.delete(itemId);
+                newSet.delete(productId);
                 return newSet;
             });
         }
     };
 
-    const handleMoveToCart = async (productId: number, itemId: number) => {
-        setProcessingItems((prev) => new Set(prev).add(itemId));
+    const handleMoveToCart = async (productId: number) => {
+        setProcessingItems((prev) => new Set(prev).add(productId));
         try {
             await addToCart({ productId, quantity: 1 });
-            await removeFromWishlist(itemId);
+            await removeFromWishlist(productId);
         } finally {
             setProcessingItems((prev) => {
                 const newSet = new Set(prev);
-                newSet.delete(itemId);
+                newSet.delete(productId);
                 return newSet;
             });
         }
@@ -101,15 +101,16 @@ export default function WishlistPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         {wishlist.map((item) => (
                             <div
-                                key={item.id}
+                                key={item.ywishlistid}
                                 className="bg-gradient-to-br from-morpheus-blue-dark/60 to-morpheus-blue-light/40 border border-morpheus-gold-dark/30 backdrop-blur-sm overflow-hidden group hover:border-morpheus-gold-light/50 transition-all duration-300"
                             >
                                 {/* Product Image */}
                                 <div className="relative aspect-square bg-gradient-to-br from-morpheus-gold-dark/10 to-morpheus-gold-light/10">
-                                    {item.yproduit?.imageurl ? (
+                                    {/* Note: No image URL available in current schema */}
+                                    {false ? (
                                         <img
-                                            src={item.yproduit.imageurl}
-                                            alt={item.yproduit.yproduitintitule || "Product"}
+                                            src=""
+                                            alt={item.yvarprod?.yprod?.yprodintitule || "Product"}
                                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                                         />
                                     ) : (
@@ -132,12 +133,12 @@ export default function WishlistPage() {
 
                                     {/* Remove from Wishlist Button */}
                                     <button
-                                        onClick={() => handleRemoveFromWishlist(item.id)}
-                                        disabled={processingItems.has(item.id)}
+                                        onClick={() => handleRemoveFromWishlist(item.yvarprodidfk)}
+                                        disabled={processingItems.has(item.yvarprodidfk)}
                                         className="absolute top-2 right-2 w-8 h-8 bg-red-500/80 hover:bg-red-500 text-white rounded-full flex items-center justify-center transition-all duration-300 opacity-0 group-hover:opacity-100 disabled:opacity-50 disabled:cursor-not-allowed"
                                         title={t('wishlist.removeFromWishlist')}
                                     >
-                                        {processingItems.has(item.id) ? (
+                                        {processingItems.has(item.yvarprodidfk) ? (
                                             <div className="w-4 h-4 border-2 border-white border-t-transparent animate-spin rounded-full"></div>
                                         ) : (
                                             <svg
@@ -158,37 +159,56 @@ export default function WishlistPage() {
 
                                     {/* Date Added Badge */}
                                     <div className="absolute bottom-2 left-2 bg-morpheus-blue-dark/80 text-white text-xs px-2 py-1 rounded">
-                                        {t('wishlist.added')} {new Date(item.created_at).toLocaleDateString()}
+                                        {t('wishlist.added')} {item.sysdate ? new Date(item.sysdate).toLocaleDateString() : ''}
                                     </div>
                                 </div>
 
                                 {/* Product Details */}
                                 <div className="p-4">
                                     <h3 className="text-white font-semibold text-lg mb-2 line-clamp-2">
-                                        {item.yproduit?.yproduitintitule || t('wishlist.unknownProduct')}
+                                        {item.yvarprod?.yvarprodintitule || item.yvarprod?.yprod?.yprodintitule || t('wishlist.unknownProduct')}
                                     </h3>
 
-                                    {item.yproduit?.yproduitdetailstech && (
+                                    {item.yvarprod?.yprod?.yproddetailstech && (
                                         <p className="text-gray-300 text-sm mb-3 line-clamp-3">
-                                            {item.yproduit.yproduitdetailstech}
+                                            {item.yvarprod.yprod.yproddetailstech}
                                         </p>
                                     )}
 
                                     {/* Price */}
                                     <div className="flex items-center gap-2 mb-4">
                                         <span className="text-morpheus-gold-light font-bold text-lg">
-                                            ${(99).toFixed(2)}
+                                            ${(item.yvarprod?.yvarprodprixpromotion || item.yvarprod?.yvarprodprixcatalogue || 99).toFixed(2)}
                                         </span>
+                                        {item.yvarprod?.yvarprodprixpromotion && (
+                                            <span className="text-gray-400 line-through text-sm">
+                                                ${item.yvarprod.yvarprodprixcatalogue.toFixed(2)}
+                                            </span>
+                                        )}
+                                    </div>
+
+                                    {/* Product Variants */}
+                                    <div className="flex items-center gap-2 mb-4 text-sm text-gray-300">
+                                        {item.yvarprod?.xcouleur && (
+                                            <span className="bg-morpheus-blue-dark/40 px-2 py-1 rounded">
+                                                {item.yvarprod.xcouleur.xcouleurintitule}
+                                            </span>
+                                        )}
+                                        {item.yvarprod?.xtaille && (
+                                            <span className="bg-morpheus-blue-dark/40 px-2 py-1 rounded">
+                                                {item.yvarprod.xtaille.xtailleintitule}
+                                            </span>
+                                        )}
                                     </div>
 
                                     {/* Action Buttons */}
                                     <div className="space-y-2">
                                         <button
-                                            onClick={() => handleAddToCart(item.yproduit?.yproduitid || 0, item.id)}
-                                            disabled={processingItems.has(item.id) || !item.yproduit?.yproduitid}
+                                            onClick={() => handleAddToCart(item.yvarprodidfk)}
+                                            disabled={processingItems.has(item.yvarprodidfk)}
                                             className="w-full bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light text-white py-2 px-4 font-medium hover:from-morpheus-gold-light hover:to-morpheus-gold-dark transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                                         >
-                                            {processingItems.has(item.id) ? (
+                                            {processingItems.has(item.yvarprodidfk) ? (
                                                 <div className="flex items-center justify-center gap-2">
                                                     <div className="w-4 h-4 border-2 border-white border-t-transparent animate-spin rounded-full"></div>
                                                     {t('wishlist.processing')}
@@ -199,8 +219,8 @@ export default function WishlistPage() {
                                         </button>
 
                                         <button
-                                            onClick={() => handleMoveToCart(item.yproduit?.yproduitid || 0, item.id)}
-                                            disabled={processingItems.has(item.id) || !item.yproduit?.yproduitid}
+                                            onClick={() => handleMoveToCart(item.yvarprodidfk)}
+                                            disabled={processingItems.has(item.yvarprodidfk)}
                                             className="w-full bg-gradient-to-r from-morpheus-gold-dark/20 to-morpheus-gold-light/20 border border-morpheus-gold-dark/40 text-morpheus-gold-light py-2 px-4 font-medium hover:from-morpheus-gold-dark/30 hover:to-morpheus-gold-light/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                                         >
                                             {t('wishlist.moveToCart')}

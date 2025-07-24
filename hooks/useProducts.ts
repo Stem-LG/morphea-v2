@@ -2,9 +2,9 @@ import { createClient } from "@/lib/client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Database } from "@/lib/supabase";
 
-type Product = Database['morpheus']['Tables']['yproduit']['Row'];
-type ProductInsert = Database['morpheus']['Tables']['yproduit']['Insert'];
-type ProductUpdate = Database['morpheus']['Tables']['yproduit']['Update'];
+type Product = Database['morpheus']['Tables']['yprod']['Row'];
+type ProductInsert = Database['morpheus']['Tables']['yprod']['Insert'];
+type ProductUpdate = Database['morpheus']['Tables']['yprod']['Update'];
 type Object3D = Database['morpheus']['Tables']['yobjet3d']['Row'];
 type Object3DInsert = Database['morpheus']['Tables']['yobjet3d']['Insert'];
 type Object3DUpdate = Database['morpheus']['Tables']['yobjet3d']['Update'];
@@ -25,9 +25,9 @@ export function useProducts(storeId: string | null) {
             const { data: infoSpots, error: infoSpotsError } = await supabase
                 .schema("morpheus")
                 .from("yinfospots")
-                .select("yinfospotactionsidfk")
-                .eq("ysceneid", storeId)
-                .not("yinfospotactionsidfk", "is", null);
+                .select("yinfospotactionidfk")
+                .eq("yscenesidfk", parseInt(storeId))
+                .not("yinfospotactionidfk", "is", null);
 
             if (infoSpotsError) {
                 console.error("Error fetching info spots:", infoSpotsError);
@@ -39,19 +39,41 @@ export function useProducts(storeId: string | null) {
             }
 
             // Extract unique action IDs
-            const actionIds = [...new Set(infoSpots.map(spot => spot.yinfospotactionsidfk).filter(Boolean))];
+            const actionIds = [...new Set(infoSpots.map(spot => spot.yinfospotactionidfk).filter(Boolean))];
 
             if (actionIds.length === 0) {
                 return [];
             }
 
-            // Then get all products for those info spot actions
+            // Get products through ydetailsevent table which links events to products
+            const { data: eventDetails, error: eventDetailsError } = await supabase
+                .schema("morpheus")
+                .from("ydetailsevent")
+                .select("yprodidfk")
+                .not("yprodidfk", "is", null);
+
+            if (eventDetailsError) {
+                console.error("Error fetching event details:", eventDetailsError);
+                throw eventDetailsError;
+            }
+
+            if (!eventDetails || eventDetails.length === 0) {
+                return [];
+            }
+
+            const productIds = [...new Set(eventDetails.map(detail => detail.yprodidfk).filter(Boolean))];
+
+            if (productIds.length === 0) {
+                return [];
+            }
+
+            // Then get all products (without 3D objects for now due to relationship complexity)
             const { data, error } = await supabase
                 .schema("morpheus")
-                .from("yproduit")
-                .select("*, yobjet3d(*)")
-                .in("yinfospotactionsidfk", actionIds)
-                .order("yproduitid");
+                .from("yprod")
+                .select("*")
+                .in("yprodid", productIds)
+                .order("yprodid");
 
             if (error) {
                 console.error("Error fetching products:", {
@@ -63,7 +85,13 @@ export function useProducts(storeId: string | null) {
                 throw error;
             }
 
-            return data as ProductWithObjects[] || [];
+            // Add empty yobjet3d array to match ProductWithObjects interface
+            const productsWithObjects = data?.map(product => ({
+                ...product,
+                yobjet3d: []
+            })) || [];
+
+            return productsWithObjects as ProductWithObjects[];
         },
         enabled: !!storeId,
     });
@@ -79,10 +107,10 @@ export function useProductsByCategory(categoryId: string | null) {
 
             const { data, error } = await supabase
                 .schema("morpheus")
-                .from("yproduit")
-                .select("*, yobjet3d(*)")
-                .eq("yinfospotactionsidfk", categoryId)
-                .order("yproduitid");
+                .from("yprod")
+                .select("*")
+                .eq("xcategprodidfk", parseInt(categoryId))
+                .order("yprodid");
 
             if (error) {
                 console.error("Error fetching products by category:", {
@@ -94,7 +122,13 @@ export function useProductsByCategory(categoryId: string | null) {
                 throw error;
             }
 
-            return data as ProductWithObjects[] || [];
+            // Add empty yobjet3d array to match ProductWithObjects interface
+            const productsWithObjects = data?.map(product => ({
+                ...product,
+                yobjet3d: []
+            })) || [];
+
+            return productsWithObjects as ProductWithObjects[];
         },
         enabled: !!categoryId,
     });
@@ -108,7 +142,7 @@ export function useCreateProduct() {
         mutationFn: async (product: ProductInsert) => {
             const { data, error } = await supabase
                 .schema("morpheus")
-                .from("yproduit")
+                .from("yprod")
                 .insert(product)
                 .select()
                 .single();
@@ -117,7 +151,7 @@ export function useCreateProduct() {
             return data;
         },
         onSuccess: (data) => {
-            queryClient.invalidateQueries({ queryKey: ['products', data.yinfospotactionsidfk] });
+            queryClient.invalidateQueries({ queryKey: ['products'] });
         },
     });
 }
@@ -130,9 +164,9 @@ export function useUpdateProduct() {
         mutationFn: async ({ id, updates }: { id: number; updates: ProductUpdate }) => {
             const { data, error } = await supabase
                 .schema("morpheus")
-                .from("yproduit")
+                .from("yprod")
                 .update(updates)
-                .eq("yproduitid", id)
+                .eq("yprodid", id)
                 .select()
                 .single();
 
@@ -140,7 +174,7 @@ export function useUpdateProduct() {
             return data;
         },
         onSuccess: (data) => {
-            queryClient.invalidateQueries({ queryKey: ['products', data.yinfospotactionsidfk] });
+            queryClient.invalidateQueries({ queryKey: ['products'] });
         },
     });
 }
@@ -156,14 +190,14 @@ export function useDeleteProduct() {
                 .schema("morpheus")
                 .from("yobjet3d")
                 .delete()
-                .eq("produit_id", id);
+                .eq("yvarprodidfk", id);
 
             // Then delete the product
             const { error } = await supabase
                 .schema("morpheus")
-                .from("yproduit")
+                .from("yprod")
                 .delete()
-                .eq("yproduitid", id);
+                .eq("yprodid", id);
 
             if (error) throw error;
             return id;
@@ -206,7 +240,7 @@ export function useUpdate3DObject() {
                 .schema("morpheus")
                 .from("yobjet3d")
                 .update(updates)
-                .eq("id", id)
+                .eq("yobjet3did", id)
                 .select()
                 .single();
 
@@ -229,7 +263,7 @@ export function useDelete3DObject() {
                 .schema("morpheus")
                 .from("yobjet3d")
                 .delete()
-                .eq("id", id);
+                .eq("yobjet3did", id);
 
             if (error) throw error;
             return id;

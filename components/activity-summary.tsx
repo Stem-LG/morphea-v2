@@ -1,7 +1,7 @@
 "use client";
 
-import { useWishlist } from "@/hooks/useWishlist";
-import { useCart } from "@/hooks/useCart";
+import { useWishlist, WishlistItem } from "@/hooks/useWishlist";
+import { useCart, CartItem } from "@/hooks/useCart";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useRouter } from "next/navigation";
 
@@ -27,12 +27,12 @@ export function ActivitySummary({}: ActivitySummaryProps) {
     const router = useRouter();
 
     const wishlistCount = wishlist.length;
-    const cartItemCount = cart.reduce((sum, item) => sum + item.yquantite, 0);
+    const cartItemCount = cart.reduce((sum, item) => sum + item.ypanierqte, 0);
     const cartUniqueCount = cart.length;
 
     // Get recent activity (last 3 items from both wishlist and cart)
-    const recentWishlistItems = wishlist.slice(0, 2);
-    const recentCartItems = cart.slice(0, 2);
+    const recentWishlistItems: WishlistItem[] = wishlist.slice(0, 2);
+    const recentCartItems: CartItem[] = cart.slice(0, 2);
 
     const handleViewWishlist = () => {
         router.push("/wishlist");
@@ -83,10 +83,10 @@ export function ActivitySummary({}: ActivitySummaryProps) {
                         <div className="space-y-2 mb-4">
                             <p className="text-gray-300 text-xs font-medium">{t('activity.recentAdditions')}</p>
                             {recentWishlistItems.map((item) => (
-                                <div key={item.id} className="flex items-center gap-2 text-xs">
+                                <div key={item.ywishlistid} className="flex items-center gap-2 text-xs">
                                     <div className="w-2 h-2 bg-morpheus-gold-light rounded-full flex-shrink-0"></div>
                                     <span className="text-gray-300 truncate">
-                                        {item.yproduit?.yproduitintitule || t('activity.unknownProduct')}
+                                        {item.yvarprod?.yprod?.yprodintitule || item.yvarprod?.yvarprodintitule || t('activity.unknownProduct')}
                                     </span>
                                 </div>
                             ))}
@@ -150,12 +150,12 @@ export function ActivitySummary({}: ActivitySummaryProps) {
                         <div className="space-y-2 mb-4">
                             <p className="text-gray-300 text-xs font-medium">{t('activity.recentAdditions')}</p>
                             {recentCartItems.map((item) => (
-                                <div key={item.id} className="flex items-center gap-2 text-xs">
+                                <div key={item.ypanierid} className="flex items-center gap-2 text-xs">
                                     <div className="w-2 h-2 bg-morpheus-gold-light rounded-full flex-shrink-0"></div>
                                     <span className="text-gray-300 truncate">
-                                        {item.yproduit?.yproduitintitule || t('activity.unknownProduct')}
-                                        {item.yquantite > 1 && (
-                                            <span className="text-morpheus-gold-light ml-1">(×{item.yquantite})</span>
+                                        {item.yvarprod?.yprod?.yprodintitule || item.yvarprod?.yvarprodintitule || t('activity.unknownProduct')}
+                                        {item.ypanierqte > 1 && (
+                                            <span className="text-morpheus-gold-light ml-1">(×{item.ypanierqte})</span>
                                         )}
                                     </span>
                                 </div>
@@ -202,7 +202,7 @@ export function ActivitySummary({}: ActivitySummaryProps) {
                     <div className="space-y-3">
                         {/* Recent wishlist additions */}
                         {recentWishlistItems.map((item) => (
-                            <div key={`wishlist-${item.id}`} className="flex items-center gap-3 text-sm">
+                            <div key={`wishlist-${item.ywishlistid}`} className="flex items-center gap-3 text-sm">
                                 <div className="w-8 h-8 bg-red-500/20 rounded-full flex items-center justify-center flex-shrink-0">
                                     <svg className="w-4 h-4 text-red-400" fill="currentColor" viewBox="0 0 24 24">
                                         <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
@@ -212,12 +212,12 @@ export function ActivitySummary({}: ActivitySummaryProps) {
                                     <p className="text-white">
                                         {t('activity.added')}{" "}
                                         <span className="text-morpheus-gold-light font-medium">
-                                            {item.yproduit?.yproduitintitule || t('activity.unknownProduct')}
+                                            {item.yvarprod?.yprod?.yprodintitule || item.yvarprod?.yvarprodintitule || t('activity.unknownProduct')}
                                         </span>{" "}
                                         {t('activity.addedToWishlist')}
                                     </p>
                                     <p className="text-gray-400 text-xs">
-                                        {new Date(item.created_at).toLocaleDateString()}
+                                        {new Date(item.sysdate || '').toLocaleDateString()}
                                     </p>
                                 </div>
                             </div>
@@ -225,7 +225,7 @@ export function ActivitySummary({}: ActivitySummaryProps) {
 
                         {/* Recent cart additions */}
                         {recentCartItems.map((item) => (
-                            <div key={`cart-${item.id}`} className="flex items-center gap-3 text-sm">
+                            <div key={`cart-${item.ypanierid}`} className="flex items-center gap-3 text-sm">
                                 <div className="w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center flex-shrink-0">
                                     <svg
                                         className="w-4 h-4 text-green-400"
@@ -245,15 +245,15 @@ export function ActivitySummary({}: ActivitySummaryProps) {
                                     <p className="text-white">
                                         {t('activity.added')}{" "}
                                         <span className="text-morpheus-gold-light font-medium">
-                                            {item.yproduit?.yproduitintitule || t('activity.unknownProduct')}
+                                            {item.yvarprod?.yprod?.yprodintitule || item.yvarprod?.yvarprodintitule || t('activity.unknownProduct')}
                                         </span>{" "}
                                         {t('activity.addedToCart')}
-                                        {item.yquantite > 1 && (
-                                            <span className="text-gray-300"> (×{item.yquantite})</span>
+                                        {item.ypanierqte > 1 && (
+                                            <span className="text-gray-300"> (×{item.ypanierqte})</span>
                                         )}
                                     </p>
                                     <p className="text-gray-400 text-xs">
-                                        {new Date(item.created_at).toLocaleDateString()}
+                                        {new Date(item.sysdate || '').toLocaleDateString()}
                                     </p>
                                 </div>
                             </div>

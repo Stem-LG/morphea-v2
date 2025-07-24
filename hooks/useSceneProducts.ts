@@ -16,7 +16,7 @@ export function useSceneProducts(sceneId: string | null) {
             }
             
             console.log("Fetching products for sceneId:", sceneId);
-            const { data, error } = await supabase.schema("morpheus").from("yproduit").select("*,yobjet3d(*)").eq("yinfospotactionsidfk", sceneId);
+            const { data, error } = await supabase.schema("morpheus").from("yprod").select("*").eq("yprodid", parseInt(sceneId));
 
             if (error) {
                 console.error("Error fetching products:", {

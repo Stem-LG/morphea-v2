@@ -188,6 +188,9 @@ export const enTranslations = {
     "failedToDelete3DObject": "Failed to delete 3D object. Please try again.",
     "imageUrlPlaceholder": "https://example.com/image.jpg",
     "saveProductFailed": "Failed to save product. Please try again.",
+    "infoTooltip": "Info Tooltip",
+    "infoTooltipPlaceholder": "Enter tooltip information",
+    "status": "Status",
     "tour": {
       "adminControls": "Admin Controls",
       "view": "View",

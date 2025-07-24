@@ -10,10 +10,10 @@ export default function CartPage() {
     const { t } = useLanguage();
     const [updatingItems, setUpdatingItems] = useState<Set<number>>(new Set());
 
-    const totalItems = cart.reduce((sum, item) => sum + item.yquantite, 0);
+    const totalItems = cart.reduce((sum, item) => sum + item.ypanierqte, 0);
     const totalPrice = cart.reduce((sum, item) => {
-        const price = 99;
-        return sum + price * item.yquantite;
+        const price = item.yvarprod?.yvarprodprixpromotion || item.yvarprod?.yvarprodprixcatalogue || 99;
+        return sum + price * item.ypanierqte;
     }, 0);
 
     const handleQuantityChange = async (itemId: number, newQuantity: number) => {
@@ -97,16 +97,17 @@ export default function CartPage() {
                         <div className="lg:col-span-2 space-y-4">
                             {cart.map((item) => (
                                 <div
-                                    key={item.id}
+                                    key={item.ypanierid}
                                     className="bg-gradient-to-br from-morpheus-blue-dark/60 to-morpheus-blue-light/40 border border-morpheus-gold-dark/30 p-6 backdrop-blur-sm"
                                 >
                                     <div className="flex items-center gap-4">
                                         {/* Product Image */}
                                         <div className="w-20 h-20 bg-gradient-to-br from-morpheus-gold-dark/20 to-morpheus-gold-light/20 border border-morpheus-gold-dark/40 flex items-center justify-center flex-shrink-0">
-                                            {item.yproduit?.imageurl ? (
+                                            {/* Note: No image URL available in current schema */}
+                                            {false ? (
                                                 <img
-                                                    src={item.yproduit.imageurl}
-                                                    alt={item.yproduit.yproduitintitule || "Product"}
+                                                    src=""
+                                                    alt={item.yvarprod?.yprod?.yprodintitule || "Product"}
                                                     className="w-full h-full object-cover"
                                                 />
                                             ) : (
@@ -129,39 +130,49 @@ export default function CartPage() {
                                         {/* Product Details */}
                                         <div className="flex-1">
                                             <h3 className="text-white font-semibold text-lg mb-1">
-                                                {item.yproduit?.yproduitintitule || t('cart.unknownProduct')}
+                                                {item.yvarprod?.yvarprodintitule || item.yvarprod?.yprod?.yprodintitule || t('cart.unknownProduct')}
                                             </h3>
-                                            {item.yproduit?.yproduitdetailstech && (
+                                            {item.yvarprod?.yprod?.yproddetailstech && (
                                                 <p className="text-gray-300 text-sm mb-2 line-clamp-2">
-                                                    {item.yproduit.yproduitdetailstech}
+                                                    {item.yvarprod.yprod.yproddetailstech}
                                                 </p>
                                             )}
                                             <div className="flex items-center gap-4">
                                                 <span className="text-morpheus-gold-light font-semibold">
-                                                    ${(99).toFixed(2)}
+                                                    ${(item.yvarprod?.yvarprodprixpromotion || item.yvarprod?.yvarprodprixcatalogue || 99).toFixed(2)}
                                                 </span>
+                                                {item.yvarprod?.xcouleur && (
+                                                    <span className="text-gray-300 text-sm">
+                                                        {item.yvarprod.xcouleur.xcouleurintitule}
+                                                    </span>
+                                                )}
+                                                {item.yvarprod?.xtaille && (
+                                                    <span className="text-gray-300 text-sm">
+                                                        {item.yvarprod.xtaille.xtailleintitule}
+                                                    </span>
+                                                )}
                                             </div>
                                         </div>
 
                                         {/* Quantity Controls */}
                                         <div className="flex items-center gap-3">
                                             <button
-                                                onClick={() => handleQuantityChange(item.id, item.yquantite - 1)}
-                                                disabled={updatingItems.has(item.id) || item.yquantite <= 1}
+                                                onClick={() => handleQuantityChange(item.ypanierid, item.ypanierqte - 1)}
+                                                disabled={updatingItems.has(item.ypanierid) || item.ypanierqte <= 1}
                                                 className="w-8 h-8 bg-gradient-to-r from-morpheus-gold-dark/20 to-morpheus-gold-light/20 border border-morpheus-gold-dark/40 text-morpheus-gold-light flex items-center justify-center hover:from-morpheus-gold-dark/30 hover:to-morpheus-gold-light/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                                             >
                                                 -
                                             </button>
                                             <span className="text-white font-semibold min-w-[2rem] text-center">
-                                                {updatingItems.has(item.id) ? (
+                                                {updatingItems.has(item.ypanierid) ? (
                                                     <div className="w-4 h-4 border-2 border-morpheus-gold-dark border-t-morpheus-gold-light animate-spin rounded-full mx-auto"></div>
                                                 ) : (
-                                                    item.yquantite
+                                                    item.ypanierqte
                                                 )}
                                             </span>
                                             <button
-                                                onClick={() => handleQuantityChange(item.id, item.yquantite + 1)}
-                                                disabled={updatingItems.has(item.id)}
+                                                onClick={() => handleQuantityChange(item.ypanierid, item.ypanierqte + 1)}
+                                                disabled={updatingItems.has(item.ypanierid)}
                                                 className="w-8 h-8 bg-gradient-to-r from-morpheus-gold-dark/20 to-morpheus-gold-light/20 border border-morpheus-gold-dark/40 text-morpheus-gold-light flex items-center justify-center hover:from-morpheus-gold-dark/30 hover:to-morpheus-gold-light/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                                             >
                                                 +
@@ -170,8 +181,8 @@ export default function CartPage() {
 
                                         {/* Remove Button */}
                                         <button
-                                            onClick={() => handleRemoveItem(item.id)}
-                                            disabled={updatingItems.has(item.id)}
+                                            onClick={() => handleRemoveItem(item.ypanierid)}
+                                            disabled={updatingItems.has(item.ypanierid)}
                                             className="text-red-400 hover:text-red-300 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                                             title={t('cart.removeFromCart')}
                                         >
@@ -196,7 +207,7 @@ export default function CartPage() {
                                         <div className="flex justify-between items-center">
                                             <span className="text-gray-300">{t('cart.itemTotal')}:</span>
                                             <span className="text-morpheus-gold-light font-semibold">
-                                                ${(99 * item.yquantite).toFixed(2)}
+                                                ${((item.yvarprod?.yvarprodprixpromotion || item.yvarprod?.yvarprodprixcatalogue || 99) * item.ypanierqte).toFixed(2)}
                                             </span>
                                         </div>
                                     </div>
