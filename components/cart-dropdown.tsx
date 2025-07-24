@@ -27,7 +27,7 @@ export function CartDropdown({ isOpen, onClose, onProductClick }: CartDropdownPr
     const { t } = useLanguage();
     const dropdownRef = useRef<HTMLDivElement>(null);
 
-    const totalItems = cart.reduce((sum, item) => sum + item.yquantite, 0);
+    const totalItems = cart.reduce((sum, item) => sum + item.ypanierqte, 0);
 
     // Close dropdown when clicking outside
     useEffect(() => {
@@ -47,24 +47,19 @@ export function CartDropdown({ isOpen, onClose, onProductClick }: CartDropdownPr
     }, [isOpen, onClose]);
 
     const handleProductClick = (item: any) => {
-        if (!onProductClick || !item.yproduit) return;
+        if (!onProductClick || !item.yvarprod) return;
 
         console.log("Cart item clicked:", item);
-        console.log("3D objects:", item.yproduit.yobjet3d);
+        console.log("Product data:", item.yvarprod);
 
         // Transform the product data to match ProductDetailsPageProps
         const productData = {
-            id: item.yproduit.yproduitid,
-            name: item.yproduit.yproduitintitule || "Unknown Product",
-            description: item.yproduit.yproduitdetailstech || "",
-            image: item.yproduit.imageurl || "/placeholder-product.jpg",
+            id: item.yvarprod.yvarprodid,
+            name: item.yvarprod.yvarprodintitule || "Unknown Product",
+            description: item.yvarprod.yprod?.yproddetailstech || "",
+            image: "/placeholder-product.jpg", // No image URL in new schema
             backgroundColor: "#f0f0f0",
-            models:
-                item.yproduit.yobjet3d?.map((obj: any, index: number) => ({
-                    url: obj.url || "",
-                    color: obj.couleur || "default",
-                    id: obj.id || index,
-                })) || [],
+            models: [], // No 3D objects in new schema structure
         };
 
         console.log("Transformed product data:", productData);
@@ -128,14 +123,14 @@ export function CartDropdown({ isOpen, onClose, onProductClick }: CartDropdownPr
                     <div className="p-4 space-y-3">
                         {cart.slice(0, 3).map((item) => (
                             <div
-                                key={item.id}
+                                key={item.ypanierid}
                                 className="flex gap-3 p-3 bg-morpheus-blue-dark/30 backdrop-blur-sm rounded-lg border border-morpheus-gold-dark/10"
                             >
                                 {/* Product Image */}
                                 <div className="w-12 h-12 bg-white rounded-md overflow-hidden flex-shrink-0">
                                     <Image
-                                        src={item.yproduit?.imageurl || "/placeholder-product.jpg"}
-                                        alt={item.yproduit?.yproduitintitule || "Product"}
+                                        src="/placeholder-product.jpg"
+                                        alt={item.yvarprod?.yvarprodintitule || "Product"}
                                         width={48}
                                         height={48}
                                         className="w-full h-full object-cover"
@@ -148,23 +143,22 @@ export function CartDropdown({ isOpen, onClose, onProductClick }: CartDropdownPr
                                         className="text-white text-sm font-medium truncate cursor-pointer hover:text-morpheus-gold-light transition-colors"
                                         onClick={() => handleProductClick(item)}
                                     >
-                                        {item.yproduit?.yproduitintitule || "Unknown Product"}
+                                        {item.yvarprod?.yvarprodintitule || "Unknown Product"}
                                     </h4>
-                                    {item.yproduit?.yinfospotactions?.yboutique && (
-                                        <p className="text-morpheus-gold-light text-xs font-medium">
-                                            {item.yproduit.yinfospotactions.yboutique.yboutiqueintitule ||
-                                                item.yproduit.yinfospotactions.yboutique.yboutiquecode}
-                                        </p>
-                                    )}
-                                    {item.ycouleur && (
+                                    {item.yvarprod?.xcouleur && (
                                         <p className="text-gray-400 text-xs flex items-center gap-1">
-                                            {t("cart.color")}:
+                                            {t("cart.color")}: {item.yvarprod.xcouleur.xcouleurintitule}
                                             <div
                                                 className="rounded rounded-full size-4"
                                                 style={{
-                                                    backgroundColor: item.ycouleur,
+                                                    backgroundColor: item.yvarprod.xcouleur.xcouleurhexa,
                                                 }}
                                             ></div>
+                                        </p>
+                                    )}
+                                    {item.yvarprod?.xtaille && (
+                                        <p className="text-gray-400 text-xs">
+                                            {t("cart.size")}: {item.yvarprod.xtaille.xtailleintitule}
                                         </p>
                                     )}
 
@@ -172,18 +166,18 @@ export function CartDropdown({ isOpen, onClose, onProductClick }: CartDropdownPr
                                     <div className="flex items-center gap-2 mt-1">
                                         <button
                                             onClick={() =>
-                                                updateQuantity({ itemId: item.id, quantity: item.yquantite - 1 })
+                                                updateQuantity({ itemId: item.ypanierid, quantity: item.ypanierqte - 1 })
                                             }
                                             className="w-6 h-6 rounded border border-morpheus-gold-dark/30 text-white hover:border-morpheus-gold-light hover:bg-morpheus-gold-dark/20 transition-all duration-300 flex items-center justify-center text-sm"
                                         >
                                             −
                                         </button>
                                         <span className="text-white text-sm font-medium w-6 text-center">
-                                            {item.yquantite}
+                                            {item.ypanierqte}
                                         </span>
                                         <button
                                             onClick={() =>
-                                                updateQuantity({ itemId: item.id, quantity: item.yquantite + 1 })
+                                                updateQuantity({ itemId: item.ypanierid, quantity: item.ypanierqte + 1 })
                                             }
                                             className="w-6 h-6 rounded border border-morpheus-gold-dark/30 text-white hover:border-morpheus-gold-light hover:bg-morpheus-gold-dark/20 transition-all duration-300 flex items-center justify-center text-sm"
                                         >
@@ -194,7 +188,7 @@ export function CartDropdown({ isOpen, onClose, onProductClick }: CartDropdownPr
 
                                 {/* Remove Button */}
                                 <button
-                                    onClick={() => removeFromCart(item.id)}
+                                    onClick={() => removeFromCart(item.ypanierid)}
                                     className="text-red-400 hover:text-red-300 transition-colors p-1 flex-shrink-0"
                                 >
                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

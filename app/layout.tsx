@@ -1,11 +1,6 @@
-"use client";
-
 import { Geist, Geist_Mono, Parisienne } from "next/font/google";
 import "./globals.css";
-import AnimatedBackground from "@/components/animated-background";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import NavBar from "./_components/nav_bar";
-import { LanguageProvider } from "@/hooks/useLanguage";
+import ClientProviders from "./_components/client-providers";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -23,25 +18,15 @@ const parisienne = Parisienne({
     weight: "400",
 });
 
-const queryClient = new QueryClient();
-
 export default function RootLayout({
     children,
 }: Readonly<{
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en">
-            <body className={`${geistSans.variable} ${geistMono.variable} ${parisienne.variable} antialiased`}>
-                <QueryClientProvider client={queryClient}>
-                    <LanguageProvider>
-                        <NavBar />
-                        {/* Animated 360° Background */}
-                        <AnimatedBackground />
-                        {/* Main content with navbar spacing */}
-                        <div className="relative z-10">{children}</div>
-                    </LanguageProvider>
-                </QueryClientProvider>
+        <html lang="en" className={`${geistSans.variable} ${geistMono.variable} ${parisienne.variable}`}>
+            <body className="antialiased">
+                <ClientProviders>{children}</ClientProviders>
             </body>
         </html>
     );

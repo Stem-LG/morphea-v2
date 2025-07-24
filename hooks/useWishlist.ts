@@ -1,12 +1,35 @@
 import { createClient } from "@/lib/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "./useAuth";
+import { Database } from "@/lib/supabase";
 
-export interface WishlistItem {
-    id: number;
-    yproduit_id: number;
-    created_at: string;
-    yuser_id: string;
+type WishlistRow = Database['morpheus']['Tables']['ywishlist']['Row'];
+type WishlistInsert = Database['morpheus']['Tables']['ywishlist']['Insert'];
+
+export interface WishlistItem extends WishlistRow {
+    yvarprodidfk: number; // Explicitly include this property
+    yvarprod?: {
+        yvarprodid: number;
+        yvarprodintitule: string;
+        yvarprodcode: string;
+        yvarprodprixcatalogue: number;
+        yvarprodprixpromotion: number | null;
+        yprod?: {
+            yprodid: number;
+            yprodintitule: string;
+            yproddetailstech: string;
+            yprodinfobulle: string;
+        } | null;
+        xcouleur?: {
+            xcouleurid: number;
+            xcouleurintitule: string;
+            xcouleurhexa: string;
+        } | null;
+        xtaille?: {
+            xtailleid: number;
+            xtailleintitule: string;
+        } | null;
+    } | null;
 }
 
 export function useWishlist() {
@@ -16,7 +39,7 @@ export function useWishlist() {
 
     const wishlistQuery = useQuery({
         queryKey: ['wishlist', user?.id],
-        queryFn: async () => {
+        queryFn: async (): Promise<WishlistItem[]> => {
             if (!user?.id) return [];
             
             const { data, error } = await supabase
@@ -24,25 +47,31 @@ export function useWishlist() {
                 .from('ywishlist')
                 .select(`
                     *,
-                    yproduit:yproduit_id (
-                        yproduitid,
-                        yproduitintitule,
-                        imageurl,
-                        yproduitdetailstech,
-                        yobjet3d (*),
-                        yinfospotactions:yinfospotactionsidfk (
-                            yinfospotactionsid,
-                            ytitle,
-                            yboutique:yboutiqueidfk (
-                                yboutiqueid,
-                                yboutiqueintitule,
-                                yboutiquecode
-                            )
+                    yvarprod:yvarprodidfk (
+                        yvarprodid,
+                        yvarprodintitule,
+                        yvarprodcode,
+                        yvarprodprixcatalogue,
+                        yvarprodprixpromotion,
+                        yprod:yprodidfk (
+                            yprodid,
+                            yprodintitule,
+                            yproddetailstech,
+                            yprodinfobulle
+                        ),
+                        xcouleur:xcouleuridfk (
+                            xcouleurid,
+                            xcouleurintitule,
+                            xcouleurhexa
+                        ),
+                        xtaille:xtailleidfk (
+                            xtailleid,
+                            xtailleintitule
                         )
                     )
                 `)
-                .eq('yuser_id', user.id)
-                .order('created_at', { ascending: false });
+                .eq('yuseridfk', user.id)
+                .order('sysdate', { ascending: false });
 
             if (error) {
                 console.error('Error fetching wishlist:', error);
@@ -63,21 +92,37 @@ export function useWishlist() {
                 .schema('morpheus')
                 .from('ywishlist')
                 .select('*')
-                .eq('yuser_id', user.id)
-                .eq('yproduit_id', productId)
-                .single();
+                .eq('yuseridfk', user.id)
+                .eq('yvarprodidfk', productId)
+                .maybeSingle();
 
             if (existingItem) {
                 throw new Error('Item already in wishlist');
             }
 
+            // Get the next available ID
+            const { data: maxIdData } = await supabase
+                .schema('morpheus')
+                .from('ywishlist')
+                .select('ywishlistid')
+                .order('ywishlistid', { ascending: false })
+                .limit(1)
+                .single();
+
+            const nextId = (maxIdData?.ywishlistid || 0) + 1;
+
+            const insertData: WishlistInsert = {
+                ywishlistid: nextId,
+                yvarprodidfk: productId,
+                yuseridfk: user.id,
+                sysaction: 'INSERT',
+                sysuser: user.id
+            };
+
             const { data, error } = await supabase
                 .schema('morpheus')
                 .from('ywishlist')
-                .insert({
-                    yproduit_id: productId,
-                    yuser_id: user.id
-                })
+                .insert(insertData)
                 .select()
                 .single();
 
@@ -97,8 +142,8 @@ export function useWishlist() {
                 .schema('morpheus')
                 .from('ywishlist')
                 .delete()
-                .eq('yuser_id', user.id)
-                .eq('yproduit_id', productId);
+                .eq('yuseridfk', user.id)
+                .eq('yvarprodidfk', productId);
 
             if (error) throw error;
         },
@@ -108,7 +153,7 @@ export function useWishlist() {
     });
 
     const isInWishlist = (productId: number) => {
-        return wishlistQuery.data?.some(item => item.yproduit_id === productId) || false;
+        return wishlistQuery.data?.some(item => item.yvarprodidfk === productId) || false;
     };
 
     return {

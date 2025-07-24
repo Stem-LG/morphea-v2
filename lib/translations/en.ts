@@ -26,6 +26,9 @@ export const enTranslations = {
     "confirm": "Confirm"
   },
   "auth": {
+    "name": "Name",
+    "namePlaceholder": "Enter your full name",
+    "nameRequired": "Name is required",
     "email": "Email",
     "password": "Password",
     "confirmPassword": "Confirm Password",
@@ -449,5 +452,40 @@ export const enTranslations = {
     "addedToWishlist": "to wishlist",
     "addedToCart": "to cart",
     "added": "Added"
+  },
+  "visitorForm": {
+    "title": "Welcome to Morpheus Mall",
+    "subtitle": "Help us personalize your experience by sharing some information about yourself.",
+    "basicInformation": "Basic Information",
+    "name": "Name",
+    "nameRequired": "Name *",
+    "email": "Email",
+    "phone": "Phone",
+    "address": "Address",
+    "namePlaceholder": "Enter your full name",
+    "emailPlaceholder": "Enter your email address",
+    "phonePlaceholder": "Enter your phone number",
+    "addressPlaceholder": "Enter your address",
+    "visitorTypes": "What describes you best? (Select all that apply)",
+    "visitorTypeLabels": {
+      "grandpublic": "General Public",
+      "clientprive": "Private Client",
+      "acheteurluxe": "Luxury Buyer",
+      "acheteurpro": "Professional Buyer",
+      "artisan": "Artisan",
+      "createur": "Creator/Designer",
+      "collectionneur": "Collector",
+      "investisseur": "Investor",
+      "influenceur": "Influencer",
+      "journaliste": "Journalist",
+      "pressespecialisee": "Specialized Press",
+      "culturel": "Cultural Professional",
+      "vip": "VIP"
+    },
+    "skipForNow": "Skip for now",
+    "submit": "Submit",
+    "submitting": "Submitting...",
+    "thankYou": "Thank you for providing your information!",
+    "errorSubmitting": "There was an error submitting your information. Please try again."
   }
 };

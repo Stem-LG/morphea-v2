@@ -6,11 +6,13 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useLanguage } from '@/hooks/useLanguage'
+import { useVisitorData } from '@/hooks/useVisitorData'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
+  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [repeatPassword, setRepeatPassword] = useState('')
@@ -18,6 +20,19 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
   const { t } = useLanguage()
+  const { visitorData, isLoading: isLoadingVisitor } = useVisitorData()
+
+  // Prefill form with visitor data when available
+  useEffect(() => {
+    if (visitorData && !isLoadingVisitor) {
+      if (visitorData.yvisiteurnom && !name) {
+        setName(visitorData.yvisiteurnom)
+      }
+      if (visitorData.yvisiteuremail && !email) {
+        setEmail(visitorData.yvisiteuremail)
+      }
+    }
+  }, [visitorData, isLoadingVisitor, name, email])
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -31,15 +46,49 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
       return
     }
 
+    if (!name.trim()) {
+      setError(t('auth.nameRequired'))
+      setIsLoading(false)
+      return
+    }
+
     try {
-      const { error } = await supabase.auth.signUp({
+      // Get current user (should be anonymous)
+      const { data: currentUserData } = await supabase.auth.getUser()
+      const currentUser = currentUserData?.user
+
+      // Sign up with email and password
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
         options: {
           emailRedirectTo: `${window.location.origin}/main`,
+          data: {
+            full_name: name.trim()
+          }
         },
       })
-      if (error) throw error
+
+      if (signUpError) throw signUpError
+
+      // If we had visitor data and a current anonymous user, update the visitor record
+      if (visitorData && currentUser && signUpData.user) {
+        try {
+          await supabase
+            .schema('morpheus')
+            .from('yvisiteur')
+            .update({
+              yuseridfk: signUpData.user.id,
+              yvisiteurnom: name.trim(),
+              yvisiteuremail: email
+            })
+            .eq('yvisiteurid', visitorData.yvisiteurid)
+        } catch (updateError) {
+          console.error('Error updating visitor record:', updateError)
+          // Don't fail the signup if visitor update fails
+        }
+      }
+
       router.push('/auth/sign-up-success')
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : t('auth.errorOccurred'))
@@ -66,6 +115,19 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
       {/* Form Card */}
       <div className="bg-gradient-to-br from-morpheus-blue-dark to-morpheus-blue-light border border-slate-700 p-8 shadow-2xl">
         <form onSubmit={handleSignUp} className="space-y-6">
+          <div className="space-y-2">
+            <Label htmlFor="name" className="text-white text-lg font-medium">{t('auth.name')}</Label>
+            <Input
+              id="name"
+              type="text"
+              placeholder={t('auth.namePlaceholder')}
+              required
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="bg-slate-700 border-slate-600 text-white placeholder:text-gray-400 h-12 text-lg focus:border-morpheus-gold-light focus:ring-morpheus-gold-light rounded-none"
+            />
+          </div>
+          
           <div className="space-y-2">
             <Label htmlFor="email" className="text-white text-lg font-medium">{t('auth.email')}</Label>
             <Input

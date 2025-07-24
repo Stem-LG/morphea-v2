@@ -1,14 +1,35 @@
 import { createClient } from "@/lib/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "./useAuth";
+import { Database } from "@/lib/supabase";
 
-export interface CartItem {
-    id: number;
-    yproduit_id: number;
-    yquantite: number;
-    ycouleur: string | null;
-    created_at: string;
-    yuser_id: string;
+type CartRow = Database['morpheus']['Tables']['ypanier']['Row'];
+type CartInsert = Database['morpheus']['Tables']['ypanier']['Insert'];
+
+export interface CartItem extends CartRow {
+    ypanierqte: number; // Explicitly include this property
+    yvarprod?: {
+        yvarprodid: number;
+        yvarprodintitule: string;
+        yvarprodcode: string;
+        yvarprodprixcatalogue: number;
+        yvarprodprixpromotion: number | null;
+        yprod?: {
+            yprodid: number;
+            yprodintitule: string;
+            yproddetailstech: string;
+            yprodinfobulle: string;
+        } | null;
+        xcouleur?: {
+            xcouleurid: number;
+            xcouleurintitule: string;
+            xcouleurhexa: string;
+        } | null;
+        xtaille?: {
+            xtailleid: number;
+            xtailleintitule: string;
+        } | null;
+    } | null;
 }
 
 export function useCart() {
@@ -18,7 +39,7 @@ export function useCart() {
 
     const cartQuery = useQuery({
         queryKey: ['cart', user?.id],
-        queryFn: async () => {
+        queryFn: async (): Promise<CartItem[]> => {
             if (!user?.id) return [];
 
             const { data, error } = await supabase
@@ -26,25 +47,31 @@ export function useCart() {
                 .from('ypanier')
                 .select(`
                     *,
-                    yproduit:yproduit_id (
-                        yproduitid,
-                        yproduitintitule,
-                        imageurl,
-                        yproduitdetailstech,
-                        yobjet3d (*),
-                        yinfospotactions:yinfospotactionsidfk (
-                            yinfospotactionsid,
-                            ytitle,
-                            yboutique:yboutiqueidfk (
-                                yboutiqueid,
-                                yboutiqueintitule,
-                                yboutiquecode
-                            )
+                    yvarprod:yvarprodidfk (
+                        yvarprodid,
+                        yvarprodintitule,
+                        yvarprodcode,
+                        yvarprodprixcatalogue,
+                        yvarprodprixpromotion,
+                        yprod:yprodidfk (
+                            yprodid,
+                            yprodintitule,
+                            yproddetailstech,
+                            yprodinfobulle
+                        ),
+                        xcouleur:xcouleuridfk (
+                            xcouleurid,
+                            xcouleurintitule,
+                            xcouleurhexa
+                        ),
+                        xtaille:xtailleidfk (
+                            xtailleid,
+                            xtailleintitule
                         )
                     )
                 `)
-                .eq('yuser_id', user.id)
-                .order('created_at', { ascending: false });
+                .eq('yuseridfk', user.id)
+                .order('sysdate', { ascending: false });
 
             if (error) {
                 console.error('Error fetching cart:', error);
@@ -57,7 +84,7 @@ export function useCart() {
     });
 
     const addToCartMutation = useMutation({
-        mutationFn: async ({ productId, quantity, color }: { productId: number; quantity: number; color?: string }) => {
+        mutationFn: async ({ productId, quantity }: { productId: number; quantity: number }) => {
             if (!user?.id) throw new Error('User not authenticated');
 
             // Check if item already exists in cart
@@ -65,34 +92,52 @@ export function useCart() {
                 .schema('morpheus')
                 .from('ypanier')
                 .select('*')
-                .eq('yuser_id', user.id)
-                .eq('yproduit_id', productId)
-                .eq('ycouleur', color || null)
-                .single();
+                .eq('yuseridfk', user.id)
+                .eq('yvarprodidfk', productId)
+                .maybeSingle();
 
             if (existingItem) {
                 // Update quantity if item exists
                 const { data, error } = await supabase
                     .schema('morpheus')
                     .from('ypanier')
-                    .update({ yquantite: existingItem.yquantite + quantity })
-                    .eq('id', existingItem.id)
+                    .update({ 
+                        ypanierqte: existingItem.ypanierqte + quantity,
+                        sysaction: 'UPDATE',
+                        sysuser: user.id
+                    })
+                    .eq('ypanierid', existingItem.ypanierid)
                     .select()
                     .single();
 
                 if (error) throw error;
                 return data;
             } else {
+                // Get the next available ID
+                const { data: maxIdData } = await supabase
+                    .schema('morpheus')
+                    .from('ypanier')
+                    .select('ypanierid')
+                    .order('ypanierid', { ascending: false })
+                    .limit(1)
+                    .single();
+
+                const nextId = (maxIdData?.ypanierid || 0) + 1;
+
                 // Add new item
+                const insertData: CartInsert = {
+                    ypanierid: nextId,
+                    yvarprodidfk: productId,
+                    ypanierqte: quantity,
+                    yuseridfk: user.id,
+                    sysaction: 'INSERT',
+                    sysuser: user.id
+                };
+
                 const { data, error } = await supabase
                     .schema('morpheus')
                     .from('ypanier')
-                    .insert({
-                        yproduit_id: productId,
-                        yquantite: quantity,
-                        ycouleur: color || null,
-                        yuser_id: user.id
-                    })
+                    .insert(insertData)
                     .select()
                     .single();
 
@@ -111,7 +156,7 @@ export function useCart() {
                 .schema('morpheus')
                 .from('ypanier')
                 .delete()
-                .eq('id', itemId);
+                .eq('ypanierid', itemId);
 
             if (error) throw error;
         },
@@ -129,8 +174,12 @@ export function useCart() {
             const { error } = await supabase
                 .schema('morpheus')
                 .from('ypanier')
-                .update({ yquantite: quantity })
-                .eq('id', itemId);
+                .update({ 
+                    ypanierqte: quantity,
+                    sysaction: 'UPDATE',
+                    sysuser: user?.id || ''
+                })
+                .eq('ypanierid', itemId);
 
             if (error) throw error;
         },
@@ -138,6 +187,17 @@ export function useCart() {
             queryClient.invalidateQueries({ queryKey: ['cart', user?.id] });
         },
     });
+
+    const getTotalItems = () => {
+        return cartQuery.data?.reduce((total, item) => total + (item.ypanierqte || 0), 0) || 0;
+    };
+
+    const getTotalPrice = () => {
+        return cartQuery.data?.reduce((total, item) => {
+            const price = item.yvarprod?.yvarprodprixpromotion || item.yvarprod?.yvarprodprixcatalogue || 0;
+            return total + (price * (item.ypanierqte || 0));
+        }, 0) || 0;
+    };
 
     return {
         cart: cartQuery.data || [],
@@ -149,5 +209,7 @@ export function useCart() {
         isAddingToCart: addToCartMutation.isPending,
         isRemovingFromCart: removeFromCartMutation.isPending,
         isUpdatingQuantity: updateQuantityMutation.isPending,
+        getTotalItems,
+        getTotalPrice,
     };
 }

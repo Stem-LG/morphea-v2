@@ -31,6 +31,7 @@ export default function NavBar() {
     const { t } = useLanguage();
 
     const { data: currentUser, isLoading } = useAuth();
+
     const { cart } = useCart();
     const { wishlist } = useWishlist();
 
@@ -42,7 +43,7 @@ export default function NavBar() {
         setIsWishlistOpen(false);
     };
 
-    const totalCartItems = cart.reduce((sum, item) => sum + item.yquantite, 0);
+    const totalCartItems = cart.reduce((sum, item) => sum + item.ypanierqte, 0);
     const totalWishlistItems = wishlist.length;
 
     return (
@@ -55,7 +56,11 @@ export default function NavBar() {
                     <div className="flex items-center justify-between h-16">
                         {/* Logo */}
                         <div className="flex flex-row items-center justify-center group">
-                            <img src="/logo.png" alt="Morpheus Mall Logo" className="h-10 w-auto hidden md:block mr-2 group-hover:scale-105 transition-transform duration-300" />
+                            <img
+                                src="/logo.png"
+                                alt="Morpheus Mall Logo"
+                                className="h-10 w-auto hidden md:block mr-2 group-hover:scale-105 transition-transform duration-300"
+                            />
                             <Link href="/" className="flex items-center space-x-2">
                                 <span className="px-2 text-3xl font-bold font-parisienne bg-gradient-to-r from-morpheus-gold-dark via-morpheus-gold-light to-morpheus-gold-dark bg-clip-text text-transparent drop-shadow-lg hover:drop-shadow-2xl transition-all duration-300">
                                     Morpheus Mall
@@ -81,8 +86,8 @@ export default function NavBar() {
                                 <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light group-hover:w-full transition-all duration-300"></span>
                             </Link>
 
-                            {/* Cart & Wishlist - Only show when logged in */}
-                            {currentUser && (
+                            {/* Cart & Wishlist - Only show when logged in (not anonymous) */}
+                            {currentUser && !currentUser.is_anonymous && (
                                 <>
                                     <div className="relative">
                                         <button
@@ -90,8 +95,18 @@ export default function NavBar() {
                                             className="relative p-2 text-gray-300 hover:text-morpheus-gold-light transition-all duration-300 group"
                                         >
                                             <div className="absolute inset-0 bg-morpheus-gold-light/20 rounded-full scale-0 group-hover:scale-100 transition-transform duration-300"></div>
-                                            <svg className="relative w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                            <svg
+                                                className="relative w-6 h-6"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth={2}
+                                                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                                                />
                                             </svg>
                                             {totalWishlistItems > 0 && (
                                                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold">
@@ -112,8 +127,18 @@ export default function NavBar() {
                                             className="relative p-2 text-gray-300 hover:text-morpheus-gold-light transition-all duration-300 group"
                                         >
                                             <div className="absolute inset-0 bg-morpheus-gold-light/20 rounded-full scale-0 group-hover:scale-100 transition-transform duration-300"></div>
-                                            <svg className="relative w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                                            <svg
+                                                className="relative w-6 h-6"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth={2}
+                                                    d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                                                />
                                             </svg>
                                             {totalCartItems > 0 && (
                                                 <span className="absolute -top-1 -right-1 bg-morpheus-gold-light text-morpheus-blue-dark text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold">
@@ -142,7 +167,7 @@ export default function NavBar() {
                                     <div className="w-5 h-5 border-2 border-morpheus-gold-dark border-t-morpheus-gold-light animate-spin rounded-full"></div>
                                     <span className="text-gray-300 text-sm">{t("nav.loading")}</span>
                                 </div>
-                            ) : currentUser ? (
+                            ) : currentUser && !currentUser.is_anonymous ? (
                                 <div className="flex items-center space-x-4">
                                     <Link
                                         href="/profile"
@@ -150,8 +175,18 @@ export default function NavBar() {
                                         title="Profile"
                                     >
                                         <div className="absolute inset-0 bg-morpheus-gold-light/20 rounded-full scale-0 group-hover:scale-100 transition-transform duration-300"></div>
-                                        <svg className="relative w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                        <svg
+                                            className="relative w-6 h-6"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                                            />
                                         </svg>
                                     </Link>
                                     <LogoutButton />
@@ -216,8 +251,8 @@ export default function NavBar() {
                                     {t("nav.administration")}
                                 </Link>
 
-                                {/* Mobile Cart & Wishlist - Only show when logged in */}
-                                {currentUser && (
+                                {/* Mobile Cart & Wishlist - Only show when logged in (not anonymous) */}
+                                {currentUser && !currentUser.is_anonymous && (
                                     <>
                                         <button
                                             onClick={() => {
@@ -226,8 +261,18 @@ export default function NavBar() {
                                             }}
                                             className="text-gray-300 hover:text-morpheus-gold-light hover:bg-morpheus-gold-dark/10 flex items-center px-4 py-3 text-base font-medium transition-all duration-300 rounded w-full"
                                         >
-                                            <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                            <svg
+                                                className="w-5 h-5 mr-3"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth={2}
+                                                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                                                />
                                             </svg>
                                             Wishlist
                                             {totalWishlistItems > 0 && (
@@ -244,8 +289,18 @@ export default function NavBar() {
                                             }}
                                             className="text-gray-300 hover:text-morpheus-gold-light hover:bg-morpheus-gold-dark/10 flex items-center px-4 py-3 text-base font-medium transition-all duration-300 rounded w-full"
                                         >
-                                            <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                                            <svg
+                                                className="w-5 h-5 mr-3"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth={2}
+                                                    d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                                                />
                                             </svg>
                                             Cart
                                             {totalCartItems > 0 && (
@@ -269,15 +324,25 @@ export default function NavBar() {
                                             <div className="w-5 h-5 border-2 border-morpheus-gold-dark border-t-morpheus-gold-light animate-spin rounded-full"></div>
                                             <span className="text-gray-300 text-sm ml-2">{t("nav.loading")}</span>
                                         </div>
-                                    ) : currentUser ? (
+                                    ) : currentUser && !currentUser.is_anonymous ? (
                                         <div className="space-y-2">
                                             <Link
                                                 href="/profile"
                                                 className="text-gray-300 hover:text-morpheus-gold-light hover:bg-morpheus-gold-dark/10 flex items-center px-4 py-3 text-base font-medium transition-all duration-300 rounded"
                                                 onClick={closeMobileMenu}
                                             >
-                                                <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                                <svg
+                                                    className="w-5 h-5 mr-3"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    viewBox="0 0 24 24"
+                                                >
+                                                    <path
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        strokeWidth={2}
+                                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                                                    />
                                                 </svg>
                                                 Profile
                                             </Link>
@@ -325,14 +390,10 @@ export default function NavBar() {
 
                     {/* Dialog Content */}
                     <div className="relative w-full h-full max-w-7xl max-h-[95vh] mx-4">
-                        <ProductDetailsPage
-                            productData={selectedProduct}
-                            onClose={() => setSelectedProduct(null)}
-                        />
+                        <ProductDetailsPage productData={selectedProduct} onClose={() => setSelectedProduct(null)} />
                     </div>
                 </div>
             )}
-
         </>
     );
 }

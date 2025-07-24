@@ -25,6 +25,9 @@ export const frTranslations = {
     "confirm": "Confirmer"
   },
   "auth": {
+    "name": "Nom",
+    "namePlaceholder": "Entrez votre nom complet",
+    "nameRequired": "Le nom est requis",
     "email": "Email",
     "password": "Mot de passe",
     "confirmPassword": "Confirmer le mot de passe",
@@ -448,5 +451,40 @@ export const frTranslations = {
     "addedToWishlist": "à la liste de souhaits",
     "addedToCart": "au panier",
     "added": "Ajouté"
+  },
+  "visitorForm": {
+    "title": "Bienvenue chez Morpheus Mall",
+    "subtitle": "Aidez-nous à personnaliser votre expérience en partageant quelques informations sur vous.",
+    "basicInformation": "Informations de base",
+    "name": "Nom",
+    "nameRequired": "Nom *",
+    "email": "Email",
+    "phone": "Téléphone",
+    "address": "Adresse",
+    "namePlaceholder": "Entrez votre nom complet",
+    "emailPlaceholder": "Entrez votre adresse email",
+    "phonePlaceholder": "Entrez votre numéro de téléphone",
+    "addressPlaceholder": "Entrez votre adresse",
+    "visitorTypes": "Qu'est-ce qui vous décrit le mieux ? (Sélectionnez tout ce qui s'applique)",
+    "visitorTypeLabels": {
+      "grandpublic": "Grand Public",
+      "clientprive": "Client Privé",
+      "acheteurluxe": "Acheteur de Luxe",
+      "acheteurpro": "Acheteur Professionnel",
+      "artisan": "Artisan",
+      "createur": "Créateur/Designer",
+      "collectionneur": "Collectionneur",
+      "investisseur": "Investisseur",
+      "influenceur": "Influenceur",
+      "journaliste": "Journaliste",
+      "pressespecialisee": "Presse Spécialisée",
+      "culturel": "Professionnel Culturel",
+      "vip": "VIP"
+    },
+    "skipForNow": "Passer pour l'instant",
+    "submit": "Soumettre",
+    "submitting": "Soumission...",
+    "thankYou": "Merci d'avoir fourni vos informations !",
+    "errorSubmitting": "Une erreur s'est produite lors de la soumission de vos informations. Veuillez réessayer."
   }
 };

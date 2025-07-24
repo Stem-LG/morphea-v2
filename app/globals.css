@@ -179,3 +179,37 @@
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     background: linear-gradient(to bottom, #FFD700, #B8860B);
 }
+
+/* Custom animations for login page */
+@keyframes gradient-x {
+    0%, 100% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+.animate-gradient-x {
+    animation: gradient-x 3s ease infinite;
+}
+
+.bg-300\% {
+    background-size: 300% 300%;
+}
+
+/* Enhanced shadow utilities */
+.shadow-3xl {
+    box-shadow: 0 35px 60px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+/* Pulse animation with delay */
+.animate-pulse-delay-1000 {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    animation-delay: 1000ms;
+}
+
+/* Custom spin animation with longer duration */
+.animate-spin-slow {
+    animation: spin 20s linear infinite;
+}

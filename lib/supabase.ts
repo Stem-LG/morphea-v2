@@ -240,6 +240,7 @@ export type Database = {
           ycompteid: number
           ycompteno: string
           ycomptestatut: string
+          yuseridfk: string
           yvisiteuridfk: number
         }
         Insert: {
@@ -251,6 +252,7 @@ export type Database = {
           ycompteid: number
           ycompteno: string
           ycomptestatut: string
+          yuseridfk: string
           yvisiteuridfk: number
         }
         Update: {
@@ -262,6 +264,7 @@ export type Database = {
           ycompteid?: number
           ycompteno?: string
           ycomptestatut?: string
+          yuseridfk?: string
           yvisiteuridfk?: number
         }
         Relationships: [
@@ -300,6 +303,7 @@ export type Database = {
           ydesignnom: string
           ydesignpays: string
           ydesignspecialite: string
+          yuseridfk: string
         }
         Insert: {
           sysaction?: string | null
@@ -326,6 +330,7 @@ export type Database = {
           ydesignnom: string
           ydesignpays: string
           ydesignspecialite: string
+          yuseridfk: string
         }
         Update: {
           sysaction?: string | null
@@ -352,6 +357,7 @@ export type Database = {
           ydesignnom?: string
           ydesignpays?: string
           ydesignspecialite?: string
+          yuseridfk?: string
         }
         Relationships: []
       }
@@ -810,9 +816,9 @@ export type Database = {
           sysadresseip: string | null
           sysdate: string | null
           sysuser: string | null
-          ycompteidfk: number
           ypanierid: number
           ypanierqte: number
+          yuseridfk: string
           yvarprodidfk: number
         }
         Insert: {
@@ -820,9 +826,9 @@ export type Database = {
           sysadresseip?: string | null
           sysdate?: string | null
           sysuser?: string | null
-          ycompteidfk: number
           ypanierid: number
           ypanierqte: number
+          yuseridfk: string
           yvarprodidfk: number
         }
         Update: {
@@ -830,19 +836,12 @@ export type Database = {
           sysadresseip?: string | null
           sysdate?: string | null
           sysuser?: string | null
-          ycompteidfk?: number
           ypanierid?: number
           ypanierqte?: number
+          yuseridfk?: string
           yvarprodidfk?: number
         }
         Relationships: [
-          {
-            foreignKeyName: "ypanier_ycompteidfk_fkey"
-            columns: ["ycompteidfk"]
-            isOneToOne: false
-            referencedRelation: "ycompte"
-            referencedColumns: ["ycompteid"]
-          },
           {
             foreignKeyName: "ypanier_yvarprodidfk_fkey"
             columns: ["yvarprodidfk"]
@@ -1190,6 +1189,7 @@ export type Database = {
           sysadresseip: string | null
           sysdate: string | null
           sysuser: string | null
+          yuseridfk: string
           yvisiteuradresse: string | null
           yvisiteurboolacheteurluxe: string
           yvisiteurboolacheteurpro: string
@@ -1215,6 +1215,7 @@ export type Database = {
           sysadresseip?: string | null
           sysdate?: string | null
           sysuser?: string | null
+          yuseridfk: string
           yvisiteuradresse?: string | null
           yvisiteurboolacheteurluxe: string
           yvisiteurboolacheteurpro: string
@@ -1240,6 +1241,7 @@ export type Database = {
           sysadresseip?: string | null
           sysdate?: string | null
           sysuser?: string | null
+          yuseridfk?: string
           yvisiteuradresse?: string | null
           yvisiteurboolacheteurluxe?: string
           yvisiteurboolacheteurpro?: string
@@ -1268,7 +1270,7 @@ export type Database = {
           sysadresseip: string | null
           sysdate: string | null
           sysuser: string
-          ycompteidfk: number
+          yuseridfk: string
           yvarprodidfk: number
           ywishlistid: number
         }
@@ -1277,7 +1279,7 @@ export type Database = {
           sysadresseip?: string | null
           sysdate?: string | null
           sysuser: string
-          ycompteidfk: number
+          yuseridfk: string
           yvarprodidfk: number
           ywishlistid: number
         }
@@ -1286,18 +1288,11 @@ export type Database = {
           sysadresseip?: string | null
           sysdate?: string | null
           sysuser?: string
-          ycompteidfk?: number
+          yuseridfk?: string
           yvarprodidfk?: number
           ywishlistid?: number
         }
         Relationships: [
-          {
-            foreignKeyName: "ywishlist_ycompteidfk_fkey"
-            columns: ["ycompteidfk"]
-            isOneToOne: false
-            referencedRelation: "ycompte"
-            referencedColumns: ["ycompteid"]
-          },
           {
             foreignKeyName: "ywishlist_yvarprodidfk_fkey"
             columns: ["yvarprodidfk"]
@@ -1313,7 +1308,7 @@ export type Database = {
           sysadresseip: string | null
           sysdate: string | null
           sysuser: string | null
-          ycompteidfk: number | null
+          yuseridfk: string
           yvarprodidfk: number
           zcommandedate: string
           zcommandeid: number
@@ -1328,7 +1323,7 @@ export type Database = {
           sysadresseip?: string | null
           sysdate?: string | null
           sysuser?: string | null
-          ycompteidfk?: number | null
+          yuseridfk: string
           yvarprodidfk: number
           zcommandedate: string
           zcommandeid: number
@@ -1343,7 +1338,7 @@ export type Database = {
           sysadresseip?: string | null
           sysdate?: string | null
           sysuser?: string | null
-          ycompteidfk?: number | null
+          yuseridfk?: string
           yvarprodidfk?: number
           zcommandedate?: string
           zcommandeid?: number
@@ -1354,13 +1349,6 @@ export type Database = {
           zcommandestatut?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "zdetailscommande_ycompteidfk_fkey"
-            columns: ["ycompteidfk"]
-            isOneToOne: false
-            referencedRelation: "ycompte"
-            referencedColumns: ["ycompteid"]
-          },
           {
             foreignKeyName: "zdetailscommande_yvarprodidfk_fkey"
             columns: ["yvarprodidfk"]

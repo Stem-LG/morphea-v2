@@ -1,5 +1,6 @@
 "use client";
 
+import AnimatedBackground from "@/components/animated-background";
 import LandingPage from "@/components/landing-page";
 import { createClient } from "@/lib/client";
 import { useRouter } from "next/navigation";
@@ -19,8 +20,9 @@ export default function Home() {
 
     return (
         <section className="relative w-full">
-            {/* Landing page as background */}
             <LandingPage />
+            {/* Animated 360° Background */}
+            <AnimatedBackground />
         </section>
     );
 }
