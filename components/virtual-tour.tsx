@@ -21,7 +21,7 @@ export default function VirtualTour({
     className = "",
     height = "100vh",
     width = "100%",
-    startingScene = "a1",
+    startingScene = "15",
     startingYaw = -1.57, // Default to -1.57 radians (facing left)
     startingPitch = 0, // Default to 0 radians (horizontal)
     showNavbar = true,
