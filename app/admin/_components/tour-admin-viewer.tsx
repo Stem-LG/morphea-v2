@@ -15,6 +15,7 @@ import { useInfospots } from '@/hooks/useInfospots'
 import { useSceneLinks } from '@/hooks/useSceneLinks'
 import { useInfoactions } from '@/hooks/useInfoactions'
 import { useLanguage } from '@/hooks/useLanguage'
+import { useStores } from '@/app/admin/_hooks/use-stores'
 import { Database } from '@/lib/supabase'
 
 type Scene = Database['morpheus']['Tables']['yscenes']['Row']
@@ -44,6 +45,7 @@ export default function TourAdminViewer({
   const { infospots, loading: infospotsLoading, createInfospot, updateInfospot, deleteInfospot } = useInfospots()
   const { scenelinks, loading: scenelinksLoading, createSceneLink, updateSceneLink, deleteSceneLink } = useSceneLinks()
   const { actions, createAction } = useInfoactions()
+  const { data: stores, isLoading: storesLoading } = useStores()
 
   const [currentScene, setCurrentScene] = useState<Scene | null>(null)
   const [isTransitioning, setIsTransitioning] = useState(false)
@@ -123,7 +125,7 @@ export default function TourAdminViewer({
     console.log('isAddingScene changed:', isAddingScene)
   }, [isAddingScene])
 
-  const loading = scenesLoading || infospotsLoading || scenelinksLoading
+  const loading = scenesLoading || infospotsLoading || scenelinksLoading || storesLoading
 
 
   // Initialize current scene with URL persistence
@@ -2045,19 +2047,19 @@ export default function TourAdminViewer({
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {t('admin.tour.actionType')} *
+                    {t('admin.tour.store')} *
                   </label>
                   <select
                     value={newActionForm.type}
                     onChange={(e) => setNewActionForm(prev => ({ ...prev, type: e.target.value }))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   >
-                    <option value="">{t('admin.tour.selectActionType')}</option>
-                    <option value="modal">{t('admin.tour.modal')}</option>
-                    <option value="navigation">{t('admin.tour.navigation')}</option>
-                    <option value="custom">{t('admin.tour.custom')}</option>
-                    <option value="link">{t('admin.tour.link')}</option>
-                    <option value="popup">{t('admin.tour.popup')}</option>
+                    <option value="">{t('admin.tour.selectStore')}</option>
+                    {stores?.map(store => (
+                      <option key={store.yboutiqueid} value={store.yboutiqueid.toString()}>
+                        {store.yboutiqueintitule || store.yboutiquecode}
+                      </option>
+                    ))}
                   </select>
                 </div>
                 
@@ -2096,16 +2098,19 @@ export default function TourAdminViewer({
                   }
                   
                   if (!newActionForm.type) {
-                    alert(t('admin.tour.pleaseSelectActionType'))
+                    alert(t('admin.tour.pleaseSelectStore'))
                     return
                   }
                   
                   try {
-                    // Create new action using the hook function
+                    // Create new action using the hook function with fixed values
                     const newAction = await createAction({
-                      type: newActionForm.type,
+                      type: 'modal',
                       title: newActionForm.title.trim(),
-                      description: newActionForm.description.trim() || null
+                      description: newActionForm.description.trim() || 'Products list modal action',
+                      modalType: 'products-list',
+                      customHandler: '',
+                      boutiqueId: parseInt(newActionForm.type) // Store ID is stored in type field
                     })
                     
                     if (newAction) {

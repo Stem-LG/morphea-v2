@@ -80,11 +80,11 @@ export function useInfoactions(): UseInfoactions {
         .insert([{
           yinfospotactionsid: actionData.id || Date.now(),
           yinfospotactionstype: actionData.type,
-          yinfospotactionstitle: actionData.title,
-          yinfospotactionsdescription: actionData.description,
-          yinfospotactionsmodaltype: actionData.modalType,
-          yinfospotactionscustomhandler: actionData.customHandler,
-          yboutiqueidfk: actionData.boutiqueId,
+          yinfospotactionstitle: actionData.title || '',
+          yinfospotactionsdescription: actionData.description || '',
+          yinfospotactionsmodaltype: actionData.modalType || '',
+          yinfospotactionscustomhandler: actionData.customHandler || '',
+          yboutiqueidfk: actionData.boutiqueId || 1, // Default to 1 if not provided
         }])
         .select()
         .single()

@@ -315,7 +315,10 @@ export const frTranslations = {
       "mode": "mode",
       "clickOrUseCurrentView": "Cliquez sur le panorama ou utilisez \"Utiliser la vue actuelle\" pour sélectionner la position",
       "noScenesDescription": "Vous n'avez pas encore créé de scènes. Créez votre première scène pour commencer à construire votre visite virtuelle.",
-      "createFirstScene": "Créer Votre Première Scène"
+      "createFirstScene": "Créer Votre Première Scène",
+      "store": "Magasin",
+      "selectStore": "Sélectionner un magasin",
+      "pleaseSelectStore": "Veuillez sélectionner un magasin"
     }
   },
   "product3DViewer": {

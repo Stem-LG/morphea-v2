@@ -316,7 +316,10 @@ export const enTranslations = {
       "clickOrUseCurrentView": "Click on panorama or use \"Use Current View\" to select position",
       "noScenesFound": "No Scenes Found",
       "noScenesDescription": "You haven't created any scenes yet. Create your first scene to start building your virtual tour.",
-      "createFirstScene": "Create Your First Scene"
+      "createFirstScene": "Create Your First Scene",
+      "store": "Store",
+      "selectStore": "Select a store",
+      "pleaseSelectStore": "Please select a store"
     }
   },
   "product3DViewer": {
