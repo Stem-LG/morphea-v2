@@ -47,7 +47,6 @@ export default function TourAdminViewer({
 
   const [currentScene, setCurrentScene] = useState<Scene | null>(null)
   const [isTransitioning, setIsTransitioning] = useState(false)
-  const [selectedMarkerPosition, setSelectedMarkerPosition] = useState<{ yaw: number; pitch: number } | null>(null)
   const [adminMode, setAdminMode] = useState<'view' | 'edit'>('view')
   const [isHandlingEdit, setIsHandlingEdit] = useState(false)
   const [isModeTransitioning, setIsModeTransitioning] = useState(false)
@@ -505,9 +504,8 @@ export default function TourAdminViewer({
         // If we're in inline adding mode, set the adding position
         if (inlineAddingInfospot || inlineAddingSceneLink) {
           setAddingMarkerPosition(position)
-        } else {
-          setSelectedMarkerPosition(position)
         }
+        // Note: Position selected for potential future use
       }
     }
   }, [adminMode, inlineEditingInfospot, inlineEditingSceneLink, inlineAddingInfospot, inlineAddingSceneLink, viewerInstance])

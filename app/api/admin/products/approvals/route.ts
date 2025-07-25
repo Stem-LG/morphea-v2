@@ -41,7 +41,10 @@ export async function GET(request: NextRequest) {
       .from('yprod')
       .select(`
         *,
-        yobjet3d(*)
+        yvarprod(
+          *,
+          yobjet3d(*)
+        )
       `)
       .eq('yprodstatut', 'not_approved')
       .order('sysdate', { ascending: false })
@@ -54,10 +57,110 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    return NextResponse.json({ products: products || [] })
+    // Transform the data to flatten 3D objects from variants
+    const transformedProducts = products?.map(product => ({
+      ...product,
+      yobjet3d: product.yvarprod?.flatMap(variant => variant.yobjet3d || []) || []
+    })) || []
+
+    return NextResponse.json({ products: transformedProducts })
     
   } catch (error) {
     console.error('Error in GET /api/admin/products/approvals:', error)
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    )
+  }
+}
+
+// DELETE /api/admin/products/approvals - Delete a product and its associated data
+export async function DELETE(request: NextRequest) {
+  try {
+    // Check if current user is admin
+    const { isAdmin, error } = await checkAdminRole(request)
+    
+    if (!isAdmin) {
+      return NextResponse.json(
+        { error: error || 'Access denied. Admin role required.' },
+        { status: 403 }
+      )
+    }
+
+    const { searchParams } = new URL(request.url)
+    const productId = searchParams.get('productId')
+
+    if (!productId) {
+      return NextResponse.json(
+        { error: 'Product ID is required' },
+        { status: 400 }
+      )
+    }
+
+    const adminSupabase = createAdminClient()
+
+    // First, get all variants for this product
+    const { data: variants } = await adminSupabase
+      .schema('morpheus')
+      .from('yvarprod')
+      .select('yvarprodid')
+      .eq('yprodidfk', parseInt(productId))
+
+    // Delete all 3D objects associated with these variants
+    if (variants && variants.length > 0) {
+      const variantIds = variants.map(v => v.yvarprodid)
+      
+      const { error: objectsError } = await adminSupabase
+        .schema('morpheus')
+        .from('yobjet3d')
+        .delete()
+        .in('yvarprodidfk', variantIds)
+
+      if (objectsError) {
+        console.error('Error deleting 3D objects:', objectsError)
+        return NextResponse.json(
+          { error: 'Failed to delete associated 3D objects' },
+          { status: 500 }
+        )
+      }
+    }
+
+    // Delete all variants for this product
+    const { error: variantsError } = await adminSupabase
+      .schema('morpheus')
+      .from('yvarprod')
+      .delete()
+      .eq('yprodidfk', parseInt(productId))
+
+    if (variantsError) {
+      console.error('Error deleting product variants:', variantsError)
+      return NextResponse.json(
+        { error: 'Failed to delete product variants' },
+        { status: 500 }
+      )
+    }
+
+    // Finally delete the product
+    const { error: productError } = await adminSupabase
+      .schema('morpheus')
+      .from('yprod')
+      .delete()
+      .eq('yprodid', parseInt(productId))
+
+    if (productError) {
+      console.error('Error deleting product:', productError)
+      return NextResponse.json(
+        { error: 'Failed to delete product' },
+        { status: 500 }
+      )
+    }
+
+    return NextResponse.json({
+      message: 'Product and associated data deleted successfully'
+    })
+
+  } catch (error) {
+    console.error('Error in DELETE /api/admin/products/approvals:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -135,7 +238,6 @@ export async function PATCH(request: NextRequest) {
       })
     }
 
-    
   } catch (error) {
     console.error('Error in PATCH /api/admin/products/approvals:', error)
     return NextResponse.json(
