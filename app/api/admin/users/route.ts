@@ -20,7 +20,7 @@ async function checkAdminRole(request: NextRequest) {
   return { isAdmin, error: null, user }
 }
 
-// GET /api/admin/users - List all users
+// GET /api/admin/users - List users with pagination and filtering
 export async function GET(request: NextRequest) {
   try {
     // Check if current user is admin
@@ -32,6 +32,13 @@ export async function GET(request: NextRequest) {
         { status: 403 }
       )
     }
+
+    // Parse query parameters
+    const { searchParams } = new URL(request.url)
+    const page = parseInt(searchParams.get('page') || '1', 10)
+    const limit = parseInt(searchParams.get('limit') || '10', 10)
+    const emailFilter = searchParams.get('email') || ''
+    const roleFilter = searchParams.get('role') || ''
 
     // Use admin client to list all users
     const adminSupabase = createAdminClient()
@@ -46,11 +53,47 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Get all users with their assigned stores
+    // Transform users and apply filtering
+    let filteredUsers = data.users.map((user) => {
+      const userMetadata = user.app_metadata || {}
+      return {
+        id: user.id,
+        email: user.email,
+        created_at: user.created_at,
+        last_sign_in_at: user.last_sign_in_at,
+        roles: userMetadata.roles || ['user'],
+        provider: userMetadata.provider || 'email',
+        providers: userMetadata.providers || ['email'],
+        assigned_stores: userMetadata.assigned_stores || [],
+        app_metadata: userMetadata
+      }
+    })
+
+    // Apply email filter
+    if (emailFilter) {
+      filteredUsers = filteredUsers.filter(user =>
+        user.email.toLowerCase().includes(emailFilter.toLowerCase())
+      )
+    }
+
+    // Apply role filter
+    if (roleFilter) {
+      filteredUsers = filteredUsers.filter(user =>
+        user.roles.includes(roleFilter)
+      )
+    }
+
+    // Calculate pagination
+    const total = filteredUsers.length
+    const totalPages = Math.ceil(total / limit)
+    const startIndex = (page - 1) * limit
+    const endIndex = startIndex + limit
+    const paginatedUsers = filteredUsers.slice(startIndex, endIndex)
+
+    // Get store details for paginated users
     const usersWithStores = await Promise.all(
-      data.users.map(async (user) => {
-        const userMetadata = user.app_metadata || {}
-        const assignedStoreIds = userMetadata.assigned_stores || []
+      paginatedUsers.map(async (user) => {
+        const assignedStoreIds = user.assigned_stores
         
         let storeDetails = []
         if (assignedStoreIds.length > 0) {
@@ -73,16 +116,22 @@ export async function GET(request: NextRequest) {
           email: user.email,
           created_at: user.created_at,
           last_sign_in_at: user.last_sign_in_at,
-          roles: userMetadata.roles || ['user'],
-          provider: userMetadata.provider || 'email',
-          providers: userMetadata.providers || ['email'],
+          roles: user.roles,
+          provider: user.provider,
+          providers: user.providers,
           assigned_stores: assignedStoreIds,
           store_details: storeDetails
         }
       })
     )
 
-    return NextResponse.json({ users: usersWithStores })
+    return NextResponse.json({
+      users: usersWithStores,
+      total,
+      totalPages,
+      page,
+      limit
+    })
     
   } catch (error) {
     console.error('Error in GET /api/admin/users:', error)

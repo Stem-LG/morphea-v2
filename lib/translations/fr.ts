@@ -125,7 +125,23 @@ export const frTranslations = {
       "assignStores": "Attribuer des boutiques",
       "makeStoreAdmin": "Faire administrateur de boutique",
       "refreshData": "Actualiser les données",
-      "refreshing": "Actualisation..."
+      "refreshing": "Actualisation...",
+      "filterByEmail": "Filtrer par Email",
+      "searchByEmail": "Rechercher par email...",
+      "filterByRole": "Filtrer par Rôle",
+      "allRoles": "Tous les Rôles",
+      "admin": "Admin",
+      "storeAdmin": "Admin Boutique",
+      "user": "Utilisateur",
+      "itemsPerPage": "Éléments par Page",
+      "clearFilters": "Effacer Filtres",
+      "showing": "Affichage",
+      "of": "sur",
+      "results": "résultats",
+      "totalUsers": "utilisateurs au total",
+      "page": "Page",
+      "previous": "Précédent",
+      "next": "Suivant"
     },
     "virtualTourAdmin": "Visite virtuelle",
     "loadingVirtualTourAdmin": "Chargement de l'administration de la visite virtuelle...",
@@ -208,6 +224,8 @@ export const frTranslations = {
       "clickToSelectPosition": "Cliquez sur le panorama ou utilisez \"Utiliser la Vue Actuelle\" pour sélectionner la position",
       "currentScene": "Scène Actuelle",
       "addNewScene": "Ajouter Nouvelle Scène",
+      "editScene": "Modifier Scène",
+      "updateScene": "Mettre à Jour Scène",
       "deleteScene": "Supprimer Scène",
       "scenesCount": "sur",
       "scenes": "scènes",
@@ -296,7 +314,9 @@ export const frTranslations = {
       "transitioningToScene": "Transition vers la scène...",
       "switchingTo": "Basculement vers",
       "mode": "mode",
-      "clickOrUseCurrentView": "Cliquez sur le panorama ou utilisez \"Utiliser la vue actuelle\" pour sélectionner la position"
+      "clickOrUseCurrentView": "Cliquez sur le panorama ou utilisez \"Utiliser la vue actuelle\" pour sélectionner la position",
+      "noScenesDescription": "Vous n'avez pas encore créé de scènes. Créez votre première scène pour commencer à construire votre visite virtuelle.",
+      "createFirstScene": "Créer Votre Première Scène"
     }
   },
   "product3DViewer": {

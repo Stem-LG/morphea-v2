@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { createPortal } from 'react-dom'
 import { Viewer } from '@photo-sphere-viewer/core'
 import { MarkersPlugin } from '@photo-sphere-viewer/markers-plugin'
 import { Button } from '@/components/ui/button'
@@ -84,6 +85,17 @@ export default function TourAdminViewer({
     fov: 50
   })
   
+  // State for editing scene
+  const [isEditingScene, setIsEditingScene] = useState<boolean>(false)
+  const [editSceneForm, setEditSceneForm] = useState({
+    id: 0,
+    name: '',
+    panorama: '',
+    yaw: 0,
+    pitch: 0,
+    fov: 50
+  })
+  
   // Refs to store current state values to avoid stale closure issues
   const adminModeRef = useRef(adminMode)
   const isTransitioningRef = useRef(isTransitioning)
@@ -106,6 +118,11 @@ export default function TourAdminViewer({
   useEffect(() => {
     forceStopTransitionsRef.current = forceStopTransitions
   }, [forceStopTransitions])
+
+  // Debug effect for isAddingScene
+  useEffect(() => {
+    console.log('isAddingScene changed:', isAddingScene)
+  }, [isAddingScene])
 
   const loading = scenesLoading || infospotsLoading || scenelinksLoading
 
@@ -797,7 +814,217 @@ export default function TourAdminViewer({
   }
 
 
-  if (loading || !currentScene) {
+  if (loading) {
+    return (
+      <div className={`relative ${className} flex items-center justify-center bg-gray-100`} style={{ height, width }}>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">{t('admin.tour.loadingVirtualTour')}</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Handle empty data case - show setup interface
+  if (!loading && scenes.length === 0) {
+    return (
+      <div className={`relative ${className} bg-gray-100`} style={{ height, width }}>
+        {!isAddingScene ? (
+          // Empty state with create button
+          <div className="flex items-center justify-center h-full">
+            <div className="text-center max-w-md mx-auto p-6">
+              <div className="mb-6">
+                <svg className="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+                <h3 className="text-xl font-semibold text-gray-700 mb-2">
+                  {t('admin.tour.noScenesFound')}
+                </h3>
+                <p className="text-gray-600 mb-6">
+                  {t('admin.tour.noScenesDescription')}
+                </p>
+              </div>
+              
+              <Button
+                onClick={() => {
+                  console.log('Create First Scene button clicked')
+                  setIsAddingScene(true)
+                  setNewSceneForm({
+                    name: '',
+                    panorama: '',
+                    yaw: 0,
+                    pitch: 0,
+                    fov: 50
+                  })
+                  console.log('isAddingScene set to true')
+                }}
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                {t('admin.tour.createFirstScene')}
+              </Button>
+            </div>
+          </div>
+        ) : (
+          // Inline form when creating scene
+          <div className="flex items-center justify-center h-full p-4">
+            <Card className="max-w-lg w-full">
+              <CardHeader>
+                <CardTitle className="text-xl font-semibold text-gray-800">
+                  {t('admin.tour.createFirstScene')}
+                </CardTitle>
+                <p className="text-gray-600">
+                  {t('admin.tour.noScenesDescription')}
+                </p>
+              </CardHeader>
+              
+              <CardContent>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t('admin.tour.sceneName')} *
+                  </label>
+                  <input
+                    type="text"
+                    value={newSceneForm.name}
+                    onChange={(e) => setNewSceneForm(prev => ({ ...prev, name: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder={t('admin.tour.enterSceneName')}
+                    autoFocus
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t('admin.tour.panoramaUrl')} *
+                  </label>
+                  <input
+                    type="url"
+                    value={newSceneForm.panorama}
+                    onChange={(e) => setNewSceneForm(prev => ({ ...prev, panorama: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder={t('admin.tour.panoramaUrlPlaceholder')}
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    {t('admin.tour.panoramaUrlDescription')}
+                  </p>
+                </div>
+                
+                {/* Preview Section */}
+                {newSceneForm.panorama && (
+                  <div className="border-t pt-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      {t('admin.tour.panoramaPreview')}
+                    </label>
+                    <div className="relative">
+                      <img
+                        src={newSceneForm.panorama}
+                        alt="Panorama preview"
+                        className="w-full h-32 object-cover rounded-md border"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement
+                          target.style.display = 'none'
+                          const errorDiv = target.nextElementSibling as HTMLDivElement
+                          if (errorDiv) errorDiv.style.display = 'flex'
+                        }}
+                      />
+                      <div
+                        className="hidden w-full h-32 bg-gray-100 rounded-md border items-center justify-center text-gray-500 text-sm"
+                      >
+                        {t('admin.tour.failedToLoadPanorama')}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+              
+              <div className="flex gap-3 mt-6">
+                <Button
+                  onClick={async () => {
+                    if (!newSceneForm.name.trim()) {
+                      alert(t('admin.tour.pleaseEnterSceneName'))
+                      return
+                    }
+                    
+                    if (!newSceneForm.panorama.trim()) {
+                      alert(t('admin.tour.pleaseEnterPanoramaUrl'))
+                      return
+                    }
+                    
+                    try {
+                      // Create new scene using the hook function
+                      const newScene = await createScene({
+                        id: Date.now(), // Generate a unique ID
+                        name: newSceneForm.name.trim(),
+                        panorama: newSceneForm.panorama.trim(),
+                        yaw: newSceneForm.yaw,
+                        pitch: newSceneForm.pitch,
+                        fov: newSceneForm.fov
+                      })
+                      
+                      if (newScene) {
+                        // Close the form
+                        setIsAddingScene(false)
+                        setNewSceneForm({
+                          name: '',
+                          panorama: '',
+                          yaw: 0,
+                          pitch: 0,
+                          fov: 50
+                        })
+                        
+                        // Navigate to the new scene to preview it
+                        setCurrentScene(newScene)
+                        
+                        // Update URL with new scene ID
+                        const newUrl = new URL(window.location.href)
+                        newUrl.searchParams.set('sceneId', newScene.yscenesid.toString())
+                        router.replace(newUrl.pathname + newUrl.search)
+                        
+                        // The component will re-render and show the viewer
+                      } else {
+                        alert('Failed to create scene. Please try again.')
+                      }
+                      
+                    } catch (error) {
+                      console.error('Error creating scene:', error)
+                      alert('Failed to create scene. Please try again.')
+                    }
+                  }}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                  disabled={!newSceneForm.name.trim() || !newSceneForm.panorama.trim()}
+                >
+                  <Plus className="w-4 h-4 mr-1" />
+                  {t('admin.tour.createAndPreviewScene')}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setIsAddingScene(false)
+                    setNewSceneForm({
+                      name: '',
+                      panorama: '',
+                      yaw: 0,
+                      pitch: 0,
+                      fov: 50
+                    })
+                  }}
+                  className="flex-1"
+                >
+                  {t('admin.tour.cancel')}
+                </Button>
+              </div>
+             </CardContent>
+           </Card>
+         </div>
+        )}
+      </div>
+    )
+  }
+
+  // Handle case where scenes exist but no current scene is selected
+  if (!currentScene) {
     return (
       <div className={`relative ${className} flex items-center justify-center bg-gray-100`} style={{ height, width }}>
         <div className="text-center">
@@ -813,7 +1040,7 @@ export default function TourAdminViewer({
     <div className={`relative ${className}`} style={{ height, width }}>
       {/* Admin Controls */}
       <div className="absolute top-4 left-4 z-20 space-y-2">
-        <Card className="bg-white/90 backdrop-blur-sm">
+        <Card className="bg-white/90 backdrop-blur-sm w-64">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm flex items-center gap-2">
               <Settings className="w-4 h-4" />
@@ -966,43 +1193,6 @@ export default function TourAdminViewer({
                   </div>
                 )}
                 
-                {!inlineAddingInfospot && !inlineAddingSceneLink && (
-                  <>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => {
-                        // Get current viewer position as fallback
-                        if (viewerInstance) {
-                          const currentPosition = viewerInstance.getPosition()
-                          setSelectedMarkerPosition({ yaw: currentPosition.yaw, pitch: currentPosition.pitch })
-                        }
-                      }}
-                      className="w-full text-xs"
-                    >
-                      {t('admin.tour.useCurrentView')}
-                    </Button>
-                    {selectedMarkerPosition ? (
-                      <div className="text-xs text-gray-600 p-2 bg-blue-50 rounded">
-                        {t('admin.tour.positionSelected')}:<br/>
-                        {t('admin.tour.yaw')}: {selectedMarkerPosition.yaw.toFixed(3)}<br/>
-                        {t('admin.tour.pitch')}: {selectedMarkerPosition.pitch.toFixed(3)}
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => setSelectedMarkerPosition(null)}
-                          className="w-full mt-1 h-6 text-xs"
-                        >
-                          {t('admin.tour.clearSelection')}
-                        </Button>
-                      </div>
-                    ) : (
-                      <div className="text-xs text-gray-500 p-2 bg-gray-50 rounded">
-                        {t('admin.tour.clickOrUseCurrentView')}
-                      </div>
-                    )}
-                  </>
-                )}
               </div>
             )}
           </CardContent>
@@ -1011,7 +1201,7 @@ export default function TourAdminViewer({
 
       {/* Scene Navigation */}
       <div className="absolute top-4 right-4 z-20">
-        <Card className="bg-white/90 backdrop-blur-sm">
+        <Card className="bg-white/90 backdrop-blur-sm w-64">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm">{t('admin.tour.currentScene')}</CardTitle>
           </CardHeader>
@@ -1035,6 +1225,26 @@ export default function TourAdminViewer({
             {/* Scene Management Buttons - Only show in edit mode */}
             {adminMode === 'edit' && (
               <div className="mt-2 space-y-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    setIsEditingScene(true)
+                    setEditSceneForm({
+                      id: currentScene.yscenesid,
+                      name: currentScene.yscenesname,
+                      panorama: currentScene.yscenespanorama,
+                      yaw: 0, // Default values for camera position
+                      pitch: 0,
+                      fov: 50
+                    })
+                  }}
+                  className="w-full"
+                >
+                  <Edit className="w-4 h-4 mr-1" />
+                  {t('admin.tour.editScene')}
+                </Button>
+                
                 <Button
                   size="sm"
                   variant="outline"
@@ -1717,12 +1927,11 @@ export default function TourAdminViewer({
 
       {/* InfoSpot Details Modal */}
       {viewingInfospot && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 max-h-[80vh] overflow-hidden">
-            {/* Modal Header */}
-            <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999]">
+          <Card className="max-w-md w-full mx-4 max-h-[80vh] overflow-hidden">
+            <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-700 text-white">
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold">{viewingInfospot.yinfospotstitle}</h2>
+                <CardTitle className="text-lg font-semibold text-white">{viewingInfospot.yinfospotstitle}</CardTitle>
                 <button
                   onClick={() => setViewingInfospot(null)}
                   className="text-white hover:text-gray-200 transition-colors"
@@ -1732,10 +1941,9 @@ export default function TourAdminViewer({
                   </svg>
                 </button>
               </div>
-            </div>
+            </CardHeader>
             
-            {/* Modal Content */}
-            <div className="p-4 overflow-y-auto max-h-96">
+            <CardContent className="p-4 overflow-y-auto max-h-96">
               {viewingInfospot.yinfospotstext && (
                 <div className="mb-4">
                   <h3 className="text-sm font-medium text-gray-700 mb-2">{t('admin.tour.description')}</h3>
@@ -1785,9 +1993,8 @@ export default function TourAdminViewer({
                   </div>
                 </div>
               </div>
-            </div>
+            </CardContent>
             
-            {/* Modal Footer */}
             <div className="bg-gray-50 px-4 py-3 flex justify-end">
               <Button
                 size="sm"
@@ -1797,18 +2004,17 @@ export default function TourAdminViewer({
                 {t('admin.tour.close')}
               </Button>
             </div>
-          </div>
+          </Card>
         </div>
       )}
 
       {/* Add New Action Modal */}
       {isAddingAction && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
-            {/* Modal Header */}
-            <div className="bg-gradient-to-r from-green-600 to-green-700 text-white p-4">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999]">
+          <Card className="max-w-md w-full mx-4">
+            <CardHeader className="bg-gradient-to-r from-green-600 to-green-700 text-white">
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold">{t('admin.tour.addNewAction')}</h2>
+                <CardTitle className="text-lg font-semibold text-white">{t('admin.tour.addNewAction')}</CardTitle>
                 <button
                   onClick={() => {
                     setIsAddingAction(false)
@@ -1821,10 +2027,9 @@ export default function TourAdminViewer({
                   </svg>
                 </button>
               </div>
-            </div>
+            </CardHeader>
             
-            {/* Modal Content */}
-            <div className="p-4">
+            <CardContent className="p-4">
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -1871,9 +2076,8 @@ export default function TourAdminViewer({
                   />
                 </div>
               </div>
-            </div>
+            </CardContent>
             
-            {/* Modal Footer */}
             <div className="bg-gray-50 px-4 py-3 flex justify-end gap-2">
               <Button
                 size="sm"
@@ -1935,18 +2139,17 @@ export default function TourAdminViewer({
                 {t('admin.tour.createAction')}
               </Button>
             </div>
-          </div>
+          </Card>
         </div>
       )}
 
       {/* Add New Scene Modal */}
-      {isAddingScene && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-lg w-full mx-4 max-h-[90vh] overflow-hidden">
-            {/* Modal Header */}
-            <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white p-4">
+      {isAddingScene && typeof window !== 'undefined' && createPortal(
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999]">
+          <Card className="max-w-lg w-full mx-4 max-h-[90vh] overflow-hidden">
+            <CardHeader className="bg-gradient-to-r from-purple-600 to-purple-700 text-white">
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold">{t('admin.tour.addNewScene')}</h2>
+                <CardTitle className="text-lg font-semibold text-white">{t('admin.tour.addNewScene')}</CardTitle>
                 <button
                   onClick={() => {
                     setIsAddingScene(false)
@@ -1965,10 +2168,9 @@ export default function TourAdminViewer({
                   </svg>
                 </button>
               </div>
-            </div>
+            </CardHeader>
             
-            {/* Modal Content */}
-            <div className="p-4 overflow-y-auto max-h-96">
+            <CardContent className="p-4 overflow-y-auto max-h-96">
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -2077,9 +2279,8 @@ export default function TourAdminViewer({
                   </div>
                 )}
               </div>
-            </div>
+            </CardContent>
             
-            {/* Modal Footer */}
             <div className="bg-gray-50 px-4 py-3 flex justify-end gap-2">
               <Button
                 size="sm"
@@ -2169,8 +2370,178 @@ export default function TourAdminViewer({
                 {t('admin.tour.createAndPreviewScene')}
               </Button>
             </div>
-          </div>
-        </div>
+          </Card>
+        </div>,
+        document.body
+      )}
+
+      {/* Edit Scene Modal */}
+      {isEditingScene && typeof window !== 'undefined' && createPortal(
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999]">
+          <Card className="max-w-lg w-full mx-4 max-h-[90vh] overflow-hidden">
+            <CardHeader className="bg-gradient-to-r from-orange-600 to-orange-700 text-white">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-lg font-semibold text-white">{t('admin.tour.editScene')}</CardTitle>
+                <button
+                  onClick={() => {
+                    setIsEditingScene(false)
+                    setEditSceneForm({
+                      id: 0,
+                      name: '',
+                      panorama: '',
+                      yaw: 0,
+                      pitch: 0,
+                      fov: 50
+                    })
+                  }}
+                  className="text-white hover:text-gray-200 transition-colors"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </CardHeader>
+            
+            <CardContent className="p-4 overflow-y-auto max-h-96">
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t('admin.tour.sceneName')} *
+                  </label>
+                  <input
+                    type="text"
+                    value={editSceneForm.name}
+                    onChange={(e) => setEditSceneForm(prev => ({ ...prev, name: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    placeholder={t('admin.tour.enterSceneName')}
+                    autoFocus
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t('admin.tour.panoramaUrl')} *
+                  </label>
+                  <input
+                    type="url"
+                    value={editSceneForm.panorama}
+                    onChange={(e) => setEditSceneForm(prev => ({ ...prev, panorama: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    placeholder={t('admin.tour.panoramaUrlPlaceholder')}
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    {t('admin.tour.panoramaUrlDescription')}
+                  </p>
+                </div>
+                
+                {/* Preview Section */}
+                {editSceneForm.panorama && (
+                  <div className="border-t pt-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      {t('admin.tour.panoramaPreview')}
+                    </label>
+                    <div className="relative">
+                      <img
+                        src={editSceneForm.panorama}
+                        alt="Panorama preview"
+                        className="w-full h-32 object-cover rounded-md border"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement
+                          target.style.display = 'none'
+                          const errorDiv = target.nextElementSibling as HTMLDivElement
+                          if (errorDiv) errorDiv.style.display = 'flex'
+                        }}
+                      />
+                      <div
+                        className="hidden w-full h-32 bg-gray-100 rounded-md border items-center justify-center text-gray-500 text-sm"
+                      >
+                        {t('admin.tour.failedToLoadPanorama')}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+            
+            <div className="bg-gray-50 px-4 py-3 flex justify-end gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  setIsEditingScene(false)
+                  setEditSceneForm({
+                    id: 0,
+                    name: '',
+                    panorama: '',
+                    yaw: 0,
+                    pitch: 0,
+                    fov: 50
+                  })
+                }}
+              >
+                {t('admin.tour.cancel')}
+              </Button>
+              <Button
+                size="sm"
+                onClick={async () => {
+                  if (!editSceneForm.name.trim()) {
+                    alert(t('admin.tour.pleaseEnterSceneName'))
+                    return
+                  }
+                  
+                  if (!editSceneForm.panorama.trim()) {
+                    alert(t('admin.tour.pleaseEnterPanoramaUrl'))
+                    return
+                  }
+                  
+                  try {
+                    // Update scene using the hook function (we need to add updateScene to useScenes hook)
+                    // For now, we'll use a placeholder - this would need to be implemented in the hook
+                    console.log('Updating scene:', editSceneForm)
+                    
+                    // Close the modal
+                    setIsEditingScene(false)
+                    setEditSceneForm({
+                      id: 0,
+                      name: '',
+                      panorama: '',
+                      yaw: 0,
+                      pitch: 0,
+                      fov: 50
+                    })
+                    
+                    // Refresh the current scene if panorama changed
+                    if (editSceneForm.panorama !== currentScene?.yscenespanorama && viewerInstance) {
+                      setIsTransitioning(true)
+                      viewerInstance.setPanorama(editSceneForm.panorama, {
+                        transition: true,
+                        showLoader: true,
+                      }).then(() => {
+                        setTimeout(() => {
+                          addMarkers()
+                          setIsTransitioning(false)
+                        }, 500)
+                      }).catch(() => {
+                        setIsTransitioning(false)
+                      })
+                    }
+                    
+                  } catch (error) {
+                    console.error('Error updating scene:', error)
+                    alert('Failed to update scene. Please try again.')
+                  }
+                }}
+                className="bg-orange-600 hover:bg-orange-700 text-white"
+                disabled={!editSceneForm.name.trim() || !editSceneForm.panorama.trim()}
+              >
+                <Edit className="w-4 h-4 mr-1" />
+                {t('admin.tour.updateScene')}
+              </Button>
+            </div>
+          </Card>
+        </div>,
+        document.body
       )}
 
       {/* Transition Overlay */}

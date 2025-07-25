@@ -126,7 +126,23 @@ export const enTranslations = {
       "assignStores": "Assign Stores",
       "makeStoreAdmin": "Make Store Admin",
       "refreshData": "Refresh Data",
-      "refreshing": "Refreshing..."
+      "refreshing": "Refreshing...",
+      "filterByEmail": "Filter by Email",
+      "searchByEmail": "Search by email...",
+      "filterByRole": "Filter by Role",
+      "allRoles": "All Roles",
+      "admin": "Admin",
+      "storeAdmin": "Store Admin",
+      "user": "User",
+      "itemsPerPage": "Items per Page",
+      "clearFilters": "Clear Filters",
+      "showing": "Showing",
+      "of": "of",
+      "results": "results",
+      "totalUsers": "total users",
+      "page": "Page",
+      "previous": "Previous",
+      "next": "Next"
     },
     "virtualTourAdmin": "Virtual Tour",
     "loadingVirtualTourAdmin": "Loading virtual tour admin...",
@@ -209,6 +225,8 @@ export const enTranslations = {
       "clickToSelectPosition": "Click on panorama or use \"Use Current View\" to select position",
       "currentScene": "Current Scene",
       "addNewScene": "Add New Scene",
+      "editScene": "Edit Scene",
+      "updateScene": "Update Scene",
       "deleteScene": "Delete Scene",
       "scenesCount": "of",
       "scenes": "scenes",
@@ -275,7 +293,6 @@ export const enTranslations = {
       "sceneLink": "Scene Link",
       "unknownScene": "Unknown Scene",
       "actionNotFound": "Action not found",
-      "noScenesFound": "No scenes found. Please create a scene first.",
       "confirmDeleteScene": "Are you sure you want to delete the scene",
       "confirmDeleteSceneWarning": "This will also delete all infospots and scene links associated with this scene.",
       "actionCannotBeUndone": "This action cannot be undone.",
@@ -297,7 +314,10 @@ export const enTranslations = {
       "transitioningToScene": "Transitioning to scene...",
       "switchingTo": "Switching to",
       "mode": "mode",
-      "clickOrUseCurrentView": "Click on panorama or use \"Use Current View\" to select position"
+      "clickOrUseCurrentView": "Click on panorama or use \"Use Current View\" to select position",
+      "noScenesFound": "No Scenes Found",
+      "noScenesDescription": "You haven't created any scenes yet. Create your first scene to start building your virtual tour.",
+      "createFirstScene": "Create Your First Scene"
     }
   },
   "product3DViewer": {

@@ -272,6 +272,17 @@ export default function UsersManagementPage() {
   const [updating, setUpdating] = useState<string | null>(null)
   const [selectedUser, setSelectedUser] = useState<UserRole | null>(null)
   const [showStoreModal, setShowStoreModal] = useState(false)
+  
+  // Pagination and filtering state
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage, setItemsPerPage] = useState(10)
+  const [emailFilter, setEmailFilter] = useState('')
+  const [roleFilter, setRoleFilter] = useState<string>('')
+  
+  // Server-side pagination state
+  const [totalUsers, setTotalUsers] = useState(0)
+  const [serverTotalPages, setServerTotalPages] = useState(0)
+  const [isLoadingUsers, setIsLoadingUsers] = useState(false)
 
   const {
     fetchUsers,
@@ -283,19 +294,35 @@ export default function UsersManagementPage() {
     clearError
   } = useUserManagement()
 
-  // Fetch all users and stores
+  // Reset to first page when filters change
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [emailFilter, roleFilter])
+
+  // Fetch paginated users and stores
   const loadData = useCallback(async () => {
     try {
-      const [usersData, storesData] = await Promise.all([
-        fetchUsers(),
+      setIsLoadingUsers(true)
+      const [usersResponse, storesData] = await Promise.all([
+        fetchUsers({
+          page: currentPage,
+          limit: itemsPerPage,
+          email: emailFilter || undefined,
+          role: roleFilter || undefined
+        }),
         fetchStores()
       ])
-      setUsers(usersData)
+      
+      setUsers(usersResponse.users)
+      setTotalUsers(usersResponse.total)
+      setServerTotalPages(usersResponse.totalPages)
       setStores(storesData)
     } catch (err) {
       console.error('Error loading data:', err)
+    } finally {
+      setIsLoadingUsers(false)
     }
-  }, [])
+  }, [currentPage, itemsPerPage, emailFilter, roleFilter])
 
   // Update user role
   const handleUpdateUserRole = async (email: string, newRole: 'user' | 'store_admin') => {
@@ -326,11 +353,12 @@ export default function UsersManagementPage() {
     setShowStoreModal(true)
   }
 
+  // Load data when component mounts or when pagination/filters change
   useEffect(() => {
     loadData()
   }, [loadData])
 
-  if (loading && users.length === 0) {
+  if ((loading || isLoadingUsers) && users.length === 0) {
     return (
       <div className="p-6">
         <h1 className="text-2xl font-bold mb-6">{t('admin.userManagement')}</h1>
@@ -361,6 +389,81 @@ export default function UsersManagementPage() {
         onAssign={handleAssignStores}
         loading={loading}
       />
+
+      {/* Filter and Search Controls */}
+      <div className="bg-white shadow-md rounded-lg p-4 mb-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+          {/* Email Filter */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {t('admin.users.filterByEmail')}
+            </label>
+            <input
+              type="text"
+              value={emailFilter}
+              onChange={(e) => setEmailFilter(e.target.value)}
+              placeholder={t('admin.users.searchByEmail')}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          {/* Role Filter */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {t('admin.users.filterByRole')}
+            </label>
+            <select
+              value={roleFilter}
+              onChange={(e) => setRoleFilter(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">{t('admin.users.allRoles')}</option>
+              <option value="admin">{t('admin.users.admin')}</option>
+              <option value="store_admin">{t('admin.users.storeAdmin')}</option>
+              <option value="user">{t('admin.users.user')}</option>
+            </select>
+          </div>
+
+          {/* Items per page */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {t('admin.users.itemsPerPage')}
+            </label>
+            <select
+              value={itemsPerPage}
+              onChange={(e) => {
+                setItemsPerPage(Number(e.target.value))
+                setCurrentPage(1)
+              }}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value={5}>5</option>
+              <option value={10}>10</option>
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+            </select>
+          </div>
+
+          {/* Clear Filters */}
+          <div>
+            <button
+              onClick={() => {
+                setEmailFilter('')
+                setRoleFilter('')
+                setCurrentPage(1)
+              }}
+              className="w-full bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+            >
+              {t('admin.users.clearFilters')}
+            </button>
+          </div>
+        </div>
+
+        {/* Results Summary */}
+        <div className="mt-4 text-sm text-gray-600">
+          {t('admin.users.showing')} {((currentPage - 1) * itemsPerPage) + 1}-{Math.min(currentPage * itemsPerPage, totalUsers)} {t('admin.users.of')} {totalUsers} {t('admin.users.results')}
+        </div>
+      </div>
 
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
         <table className="min-w-full divide-y divide-gray-200">
@@ -459,6 +562,97 @@ export default function UsersManagementPage() {
           </tbody>
         </table>
       </div>
+
+      {/* Pagination Controls */}
+      {serverTotalPages > 1 && (
+        <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6 mt-4">
+          <div className="flex-1 flex justify-between sm:hidden">
+            <button
+              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+              disabled={currentPage === 1 || isLoadingUsers}
+              className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {t('admin.users.previous')}
+            </button>
+            <button
+              onClick={() => setCurrentPage(Math.min(serverTotalPages, currentPage + 1))}
+              disabled={currentPage === serverTotalPages || isLoadingUsers}
+              className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {t('admin.users.next')}
+            </button>
+          </div>
+          <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm text-gray-700">
+                {t('admin.users.page')} {currentPage} {t('admin.users.of')} {serverTotalPages} - {t('admin.users.showing')} {((currentPage - 1) * itemsPerPage) + 1}-{Math.min(currentPage * itemsPerPage, totalUsers)} {t('admin.users.of')} {totalUsers} {t('admin.users.results')}
+              </p>
+            </div>
+            <div>
+              <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                <button
+                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                  disabled={currentPage === 1 || isLoadingUsers}
+                  className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <span className="sr-only">{t('admin.users.previous')}</span>
+                  <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                </button>
+                
+                {/* Page numbers */}
+                {Array.from({ length: serverTotalPages }, (_, i) => i + 1).map((page) => {
+                  if (
+                    page === 1 ||
+                    page === serverTotalPages ||
+                    (page >= currentPage - 2 && page <= currentPage + 2)
+                  ) {
+                    return (
+                      <button
+                        key={page}
+                        onClick={() => setCurrentPage(page)}
+                        disabled={isLoadingUsers}
+                        className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium disabled:opacity-50 ${
+                          page === currentPage
+                            ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
+                            : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    )
+                  } else if (
+                    page === currentPage - 3 ||
+                    page === currentPage + 3
+                  ) {
+                    return (
+                      <span
+                        key={page}
+                        className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700"
+                      >
+                        ...
+                      </span>
+                    )
+                  }
+                  return null
+                })}
+                
+                <button
+                  onClick={() => setCurrentPage(Math.min(serverTotalPages, currentPage + 1))}
+                  disabled={currentPage === serverTotalPages || isLoadingUsers}
+                  className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <span className="sr-only">{t('admin.users.next')}</span>
+                  <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                  </svg>
+                </button>
+              </nav>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="mt-4">
         <button

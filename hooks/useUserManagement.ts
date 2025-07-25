@@ -16,12 +16,34 @@ export function useUserManagement() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const fetchUsers = async (): Promise<UserRole[]> => {
+  interface FetchUsersParams {
+    page?: number
+    limit?: number
+    email?: string
+    role?: string
+  }
+
+  interface PaginatedUsersResponse {
+    users: UserRole[]
+    total: number
+    page: number
+    limit: number
+    totalPages: number
+  }
+
+  const fetchUsers = async (params: FetchUsersParams = {}): Promise<PaginatedUsersResponse> => {
     try {
       setLoading(true)
       setError(null)
       
-      const response = await fetch('/api/admin/users')
+      const searchParams = new URLSearchParams()
+      if (params.page) searchParams.append('page', params.page.toString())
+      if (params.limit) searchParams.append('limit', params.limit.toString())
+      if (params.email) searchParams.append('email', params.email)
+      if (params.role) searchParams.append('role', params.role)
+      
+      const url = `/api/admin/users${searchParams.toString() ? `?${searchParams.toString()}` : ''}`
+      const response = await fetch(url)
       const data = await response.json()
 
       if (!response.ok) {
@@ -29,8 +51,23 @@ export function useUserManagement() {
         throw new Error(errorData.error || 'Failed to fetch users')
       }
 
-      const successData = data as UsersListResponse
-      return successData.users
+      // Handle both old and new response formats for backward compatibility
+      if (data.users && Array.isArray(data.users) && data.total !== undefined) {
+        // New paginated response
+        return data as PaginatedUsersResponse
+      } else if (data.users && Array.isArray(data.users)) {
+        // Old response format - convert to paginated format
+        const users = data.users as UserRole[]
+        return {
+          users,
+          total: users.length,
+          page: 1,
+          limit: users.length,
+          totalPages: 1
+        }
+      } else {
+        throw new Error('Invalid response format')
+      }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An error occurred'
       setError(errorMessage)
