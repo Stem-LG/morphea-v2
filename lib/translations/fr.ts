@@ -113,7 +113,6 @@ export const frTranslations = {
       "chooseStoreAdmin": "Choisir un administrateur de boutique...",
       "boutiquesAssigned": "boutiques attribuées",
       "selectBoutiques": "Sélectionner des boutiques",
-      "quickAssign": "Attribution rapide",
       "email": "Email",
       "roles": "Rôles",
       "assignedStores": "Boutiques attribuées",

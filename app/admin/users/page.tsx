@@ -160,111 +160,6 @@ function StoreAssignmentModal({ user, stores, isOpen, onClose, onAssign, loading
   )
 }
 
-interface QuickAssignProps {
-  users: UserRole[]
-  stores: Store[]
-  onAssign: (email: string, storeIds: number[]) => Promise<void>
-  loading: boolean
-}
-
-function QuickAssignSection({ users, stores, onAssign, loading }: QuickAssignProps) {
-  const { t } = useLanguage()
-  const [selectedUser, setSelectedUser] = useState('')
-  const [selectedStores, setSelectedStores] = useState<number[]>([])
-  const [isExpanded, setIsExpanded] = useState(false)
-
-  const storeAdminUsers = users.filter(user => user.roles.includes('store_admin'))
-
-  const handleQuickAssign = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (selectedUser && selectedStores.length > 0) {
-      await onAssign(selectedUser, selectedStores)
-      setSelectedUser('')
-      setSelectedStores([])
-    }
-  }
-
-  const toggleStore = (storeId: number) => {
-    setSelectedStores(prev =>
-      prev.includes(storeId)
-        ? prev.filter(id => id !== storeId)
-        : [...prev, storeId]
-    )
-  }
-
-  return (
-    <div className="bg-white shadow-md rounded-lg p-6 mb-6">
-      <button
-        onClick={() => setIsExpanded(!isExpanded)}
-        className="flex items-center justify-between w-full text-left"
-      >
-        <h2 className="text-lg font-semibold text-gray-900">{t('admin.users.quickBoutiqueAssignment')}</h2>
-        <span className="text-gray-500">
-          {isExpanded ? '▼' : '▶'}
-        </span>
-      </button>
-      
-      {isExpanded && (
-        <form onSubmit={handleQuickAssign} className="mt-4 space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* User selection */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('admin.users.selectStoreAdminUser')}
-              </label>
-              <select
-                value={selectedUser}
-                onChange={(e) => setSelectedUser(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              >
-                <option value="">{t('admin.users.chooseStoreAdmin')}</option>
-                {storeAdminUsers.map((user) => (
-                  <option key={user.id} value={user.email}>
-                    {user.email} ({user.assigned_stores?.length || 0} {t('admin.users.boutiquesAssigned')})
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Store selection */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('admin.users.selectBoutiques')} ({selectedStores.length} {t('admin.users.selected')})
-              </label>
-              <div className="max-h-32 overflow-y-auto border border-gray-300 rounded-md p-2 space-y-1">
-                {stores.map((store) => (
-                  <label key={store.id} className="flex items-center space-x-2 text-sm">
-                    <input
-                      type="checkbox"
-                      checked={selectedStores.includes(store.id)}
-                      onChange={() => toggleStore(store.id)}
-                      className="rounded text-blue-600"
-                    />
-                    <span className="truncate">
-                      <strong>{store.name}</strong> ({store.code})
-                    </span>
-                  </label>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className="flex justify-end">
-            <button
-              type="submit"
-              disabled={loading || !selectedUser || selectedStores.length === 0}
-              className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
-            >
-              {loading ? t('admin.users.assigning') : `${t('admin.users.quickAssign')} ${selectedStores.length} ${selectedStores.length !== 1 ? t('admin.users.boutiquesSelected') : t('admin.users.boutiqueSelected')}`}
-            </button>
-          </div>
-        </form>
-      )}
-    </div>
-  )
-}
-
 export default function UsersManagementPage() {
   const { t } = useLanguage()
   const [users, setUsers] = useState<UserRole[]>([])
@@ -382,13 +277,6 @@ export default function UsersManagementPage() {
           </button>
         </div>
       )}
-
-      <QuickAssignSection
-        users={users}
-        stores={stores}
-        onAssign={handleAssignStores}
-        loading={loading}
-      />
 
       {/* Filter and Search Controls */}
       <div className="bg-white shadow-md rounded-lg p-4 mb-4">

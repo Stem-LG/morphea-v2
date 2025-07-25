@@ -114,7 +114,6 @@ export const enTranslations = {
       "chooseStoreAdmin": "Choose a store admin...",
       "boutiquesAssigned": "boutiques assigned",
       "selectBoutiques": "Select Boutiques",
-      "quickAssign": "Quick Assign",
       "email": "Email",
       "roles": "Roles",
       "assignedStores": "Assigned Stores",
