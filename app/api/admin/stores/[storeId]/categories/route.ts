@@ -30,7 +30,7 @@ async function checkUserStoreAccess(request: NextRequest, storeId: string) {
   return { hasAccess: false, error: 'Insufficient permissions' }
 }
 
-// GET /api/adminv2/stores/[storeId]/categories - Get categories for a specific store
+// GET /api/admin/stores/[storeId]/categories - Get categories for a specific store
 export async function GET(
   request: NextRequest,
   { params }: { params: { storeId: string } }
@@ -126,7 +126,7 @@ export async function GET(
     })
     
   } catch (error) {
-    console.error('Error in GET /api/adminv2/stores/[storeId]/categories:', error)
+    console.error('Error in GET /api/admin/stores/[storeId]/categories:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -134,7 +134,7 @@ export async function GET(
   }
 }
 
-// POST /api/adminv2/stores/[storeId]/categories - Create a new category for the store
+// POST /api/admin/stores/[storeId]/categories - Create a new category for the store
 export async function POST(
   request: NextRequest,
   { params }: { params: { storeId: string } }
@@ -179,7 +179,7 @@ export async function POST(
     })
 
   } catch (error) {
-    console.error('Error in POST /api/adminv2/stores/[storeId]/categories:', error)
+    console.error('Error in POST /api/admin/stores/[storeId]/categories:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -187,7 +187,7 @@ export async function POST(
   }
 }
 
-// PATCH /api/adminv2/stores/[storeId]/categories - Bulk update categories
+// PATCH /api/admin/stores/[storeId]/categories - Bulk update categories
 export async function PATCH(
   request: NextRequest,
   { params }: { params: { storeId: string } }
@@ -228,7 +228,7 @@ export async function PATCH(
     })
 
   } catch (error) {
-    console.error('Error in PATCH /api/adminv2/stores/[storeId]/categories:', error)
+    console.error('Error in PATCH /api/admin/stores/[storeId]/categories:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -236,7 +236,7 @@ export async function PATCH(
   }
 }
 
-// DELETE /api/adminv2/stores/[storeId]/categories - Delete categories
+// DELETE /api/admin/stores/[storeId]/categories - Delete categories
 export async function DELETE(
   request: NextRequest,
   { params }: { params: { storeId: string } }
@@ -275,7 +275,7 @@ export async function DELETE(
     })
 
   } catch (error) {
-    console.error('Error in DELETE /api/adminv2/stores/[storeId]/categories:', error)
+    console.error('Error in DELETE /api/admin/stores/[storeId]/categories:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

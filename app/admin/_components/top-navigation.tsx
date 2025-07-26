@@ -116,7 +116,7 @@ export function TopNavigation({ user, onMenuToggle }: TopNavigationProps) {
                                     </div>
                                     
                                     <div className="p-2">
-                                        <Link href="/adminv2/profile">
+                                        <Link href="/admin/profile">
                                             <Button
                                                 variant="ghost"
                                                 size="sm"

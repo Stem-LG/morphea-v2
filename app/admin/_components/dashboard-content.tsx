@@ -39,7 +39,7 @@ export function DashboardContent() {
             title: t('admin.manageStores'),
             description: t('admin.manageStoresDesc'),
             icon: Store,
-            href: '/adminv2/stores',
+            href: '/admin/stores',
             color: 'from-blue-500 to-blue-600',
             available: true
         },
@@ -47,7 +47,7 @@ export function DashboardContent() {
             title: t('admin.addProduct'),
             description: t('admin.addProductDesc'),
             icon: Plus,
-            href: '/adminv2/stores',
+            href: '/admin/stores',
             color: 'from-green-500 to-green-600',
             available: true
         },
@@ -55,7 +55,7 @@ export function DashboardContent() {
             title: t('admin.viewAnalytics'),
             description: t('admin.viewAnalyticsDesc'),
             icon: BarChart3,
-            href: '/adminv2/analytics',
+            href: '/admin/analytics',
             color: 'from-purple-500 to-purple-600',
             available: true
         },
@@ -63,7 +63,7 @@ export function DashboardContent() {
             title: t('admin.manageUsers'),
             description: t('admin.manageUsersDesc'),
             icon: Users,
-            href: '/adminv2/users',
+            href: '/admin/users',
             color: 'from-orange-500 to-orange-600',
             available: isAdmin
         }

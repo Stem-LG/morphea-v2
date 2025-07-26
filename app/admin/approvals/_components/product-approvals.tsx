@@ -11,19 +11,30 @@ import {
     Package, 
     Search,
     Filter,
-    MoreHorizontal,
     Clock,
     Trash2,
-    AlertCircle
+    AlertCircle,
+    AlertTriangle
 } from "lucide-react";
-import { usePendingProducts, useApproveProduct } from "@/hooks/useProductApprovals";
+import { usePendingProducts, useApproveProduct, useNeedsRevisionProduct } from "@/hooks/useProductApprovals";
 import { useDeleteProduct } from "@/hooks/useProducts";
 import { useLanguage } from "@/hooks/useLanguage";
 import type { ProductWithObjects } from "@/hooks/useProducts";
-import { ApprovalStats } from "./approval-stats";
 import { ProductDetailsModal } from "./product-details-modal";
 
-type FilterStatus = "all" | "pending" | "approved" | "rejected";
+interface ApprovalData {
+    categoryId: number;
+    variants: {
+        yvarprodid: number;
+        yvarprodprixcatalogue: number;
+        yvarprodprixpromotion: number | null;
+        yvarprodpromotiondatedeb: string | null;
+        yvarprodpromotiondatefin: string | null;
+        yvarprodnbrjourlivraison: number;
+    }[];
+}
+
+type FilterStatus = "all" | "pending" | "approved" | "needs_revision";
 type SortOption = "newest" | "oldest" | "name" | "code";
 
 export function ProductApprovals() {
@@ -32,10 +43,10 @@ export function ProductApprovals() {
     const [searchTerm, setSearchTerm] = useState("");
     const [filterStatus, setFilterStatus] = useState<FilterStatus>("pending");
     const [sortBy, setSortBy] = useState<SortOption>("newest");
-    const [selectedProducts, setSelectedProducts] = useState<number[]>([]);
     
     const { data: pendingProducts, isLoading, error } = usePendingProducts();
     const approveProductMutation = useApproveProduct();
+    const needsRevisionMutation = useNeedsRevisionProduct();
     const deleteProductMutation = useDeleteProduct();
 
     // Filter and sort products
@@ -46,7 +57,7 @@ export function ProductApprovals() {
         const matchesStatus = filterStatus === "all" || 
                             (filterStatus === "pending" && product.yprodstatut === "not_approved") ||
                             (filterStatus === "approved" && product.yprodstatut === "approved") ||
-                            (filterStatus === "rejected" && product.yprodstatut === "rejected");
+                            (filterStatus === "needs_revision" && product.yprodstatut === "needs_revision");
         
         return matchesSearch && matchesStatus;
     })?.sort((a, b) => {
@@ -64,27 +75,21 @@ export function ProductApprovals() {
         }
     }) || [];
 
-    const handleApprove = async (productId: number) => {
+    const handleApprove = async (productId: number, approvalData: ApprovalData) => {
         try {
-            await approveProductMutation.mutateAsync(productId);
+            await approveProductMutation.mutateAsync({ productId, approvalData });
             setSelectedProduct(null);
         } catch (error) {
             console.error('Failed to approve product:', error);
         }
     };
 
-    const handleBulkApprove = async () => {
-        if (selectedProducts.length === 0) return;
-        
-        if (confirm(`Are you sure you want to approve ${selectedProducts.length} products?`)) {
-            try {
-                for (const productId of selectedProducts) {
-                    await approveProductMutation.mutateAsync(productId);
-                }
-                setSelectedProducts([]);
-            } catch (error) {
-                console.error('Failed to bulk approve products:', error);
-            }
+    const handleNeedsRevision = async (productId: number, comments: string) => {
+        try {
+            await needsRevisionMutation.mutateAsync({ productId, comments: "" });
+            setSelectedProduct(null);
+        } catch (error) {
+            console.error('Failed to mark product as needs revision:', error);
         }
     };
 
@@ -93,41 +98,9 @@ export function ProductApprovals() {
             try {
                 await deleteProductMutation.mutateAsync(productId);
                 setSelectedProduct(null);
-                setSelectedProducts(prev => prev.filter(id => id !== productId));
             } catch (error) {
                 console.error('Failed to delete product:', error);
             }
-        }
-    };
-
-    const handleBulkDelete = async () => {
-        if (selectedProducts.length === 0) return;
-        
-        if (confirm(`Are you sure you want to delete ${selectedProducts.length} products? This action cannot be undone.`)) {
-            try {
-                for (const productId of selectedProducts) {
-                    await deleteProductMutation.mutateAsync(productId);
-                }
-                setSelectedProducts([]);
-            } catch (error) {
-                console.error('Failed to bulk delete products:', error);
-            }
-        }
-    };
-
-    const toggleProductSelection = (productId: number) => {
-        setSelectedProducts(prev => 
-            prev.includes(productId) 
-                ? prev.filter(id => id !== productId)
-                : [...prev, productId]
-        );
-    };
-
-    const toggleSelectAll = () => {
-        if (selectedProducts.length === filteredProducts.length) {
-            setSelectedProducts([]);
-        } else {
-            setSelectedProducts(filteredProducts.map(p => p.yprodid));
         }
     };
 
@@ -135,8 +108,8 @@ export function ProductApprovals() {
         switch (status) {
             case "approved":
                 return <CheckCircle className="h-4 w-4 text-green-400" />;
-            case "rejected":
-                return <XCircle className="h-4 w-4 text-red-400" />;
+            case "needs_revision":
+                return <AlertTriangle className="h-4 w-4 text-orange-400" />;
             default:
                 return <Clock className="h-4 w-4 text-yellow-400" />;
         }
@@ -146,8 +119,8 @@ export function ProductApprovals() {
         switch (status) {
             case "approved":
                 return "Approved";
-            case "rejected":
-                return "Rejected";
+            case "needs_revision":
+                return "Needs Revision";
             default:
                 return "Pending";
         }
@@ -157,8 +130,8 @@ export function ProductApprovals() {
         switch (status) {
             case "approved":
                 return "text-green-400 bg-green-400/10 border-green-400/20";
-            case "rejected":
-                return "text-red-400 bg-red-400/10 border-red-400/20";
+            case "needs_revision":
+                return "text-orange-400 bg-orange-400/10 border-orange-400/20";
             default:
                 return "text-yellow-400 bg-yellow-400/10 border-yellow-400/20";
         }
@@ -204,9 +177,6 @@ export function ProductApprovals() {
                 </div>
             </div>
 
-            {/* Approval Statistics */}
-            <ApprovalStats />
-
             {/* Search and Filters */}
             <div className="flex flex-col lg:flex-row gap-4">
                 <div className="relative flex-1">
@@ -228,7 +198,7 @@ export function ProductApprovals() {
                         <option value="all">All Status</option>
                         <option value="pending">Pending</option>
                         <option value="approved">Approved</option>
-                        <option value="rejected">Rejected</option>
+                        <option value="needs_revision">Needs Revision</option>
                     </select>
                     
                     <select
@@ -249,50 +219,6 @@ export function ProductApprovals() {
                 </div>
             </div>
 
-            {/* Bulk Actions */}
-            {selectedProducts.length > 0 && (
-                <Card className="bg-gradient-to-br from-morpheus-blue-dark/40 to-morpheus-blue-light/40 border-slate-700/50 shadow-xl">
-                    <CardContent className="p-4">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                                <span className="text-white font-medium">
-                                    {selectedProducts.length} products selected
-                                </span>
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => setSelectedProducts([])}
-                                    className="border-slate-600 text-gray-300 hover:bg-slate-700/50"
-                                >
-                                    Clear Selection
-                                </Button>
-                            </div>
-                            <div className="flex gap-2">
-                                <Button
-                                    onClick={handleBulkApprove}
-                                    disabled={approveProductMutation.isPending}
-                                    className="bg-green-600 hover:bg-green-700 text-white"
-                                    size="sm"
-                                >
-                                    <CheckCircle className="h-4 w-4 mr-2" />
-                                    Approve Selected
-                                </Button>
-                                <Button
-                                    onClick={handleBulkDelete}
-                                    disabled={deleteProductMutation.isPending}
-                                    variant="outline"
-                                    size="sm"
-                                    className="border-red-600 text-red-400 hover:bg-red-600/10"
-                                >
-                                    <Trash2 className="h-4 w-4 mr-2" />
-                                    Delete Selected
-                                </Button>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
-            )}
-
             {/* Products Grid */}
             {filteredProducts.length === 0 ? (
                 <div className="text-center py-12">
@@ -309,40 +235,17 @@ export function ProductApprovals() {
                 </div>
             ) : (
                 <>
-                    {/* Select All Checkbox */}
-                    <div className="flex items-center gap-3 mb-4">
-                        <input
-                            type="checkbox"
-                            checked={selectedProducts.length === filteredProducts.length}
-                            onChange={toggleSelectAll}
-                            className="w-4 h-4 text-morpheus-gold-light bg-morpheus-blue-dark border-slate-600 rounded focus:ring-morpheus-gold-light"
-                        />
-                        <span className="text-gray-300 text-sm">
-                            Select all {filteredProducts.length} products
-                        </span>
-                    </div>
-
                     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                         {filteredProducts.map((product: ProductWithObjects) => (
                             <Card
                                 key={product.yprodid}
-                                className={`bg-gradient-to-br from-morpheus-blue-dark/40 to-morpheus-blue-light/40 border-slate-700/50 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 group ${
-                                    selectedProducts.includes(product.yprodid) ? 'ring-2 ring-morpheus-gold-light/50' : ''
-                                }`}
+                                className="bg-gradient-to-br from-morpheus-blue-dark/40 to-morpheus-blue-light/40 border-slate-700/50 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 group"
                             >
                                 <CardHeader className="pb-3">
                                     <div className="flex items-start justify-between">
-                                        <div className="flex items-center gap-3 flex-1">
-                                            <input
-                                                type="checkbox"
-                                                checked={selectedProducts.includes(product.yprodid)}
-                                                onChange={() => toggleProductSelection(product.yprodid)}
-                                                className="w-4 h-4 text-morpheus-gold-light bg-morpheus-blue-dark border-slate-600 rounded focus:ring-morpheus-gold-light"
-                                            />
-                                            <CardTitle className="text-white text-lg truncate">
-                                                {product.yprodintitule}
-                                            </CardTitle>
-                                        </div>
+                                        <CardTitle className="text-white text-lg truncate">
+                                            {product.yprodintitule}
+                                        </CardTitle>
                                         <Badge className={`px-2 py-1 text-xs font-medium flex items-center gap-1 border ${getStatusColor(product.yprodstatut || 'not_approved')}`}>
                                             {getStatusIcon(product.yprodstatut || 'not_approved')}
                                             {getStatusText(product.yprodstatut || 'not_approved')}
@@ -381,16 +284,7 @@ export function ProductApprovals() {
                                             className="flex-1 border-slate-600 text-white hover:bg-slate-700/50"
                                         >
                                             <Eye className="h-4 w-4 mr-1" />
-                                            View Details
-                                        </Button>
-                                        <Button
-                                            size="sm"
-                                            onClick={() => handleApprove(product.yprodid)}
-                                            disabled={approveProductMutation.isPending}
-                                            className="flex-1 bg-green-600 hover:bg-green-700 text-white"
-                                        >
-                                            <CheckCircle className="h-4 w-4 mr-1" />
-                                            Approve
+                                            Review
                                         </Button>
                                         <Button
                                             variant="outline"
@@ -415,6 +309,7 @@ export function ProductApprovals() {
                     product={selectedProduct}
                     onClose={() => setSelectedProduct(null)}
                     onApprove={handleApprove}
+                    onNeedsRevision={handleNeedsRevision}
                     onDelete={handleDelete}
                 />
             )}

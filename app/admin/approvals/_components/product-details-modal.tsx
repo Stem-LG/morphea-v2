@@ -1,8 +1,10 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { 
     X, 
     CheckCircle, 
@@ -15,35 +17,150 @@ import {
     Tag,
     Palette,
     Box,
-    MessageSquare,
-    Download
+    Download,
+    AlertTriangle,
+    Save
 } from "lucide-react";
 import type { ProductWithObjects } from "@/hooks/useProducts";
 import { useLanguage } from "@/hooks/useLanguage";
+import { useCategories } from "@/hooks/useCategories";
+import { useProductVariants } from "@/hooks/useProductVariants";
 
 interface ProductDetailsModalProps {
     product: ProductWithObjects;
     onClose: () => void;
-    onApprove: (productId: number) => void;
+    onApprove: (productId: number, approvalData: ApprovalData) => void;
+    onNeedsRevision: (productId: number, comments: string) => void;
     onDelete: (productId: number) => void;
+}
+
+interface ApprovalData {
+    categoryId: number;
+    variants: {
+        yvarprodid: number;
+        yvarprodprixcatalogue: number;
+        yvarprodprixpromotion: number | null;
+        yvarprodpromotiondatedeb: string | null;
+        yvarprodpromotiondatefin: string | null;
+        yvarprodnbrjourlivraison: number;
+    }[];
 }
 
 export function ProductDetailsModal({ 
     product, 
     onClose, 
-    onApprove, 
+    onApprove,
+    onNeedsRevision,
     onDelete 
 }: ProductDetailsModalProps) {
     const { t } = useLanguage();
-    const [selectedTab, setSelectedTab] = useState<"details" | "objects" | "variants">("details");
-    const [comments, setComments] = useState("");
+    const [selectedTab, setSelectedTab] = useState<"details" | "objects" | "approval">("details");
+    
+    // Approval form state
+    const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
+    const [variantData, setVariantData] = useState<Record<number, {
+        yvarprodprixcatalogue: string;
+        yvarprodprixpromotion: string;
+        yvarprodpromotiondatedeb: string;
+        yvarprodpromotiondatefin: string;
+        yvarprodnbrjourlivraison: string;
+    }>>({});
+
+    // Load data
+    const { data: categories, isLoading: categoriesLoading } = useCategories();
+    const { data: variants, isLoading: variantsLoading } = useProductVariants(product.yprodid);
+
+    // Initialize variant data when variants are loaded
+    useEffect(() => {
+        if (variants && variants.length > 0) {
+            const initialData: Record<number, any> = {};
+            variants.forEach(variant => {
+                initialData[variant.yvarprodid] = {
+                    yvarprodprixcatalogue: variant.yvarprodprixcatalogue?.toString() || '',
+                    yvarprodprixpromotion: variant.yvarprodprixpromotion?.toString() || '',
+                    yvarprodpromotiondatedeb: variant.yvarprodpromotiondatedeb || '',
+                    yvarprodpromotiondatefin: variant.yvarprodpromotiondatefin || '',
+                    yvarprodnbrjourlivraison: variant.yvarprodnbrjourlivraison?.toString() || '',
+                };
+            });
+            setVariantData(initialData);
+        }
+    }, [variants]);
+
+    const updateVariantField = (variantId: number, field: string, value: string) => {
+        setVariantData(prev => ({
+            ...prev,
+            [variantId]: {
+                ...prev[variantId],
+                [field]: value
+            }
+        }));
+    };
+
+    const validateApprovalData = (): boolean => {
+        if (!selectedCategoryId) return false;
+        
+        if (!variants || variants.length === 0) return false;
+
+        for (const variant of variants) {
+            const data = variantData[variant.yvarprodid];
+            if (!data) return false;
+            
+            // Required fields validation
+            if (!data.yvarprodprixcatalogue || 
+                !data.yvarprodnbrjourlivraison) {
+                return false;
+            }
+
+            // Numeric validation
+            if (isNaN(Number(data.yvarprodprixcatalogue)) ||
+                isNaN(Number(data.yvarprodnbrjourlivraison))) {
+                return false;
+            }
+
+            // If promotion price is provided, validate dates
+            if (data.yvarprodprixpromotion && 
+                (!data.yvarprodpromotiondatedeb || !data.yvarprodpromotiondatefin)) {
+                return false;
+            }
+        }
+
+        return true;
+    };
+
+    const handleApprove = () => {
+        if (!validateApprovalData()) {
+            alert('Please fill in all required fields correctly.');
+            return;
+        }
+
+        const approvalData: ApprovalData = {
+            categoryId: selectedCategoryId!,
+            variants: variants!.map(variant => ({
+                yvarprodid: variant.yvarprodid,
+                yvarprodprixcatalogue: Number(variantData[variant.yvarprodid].yvarprodprixcatalogue),
+                yvarprodprixpromotion: variantData[variant.yvarprodid].yvarprodprixpromotion 
+                    ? Number(variantData[variant.yvarprodid].yvarprodprixpromotion) 
+                    : null,
+                yvarprodpromotiondatedeb: variantData[variant.yvarprodid].yvarprodpromotiondatedeb || null,
+                yvarprodpromotiondatefin: variantData[variant.yvarprodid].yvarprodpromotiondatefin || null,
+                yvarprodnbrjourlivraison: Number(variantData[variant.yvarprodid].yvarprodnbrjourlivraison),
+            }))
+        };
+
+        onApprove(product.yprodid, approvalData);
+    };
+
+    const handleNeedsRevision = () => {
+        onNeedsRevision(product.yprodid, "");
+    };
 
     const getStatusIcon = (status: string) => {
         switch (status) {
             case "approved":
                 return <CheckCircle className="h-4 w-4 text-green-400" />;
-            case "rejected":
-                return <X className="h-4 w-4 text-red-400" />;
+            case "needs_revision":
+                return <AlertTriangle className="h-4 w-4 text-orange-400" />;
             default:
                 return <Package className="h-4 w-4 text-yellow-400" />;
         }
@@ -53,8 +170,8 @@ export function ProductDetailsModal({
         switch (status) {
             case "approved":
                 return "Approved";
-            case "rejected":
-                return "Rejected";
+            case "needs_revision":
+                return "Needs Revision";
             default:
                 return "Pending Approval";
         }
@@ -64,8 +181,8 @@ export function ProductDetailsModal({
         switch (status) {
             case "approved":
                 return "text-green-400 bg-green-400/10 border-green-400/20";
-            case "rejected":
-                return "text-red-400 bg-red-400/10 border-red-400/20";
+            case "needs_revision":
+                return "text-orange-400 bg-orange-400/10 border-orange-400/20";
             default:
                 return "text-yellow-400 bg-yellow-400/10 border-yellow-400/20";
         }
@@ -74,7 +191,7 @@ export function ProductDetailsModal({
     const tabs = [
         { id: "details", label: "Product Details", icon: Package },
         { id: "objects", label: "3D Objects", icon: Box },
-        { id: "variants", label: "Variants", icon: Palette }
+        { id: "approval", label: "Approval Form", icon: CheckCircle }
     ];
 
     return (
@@ -219,8 +336,7 @@ export function ProductDetailsModal({
                                                 <span className="text-xs text-gray-300">Variants</span>
                                             </div>
                                             <div className="text-lg font-bold text-white">
-                                                {/* Mock data - replace with real variant count */}
-                                                {Math.floor(Math.random() * 5) + 1}
+                                                {variants?.length || 0}
                                             </div>
                                         </div>
                                     </div>
@@ -309,40 +425,141 @@ export function ProductDetailsModal({
                         </div>
                     )}
 
-                    {selectedTab === "variants" && (
-                        <div className="space-y-4">
-                            <div className="flex items-center justify-between">
-                                <h3 className="text-lg font-semibold text-white">Product Variants</h3>
-                            </div>
-                            
-                            {/* Placeholder for variants - would need to fetch from yvarprod table */}
-                            <div className="text-center py-8">
-                                <Palette className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                                <p className="text-gray-300 text-lg">Variant information</p>
-                                <p className="text-gray-400 text-sm">Variant details would be displayed here</p>
-                            </div>
+                    {selectedTab === "approval" && (
+                        <div className="space-y-6">
+                            {/* Category Selection */}
+                            <Card className="bg-gradient-to-br from-morpheus-blue-dark/20 to-morpheus-blue-light/20 border-slate-700/50">
+                                <CardHeader>
+                                    <CardTitle className="text-white flex items-center gap-2">
+                                        <Tag className="h-5 w-5 text-morpheus-gold-light" />
+                                        Product Category
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="space-y-2">
+                                        <Label className="text-gray-300">Select Category *</Label>
+                                        {categoriesLoading ? (
+                                            <div className="text-gray-400">Loading categories...</div>
+                                        ) : (
+                                            <select
+                                                value={selectedCategoryId || ''}
+                                                onChange={(e) => setSelectedCategoryId(Number(e.target.value) || null)}
+                                                className="w-full p-3 bg-morpheus-blue-dark/30 border border-slate-600 rounded-md text-white"
+                                            >
+                                                <option value="">Choose a category...</option>
+                                                {categories?.map(category => (
+                                                    <option key={category.xcategprodid} value={category.xcategprodid}>
+                                                        {category.xcategprodintitule}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        )}
+                                    </div>
+                                </CardContent>
+                            </Card>
+
+                            {/* Variants Pricing */}
+                            <Card className="bg-gradient-to-br from-morpheus-blue-dark/20 to-morpheus-blue-light/20 border-slate-700/50">
+                                <CardHeader>
+                                    <CardTitle className="text-white flex items-center gap-2">
+                                        <Palette className="h-5 w-5 text-morpheus-gold-light" />
+                                        Product Variants ({variants?.length || 0})
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    {variantsLoading ? (
+                                        <div className="text-gray-400">Loading variants...</div>
+                                    ) : variants && variants.length > 0 ? (
+                                        <div className="space-y-6">
+                                            {variants.map((variant, index) => (
+                                                <div key={variant.yvarprodid} className="p-4 bg-morpheus-blue-dark/20 rounded-lg border border-slate-600/30">
+                                                    <h4 className="text-white font-medium mb-4 flex items-center gap-2">
+                                                        <Palette className="h-4 w-4" />
+                                                        Variant {index + 1}: {variant.yvarprodintitule}
+                                                    </h4>
+                                                    
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                        {/* Catalog Price */}
+                                                        <div>
+                                                            <Label className="text-gray-300">Catalog Price *</Label>
+                                                            <Input
+                                                                type="number"
+                                                                step="0.01"
+                                                                value={variantData[variant.yvarprodid]?.yvarprodprixcatalogue || ''}
+                                                                onChange={(e) => updateVariantField(variant.yvarprodid, 'yvarprodprixcatalogue', e.target.value)}
+                                                                className="bg-morpheus-blue-dark/30 border-slate-600 text-white"
+                                                                placeholder="0.00"
+                                                            />
+                                                        </div>
+
+                                                        {/* Delivery Days */}
+                                                        <div>
+                                                            <Label className="text-gray-300">Delivery Days *</Label>
+                                                            <Input
+                                                                type="number"
+                                                                value={variantData[variant.yvarprodid]?.yvarprodnbrjourlivraison || ''}
+                                                                onChange={(e) => updateVariantField(variant.yvarprodid, 'yvarprodnbrjourlivraison', e.target.value)}
+                                                                className="bg-morpheus-blue-dark/30 border-slate-600 text-white"
+                                                                placeholder="7"
+                                                            />
+                                                        </div>
+
+                                                        {/* Promotion Price */}
+                                                        <div>
+                                                            <Label className="text-gray-300">Promotion Price</Label>
+                                                            <Input
+                                                                type="number"
+                                                                step="0.01"
+                                                                value={variantData[variant.yvarprodid]?.yvarprodprixpromotion || ''}
+                                                                onChange={(e) => updateVariantField(variant.yvarprodid, 'yvarprodprixpromotion', e.target.value)}
+                                                                className="bg-morpheus-blue-dark/30 border-slate-600 text-white"
+                                                                placeholder="0.00"
+                                                            />
+                                                        </div>
+
+                                                        {/* Promotion Start Date */}
+                                                        <div>
+                                                            <Label className="text-gray-300">Promotion Start Date</Label>
+                                                            <Input
+                                                                type="date"
+                                                                value={variantData[variant.yvarprodid]?.yvarprodpromotiondatedeb || ''}
+                                                                onChange={(e) => updateVariantField(variant.yvarprodid, 'yvarprodpromotiondatedeb', e.target.value)}
+                                                                className="bg-morpheus-blue-dark/30 border-slate-600 text-white"
+                                                            />
+                                                        </div>
+
+                                                        {/* Promotion End Date */}
+                                                        <div className="md:col-span-2">
+                                                            <Label className="text-gray-300">Promotion End Date</Label>
+                                                            <Input
+                                                                type="date"
+                                                                value={variantData[variant.yvarprodid]?.yvarprodpromotiondatefin || ''}
+                                                                onChange={(e) => updateVariantField(variant.yvarprodid, 'yvarprodpromotiondatefin', e.target.value)}
+                                                                className="bg-morpheus-blue-dark/30 border-slate-600 text-white"
+                                                            />
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Variant Info */}
+                                                    <div className="mt-4 flex gap-4 text-sm text-gray-400">
+                                                        <span>Color: {variant.xcouleur?.xcouleurintitule || 'N/A'}</span>
+                                                        <span>Size: {variant.xtaille?.xtailleintitule || 'N/A'}</span>
+                                                        <span>Currency: {variant.xdevise?.xdeviseintitule || 'N/A'}</span>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <div className="text-center py-8">
+                                            <Palette className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                                            <p className="text-gray-300 text-lg">No variants found</p>
+                                            <p className="text-gray-400 text-sm">This product doesn't have any variants</p>
+                                        </div>
+                                    )}
+                                </CardContent>
+                            </Card>
                         </div>
                     )}
-                </div>
-
-                {/* Comments Section */}
-                <div className="px-6 pb-4">
-                    <Card className="bg-gradient-to-br from-morpheus-blue-dark/20 to-morpheus-blue-light/20 border-slate-700/50">
-                        <CardHeader className="pb-3">
-                            <CardTitle className="text-white flex items-center gap-2">
-                                <MessageSquare className="h-5 w-5 text-morpheus-gold-light" />
-                                Approval Comments
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <textarea
-                                value={comments}
-                                onChange={(e) => setComments(e.target.value)}
-                                placeholder="Add comments about this product approval..."
-                                className="w-full h-20 bg-morpheus-blue-dark/30 border border-slate-600 rounded-md text-white placeholder-gray-400 p-3 text-sm resize-none focus:ring-2 focus:ring-morpheus-gold-light/50 focus:border-morpheus-gold-light/50"
-                            />
-                        </CardContent>
-                    </Card>
                 </div>
 
                 {/* Actions */}
@@ -364,9 +581,20 @@ export function ProductDetailsModal({
                             <Trash2 className="h-4 w-4 mr-2" />
                             Delete Product
                         </Button>
+                        
                         <Button
-                            onClick={() => onApprove(product.yprodid)}
-                            className="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white shadow-lg"
+                            variant="outline"
+                            onClick={handleNeedsRevision}
+                            className="border-orange-600 text-orange-400 hover:bg-orange-600/10"
+                        >
+                            <AlertTriangle className="h-4 w-4 mr-2" />
+                            Needs Revision
+                        </Button>
+                        
+                        <Button
+                            onClick={handleApprove}
+                            disabled={!validateApprovalData()}
+                            className="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             <CheckCircle className="h-4 w-4 mr-2" />
                             Approve Product

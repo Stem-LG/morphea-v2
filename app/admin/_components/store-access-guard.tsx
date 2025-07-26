@@ -55,7 +55,7 @@ export function StoreAccessGuard({ storeId, children, fallback }: StoreAccessGua
                                         Sign In
                                     </Button>
                                 </Link>
-                                <Link href="/adminv2">
+                                <Link href="/admin">
                                     <Button variant="outline" className="w-full border-slate-600 text-white hover:bg-slate-700/50">
                                         <ArrowLeft className="h-4 w-4 mr-2" />
                                         Back to Dashboard
@@ -158,13 +158,13 @@ export function StoreAccessGuard({ storeId, children, fallback }: StoreAccessGua
                                 </div>
                             </div>
                             <div className="flex flex-col gap-2">
-                                <Link href="/adminv2/stores">
+                                <Link href="/admin/stores">
                                     <Button className="w-full bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-[#695029] hover:to-[#d4c066] text-white">
                                         <ArrowLeft className="h-4 w-4 mr-2" />
                                         View Available Stores
                                     </Button>
                                 </Link>
-                                <Link href="/adminv2">
+                                <Link href="/admin">
                                     <Button variant="outline" className="w-full border-slate-600 text-white hover:bg-slate-700/50">
                                         Back to Dashboard
                                     </Button>

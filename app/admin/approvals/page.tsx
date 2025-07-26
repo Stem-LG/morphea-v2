@@ -1,10 +1,12 @@
 "use client";
 import React from "react";
 import { AdminV2Layout } from "../_components/admin-v2-layout";
-import { ProductApprovals } from "./_components/product-approvals";
+
 import { useAuth } from "@/hooks/useAuth";
 import { AccessDenied } from "../_components/access-denied";
 import { LoadingScreen } from "../_components/loading-screen";
+import { ProductApprovals } from "./_components/product-approvals";
+
 
 export default function ApprovalsPage() {
     const { data: user, isLoading } = useAuth();

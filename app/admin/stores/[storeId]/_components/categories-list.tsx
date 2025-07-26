@@ -272,7 +272,7 @@ export function CategoriesList({ storeId, store }: CategoriesListProps) {
 
                                 {/* Actions */}
                                 <div className="flex gap-2 pt-2">
-                                    <Link href={`/adminv2/stores/${storeId}/categories/${category.id}`} className="flex-1">
+                                    <Link href={`/admin/stores/${storeId}/categories/${category.id}`} className="flex-1">
                                         <Button
                                             variant="outline"
                                             size="sm"

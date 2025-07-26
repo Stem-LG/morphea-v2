@@ -39,49 +39,49 @@ export function ModernSidebar({ isOpen, isCollapsed, onToggle, onCollapse, userR
                 id: "dashboard",
                 label: t("admin.dashboard"),
                 icon: LayoutDashboard,
-                href: "/adminv2",
+                href: "/admin",
                 roles: ["admin", "store_admin"],
             },
             {
                 id: "stores",
                 label: t("admin.storeManagement"),
                 icon: Store,
-                href: "/adminv2/stores",
+                href: "/admin/stores",
                 roles: ["admin", "store_admin"],
             },
             {
                 id: "approvals",
                 label: "Product Approvals",
                 icon: CheckCircle,
-                href: "/adminv2/approvals",
+                href: "/admin/approvals",
                 roles: ["admin"],
             },
             {
                 id: "products",
                 label: t("admin.productManagement"),
                 icon: Package,
-                href: "/adminv2/products",
+                href: "/admin/products",
                 roles: ["admin"],
             },
             {
                 id: "analytics",
                 label: t("admin.analytics"),
                 icon: BarChart3,
-                href: "/adminv2/analytics",
+                href: "/admin/analytics",
                 roles: ["admin", "store_admin"],
             },
             {
                 id: "users",
                 label: t("admin.userManagement"),
                 icon: Users,
-                href: "/adminv2/users",
+                href: "/admin/users",
                 roles: ["admin"],
             },
             {
                 id: "tour",
                 label: t("admin.virtualTourAdmin"),
                 icon: Eye,
-                href: "/adminv2/tour",
+                href: "/admin/tour",
                 roles: ["admin"],
             },
         ];
@@ -120,7 +120,7 @@ export function ModernSidebar({ isOpen, isCollapsed, onToggle, onCollapse, userR
                 <div className="p-4 border-b border-slate-700/50">
                     <div className="flex items-center justify-between">
                         {!isCollapsed && (
-                            <Link href="/adminv2" className="flex items-center gap-3">
+                            <Link href="/admin" className="flex items-center gap-3">
                                 <div className="w-8 h-8 bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light rounded-lg flex items-center justify-center">
                                     <ShoppingBag className="h-5 w-5 text-white" />
                                 </div>
@@ -171,8 +171,8 @@ export function ModernSidebar({ isOpen, isCollapsed, onToggle, onCollapse, userR
                         // More precise active state logic
                         const isActive = (() => {
                             // Dashboard should only be active on exact match
-                            if (item.href === "/adminv2") {
-                                return pathname === "/adminv2";
+                            if (item.href === "/admin") {
+                                return pathname === "/admin";
                             }
 
                             // For other routes, check exact match or if it's a sub-route
@@ -181,7 +181,7 @@ export function ModernSidebar({ isOpen, isCollapsed, onToggle, onCollapse, userR
                             }
 
                             // Check if current path is a sub-route of this menu item
-                            // But make sure we don't match shorter paths (e.g., /adminv2 shouldn't match /adminv2/stores)
+                            // But make sure we don't match shorter paths (e.g., /admin shouldn't match /admin/stores)
                             if (pathname.startsWith(item.href + "/")) {
                                 return true;
                             }
@@ -229,7 +229,7 @@ export function ModernSidebar({ isOpen, isCollapsed, onToggle, onCollapse, userR
                                 </>
                             )}
                         </div>
-                        <Link href="/adminv2/profile">
+                        <Link href="/admin/profile">
                             <Button
                                 variant="ghost"
                                 size="sm"

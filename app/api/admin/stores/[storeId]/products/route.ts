@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase-admin'
 import { createClient } from '@/lib/server'
-import { checkStoreAccess } from '@/lib/store-access'
 
 // Helper function to check if user has access to the store
 async function checkUserStoreAccess(request: NextRequest, storeId: string) {
@@ -31,7 +30,7 @@ async function checkUserStoreAccess(request: NextRequest, storeId: string) {
   return { hasAccess: false, error: 'Insufficient permissions' }
 }
 
-// GET /api/adminv2/stores/[storeId]/products - Get products for a specific store
+// GET /api/admin/stores/[storeId]/products - Get products for a specific store
 export async function GET(
   request: NextRequest,
   { params }: { params: { storeId: string } }
@@ -153,7 +152,7 @@ export async function GET(
     })
     
   } catch (error) {
-    console.error('Error in GET /api/adminv2/stores/[storeId]/products:', error)
+    console.error('Error in GET /api/admin/stores/[storeId]/products:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -161,7 +160,7 @@ export async function GET(
   }
 }
 
-// POST /api/adminv2/stores/[storeId]/products - Create a new product for the store
+// POST /api/admin/stores/[storeId]/products - Create a new product for the store
 export async function POST(
   request: NextRequest,
   { params }: { params: { storeId: string } }
@@ -253,7 +252,7 @@ export async function POST(
     })
 
   } catch (error) {
-    console.error('Error in POST /api/adminv2/stores/[storeId]/products:', error)
+    console.error('Error in POST /api/admin/stores/[storeId]/products:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -261,7 +260,7 @@ export async function POST(
   }
 }
 
-// PATCH /api/adminv2/stores/[storeId]/products - Bulk update products
+// PATCH /api/admin/stores/[storeId]/products - Bulk update products
 export async function PATCH(
   request: NextRequest,
   { params }: { params: { storeId: string } }
@@ -318,7 +317,7 @@ export async function PATCH(
     })
 
   } catch (error) {
-    console.error('Error in PATCH /api/adminv2/stores/[storeId]/products:', error)
+    console.error('Error in PATCH /api/admin/stores/[storeId]/products:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

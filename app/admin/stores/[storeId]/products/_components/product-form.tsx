@@ -342,7 +342,7 @@ export function ProductForm({ storeId, productId }: ProductFormProps) {
             
             // Redirect after a short delay
             setTimeout(() => {
-                router.push(`/adminv2/stores/${storeId}`);
+                router.push(`/admin/stores/${storeId}`);
             }, 2000);
 
         } catch (error) {
@@ -356,7 +356,7 @@ export function ProductForm({ storeId, productId }: ProductFormProps) {
     };
 
     const handleBack = () => {
-        router.push(`/adminv2/stores/${storeId}`);
+        router.push(`/admin/stores/${storeId}`);
     };
 
     return (

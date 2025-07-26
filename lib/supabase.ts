@@ -56,7 +56,7 @@ export type Database = {
           sysdate?: string | null
           sysuser?: string | null
           xcategprodcode: string
-          xcategprodid: number
+          xcategprodid?: number
           xcategprodinfobulle: string
           xcategprodintitule: string
         }
@@ -129,7 +129,7 @@ export type Database = {
           xdeviseboolautorisepaiement: string
           xdevisecodealpha: string
           xdevisecodenum: string
-          xdeviseid: number
+          xdeviseid?: number
           xdeviseintitule: string
           xdevisenbrdec: number
         }
@@ -205,7 +205,7 @@ export type Database = {
           sysuser?: string | null
           yboutiqueadressemall: string
           yboutiquecode: string
-          yboutiqueid: number
+          yboutiqueid?: number
           yboutiqueintitule?: string | null
           ymallidfk: number
         }
@@ -324,7 +324,7 @@ export type Database = {
           ydesigncouleur3codehexa?: string | null
           ydesigncouleur3codervb?: string | null
           ydesigncouleur3dsg?: string | null
-          ydesignid: number
+          ydesignid?: number
           ydesignmarque: string
           ydesignmorpheusdate: string
           ydesignnom: string
@@ -607,7 +607,7 @@ export type Database = {
           ymallcontactemail: string
           ymallcontactpersonne: string
           ymallcontacttelephone: string
-          ymallid: number
+          ymallid?: number
           ymallintitule: string
           ymalllocalisation: string
         }
@@ -931,7 +931,7 @@ export type Database = {
           sysuser?: string | null
           yscenelinksaxexyaw: number
           yscenelinksaxeypitch: number
-          yscenelinksid: number
+          yscenelinksid?: number
           yscenelinksname: string
           yscenesidfkactuelle?: number | null
           yscenesidfktarget: number
@@ -985,7 +985,7 @@ export type Database = {
           sysuser?: string | null
           yscenesaxexyaw: number
           yscenesaxeypitch: number
-          yscenesid: number
+          yscenesid?: number
           yscenesname: string
           yscenespanorama: string
           ysceneszoomfov: number
@@ -1363,7 +1363,18 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      add_system_columns: {
+        Args: { table_name: string }
+        Returns: string
+      }
+      add_system_columns_to_all: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      apply_system_triggers: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never

@@ -30,7 +30,7 @@ async function checkUserStoreAccess(request: NextRequest, storeId: string) {
   return { hasAccess: false, error: 'Insufficient permissions' }
 }
 
-// POST /api/adminv2/stores/[storeId]/products/new - Create a new product with variants and media
+// POST /api/admin/stores/[storeId]/products/new - Create a new product with variants and media
 export async function POST(
   request: NextRequest,
   { params }: { params: { storeId: string } }
@@ -196,7 +196,7 @@ export async function POST(
     }, { status: 201 })
 
   } catch (error) {
-    console.error('Error in POST /api/adminv2/stores/[storeId]/products/new:', error)
+    console.error('Error in POST /api/admin/stores/[storeId]/products/new:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -204,7 +204,7 @@ export async function POST(
   }
 }
 
-// GET /api/adminv2/stores/[storeId]/products/new - Get form data (categories, colors, sizes)
+// GET /api/admin/stores/[storeId]/products/new - Get form data (categories, colors, sizes)
 export async function GET(
   request: NextRequest,
   { params }: { params: { storeId: string } }
@@ -258,7 +258,7 @@ export async function GET(
     })
 
   } catch (error) {
-    console.error('Error in GET /api/adminv2/stores/[storeId]/products/new:', error)
+    console.error('Error in GET /api/admin/stores/[storeId]/products/new:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

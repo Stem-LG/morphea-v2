@@ -138,7 +138,7 @@ export function ProductsList({ storeId, store }: ProductsListProps) {
                 </div>
                 
                 <Button
-                    onClick={() => window.location.href = `/adminv2/stores/${storeId}/products/new`}
+                    onClick={() => window.location.href = `/admin/stores/${storeId}/products/new`}
                     className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-[#695029] hover:to-[#d4c066] text-white font-semibold shadow-2xl transition-all duration-300 hover:scale-105"
                 >
                     <Plus className="h-4 w-4 mr-2" />
@@ -192,7 +192,7 @@ export function ProductsList({ storeId, store }: ProductsListProps) {
                     </p>
                     {(!searchTerm && filterStatus === "all") && (
                         <Button
-                            onClick={() => window.location.href = `/adminv2/stores/${storeId}/products/new`}
+                            onClick={() => window.location.href = `/admin/stores/${storeId}/products/new`}
                             className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-[#695029] hover:to-[#d4c066] text-white"
                         >
                             <Plus className="h-4 w-4 mr-2" />
@@ -247,7 +247,7 @@ export function ProductsList({ storeId, store }: ProductsListProps) {
                                     <Button
                                         variant="outline"
                                         size="sm"
-                                        onClick={() => window.location.href = `/adminv2/stores/${storeId}/products/${product.yprodid}`}
+                                        onClick={() => window.location.href = `/admin/stores/${storeId}/products/${product.yprodid}`}
                                         className="flex-1 border-slate-600 text-white hover:bg-slate-700/50"
                                     >
                                         <Eye className="h-4 w-4 mr-1" />
@@ -256,7 +256,7 @@ export function ProductsList({ storeId, store }: ProductsListProps) {
                                     <Button
                                         variant="outline"
                                         size="sm"
-                                        onClick={() => window.location.href = `/adminv2/stores/${storeId}/products/${product.yprodid}/edit`}
+                                        onClick={() => window.location.href = `/admin/stores/${storeId}/products/${product.yprodid}/edit`}
                                         className="flex-1 border-slate-600 text-white hover:bg-slate-700/50"
                                     >
                                         <Edit className="h-4 w-4 mr-1" />

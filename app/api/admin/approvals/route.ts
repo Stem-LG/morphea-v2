@@ -19,7 +19,7 @@ async function checkAdminRole(request: NextRequest) {
   return { isAdmin, error: null, user }
 }
 
-// GET /api/adminv2/approvals - Get pending products for approval
+// GET /api/admin/approvals - Get pending products for approval
 export async function GET(request: NextRequest) {
   try {
     // Check if current user is admin
@@ -65,7 +65,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ products: transformedProducts })
     
   } catch (error) {
-    console.error('Error in GET /api/adminv2/approvals:', error)
+    console.error('Error in GET /api/admin/approvals:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -73,7 +73,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// PATCH /api/adminv2/approvals - Bulk approve products
+// PATCH /api/admin/approvals - Bulk approve products
 export async function PATCH(request: NextRequest) {
   try {
     // Check if current user is admin
@@ -145,7 +145,7 @@ export async function PATCH(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Error in PATCH /api/adminv2/approvals:', error)
+    console.error('Error in PATCH /api/admin/approvals:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -153,7 +153,7 @@ export async function PATCH(request: NextRequest) {
   }
 }
 
-// DELETE /api/adminv2/approvals - Bulk delete products
+// DELETE /api/admin/approvals - Bulk delete products
 export async function DELETE(request: NextRequest) {
   try {
     // Check if current user is admin
@@ -246,7 +246,7 @@ export async function DELETE(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Error in DELETE /api/adminv2/approvals:', error)
+    console.error('Error in DELETE /api/admin/approvals:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

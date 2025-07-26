@@ -76,7 +76,7 @@ export default function StoreManagementPage() {
                             <p className="text-gray-300 mb-6">
                                 The requested store could not be found.
                             </p>
-                            <Link href="/adminv2/stores">
+                            <Link href="/admin/stores">
                                 <Button variant="outline" className="border-slate-600 text-white hover:bg-slate-700/50">
                                     <ArrowLeft className="h-4 w-4 mr-2" />
                                     {t('admin.backToStores')}
@@ -95,7 +95,7 @@ export default function StoreManagementPage() {
             {/* Header */}
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                 <div className="flex items-center gap-4">
-                    <Link href="/adminv2/stores">
+                    <Link href="/admin/stores">
                         <Button
                             variant="outline"
                             size="sm"

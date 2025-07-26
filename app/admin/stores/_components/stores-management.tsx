@@ -170,7 +170,7 @@ export function StoresManagement() {
 
                                 {/* Actions */}
                                 <div className="pt-2">
-                                    <Link href={`/adminv2/stores/${store.yboutiqueid}`}>
+                                    <Link href={`/admin/stores/${store.yboutiqueid}`}>
                                         <Button
                                             variant="outline"
                                             className="w-full border-slate-600 text-white hover:bg-slate-700/50 group-hover:border-morpheus-gold-light/50"

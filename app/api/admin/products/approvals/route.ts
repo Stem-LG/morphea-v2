@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
           yobjet3d(*)
         )
       `)
-      .eq('yprodstatut', 'not_approved')
+      .in('yprodstatut', ['not_approved', 'approved', 'needs_revision'])
       .order('sysdate', { ascending: false })
 
     if (productsError) {
@@ -168,7 +168,7 @@ export async function DELETE(request: NextRequest) {
   }
 }
 
-// PATCH /api/admin/products/approvals - Approve or reject a product
+// PATCH /api/admin/products/approvals - Approve, reject, or mark for revision a product
 export async function PATCH(request: NextRequest) {
   try {
     // Check if current user is admin
@@ -182,7 +182,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { productId, action } = body
+    const { productId, action, approvalData, comments } = body
 
     if (!productId || !action) {
       return NextResponse.json(
@@ -191,25 +191,98 @@ export async function PATCH(request: NextRequest) {
       )
     }
 
-    if (!['approve', 'reject'].includes(action)) {
+    if (!['approve', 'reject', 'needs_revision'].includes(action)) {
       return NextResponse.json(
-        { error: 'Action must be either "approve" or "reject"' },
+        { error: 'Action must be either "approve", "reject", or "needs_revision"' },
         { status: 400 }
       )
     }
 
     // Use admin client to update product status
     const adminSupabase = createAdminClient()
+    const currentTime = new Date().toISOString()
     
     if (action === 'approve') {
-      // Approve the product
-      const currentTime = new Date().toISOString()
-      
+      if (!approvalData) {
+        return NextResponse.json(
+          { error: 'Approval data is required for approval' },
+          { status: 400 }
+        )
+      }
+
+      // Start a transaction to update product, category, and variants
+      try {
+        // 1. Update product status and category
+        const { data: updatedProduct, error: updateError } = await adminSupabase
+          .schema('morpheus')
+          .from('yprod')
+          .update({
+            yprodstatut: 'approved',
+            xcategprodidfk: approvalData.categoryId,
+            sysdate: currentTime,
+            sysaction: 'update',
+            sysuser: user?.email || 'admin'
+          })
+          .eq('yprodid', productId)
+          .select()
+          .single()
+
+        if (updateError) {
+          console.error('Error updating product status:', updateError)
+          return NextResponse.json(
+            { error: 'Failed to update product status' },
+            { status: 500 }
+          )
+        }
+
+        // 2. Update variants with pricing and delivery information
+        if (approvalData.variants && approvalData.variants.length > 0) {
+          for (const variant of approvalData.variants) {
+            const { error: variantError } = await adminSupabase
+              .schema('morpheus')
+              .from('yvarprod')
+              .update({
+                yvarprodprixcatalogue: variant.yvarprodprixcatalogue,
+                yvarprodprixpromotion: variant.yvarprodprixpromotion,
+                yvarprodpromotiondatedeb: variant.yvarprodpromotiondatedeb,
+                yvarprodpromotiondatefin: variant.yvarprodpromotiondatefin,
+                yvarprodnbrjourlivraison: variant.yvarprodnbrjourlivraison,
+                sysdate: currentTime,
+                sysaction: 'update',
+                sysuser: user?.email || 'admin'
+              })
+              .eq('yvarprodid', variant.yvarprodid)
+
+            if (variantError) {
+              console.error('Error updating variant:', variantError)
+              return NextResponse.json(
+                { error: `Failed to update variant ${variant.yvarprodid}` },
+                { status: 500 }
+              )
+            }
+          }
+        }
+
+        return NextResponse.json({
+          product: updatedProduct,
+          message: `Product approved successfully with ${approvalData.variants?.length || 0} variants updated`
+        })
+
+      } catch (transactionError) {
+        console.error('Transaction error:', transactionError)
+        return NextResponse.json(
+          { error: 'Failed to complete approval transaction' },
+          { status: 500 }
+        )
+      }
+
+    } else if (action === 'needs_revision') {
+      // Mark product as needs revision
       const { data: updatedProduct, error: updateError } = await adminSupabase
         .schema('morpheus')
         .from('yprod')
         .update({
-          yprodstatut: 'approved',
+          yprodstatut: 'needs_revision',
           sysdate: currentTime,
           sysaction: 'update',
           sysuser: user?.email || 'admin'
@@ -228,8 +301,9 @@ export async function PATCH(request: NextRequest) {
 
       return NextResponse.json({
         product: updatedProduct,
-        message: `Product approved successfully`
+        message: `Product marked as needs revision`
       })
+
     } else {
       // For reject, we could either delete the product or keep it as not_approved
       // Since there's no rejected status, let's keep it as not_approved but add a note
