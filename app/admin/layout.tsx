@@ -1,24 +1,13 @@
-"use client";
-import React, { useState } from "react";
-import { AdminSidebar } from "@/app/admin/_components/admin-sidebar";
+import React from "react";
 
-export default function AdminLayout({
+export default function AdminV2Layout({
     children,
 }: {
     children: React.ReactNode;
 }) {
-    const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-
     return (
-        <div className="flex min-h-[calc(100vh-4rem)] bg-gray-50">
-            <AdminSidebar
-                isOpen={sidebarOpen}
-                isCollapsed={sidebarCollapsed}
-                onToggle={() => setSidebarOpen(!sidebarOpen)}
-                onCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
-            />
-            <div className="flex-1 overflow-auto">{children}</div>
+        <div className="">
+            {children}
         </div>
     );
 }
