@@ -1040,19 +1040,19 @@ export default function TourAdminViewer({
     <div className={`relative ${className}`} style={{ height, width }}>
       {/* Admin Controls */}
       <div className="absolute top-4 left-4 z-20 space-y-2">
-        <Card className="bg-white/90 backdrop-blur-sm w-64">
+        <Card className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm w-64">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm flex items-center gap-2">
+            <CardTitle className="text-sm flex items-center gap-2 text-gray-900 dark:text-white">
               <Settings className="w-4 h-4" />
               {t('admin.tour.adminControls')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
             {/* Mode Switcher */}
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
               <div className="flex items-center gap-3">
-                <Eye className={`w-4 h-4 ${adminMode === 'view' ? 'text-blue-600' : 'text-gray-400'}`} />
-                <span className={`text-sm font-medium ${adminMode === 'view' ? 'text-blue-600' : 'text-gray-600'}`}>
+                <Eye className={`w-4 h-4 ${adminMode === 'view' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400 dark:text-gray-500'}`} />
+                <span className={`text-sm font-medium ${adminMode === 'view' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-300'}`}>
                   {t('admin.tour.view')}
                 </span>
               </div>
@@ -1124,10 +1124,10 @@ export default function TourAdminViewer({
               </div>
               
               <div className="flex items-center gap-3">
-                <span className={`text-sm font-medium ${adminMode === 'edit' ? 'text-orange-600' : 'text-gray-600'}`}>
+                <span className={`text-sm font-medium ${adminMode === 'edit' ? 'text-orange-600 dark:text-orange-400' : 'text-gray-600 dark:text-gray-300'}`}>
                   {t('admin.tour.edit')}
                 </span>
-                <Edit className={`w-4 h-4 ${adminMode === 'edit' ? 'text-orange-600' : 'text-gray-400'}`} />
+                <Edit className={`w-4 h-4 ${adminMode === 'edit' ? 'text-orange-600 dark:text-orange-400' : 'text-gray-400 dark:text-gray-500'}`} />
               </div>
             </div>
             
@@ -1183,11 +1183,11 @@ export default function TourAdminViewer({
                 </Button>
                 
                 {(inlineAddingInfospot || inlineAddingSceneLink) && addingMarkerPosition && (
-                  <div className="text-xs text-green-600 p-2 bg-green-50 rounded">
+                  <div className="text-xs text-green-600 dark:text-green-400 p-2 bg-green-50 dark:bg-green-900/30 rounded">
                     {t('admin.tour.addingPosition')}:<br/>
                     {t('admin.tour.yaw')}: {addingMarkerPosition.yaw.toFixed(3)}<br/>
                     {t('admin.tour.pitch')}: {addingMarkerPosition.pitch.toFixed(3)}
-                    <div className="text-xs text-gray-600 mt-1">
+                    <div className="text-xs text-gray-600 dark:text-gray-300 mt-1">
                       {t('admin.tour.clickToChangePosition')}
                     </div>
                   </div>
@@ -1201,16 +1201,16 @@ export default function TourAdminViewer({
 
       {/* Scene Navigation */}
       <div className="absolute top-4 right-4 z-20">
-        <Card className="bg-white/90 backdrop-blur-sm w-64">
+        <Card className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm w-64">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm">{t('admin.tour.currentScene')}</CardTitle>
+            <CardTitle className="text-sm text-gray-900 dark:text-white">{t('admin.tour.currentScene')}</CardTitle>
           </CardHeader>
           <CardContent>
             <select
               value={currentScene.yscenesid.toString()}
               onChange={(e) => handleSceneChange(e.target.value)}
               disabled={isTransitioning}
-              className="w-full px-2 py-1 text-sm border rounded"
+              className="w-full px-2 py-1 text-sm border border-gray-200 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             >
               {scenes.map((scene) => (
                 <option key={scene.yscenesid} value={scene.yscenesid.toString()}>
@@ -1218,7 +1218,7 @@ export default function TourAdminViewer({
                 </option>
               ))}
             </select>
-            <div className="mt-2 text-xs text-gray-600">
+            <div className="mt-2 text-xs text-gray-600 dark:text-gray-300">
               <Badge variant="outline">{currentScene.yscenesid}</Badge>
             </div>
             
@@ -1328,27 +1328,27 @@ export default function TourAdminViewer({
 
       {/* Scene Info */}
       <div className="absolute bottom-4 left-4 z-20">
-        <Card className="bg-black/70 text-white">
+        <Card className="bg-black/70 dark:bg-gray-900/80 text-white dark:text-gray-100">
           <CardContent className="p-3">
-            <h3 className="font-semibold">{currentScene.yscenesname}</h3>
-            <p className="text-sm opacity-75">
+            <h3 className="font-semibold text-white dark:text-gray-100">{currentScene.yscenesname}</h3>
+            <p className="text-sm opacity-75 text-gray-200 dark:text-gray-300">
               {scenes.findIndex(s => s.yscenesid === currentScene.yscenesid) + 1} {t('admin.tour.of')} {scenes.length} {t('admin.tour.scenes')}
             </p>
             {adminMode === 'edit' ? (
               <div className="text-xs mt-1 space-y-1">
-                <p className="text-yellow-300">
+                <p className="text-yellow-300 dark:text-yellow-400">
                   {t('admin.tour.clickPanoramaToSelectPosition')}
                 </p>
-                <p className="text-blue-300">
+                <p className="text-blue-300 dark:text-blue-400">
                   {t('admin.tour.clickMarkersToEdit')}
                 </p>
               </div>
             ) : (
               <div className="text-xs mt-1 space-y-1">
-                <p className="text-green-300">
+                <p className="text-green-300 dark:text-green-400">
                   {t('admin.tour.clickMarkersToInteract')}
                 </p>
-                <p className="text-blue-300">
+                <p className="text-blue-300 dark:text-blue-400">
                   {t('admin.tour.ctrlClickToEdit')}
                 </p>
               </div>
@@ -1363,9 +1363,9 @@ export default function TourAdminViewer({
       {/* Inline Editing Panel */}
       {(inlineEditingInfospot || inlineEditingSceneLink) && (
         <div className="absolute top-1/2 right-4 transform -translate-y-1/2 z-30">
-          <Card className="bg-white/95 backdrop-blur-sm shadow-xl border-2 border-blue-500 max-w-sm">
+          <Card className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm shadow-xl border-2 border-blue-500 dark:border-blue-400 max-w-sm">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm flex items-center gap-2">
+              <CardTitle className="text-sm flex items-center gap-2 text-gray-900 dark:text-white">
                 <Edit className="w-4 h-4" />
                 {inlineEditingInfospot ? t('admin.tour.editInfoSpot') : t('admin.tour.editSceneLink')}
               </CardTitle>
@@ -1375,30 +1375,30 @@ export default function TourAdminViewer({
               {inlineEditingInfospot && (
                 <div className="space-y-2">
                   <div>
-                    <label className="text-xs font-medium">{t('admin.tour.title')}:</label>
+                    <label className="text-xs font-medium text-gray-700 dark:text-gray-300">{t('admin.tour.title')}:</label>
                     <input
                       type="text"
                       value={inlineEditingInfospot.yinfospotstitle}
                       onChange={(e) => setInlineEditingInfospot(prev => prev ? {...prev, yinfospotstitle: e.target.value} : null)}
-                      className="w-full px-2 py-1 text-xs border rounded"
+                      className="w-full px-2 py-1 text-xs border border-gray-200 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                       placeholder={t('admin.tour.infospotTitlePlaceholder')}
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-medium">{t('admin.tour.description')}:</label>
+                    <label className="text-xs font-medium text-gray-700 dark:text-gray-300">{t('admin.tour.description')}:</label>
                     <textarea
                       value={inlineEditingInfospot.yinfospotstext}
                       onChange={(e) => setInlineEditingInfospot(prev => prev ? {...prev, yinfospotstext: e.target.value} : null)}
-                      className="w-full px-2 py-1 text-xs border rounded h-16 resize-none"
+                      className="w-full px-2 py-1 text-xs border border-gray-200 dark:border-gray-600 rounded h-16 resize-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                       placeholder={t('admin.tour.infospotDescriptionPlaceholder')}
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-medium">{t('admin.tour.infospotAction')}:</label>
+                    <label className="text-xs font-medium text-gray-700 dark:text-gray-300">{t('admin.tour.infospotAction')}:</label>
                     <select
                       value={inlineEditingInfospot.yinfospotactionidfk?.toString() || ''}
                       onChange={(e) => setInlineEditingInfospot(prev => prev ? {...prev, yinfospotactionidfk: e.target.value ? parseInt(e.target.value) : null} : null)}
-                      className="w-full px-2 py-1 text-xs border rounded"
+                      className="w-full px-2 py-1 text-xs border border-gray-200 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     >
                       <option value="">{t('admin.tour.noAction')}</option>
                       {actions.map(action => (
@@ -1427,21 +1427,21 @@ export default function TourAdminViewer({
               {inlineEditingSceneLink && (
                 <div className="space-y-2">
                   <div>
-                    <label className="text-xs font-medium">{t('admin.tour.name')}:</label>
+                    <label className="text-xs font-medium text-gray-700 dark:text-gray-300">{t('admin.tour.name')}:</label>
                     <input
                       type="text"
                       value={inlineEditingSceneLink.yscenelinksname}
                       onChange={(e) => setInlineEditingSceneLink(prev => prev ? {...prev, yscenelinksname: e.target.value} : null)}
-                      className="w-full px-2 py-1 text-xs border rounded"
+                      className="w-full px-2 py-1 text-xs border border-gray-200 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                       placeholder={t('admin.tour.sceneLinkNamePlaceholder')}
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-medium">{t('admin.tour.targetScene')}:</label>
+                    <label className="text-xs font-medium text-gray-700 dark:text-gray-300">{t('admin.tour.targetScene')}:</label>
                     <select
                       value={inlineEditingSceneLink.yscenesidfktarget.toString()}
                       onChange={(e) => setInlineEditingSceneLink(prev => prev ? {...prev, yscenesidfktarget: parseInt(e.target.value)} : null)}
-                      className="w-full px-2 py-1 text-xs border rounded"
+                      className="w-full px-2 py-1 text-xs border border-gray-200 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     >
                       {scenes.filter(s => s.yscenesid !== currentScene?.yscenesid).map(scene => (
                         <option key={scene.yscenesid} value={scene.yscenesid.toString()}>
@@ -1455,17 +1455,17 @@ export default function TourAdminViewer({
 
               {/* Position Display */}
               {previewMarkerPosition && (
-                <div className="text-xs bg-blue-50 p-2 rounded">
-                  <div className="font-semibold text-blue-800">{t('admin.tour.currentPosition')}:</div>
-                  <div>{t('admin.tour.yaw')}: {previewMarkerPosition.yaw.toFixed(3)}</div>
-                  <div>{t('admin.tour.pitch')}: {previewMarkerPosition.pitch.toFixed(3)}</div>
+                <div className="text-xs bg-blue-50 dark:bg-blue-900/30 p-2 rounded">
+                  <div className="font-semibold text-blue-800 dark:text-blue-200">{t('admin.tour.currentPosition')}:</div>
+                  <div className="text-gray-700 dark:text-gray-300">{t('admin.tour.yaw')}: {previewMarkerPosition.yaw.toFixed(3)}</div>
+                  <div className="text-gray-700 dark:text-gray-300">{t('admin.tour.pitch')}: {previewMarkerPosition.pitch.toFixed(3)}</div>
                 </div>
               )}
               
               {/* Position Controls */}
               <div className="space-y-2">
                 <div>
-                  <label className="text-xs font-medium">{t('admin.tour.yaw')}:</label>
+                  <label className="text-xs font-medium text-gray-700 dark:text-gray-300">{t('admin.tour.yaw')}:</label>
                   <div className="flex gap-2 items-center">
                     <input
                       type="range"
@@ -1483,12 +1483,12 @@ export default function TourAdminViewer({
                       step="0.01"
                       value={previewMarkerPosition?.yaw || 0}
                       onChange={(e) => setPreviewMarkerPosition(prev => prev ? {...prev, yaw: parseFloat(e.target.value) || 0} : null)}
-                      className="w-20 px-2 py-1 text-xs border rounded"
+                      className="w-20 px-2 py-1 text-xs border border-gray-200 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="text-xs font-medium">{t('admin.tour.pitch')}:</label>
+                  <label className="text-xs font-medium text-gray-700 dark:text-gray-300">{t('admin.tour.pitch')}:</label>
                   <div className="flex gap-2 items-center">
                     <input
                       type="range"
@@ -1506,7 +1506,7 @@ export default function TourAdminViewer({
                       step="0.01"
                       value={previewMarkerPosition?.pitch || 0}
                       onChange={(e) => setPreviewMarkerPosition(prev => prev ? {...prev, pitch: parseFloat(e.target.value) || 0} : null)}
-                      className="w-20 px-2 py-1 text-xs border rounded"
+                      className="w-20 px-2 py-1 text-xs border border-gray-200 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     />
                   </div>
                 </div>
@@ -1663,25 +1663,25 @@ export default function TourAdminViewer({
       {/* Inline Adding Panel */}
       {(inlineAddingInfospot || inlineAddingSceneLink) && addingMarkerPosition && (
         <div className="absolute top-1/2 left-4 transform -translate-y-1/2 z-30">
-          <Card className="bg-white/95 backdrop-blur-sm shadow-xl border-2 border-green-500">
+          <Card className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm shadow-xl border-2 border-green-500 dark:border-green-400">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm flex items-center gap-2">
+              <CardTitle className="text-sm flex items-center gap-2 text-gray-900 dark:text-white">
                 <Plus className="w-4 h-4" />
                 {inlineAddingInfospot ? t('admin.tour.addNewInfoSpot') : t('admin.tour.addNewSceneLink')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               {/* Position Display */}
-              <div className="text-xs bg-green-50 p-2 rounded">
-                <div className="font-semibold text-green-800">{t('admin.tour.position')}:</div>
-                <div>{t('admin.tour.yaw')}: {addingMarkerPosition.yaw.toFixed(3)}</div>
-                <div>{t('admin.tour.pitch')}: {addingMarkerPosition.pitch.toFixed(3)}</div>
+              <div className="text-xs bg-green-50 dark:bg-green-900/30 p-2 rounded">
+                <div className="font-semibold text-green-800 dark:text-green-200">{t('admin.tour.position')}:</div>
+                <div className="text-gray-700 dark:text-gray-300">{t('admin.tour.yaw')}: {addingMarkerPosition.yaw.toFixed(3)}</div>
+                <div className="text-gray-700 dark:text-gray-300">{t('admin.tour.pitch')}: {addingMarkerPosition.pitch.toFixed(3)}</div>
               </div>
               
               {/* Position Controls */}
               <div className="space-y-2">
                 <div>
-                  <label className="text-xs font-medium">{t('admin.tour.yaw')}:</label>
+                  <label className="text-xs font-medium text-gray-700 dark:text-gray-300">{t('admin.tour.yaw')}:</label>
                   <div className="flex gap-2 items-center">
                     <input
                       type="range"
@@ -1699,12 +1699,12 @@ export default function TourAdminViewer({
                       step="0.01"
                       value={addingMarkerPosition.yaw}
                       onChange={(e) => setAddingMarkerPosition(prev => prev ? {...prev, yaw: parseFloat(e.target.value) || 0} : null)}
-                      className="w-20 px-2 py-1 text-xs border rounded"
+                      className="w-20 px-2 py-1 text-xs border border-gray-200 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="text-xs font-medium">{t('admin.tour.pitch')}:</label>
+                  <label className="text-xs font-medium text-gray-700 dark:text-gray-300">{t('admin.tour.pitch')}:</label>
                   <div className="flex gap-2 items-center">
                     <input
                       type="range"
@@ -1722,7 +1722,7 @@ export default function TourAdminViewer({
                       step="0.01"
                       value={addingMarkerPosition.pitch}
                       onChange={(e) => setAddingMarkerPosition(prev => prev ? {...prev, pitch: parseFloat(e.target.value) || 0} : null)}
-                      className="w-20 px-2 py-1 text-xs border rounded"
+                      className="w-20 px-2 py-1 text-xs border border-gray-200 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     />
                   </div>
                 </div>
@@ -1732,26 +1732,26 @@ export default function TourAdminViewer({
               {inlineAddingInfospot && (
                 <div className="space-y-2">
                   <div>
-                    <label className="text-xs font-medium">{t('admin.tour.title')}:</label>
+                    <label className="text-xs font-medium text-gray-700 dark:text-gray-300">{t('admin.tour.title')}:</label>
                     <input
                       type="text"
                       placeholder={t('admin.tour.infospotTitlePlaceholder')}
-                      className="w-full px-2 py-1 text-xs border rounded"
+                      className="w-full px-2 py-1 text-xs border border-gray-200 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                       id="adding-infospot-title"
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-medium">{t('admin.tour.text')}:</label>
+                    <label className="text-xs font-medium text-gray-700 dark:text-gray-300">{t('admin.tour.text')}:</label>
                     <textarea
                       placeholder={t('admin.tour.infospotDescriptionPlaceholder')}
-                      className="w-full px-2 py-1 text-xs border rounded h-16 resize-none"
+                      className="w-full px-2 py-1 text-xs border border-gray-200 dark:border-gray-600 rounded h-16 resize-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                       id="adding-infospot-text"
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-medium">{t('admin.tour.infospotAction')}:</label>
+                    <label className="text-xs font-medium text-gray-700 dark:text-gray-300">{t('admin.tour.infospotAction')}:</label>
                     <select
-                      className="w-full px-2 py-1 text-xs border rounded"
+                      className="w-full px-2 py-1 text-xs border border-gray-200 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                       id="adding-infospot-action"
                     >
                       <option value="">{t('admin.tour.noAction')}</option>
@@ -1780,18 +1780,18 @@ export default function TourAdminViewer({
               {inlineAddingSceneLink && (
                 <div className="space-y-2">
                   <div>
-                    <label className="text-xs font-medium">{t('admin.tour.name')}:</label>
+                    <label className="text-xs font-medium text-gray-700 dark:text-gray-300">{t('admin.tour.name')}:</label>
                     <input
                       type="text"
                       placeholder={t('admin.tour.sceneLinkNamePlaceholder')}
-                      className="w-full px-2 py-1 text-xs border rounded"
+                      className="w-full px-2 py-1 text-xs border border-gray-200 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                       id="adding-scenelink-name"
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-medium">{t('admin.tour.targetScene')}:</label>
+                    <label className="text-xs font-medium text-gray-700 dark:text-gray-300">{t('admin.tour.targetScene')}:</label>
                     <select
-                      className="w-full px-2 py-1 text-xs border rounded"
+                      className="w-full px-2 py-1 text-xs border border-gray-200 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                       id="adding-scenelink-target"
                     >
                       <option value="">{t('admin.tour.selectTargetScene')}</option>
@@ -1928,8 +1928,8 @@ export default function TourAdminViewer({
       {/* InfoSpot Details Modal */}
       {viewingInfospot && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999]">
-          <Card className="max-w-md w-full mx-4 max-h-[80vh] overflow-hidden">
-            <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-700 text-white">
+          <Card className="max-w-md w-full mx-4 max-h-[80vh] overflow-hidden bg-white dark:bg-gray-800">
+            <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-700 dark:from-blue-700 dark:to-blue-800 text-white">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg font-semibold text-white">{viewingInfospot.yinfospotstitle}</CardTitle>
                 <button
@@ -1946,8 +1946,8 @@ export default function TourAdminViewer({
             <CardContent className="p-4 overflow-y-auto max-h-96">
               {viewingInfospot.yinfospotstext && (
                 <div className="mb-4">
-                  <h3 className="text-sm font-medium text-gray-700 mb-2">{t('admin.tour.description')}</h3>
-                  <p className="text-gray-600 leading-relaxed whitespace-pre-wrap">
+                  <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('admin.tour.description')}</h3>
+                  <p className="text-gray-600 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">
                     {viewingInfospot.yinfospotstext}
                   </p>
                 </div>
@@ -1956,30 +1956,30 @@ export default function TourAdminViewer({
               {/* Show action information if available */}
               {viewingInfospot.yinfospotactionidfk && (
                 <div className="mb-4">
-                  <h3 className="text-sm font-medium text-gray-700 mb-2">{t('admin.tour.action')}</h3>
+                  <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('admin.tour.action')}</h3>
                   {(() => {
                     const action = actions.find(a => a.yinfospotactionsid === viewingInfospot.yinfospotactionidfk)
                     return action ? (
-                      <div className="bg-gray-50 p-3 rounded">
+                      <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded">
                         <div className="flex items-center gap-2 mb-1">
                           <Badge variant="outline">{action.yinfospotactionstype}</Badge>
-                          <span className="text-sm font-medium">{action.yinfospotactionstitle}</span>
+                          <span className="text-sm font-medium text-gray-900 dark:text-white">{action.yinfospotactionstitle}</span>
                         </div>
                         {action.yinfospotactionsdescription && (
-                          <p className="text-sm text-gray-600">{action.yinfospotactionsdescription}</p>
+                          <p className="text-sm text-gray-600 dark:text-gray-300">{action.yinfospotactionsdescription}</p>
                         )}
                       </div>
                     ) : (
-                      <p className="text-sm text-gray-500">{t('admin.tour.actionNotFound')}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">{t('admin.tour.actionNotFound')}</p>
                     )
                   })()}
                 </div>
               )}
               
               {/* Technical details for admin */}
-              <div className="border-t pt-4 mt-4">
-                <h3 className="text-sm font-medium text-gray-700 mb-2">{t('admin.tour.technicalDetails')}</h3>
-                <div className="grid grid-cols-2 gap-2 text-xs text-gray-500">
+              <div className="border-t border-gray-200 dark:border-gray-600 pt-4 mt-4">
+                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('admin.tour.technicalDetails')}</h3>
+                <div className="grid grid-cols-2 gap-2 text-xs text-gray-500 dark:text-gray-400">
                   <div>
                     <span className="font-medium">{t('admin.tour.position')}:</span>
                     <div>{t('admin.tour.yaw')}: {viewingInfospot.yinfospotsaxexyaw.toFixed(3)}</div>
@@ -1995,7 +1995,7 @@ export default function TourAdminViewer({
               </div>
             </CardContent>
             
-            <div className="bg-gray-50 px-4 py-3 flex justify-end">
+            <div className="bg-gray-50 dark:bg-gray-700 px-4 py-3 flex justify-end">
               <Button
                 size="sm"
                 onClick={() => setViewingInfospot(null)}
@@ -2011,8 +2011,8 @@ export default function TourAdminViewer({
       {/* Add New Action Modal */}
       {isAddingAction && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999]">
-          <Card className="max-w-md w-full mx-4">
-            <CardHeader className="bg-gradient-to-r from-green-600 to-green-700 text-white">
+          <Card className="max-w-md w-full mx-4 bg-white dark:bg-gray-800">
+            <CardHeader className="bg-gradient-to-r from-green-600 to-green-700 dark:from-green-700 dark:to-green-800 text-white">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg font-semibold text-white">{t('admin.tour.addNewAction')}</CardTitle>
                 <button
@@ -2032,27 +2032,27 @@ export default function TourAdminViewer({
             <CardContent className="p-4">
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     {t('admin.tour.actionTitle')} *
                   </label>
                   <input
                     type="text"
                     value={newActionForm.title}
                     onChange={(e) => setNewActionForm(prev => ({ ...prev, title: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     placeholder={t('admin.tour.enterActionTitle')}
                     autoFocus
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     {t('admin.tour.store')} *
                   </label>
                   <select
                     value={newActionForm.type}
                     onChange={(e) => setNewActionForm(prev => ({ ...prev, type: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   >
                     <option value="">{t('admin.tour.selectStore')}</option>
                     {stores?.map(store => (
@@ -2064,13 +2064,13 @@ export default function TourAdminViewer({
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     {t('admin.tour.descriptionOptional')}
                   </label>
                   <textarea
                     value={newActionForm.description}
                     onChange={(e) => setNewActionForm(prev => ({ ...prev, description: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     rows={3}
                     placeholder={t('admin.tour.enterActionDescription')}
                   />
@@ -2078,7 +2078,7 @@ export default function TourAdminViewer({
               </div>
             </CardContent>
             
-            <div className="bg-gray-50 px-4 py-3 flex justify-end gap-2">
+            <div className="bg-gray-50 dark:bg-gray-700 px-4 py-3 flex justify-end gap-2">
               <Button
                 size="sm"
                 variant="outline"
@@ -2149,8 +2149,8 @@ export default function TourAdminViewer({
       {/* Add New Scene Modal */}
       {isAddingScene && typeof window !== 'undefined' && createPortal(
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999]">
-          <Card className="max-w-lg w-full mx-4 max-h-[90vh] overflow-hidden">
-            <CardHeader className="bg-gradient-to-r from-purple-600 to-purple-700 text-white">
+          <Card className="max-w-lg w-full mx-4 max-h-[90vh] overflow-hidden bg-white dark:bg-gray-800">
+            <CardHeader className="bg-gradient-to-r from-purple-600 to-purple-700 dark:from-purple-700 dark:to-purple-800 text-white">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg font-semibold text-white">{t('admin.tour.addNewScene')}</CardTitle>
                 <button
@@ -2176,96 +2176,96 @@ export default function TourAdminViewer({
             <CardContent className="p-4 overflow-y-auto max-h-96">
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     {t('admin.tour.sceneName')} *
                   </label>
                   <input
                     type="text"
                     value={newSceneForm.name}
                     onChange={(e) => setNewSceneForm(prev => ({ ...prev, name: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     placeholder={t('admin.tour.enterSceneName')}
                     autoFocus
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     {t('admin.tour.panoramaUrl')} *
                   </label>
                   <input
                     type="url"
                     value={newSceneForm.panorama}
                     onChange={(e) => setNewSceneForm(prev => ({ ...prev, panorama: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     placeholder={t('admin.tour.panoramaUrlPlaceholder')}
                   />
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     {t('admin.tour.panoramaUrlDescription')}
                   </p>
                 </div>
                 
                 <div className="grid grid-cols-3 gap-3">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       {t('admin.tour.initialYaw')}
                     </label>
                     <input
                       type="number"
                       value={newSceneForm.yaw}
                       onChange={(e) => setNewSceneForm(prev => ({ ...prev, yaw: parseFloat(e.target.value) || 0 }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                       step="0.1"
                       min="-3.14159"
                       max="3.14159"
                     />
-                    <p className="text-xs text-gray-500 mt-1">{t('admin.tour.horizontalRotation')}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t('admin.tour.horizontalRotation')}</p>
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       {t('admin.tour.initialPitch')}
                     </label>
                     <input
                       type="number"
                       value={newSceneForm.pitch}
                       onChange={(e) => setNewSceneForm(prev => ({ ...prev, pitch: parseFloat(e.target.value) || 0 }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                       step="0.1"
                       min="-1.5708"
                       max="1.5708"
                     />
-                    <p className="text-xs text-gray-500 mt-1">{t('admin.tour.verticalRotation')}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t('admin.tour.verticalRotation')}</p>
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       {t('admin.tour.fieldOfView')}
                     </label>
                     <input
                       type="number"
                       value={newSceneForm.fov}
                       onChange={(e) => setNewSceneForm(prev => ({ ...prev, fov: parseFloat(e.target.value) || 50 }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                       step="1"
                       min="30"
                       max="120"
                     />
-                    <p className="text-xs text-gray-500 mt-1">{t('admin.tour.zoomLevel')}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t('admin.tour.zoomLevel')}</p>
                   </div>
                 </div>
                 
                 {/* Preview Section */}
                 {newSceneForm.panorama && (
-                  <div className="border-t pt-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <div className="border-t border-gray-200 dark:border-gray-600 pt-4">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       {t('admin.tour.panoramaPreview')}
                     </label>
                     <div className="relative">
                       <img
                         src={newSceneForm.panorama}
                         alt="Panorama preview"
-                        className="w-full h-32 object-cover rounded-md border"
+                        className="w-full h-32 object-cover rounded-md border border-gray-200 dark:border-gray-600"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement
                           target.style.display = 'none'
@@ -2274,7 +2274,7 @@ export default function TourAdminViewer({
                         }}
                       />
                       <div
-                        className="hidden w-full h-32 bg-gray-100 rounded-md border items-center justify-center text-gray-500 text-sm"
+                        className="hidden w-full h-32 bg-gray-100 dark:bg-gray-700 rounded-md border border-gray-200 dark:border-gray-600 items-center justify-center text-gray-500 dark:text-gray-400 text-sm"
                       >
                         {t('admin.tour.failedToLoadPanorama')}
                       </div>
@@ -2284,7 +2284,7 @@ export default function TourAdminViewer({
               </div>
             </CardContent>
             
-            <div className="bg-gray-50 px-4 py-3 flex justify-end gap-2">
+            <div className="bg-gray-50 dark:bg-gray-700 px-4 py-3 flex justify-end gap-2">
               <Button
                 size="sm"
                 variant="outline"
@@ -2381,8 +2381,8 @@ export default function TourAdminViewer({
       {/* Edit Scene Modal */}
       {isEditingScene && typeof window !== 'undefined' && createPortal(
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999]">
-          <Card className="max-w-lg w-full mx-4 max-h-[90vh] overflow-hidden">
-            <CardHeader className="bg-gradient-to-r from-orange-600 to-orange-700 text-white">
+          <Card className="max-w-lg w-full mx-4 max-h-[90vh] overflow-hidden bg-white dark:bg-gray-800">
+            <CardHeader className="bg-gradient-to-r from-orange-600 to-orange-700 dark:from-orange-700 dark:to-orange-800 text-white">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg font-semibold text-white">{t('admin.tour.editScene')}</CardTitle>
                 <button
@@ -2409,46 +2409,46 @@ export default function TourAdminViewer({
             <CardContent className="p-4 overflow-y-auto max-h-96">
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     {t('admin.tour.sceneName')} *
                   </label>
                   <input
                     type="text"
                     value={editSceneForm.name}
                     onChange={(e) => setEditSceneForm(prev => ({ ...prev, name: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     placeholder={t('admin.tour.enterSceneName')}
                     autoFocus
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     {t('admin.tour.panoramaUrl')} *
                   </label>
                   <input
                     type="url"
                     value={editSceneForm.panorama}
                     onChange={(e) => setEditSceneForm(prev => ({ ...prev, panorama: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     placeholder={t('admin.tour.panoramaUrlPlaceholder')}
                   />
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     {t('admin.tour.panoramaUrlDescription')}
                   </p>
                 </div>
                 
                 {/* Preview Section */}
                 {editSceneForm.panorama && (
-                  <div className="border-t pt-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <div className="border-t border-gray-200 dark:border-gray-600 pt-4">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       {t('admin.tour.panoramaPreview')}
                     </label>
                     <div className="relative">
                       <img
                         src={editSceneForm.panorama}
                         alt="Panorama preview"
-                        className="w-full h-32 object-cover rounded-md border"
+                        className="w-full h-32 object-cover rounded-md border border-gray-200 dark:border-gray-600"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement
                           target.style.display = 'none'
@@ -2457,7 +2457,7 @@ export default function TourAdminViewer({
                         }}
                       />
                       <div
-                        className="hidden w-full h-32 bg-gray-100 rounded-md border items-center justify-center text-gray-500 text-sm"
+                        className="hidden w-full h-32 bg-gray-100 dark:bg-gray-700 rounded-md border border-gray-200 dark:border-gray-600 items-center justify-center text-gray-500 dark:text-gray-400 text-sm"
                       >
                         {t('admin.tour.failedToLoadPanorama')}
                       </div>
@@ -2467,7 +2467,7 @@ export default function TourAdminViewer({
               </div>
             </CardContent>
             
-            <div className="bg-gray-50 px-4 py-3 flex justify-end gap-2">
+            <div className="bg-gray-50 dark:bg-gray-700 px-4 py-3 flex justify-end gap-2">
               <Button
                 size="sm"
                 variant="outline"
@@ -2551,9 +2551,9 @@ export default function TourAdminViewer({
       {(isModeTransitioning) && (
         <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-30">
 
-          <div className="bg-white rounded-lg p-4 flex items-center gap-3">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 flex items-center gap-3">
             <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-            <span>
+            <span className="text-gray-900 dark:text-white">
               {isTransitioning ? t('admin.tour.transitioningToScene') : `${t('admin.tour.switchingTo')} ${t(`admin.tour.${adminMode}`)} ${t('admin.tour.mode')}...`}
             </span>
           </div>
