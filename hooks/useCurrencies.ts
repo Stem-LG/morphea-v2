@@ -65,11 +65,17 @@ export function useCreateCurrency() {
         mutationFn: async (currencyData: Omit<CurrencyInsert, 'xdeviseid' | 'sysdate' | 'sysaction' | 'sysuser' | 'sysadresseip'>) => {
             const currentTime = new Date().toISOString();
             
+            // Convert boolean string to single character for database
+            const convertedData = {
+                ...currencyData,
+                xdeviseboolautorisepaiement: currencyData.xdeviseboolautorisepaiement === "true" ? "Y" : "N"
+            };
+            
             const { data, error } = await supabase
                 .schema("morpheus")
                 .from("xdevise")
                 .insert({
-                    ...currencyData,
+                    ...convertedData,
                     sysdate: currentTime,
                     sysaction: 'insert',
                     sysuser: 'admin', // This should be replaced with actual user
@@ -100,11 +106,17 @@ export function useUpdateCurrency() {
         mutationFn: async ({ currencyId, updates }: { currencyId: number; updates: Partial<CurrencyUpdate> }) => {
             const currentTime = new Date().toISOString();
             
+            // Convert boolean string to single character for database if present
+            const convertedUpdates = { ...updates };
+            if (convertedUpdates.xdeviseboolautorisepaiement !== undefined) {
+                convertedUpdates.xdeviseboolautorisepaiement = convertedUpdates.xdeviseboolautorisepaiement === "true" ? "Y" : "N";
+            }
+            
             const { data, error } = await supabase
                 .schema("morpheus")
                 .from("xdevise")
                 .update({
-                    ...updates,
+                    ...convertedUpdates,
                     sysdate: currentTime,
                     sysaction: 'update',
                     sysuser: 'admin', // This should be replaced with actual user
@@ -164,7 +176,7 @@ export function usePaymentCurrencies() {
                 .schema("morpheus")
                 .from("xdevise")
                 .select("*")
-                .eq("xdeviseboolautorisepaiement", "true")
+                .eq("xdeviseboolautorisepaiement", "Y")
                 .order("xdeviseintitule", { ascending: true });
 
             if (error) {

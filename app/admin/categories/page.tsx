@@ -4,9 +4,9 @@ import { AdminV2Layout } from "../_components/admin-v2-layout";
 import { useAuth } from "@/hooks/useAuth";
 import { AccessDenied } from "../_components/access-denied";
 import { LoadingScreen } from "../_components/loading-screen";
-import { CurrencyManagement } from "./_components/currency-management";
+import { CategoryManagement } from "./_components/category-management";
 
-export default function CurrenciesPage() {
+export default function CategoriesPage() {
     const { data: user, isLoading } = useAuth();
     
     if (isLoading) {
@@ -24,7 +24,7 @@ export default function CurrenciesPage() {
 
     return (
         <AdminV2Layout>
-            <CurrencyManagement />
+            <CategoryManagement />
         </AdminV2Layout>
     );
 }

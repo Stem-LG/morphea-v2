@@ -72,7 +72,7 @@ export function CurrencyManagement() {
             xdevisecodealpha: currency.xdevisecodealpha || "",
             xdevisecodenum: currency.xdevisecodenum || "",
             xdevisenbrdec: currency.xdevisenbrdec || 2,
-            xdeviseboolautorisepaiement: currency.xdeviseboolautorisepaiement || "false"
+            xdeviseboolautorisepaiement: currency.xdeviseboolautorisepaiement === "Y" ? "true" : "false"
         });
         setEditingCurrency(currency.xdeviseid);
         setShowForm(true);
@@ -283,7 +283,7 @@ export function CurrencyManagement() {
                                         {currency.xdeviseintitule}
                                     </CardTitle>
                                     <div className="flex items-center gap-2">
-                                        {currency.xdeviseboolautorisepaiement === "true" && (
+                                        {currency.xdeviseboolautorisepaiement === "Y" && (
                                             <Badge className="px-2 py-1 text-xs font-medium flex items-center gap-1 border text-green-400 bg-green-400/10 border-green-400/20">
                                                 <CheckCircle className="h-3 w-3" />
                                                 Payment
@@ -309,8 +309,8 @@ export function CurrencyManagement() {
                                     </div>
                                     <div>
                                         <span className="text-gray-400">Status:</span>
-                                        <p className={`font-medium ${currency.xdeviseboolautorisepaiement === "true" ? "text-green-400" : "text-gray-400"}`}>
-                                            {currency.xdeviseboolautorisepaiement === "true" ? "Active" : "Inactive"}
+                                        <p className={`font-medium ${currency.xdeviseboolautorisepaiement === "Y" ? "text-green-400" : "text-gray-400"}`}>
+                                            {currency.xdeviseboolautorisepaiement === "Y" ? "Active" : "Inactive"}
                                         </p>
                                     </div>
                                 </div>
