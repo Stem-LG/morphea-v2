@@ -14,6 +14,7 @@ interface ApprovalData {
         yvarprodpromotiondatedeb: string | null;
         yvarprodpromotiondatefin: string | null;
         yvarprodnbrjourlivraison: number;
+        currencyId: number;
     }[];
 }
 

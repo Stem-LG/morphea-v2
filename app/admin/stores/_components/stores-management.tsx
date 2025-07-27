@@ -6,7 +6,6 @@ import {
     Store,
     MapPin,
     Package,
-    Users,
     BarChart3,
     ArrowRight,
     Plus

@@ -16,7 +16,7 @@ export default function ProductApprovals() {
     const fetchProducts = async () => {
       setLoading(true);
       const supabase = createClient();
-      const { data, error } = await supabase
+      const { data } = await supabase
         .schema('morpheus')
         .from('yprod')
         .select('*')

@@ -10,8 +10,6 @@ import {
     Trash2,
     Palette,
     Ruler,
-    DollarSign,
-    Truck,
     Edit,
     Save,
     X,
@@ -24,7 +22,6 @@ import {
     Video,
     PlusCircle
 } from "lucide-react";
-import { useLanguage } from "@/hooks/useLanguage";
 
 interface MediaObject {
     id?: string;
@@ -60,7 +57,6 @@ export function VariantManager({
     onCreateColor,
     onCreateSize
 }: VariantManagerProps) {
-    const { t } = useLanguage();
     const [editingIndex, setEditingIndex] = useState<number | null>(null);
     const [showColorDialog, setShowColorDialog] = useState(false);
     const [showSizeDialog, setShowSizeDialog] = useState(false);
@@ -114,11 +110,11 @@ export function VariantManager({
     };
 
 
-    const handleSaveVariant = (index: number) => {
+    const handleSaveVariant = () => {
         setEditingIndex(null);
     };
 
-    const handleCancelEdit = (index: number) => {
+    const handleCancelEdit = () => {
         setEditingIndex(null);
     };
 
@@ -128,7 +124,7 @@ export function VariantManager({
         
         setIsCreatingColor(true);
         try {
-            const createdColor = await onCreateColor({
+            await onCreateColor({
                 name: newColor.name.trim(),
                 code: newColor.code.trim() || newColor.name.trim().toUpperCase().replace(/\s+/g, '_'),
                 hex: newColor.hex,
@@ -151,7 +147,7 @@ export function VariantManager({
         
         setIsCreatingSize(true);
         try {
-            const createdSize = await onCreateSize({
+            await onCreateSize({
                 name: newSize.name.trim(),
                 code: newSize.code.trim() || newSize.name.trim().toUpperCase().replace(/\s+/g, '_'),
                 eur: newSize.eur.trim(),
@@ -322,7 +318,7 @@ export function VariantManager({
                                                     <Button
                                                         type="button"
                                                         size="sm"
-                                                        onClick={() => handleSaveVariant(index)}
+                                                        onClick={() => handleSaveVariant()}
                                                         className="bg-green-600 hover:bg-green-700 text-white"
                                                     >
                                                         <Save className="h-4 w-4" />
@@ -331,7 +327,7 @@ export function VariantManager({
                                                         type="button"
                                                         size="sm"
                                                         variant="outline"
-                                                        onClick={() => handleCancelEdit(index)}
+                                                        onClick={() => handleCancelEdit()}
                                                         className="border-slate-600 text-white hover:bg-slate-700/50"
                                                     >
                                                         <X className="h-4 w-4" />

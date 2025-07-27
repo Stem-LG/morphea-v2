@@ -182,7 +182,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { productId, action, approvalData, comments } = body
+    const { productId, action, approvalData } = body
 
     if (!productId || !action) {
       return NextResponse.json(
@@ -235,7 +235,7 @@ export async function PATCH(request: NextRequest) {
           )
         }
 
-        // 2. Update variants with pricing and delivery information
+        // 2. Update variants with pricing, delivery information, and currency
         if (approvalData.variants && approvalData.variants.length > 0) {
           for (const variant of approvalData.variants) {
             const { error: variantError } = await adminSupabase
@@ -247,6 +247,7 @@ export async function PATCH(request: NextRequest) {
                 yvarprodpromotiondatedeb: variant.yvarprodpromotiondatedeb,
                 yvarprodpromotiondatefin: variant.yvarprodpromotiondatefin,
                 yvarprodnbrjourlivraison: variant.yvarprodnbrjourlivraison,
+                xdeviseidfk: variant.currencyId,
                 sysdate: currentTime,
                 sysaction: 'update',
                 sysuser: user?.email || 'admin'

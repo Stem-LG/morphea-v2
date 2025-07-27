@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createAdminClient } from '@/lib/supabase-admin'
 import { createClient } from '@/lib/server'
 
 // Helper function to check if user has access to the store
@@ -33,10 +32,10 @@ async function checkUserStoreAccess(request: NextRequest, storeId: string) {
 // GET /api/admin/stores/[storeId]/categories - Get categories for a specific store
 export async function GET(
   request: NextRequest,
-  { params }: { params: { storeId: string } }
+  { params }: { params: Promise<{ storeId: string }> }
 ) {
   try {
-    const storeId = params.storeId
+    const { storeId } = await params
 
     // Check if current user has access to this store
     const { hasAccess, error } = await checkUserStoreAccess(request, storeId)
@@ -137,13 +136,13 @@ export async function GET(
 // POST /api/admin/stores/[storeId]/categories - Create a new category for the store
 export async function POST(
   request: NextRequest,
-  { params }: { params: { storeId: string } }
+  { params }: { params: Promise<{ storeId: string }> }
 ) {
   try {
-    const storeId = params.storeId
+    const { storeId } = await params
 
     // Check if current user has access to this store
-    const { hasAccess, error, user } = await checkUserStoreAccess(request, storeId)
+    const { hasAccess, error } = await checkUserStoreAccess(request, storeId)
     
     if (!hasAccess) {
       return NextResponse.json(
@@ -190,13 +189,13 @@ export async function POST(
 // PATCH /api/admin/stores/[storeId]/categories - Bulk update categories
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { storeId: string } }
+  { params }: { params: Promise<{ storeId: string }> }
 ) {
   try {
-    const storeId = params.storeId
+    const { storeId } = await params
 
     // Check if current user has access to this store
-    const { hasAccess, error, user } = await checkUserStoreAccess(request, storeId)
+    const { hasAccess, error } = await checkUserStoreAccess(request, storeId)
     
     if (!hasAccess) {
       return NextResponse.json(
@@ -239,13 +238,13 @@ export async function PATCH(
 // DELETE /api/admin/stores/[storeId]/categories - Delete categories
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { storeId: string } }
+  { params }: { params: Promise<{ storeId: string }> }
 ) {
   try {
-    const storeId = params.storeId
+    const { storeId } = await params
 
     // Check if current user has access to this store
-    const { hasAccess, error, user } = await checkUserStoreAccess(request, storeId)
+    const { hasAccess, error } = await checkUserStoreAccess(request, storeId)
     
     if (!hasAccess) {
       return NextResponse.json(

@@ -11,16 +11,14 @@ import {
     Edit,
     Trash2,
     Eye,
-    MoreHorizontal,
     CheckCircle,
     XCircle,
     Clock
 } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
-import { useStoreProducts, useStoreProductStats } from "@/hooks/useAdminV2Products";
+import { useStoreProducts } from "@/hooks/useAdminV2Products";
 import { useDeleteProduct } from "@/hooks/useProducts";
 import type { ProductWithObjects } from "@/hooks/useProducts";
-import Image from "next/image";
 
 interface ProductsListProps {
     storeId: string;
@@ -29,17 +27,15 @@ interface ProductsListProps {
 
 type FilterStatus = "all" | "approved" | "pending" | "rejected";
 
-export function ProductsList({ storeId, store }: ProductsListProps) {
+export function ProductsList({ storeId }: ProductsListProps) {
     const { t } = useLanguage();
     const [searchTerm, setSearchTerm] = useState("");
     const [filterStatus, setFilterStatus] = useState<FilterStatus>("all");
-    const [selectedCategory, setSelectedCategory] = useState<string>("all");
     
     const { data: products, isLoading, error } = useStoreProducts(storeId, {
         status: filterStatus === 'all' ? undefined : filterStatus,
         search: searchTerm || undefined
     });
-    const { data: productStats } = useStoreProductStats(storeId);
     const deleteProduct = useDeleteProduct();
 
     const handleDeleteProduct = async (productId: number) => {

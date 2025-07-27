@@ -17,6 +17,7 @@ import {
     Users,
     CheckCircle,
     Eye,
+    DollarSign,
 } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
 
@@ -61,6 +62,13 @@ export function ModernSidebar({ isOpen, isCollapsed, onToggle, onCollapse, userR
                 label: t("admin.productManagement"),
                 icon: Package,
                 href: "/admin/products",
+                roles: ["admin"],
+            },
+            {
+                id: "currencies",
+                label: "Currency Management",
+                icon: DollarSign,
+                href: "/admin/currencies",
                 roles: ["admin"],
             },
             {

@@ -1,7 +1,6 @@
 "use client";
 import React, { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { useLanguage } from "@/hooks/useLanguage";
 import { ModernSidebar } from "./modern-sidebar";
 import { LoadingScreen } from "./loading-screen";
 import { AccessDenied } from "./access-denied";
@@ -14,7 +13,6 @@ export function AdminV2Layout({ children }: AdminV2LayoutProps) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
     const { data: user, isLoading } = useAuth();
-    const { t } = useLanguage();
 
     // Show loading screen while checking authentication
     if (isLoading) {

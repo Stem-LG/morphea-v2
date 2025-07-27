@@ -33,10 +33,10 @@ async function checkUserStoreAccess(request: NextRequest, storeId: string) {
 // POST /api/admin/stores/[storeId]/products/new - Create a new product with variants and media
 export async function POST(
   request: NextRequest,
-  { params }: { params: { storeId: string } }
+  { params }: { params: Promise<{ storeId: string }> }
 ) {
   try {
-    const storeId = params.storeId
+    const { storeId } = await params
 
     // Check if current user has access to this store
     const { hasAccess, error, user } = await checkUserStoreAccess(request, storeId)
@@ -207,10 +207,10 @@ export async function POST(
 // GET /api/admin/stores/[storeId]/products/new - Get form data (categories, colors, sizes)
 export async function GET(
   request: NextRequest,
-  { params }: { params: { storeId: string } }
+  { params }: { params: Promise<{ storeId: string }> }
 ) {
   try {
-    const storeId = params.storeId
+    const { storeId } = await params
 
     // Check if current user has access to this store
     const { hasAccess, error } = await checkUserStoreAccess(request, storeId)

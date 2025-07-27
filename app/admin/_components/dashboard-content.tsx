@@ -1,6 +1,5 @@
 "use client";
 import React from "react";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
     Store, 
@@ -23,7 +22,6 @@ export function DashboardContent() {
     const userMetadata = user?.app_metadata as { roles?: string[], assigned_stores?: number[] };
     const roles = userMetadata?.roles || [];
     const isAdmin = roles.includes('admin');
-    const isStoreAdmin = roles.includes('store_admin');
     const assignedStores = userMetadata?.assigned_stores || [];
 
     // Mock data - in real implementation, this would come from API

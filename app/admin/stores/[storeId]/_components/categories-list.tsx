@@ -10,10 +10,8 @@ import {
     Package,
     Edit,
     Trash2,
-    Eye,
-    MoreHorizontal
+    Eye
 } from "lucide-react";
-import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/hooks/useAuth";
 import { useStoreCategories, useCategoryStats } from "@/hooks/useAdminV2Categories";
 import Link from "next/link";
@@ -23,8 +21,7 @@ interface CategoriesListProps {
     store: any;
 }
 
-export function CategoriesList({ storeId, store }: CategoriesListProps) {
-    const { t } = useLanguage();
+export function CategoriesList({ storeId }: CategoriesListProps) {
     const { data: user } = useAuth();
     const [searchTerm, setSearchTerm] = useState("");
     const [showInactive, setShowInactive] = useState(false);

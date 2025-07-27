@@ -6,14 +6,12 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { 
     CheckCircle, 
-    XCircle, 
     Eye, 
     Package, 
     Search,
     Filter,
     Clock,
     Trash2,
-    AlertCircle,
     AlertTriangle
 } from "lucide-react";
 import { usePendingProducts, useApproveProduct, useNeedsRevisionProduct } from "@/hooks/useProductApprovals";
@@ -31,6 +29,7 @@ interface ApprovalData {
         yvarprodpromotiondatedeb: string | null;
         yvarprodpromotiondatefin: string | null;
         yvarprodnbrjourlivraison: number;
+        currencyId: number;
     }[];
 }
 
@@ -44,7 +43,7 @@ export function ProductApprovals() {
     const [filterStatus, setFilterStatus] = useState<FilterStatus>("pending");
     const [sortBy, setSortBy] = useState<SortOption>("newest");
     
-    const { data: pendingProducts, isLoading, error } = usePendingProducts();
+    const { data: pendingProducts, isLoading } = usePendingProducts();
     const approveProductMutation = useApproveProduct();
     const needsRevisionMutation = useNeedsRevisionProduct();
     const deleteProductMutation = useDeleteProduct();
@@ -84,7 +83,7 @@ export function ProductApprovals() {
         }
     };
 
-    const handleNeedsRevision = async (productId: number, comments: string) => {
+    const handleNeedsRevision = async (productId: number) => {
         try {
             await needsRevisionMutation.mutateAsync({ productId, comments: "" });
             setSelectedProduct(null);
@@ -143,20 +142,7 @@ export function ProductApprovals() {
                 <div className="flex items-center justify-center h-64">
                     <div className="text-center">
                         <div className="animate-spin rounded-full h-12 w-12 border-4 border-morpheus-gold-light/30 border-t-morpheus-gold-light mx-auto mb-4"></div>
-                        <p className="text-white text-lg">Loading pending products...</p>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
-    if (error) {
-        return (
-            <div className="p-6">
-                <div className="flex items-center justify-center h-64">
-                    <div className="text-center">
-                        <AlertCircle className="h-12 w-12 text-red-400 mx-auto mb-4" />
-                        <p className="text-red-400 text-lg">Error loading products: {error.message}</p>
+                        <p className="text-white text-lg">{t('admin.loadingProducts')}</p>
                     </div>
                 </div>
             </div>

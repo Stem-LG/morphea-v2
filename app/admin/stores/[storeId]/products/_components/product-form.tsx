@@ -15,7 +15,6 @@ import {
     CheckCircle,
     Loader2
 } from "lucide-react";
-import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/hooks/useAuth";
 import { createClient } from "@/lib/client";
 import { VariantManager } from "./variant-manager";
@@ -40,7 +39,6 @@ interface FormErrors {
 
 export function ProductForm({ storeId, productId }: ProductFormProps) {
     const router = useRouter();
-    const { t } = useLanguage();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [errors, setErrors] = useState<FormErrors>({});
     const [successMessage, setSuccessMessage] = useState("");
@@ -174,7 +172,7 @@ export function ProductForm({ storeId, productId }: ProductFormProps) {
             const productId = Date.now();
 
             // Create the main product using direct Supabase call
-            const { data: newProduct, error: productError } = await supabase
+            const { error: productError } = await supabase
                 .schema('morpheus')
                 .from('yprod')
                 .insert({
@@ -506,7 +504,6 @@ export function ProductForm({ storeId, productId }: ProductFormProps) {
                     onVariantsChange={setVariants}
                     colors={colors}
                     sizes={sizes}
-                    currencies={currencies}
                     onCreateColor={async (colorData) => {
                         try {
                             const newColorId = Date.now();

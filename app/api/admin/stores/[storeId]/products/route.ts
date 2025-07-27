@@ -33,13 +33,13 @@ async function checkUserStoreAccess(request: NextRequest, storeId: string) {
 // GET /api/admin/stores/[storeId]/products - Get products for a specific store
 export async function GET(
   request: NextRequest,
-  { params }: { params: { storeId: string } }
+  { params }: { params: Promise<{ storeId: string }> }
 ) {
   try {
-    const storeId = params.storeId
+    const { storeId } = await params
 
     // Check if current user has access to this store
-    const { hasAccess, error, user } = await checkUserStoreAccess(request, storeId)
+    const { hasAccess, error } = await checkUserStoreAccess(request, storeId)
     
     if (!hasAccess) {
       return NextResponse.json(
@@ -163,10 +163,10 @@ export async function GET(
 // POST /api/admin/stores/[storeId]/products - Create a new product for the store
 export async function POST(
   request: NextRequest,
-  { params }: { params: { storeId: string } }
+  { params }: { params: Promise<{ storeId: string }> }
 ) {
   try {
-    const storeId = params.storeId
+    const { storeId } = await params
 
     // Check if current user has access to this store
     const { hasAccess, error, user } = await checkUserStoreAccess(request, storeId)
@@ -263,10 +263,10 @@ export async function POST(
 // PATCH /api/admin/stores/[storeId]/products - Bulk update products
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { storeId: string } }
+  { params }: { params: Promise<{ storeId: string }> }
 ) {
   try {
-    const storeId = params.storeId
+    const { storeId } = await params
 
     // Check if current user has access to this store
     const { hasAccess, error, user } = await checkUserStoreAccess(request, storeId)

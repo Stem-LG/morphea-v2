@@ -2,7 +2,6 @@
 import React from "react";
 import { useParams } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
-import { useLanguage } from "@/hooks/useLanguage";
 import { LoadingScreen } from "@/app/admin/_components/loading-screen";
 import { AccessDenied } from "@/app/admin/_components/access-denied";
 import { ProductForm } from "../_components/product-form";
@@ -11,7 +10,6 @@ export default function NewProductPage() {
     const params = useParams();
     const storeId = params.storeId as string;
     const { data: user, isLoading } = useAuth();
-    const { t } = useLanguage();
 
     // Show loading screen while checking authentication
     if (isLoading) {

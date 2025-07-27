@@ -3,7 +3,7 @@ import { createAdminClient } from '@/lib/supabase-admin'
 import { createClient } from '@/lib/server'
 
 // Helper function to check if user has admin role
-async function checkAdminRole(request: NextRequest) {
+async function checkAdminRole() {
   const supabase = await createClient()
   
   const { data: { user }, error } = await supabase.auth.getUser()
@@ -20,10 +20,10 @@ async function checkAdminRole(request: NextRequest) {
 }
 
 // GET /api/admin/approvals - Get pending products for approval
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // Check if current user is admin
-    const { isAdmin, error } = await checkAdminRole(request)
+    const { isAdmin, error } = await checkAdminRole()
     
     if (!isAdmin) {
       return NextResponse.json(
@@ -77,7 +77,7 @@ export async function GET(request: NextRequest) {
 export async function PATCH(request: NextRequest) {
   try {
     // Check if current user is admin
-    const { isAdmin, error, user } = await checkAdminRole(request)
+    const { isAdmin, error, user } = await checkAdminRole()
     
     if (!isAdmin) {
       return NextResponse.json(
@@ -157,7 +157,7 @@ export async function PATCH(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   try {
     // Check if current user is admin
-    const { isAdmin, error } = await checkAdminRole(request)
+    const { isAdmin, error } = await checkAdminRole()
     
     if (!isAdmin) {
       return NextResponse.json(

@@ -18,13 +18,13 @@ import {
     Palette,
     Box,
     Download,
-    AlertTriangle,
-    Save
+    AlertTriangle
 } from "lucide-react";
 import type { ProductWithObjects } from "@/hooks/useProducts";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useCategories } from "@/hooks/useCategories";
 import { useProductVariants } from "@/hooks/useProductVariants";
+import { useCurrencies } from "@/hooks/useCurrencies";
 
 interface ProductDetailsModalProps {
     product: ProductWithObjects;
@@ -43,6 +43,7 @@ interface ApprovalData {
         yvarprodpromotiondatedeb: string | null;
         yvarprodpromotiondatefin: string | null;
         yvarprodnbrjourlivraison: number;
+        currencyId: number;
     }[];
 }
 
@@ -64,11 +65,13 @@ export function ProductDetailsModal({
         yvarprodpromotiondatedeb: string;
         yvarprodpromotiondatefin: string;
         yvarprodnbrjourlivraison: string;
+        currencyId: string;
     }>>({});
 
     // Load data
     const { data: categories, isLoading: categoriesLoading } = useCategories();
     const { data: variants, isLoading: variantsLoading } = useProductVariants(product.yprodid);
+    const { data: currencies, isLoading: currenciesLoading } = useCurrencies();
 
     // Initialize variant data when variants are loaded
     useEffect(() => {
@@ -81,6 +84,7 @@ export function ProductDetailsModal({
                     yvarprodpromotiondatedeb: variant.yvarprodpromotiondatedeb || '',
                     yvarprodpromotiondatefin: variant.yvarprodpromotiondatefin || '',
                     yvarprodnbrjourlivraison: variant.yvarprodnbrjourlivraison?.toString() || '',
+                    currencyId: variant.xdeviseidfk?.toString() || '',
                 };
             });
             setVariantData(initialData);
@@ -107,14 +111,16 @@ export function ProductDetailsModal({
             if (!data) return false;
             
             // Required fields validation
-            if (!data.yvarprodprixcatalogue || 
-                !data.yvarprodnbrjourlivraison) {
+            if (!data.yvarprodprixcatalogue ||
+                !data.yvarprodnbrjourlivraison ||
+                !data.currencyId) {
                 return false;
             }
 
             // Numeric validation
             if (isNaN(Number(data.yvarprodprixcatalogue)) ||
-                isNaN(Number(data.yvarprodnbrjourlivraison))) {
+                isNaN(Number(data.yvarprodnbrjourlivraison)) ||
+                isNaN(Number(data.currencyId))) {
                 return false;
             }
 
@@ -130,7 +136,7 @@ export function ProductDetailsModal({
 
     const handleApprove = () => {
         if (!validateApprovalData()) {
-            alert('Please fill in all required fields correctly.');
+            alert(t('admin.productApprovalsDetail.fillRequiredFields'));
             return;
         }
 
@@ -139,12 +145,13 @@ export function ProductDetailsModal({
             variants: variants!.map(variant => ({
                 yvarprodid: variant.yvarprodid,
                 yvarprodprixcatalogue: Number(variantData[variant.yvarprodid].yvarprodprixcatalogue),
-                yvarprodprixpromotion: variantData[variant.yvarprodid].yvarprodprixpromotion 
-                    ? Number(variantData[variant.yvarprodid].yvarprodprixpromotion) 
+                yvarprodprixpromotion: variantData[variant.yvarprodid].yvarprodprixpromotion
+                    ? Number(variantData[variant.yvarprodid].yvarprodprixpromotion)
                     : null,
                 yvarprodpromotiondatedeb: variantData[variant.yvarprodid].yvarprodpromotiondatedeb || null,
                 yvarprodpromotiondatefin: variantData[variant.yvarprodid].yvarprodpromotiondatefin || null,
                 yvarprodnbrjourlivraison: Number(variantData[variant.yvarprodid].yvarprodnbrjourlivraison),
+                currencyId: Number(variantData[variant.yvarprodid].currencyId),
             }))
         };
 
@@ -169,11 +176,11 @@ export function ProductDetailsModal({
     const getStatusText = (status: string) => {
         switch (status) {
             case "approved":
-                return "Approved";
+                return t('admin.productApprovalsDetail.approved');
             case "needs_revision":
-                return "Needs Revision";
+                return t('admin.productApprovalsDetail.needsRevisionStatus');
             default:
-                return "Pending Approval";
+                return t('admin.productApprovalsDetail.pendingApproval');
         }
     };
 
@@ -189,9 +196,9 @@ export function ProductDetailsModal({
     };
 
     const tabs = [
-        { id: "details", label: "Product Details", icon: Package },
-        { id: "objects", label: "3D Objects", icon: Box },
-        { id: "approval", label: "Approval Form", icon: CheckCircle }
+        { id: "details", label: t('admin.productApprovalsDetail.productDetails'), icon: Package },
+        { id: "objects", label: t('admin.productApprovalsDetail.objectsTab'), icon: Box },
+        { id: "approval", label: t('admin.productApprovalsDetail.approvalTab'), icon: CheckCircle }
     ];
 
     return (
@@ -209,7 +216,7 @@ export function ProductDetailsModal({
                                     {product.yprodintitule}
                                 </h2>
                                 <p className="text-gray-300">
-                                    Code: {product.yprodcode}
+                                    {t('admin.productApprovalsDetail.productCode')}: {product.yprodcode}
                                 </p>
                             </div>
                         </div>
@@ -262,27 +269,27 @@ export function ProductDetailsModal({
                                 <CardHeader>
                                     <CardTitle className="text-white flex items-center gap-2">
                                         <Package className="h-5 w-5 text-morpheus-gold-light" />
-                                        Basic Information
+                                        {t('admin.productApprovalsDetail.basicInformation')}
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className="space-y-4">
                                     <div>
-                                        <label className="text-sm font-medium text-gray-400">Product Name</label>
+                                        <label className="text-sm font-medium text-gray-400">{t('admin.productApprovalsDetail.productName')}</label>
                                         <p className="text-white font-medium">{product.yprodintitule}</p>
                                     </div>
                                     <div>
-                                        <label className="text-sm font-medium text-gray-400">Product Code</label>
+                                        <label className="text-sm font-medium text-gray-400">{t('admin.productApprovalsDetail.productCode')}</label>
                                         <p className="text-white font-medium">{product.yprodcode}</p>
                                     </div>
                                     <div>
-                                        <label className="text-sm font-medium text-gray-400">Technical Details</label>
+                                        <label className="text-sm font-medium text-gray-400">{t('admin.productApprovalsDetail.technicalDetails')}</label>
                                         <p className="text-gray-300 text-sm leading-relaxed">
-                                            {product.yproddetailstech || "No technical details provided"}
+                                            {product.yproddetailstech || t('admin.productApprovalsDetail.noImageAvailable')}
                                         </p>
                                     </div>
                                     {product.sysdate && (
                                         <div>
-                                            <label className="text-sm font-medium text-gray-400">Created Date</label>
+                                            <label className="text-sm font-medium text-gray-400">{t('admin.productApprovalsDetail.createdDate')}</label>
                                             <div className="flex items-center gap-2 text-gray-300">
                                                 <Calendar className="h-4 w-4" />
                                                 <span>{new Date(product.sysdate).toLocaleDateString()}</span>
@@ -291,7 +298,7 @@ export function ProductDetailsModal({
                                     )}
                                     {product.sysuser && (
                                         <div>
-                                            <label className="text-sm font-medium text-gray-400">Created By</label>
+                                            <label className="text-sm font-medium text-gray-400">{t('admin.productApprovalsDetail.createdBy')}</label>
                                             <div className="flex items-center gap-2 text-gray-300">
                                                 <User className="h-4 w-4" />
                                                 <span>{product.sysuser}</span>
@@ -306,7 +313,7 @@ export function ProductDetailsModal({
                                 <CardHeader>
                                     <CardTitle className="text-white flex items-center gap-2">
                                         <Eye className="h-5 w-5 text-morpheus-gold-light" />
-                                        Product Preview
+                                        {t('admin.productApprovalsDetail.productPreview')}
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent>
@@ -314,8 +321,8 @@ export function ProductDetailsModal({
                                     <div className="w-full h-48 bg-gradient-to-br from-morpheus-blue-dark/10 to-morpheus-blue-light/10 rounded-lg flex items-center justify-center border border-slate-600/30 mb-4">
                                         <div className="text-center">
                                             <Package className="h-12 w-12 text-gray-400 mx-auto mb-2" />
-                                            <p className="text-gray-400 text-sm">Product Image</p>
-                                            <p className="text-gray-500 text-xs">No image available</p>
+                                            <p className="text-gray-400 text-sm">{t('admin.productApprovalsDetail.productImage')}</p>
+                                            <p className="text-gray-500 text-xs">{t('admin.productApprovalsDetail.noImageAvailable')}</p>
                                         </div>
                                     </div>
                                     
@@ -324,7 +331,7 @@ export function ProductDetailsModal({
                                         <div className="bg-morpheus-blue-dark/30 p-3 rounded-lg">
                                             <div className="flex items-center gap-2 mb-1">
                                                 <Box className="h-4 w-4 text-blue-400" />
-                                                <span className="text-xs text-gray-300">3D Objects</span>
+                                                <span className="text-xs text-gray-300">{t('admin.productApprovalsDetail.threeDObjects')}</span>
                                             </div>
                                             <div className="text-lg font-bold text-white">
                                                 {product.yobjet3d?.length || 0}
@@ -333,7 +340,7 @@ export function ProductDetailsModal({
                                         <div className="bg-morpheus-blue-dark/30 p-3 rounded-lg">
                                             <div className="flex items-center gap-2 mb-1">
                                                 <Palette className="h-4 w-4 text-purple-400" />
-                                                <span className="text-xs text-gray-300">Variants</span>
+                                                <span className="text-xs text-gray-300">{t('admin.productApprovalsDetail.variants')}</span>
                                             </div>
                                             <div className="text-lg font-bold text-white">
                                                 {variants?.length || 0}
@@ -349,7 +356,7 @@ export function ProductDetailsModal({
                         <div className="space-y-4">
                             <div className="flex items-center justify-between">
                                 <h3 className="text-lg font-semibold text-white">
-                                    3D Objects ({product.yobjet3d?.length || 0})
+                                    {t('admin.productApprovalsDetail.threeDObjectsCount').replace('{0}', (product.yobjet3d?.length || 0).toString())}
                                 </h3>
                             </div>
                             
@@ -361,17 +368,17 @@ export function ProductDetailsModal({
                                                 <CardTitle className="text-white flex items-center justify-between">
                                                     <span className="flex items-center gap-2">
                                                         <Box className="h-5 w-5 text-morpheus-gold-light" />
-                                                        3D Object {index + 1}
+                                                        {t('admin.productApprovalsDetail.threeDObject')} {index + 1}
                                                     </span>
                                                     <Badge variant="outline" className="border-slate-600 text-gray-300">
-                                                        Order: {obj.yobjet3dorder || 'N/A'}
+                                                        {t('admin.productApprovalsDetail.order')}: {obj.yobjet3dorder || t('admin.productApprovalsDetail.na')}
                                                     </Badge>
                                                 </CardTitle>
                                             </CardHeader>
                                             <CardContent className="space-y-3">
                                                 {obj.yobjet3dcouleur && (
                                                     <div>
-                                                        <label className="text-sm font-medium text-gray-400">Color</label>
+                                                        <label className="text-sm font-medium text-gray-400">{t('admin.productApprovalsDetail.color')}</label>
                                                         <div className="flex items-center gap-2">
                                                             <div 
                                                                 className="w-4 h-4 rounded border border-slate-600"
@@ -383,13 +390,13 @@ export function ProductDetailsModal({
                                                 )}
                                                 
                                                 <div>
-                                                    <label className="text-sm font-medium text-gray-400">Action</label>
+                                                    <label className="text-sm font-medium text-gray-400">{t('admin.productApprovalsDetail.action')}</label>
                                                     <p className="text-white">{obj.yobjet3daction}</p>
                                                 </div>
                                                 
                                                 {obj.yobjet3durl && (
                                                     <div>
-                                                        <label className="text-sm font-medium text-gray-400">3D Model</label>
+                                                        <label className="text-sm font-medium text-gray-400">{t('admin.productApprovalsDetail.threeDModel')}</label>
                                                         <div className="flex gap-2">
                                                             <Button
                                                                 variant="outline"
@@ -398,7 +405,7 @@ export function ProductDetailsModal({
                                                                 className="border-slate-600 text-blue-400 hover:bg-blue-600/10"
                                                             >
                                                                 <ExternalLink className="h-4 w-4 mr-2" />
-                                                                View 3D Model
+                                                                {t('admin.productApprovalsDetail.view3DModel')}
                                                             </Button>
                                                             <Button
                                                                 variant="outline"
@@ -406,7 +413,7 @@ export function ProductDetailsModal({
                                                                 className="border-slate-600 text-gray-300 hover:bg-slate-700/50"
                                                             >
                                                                 <Download className="h-4 w-4 mr-2" />
-                                                                Download
+                                                                {t('admin.productApprovalsDetail.download')}
                                                             </Button>
                                                         </div>
                                                     </div>
@@ -418,8 +425,8 @@ export function ProductDetailsModal({
                             ) : (
                                 <div className="text-center py-8">
                                     <Box className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                                    <p className="text-gray-300 text-lg">No 3D objects available</p>
-                                    <p className="text-gray-400 text-sm">This product doesn't have any 3D models attached</p>
+                                    <p className="text-gray-300 text-lg">{t('admin.productApprovalsDetail.noThreeDObjectsAvailable')}</p>
+                                    <p className="text-gray-400 text-sm">{t('admin.productApprovalsDetail.noThreeDObjectsDescription')}</p>
                                 </div>
                             )}
                         </div>
@@ -432,21 +439,21 @@ export function ProductDetailsModal({
                                 <CardHeader>
                                     <CardTitle className="text-white flex items-center gap-2">
                                         <Tag className="h-5 w-5 text-morpheus-gold-light" />
-                                        Product Category
+                                        {t('admin.productApprovalsDetail.productCategory')}
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent>
                                     <div className="space-y-2">
-                                        <Label className="text-gray-300">Select Category *</Label>
+                                        <Label className="text-gray-300">{t('admin.productApprovalsDetail.selectCategory')} *</Label>
                                         {categoriesLoading ? (
-                                            <div className="text-gray-400">Loading categories...</div>
+                                            <div className="text-gray-400">{t('admin.productApprovalsDetail.loadingCategories')}</div>
                                         ) : (
                                             <select
                                                 value={selectedCategoryId || ''}
                                                 onChange={(e) => setSelectedCategoryId(Number(e.target.value) || null)}
                                                 className="w-full p-3 bg-morpheus-blue-dark/30 border border-slate-600 rounded-md text-white"
                                             >
-                                                <option value="">Choose a category...</option>
+                                                <option value="">{t('admin.productApprovalsDetail.selectCategoryPlaceholder')}</option>
                                                 {categories?.map(category => (
                                                     <option key={category.xcategprodid} value={category.xcategprodid}>
                                                         {category.xcategprodintitule}
@@ -463,25 +470,43 @@ export function ProductDetailsModal({
                                 <CardHeader>
                                     <CardTitle className="text-white flex items-center gap-2">
                                         <Palette className="h-5 w-5 text-morpheus-gold-light" />
-                                        Product Variants ({variants?.length || 0})
+                                        {t('admin.productApprovalsDetail.productVariants').replace('{0}', (variants?.length || 0).toString())}
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent>
-                                    {variantsLoading ? (
-                                        <div className="text-gray-400">Loading variants...</div>
+                                    {variantsLoading || currenciesLoading ? (
+                                        <div className="text-gray-400">{t('admin.productApprovalsDetail.loadingVariants')}</div>
                                     ) : variants && variants.length > 0 ? (
                                         <div className="space-y-6">
                                             {variants.map((variant, index) => (
                                                 <div key={variant.yvarprodid} className="p-4 bg-morpheus-blue-dark/20 rounded-lg border border-slate-600/30">
                                                     <h4 className="text-white font-medium mb-4 flex items-center gap-2">
                                                         <Palette className="h-4 w-4" />
-                                                        Variant {index + 1}: {variant.yvarprodintitule}
+                                                        {t('admin.productApprovalsDetail.variant')} {index + 1}: {variant.yvarprodintitule}
                                                     </h4>
                                                     
                                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                        {/* Currency Selection */}
+                                                        <div>
+                                                            <Label className="text-gray-300">Currency *</Label>
+                                                            <select
+                                                                value={variantData[variant.yvarprodid]?.currencyId || ''}
+                                                                onChange={(e) => updateVariantField(variant.yvarprodid, 'currencyId', e.target.value)}
+                                                                className="w-full p-3 bg-morpheus-blue-dark/30 border border-slate-600 rounded-md text-white"
+                                                                required
+                                                            >
+                                                                <option value="">Select Currency</option>
+                                                                {currencies?.map(currency => (
+                                                                    <option key={currency.xdeviseid} value={currency.xdeviseid}>
+                                                                        {currency.xdeviseintitule} ({currency.xdevisecodealpha})
+                                                                    </option>
+                                                                ))}
+                                                            </select>
+                                                        </div>
+
                                                         {/* Catalog Price */}
                                                         <div>
-                                                            <Label className="text-gray-300">Catalog Price *</Label>
+                                                            <Label className="text-gray-300">{t('admin.productApprovalsDetail.catalogPriceRequired')}</Label>
                                                             <Input
                                                                 type="number"
                                                                 step="0.01"
@@ -494,7 +519,7 @@ export function ProductDetailsModal({
 
                                                         {/* Delivery Days */}
                                                         <div>
-                                                            <Label className="text-gray-300">Delivery Days *</Label>
+                                                            <Label className="text-gray-300">{t('admin.productApprovalsDetail.deliveryDaysRequired')}</Label>
                                                             <Input
                                                                 type="number"
                                                                 value={variantData[variant.yvarprodid]?.yvarprodnbrjourlivraison || ''}
@@ -506,7 +531,7 @@ export function ProductDetailsModal({
 
                                                         {/* Promotion Price */}
                                                         <div>
-                                                            <Label className="text-gray-300">Promotion Price</Label>
+                                                            <Label className="text-gray-300">{t('admin.productApprovalsDetail.promotionPrice')}</Label>
                                                             <Input
                                                                 type="number"
                                                                 step="0.01"
@@ -519,7 +544,7 @@ export function ProductDetailsModal({
 
                                                         {/* Promotion Start Date */}
                                                         <div>
-                                                            <Label className="text-gray-300">Promotion Start Date</Label>
+                                                            <Label className="text-gray-300">{t('admin.productApprovalsDetail.promotionStartDate')}</Label>
                                                             <Input
                                                                 type="date"
                                                                 value={variantData[variant.yvarprodid]?.yvarprodpromotiondatedeb || ''}
@@ -530,7 +555,7 @@ export function ProductDetailsModal({
 
                                                         {/* Promotion End Date */}
                                                         <div className="md:col-span-2">
-                                                            <Label className="text-gray-300">Promotion End Date</Label>
+                                                            <Label className="text-gray-300">{t('admin.productApprovalsDetail.promotionEndDate')}</Label>
                                                             <Input
                                                                 type="date"
                                                                 value={variantData[variant.yvarprodid]?.yvarprodpromotiondatefin || ''}
@@ -542,9 +567,9 @@ export function ProductDetailsModal({
 
                                                     {/* Variant Info */}
                                                     <div className="mt-4 flex gap-4 text-sm text-gray-400">
-                                                        <span>Color: {variant.xcouleur?.xcouleurintitule || 'N/A'}</span>
-                                                        <span>Size: {variant.xtaille?.xtailleintitule || 'N/A'}</span>
-                                                        <span>Currency: {variant.xdevise?.xdeviseintitule || 'N/A'}</span>
+                                                        <span>{t('admin.productApprovalsDetail.color')}: {variant.xcouleur?.xcouleurintitule || t('admin.productApprovalsDetail.na')}</span>
+                                                        <span>{t('admin.productApprovalsDetail.size')}: {variant.xtaille?.xtailleintitule || t('admin.productApprovalsDetail.na')}</span>
+                                                        <span>{t('admin.productApprovalsDetail.currency')}: {variant.xdevise?.xdeviseintitule || t('admin.productApprovalsDetail.na')}</span>
                                                     </div>
                                                 </div>
                                             ))}
@@ -552,8 +577,8 @@ export function ProductDetailsModal({
                                     ) : (
                                         <div className="text-center py-8">
                                             <Palette className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                                            <p className="text-gray-300 text-lg">No variants found</p>
-                                            <p className="text-gray-400 text-sm">This product doesn't have any variants</p>
+                                            <p className="text-gray-300 text-lg">{t('admin.productApprovalsDetail.noVariantsFound')}</p>
+                                            <p className="text-gray-400 text-sm">{t('admin.productApprovalsDetail.noVariantsDescription')}</p>
                                         </div>
                                     )}
                                 </CardContent>
@@ -569,7 +594,7 @@ export function ProductDetailsModal({
                         onClick={onClose}
                         className="border-slate-600 text-gray-300 hover:bg-slate-700/50"
                     >
-                        Close
+                        {t('admin.productApprovalsDetail.close')}
                     </Button>
                     
                     <div className="flex gap-3">
@@ -579,7 +604,7 @@ export function ProductDetailsModal({
                             className="border-red-600 text-red-400 hover:bg-red-600/10"
                         >
                             <Trash2 className="h-4 w-4 mr-2" />
-                            Delete Product
+                            {t('admin.productApprovalsDetail.deleteProduct')}
                         </Button>
                         
                         <Button
@@ -588,7 +613,7 @@ export function ProductDetailsModal({
                             className="border-orange-600 text-orange-400 hover:bg-orange-600/10"
                         >
                             <AlertTriangle className="h-4 w-4 mr-2" />
-                            Needs Revision
+                            {t('admin.productApprovalsDetail.needsRevision')}
                         </Button>
                         
                         <Button
@@ -597,7 +622,7 @@ export function ProductDetailsModal({
                             className="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             <CheckCircle className="h-4 w-4 mr-2" />
-                            Approve Product
+                            {t('admin.productApprovalsDetail.approveProduct')}
                         </Button>
                     </div>
                 </div>

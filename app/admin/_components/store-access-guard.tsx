@@ -94,7 +94,7 @@ export function StoreAccessGuard({ storeId, children, fallback }: StoreAccessGua
                         </CardHeader>
                         <CardContent className="text-center space-y-4">
                             <p className="text-gray-300">
-                                You don't have permission to access the admin panel. Please contact an administrator if you believe this is an error.
+                                You don&apos;t have permission to access the admin panel. Please contact an administrator if you believe this is an error.
                             </p>
                             <div className="flex flex-col gap-2">
                                 <Link href="/main">
@@ -131,7 +131,7 @@ export function StoreAccessGuard({ storeId, children, fallback }: StoreAccessGua
                         </CardHeader>
                         <CardContent className="text-center space-y-4">
                             <p className="text-gray-300">
-                                You don't have access to manage this store. 
+                                You don&apos;t have access to manage this store. 
                                 {isStoreAdmin && (
                                     <span className="block mt-2">
                                         You can only manage stores that have been assigned to you.

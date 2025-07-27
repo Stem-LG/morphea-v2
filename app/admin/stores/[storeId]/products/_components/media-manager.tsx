@@ -106,11 +106,11 @@ export function MediaManager({ mediaObjects, onMediaChange, colors }: MediaManag
         }
     };
 
-    const handleSaveMedia = (index: number) => {
+    const handleSaveMedia = () => {
         setEditingIndex(null);
     };
 
-    const handleCancelEdit = (index: number) => {
+    const handleCancelEdit = () => {
         setEditingIndex(null);
     };
 
@@ -129,7 +129,7 @@ export function MediaManager({ mediaObjects, onMediaChange, colors }: MediaManag
                 <CardTitle className="flex items-center justify-between text-white text-xl">
                     <div className="flex items-center gap-2">
                         <Box className="h-5 w-5 text-morpheus-gold-light" />
-                        3D Models & Media
+                        {t('admin.mediaManager.title')}
                     </div>
                     <div className="flex gap-2">
                         <Button
@@ -138,7 +138,7 @@ export function MediaManager({ mediaObjects, onMediaChange, colors }: MediaManag
                             className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-[#695029] hover:to-[#d4c066] text-white font-semibold shadow-lg transition-all duration-300 hover:scale-105"
                         >
                             <Box className="h-4 w-4 mr-2" />
-                            Add 3D Model
+                            {t('admin.mediaManager.add3DModel')}
                         </Button>
                         <Button
                             type="button"
@@ -147,7 +147,7 @@ export function MediaManager({ mediaObjects, onMediaChange, colors }: MediaManag
                             className="border-slate-600 text-white hover:bg-slate-700/50"
                         >
                             <Image className="h-4 w-4 mr-2" />
-                            Add Image
+                            {t('admin.mediaManager.addImage')}
                         </Button>
                         <Button
                             type="button"
@@ -156,7 +156,7 @@ export function MediaManager({ mediaObjects, onMediaChange, colors }: MediaManag
                             className="border-slate-600 text-white hover:bg-slate-700/50"
                         >
                             <Video className="h-4 w-4 mr-2" />
-                            Add Video
+                            {t('admin.mediaManager.addVideo')}
                         </Button>
                     </div>
                 </CardTitle>
@@ -166,10 +166,10 @@ export function MediaManager({ mediaObjects, onMediaChange, colors }: MediaManag
                     <div className="text-center py-8">
                         <Box className="h-16 w-16 text-gray-400 mx-auto mb-4" />
                         <h3 className="text-lg font-medium text-white mb-2">
-                            No media added yet
+                            {t('admin.mediaManager.noMediaAddedYet')}
                         </h3>
                         <p className="text-gray-300 mb-4">
-                            Add 3D models, images, and videos to showcase your product variants
+                            {t('admin.mediaManager.noMediaDescription')}
                         </p>
                         <div className="flex gap-2 justify-center">
                             <Button
@@ -178,7 +178,7 @@ export function MediaManager({ mediaObjects, onMediaChange, colors }: MediaManag
                                 className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-[#695029] hover:to-[#d4c066] text-white"
                             >
                                 <Box className="h-4 w-4 mr-2" />
-                                Add 3D Model
+                                {t('admin.mediaManager.add3DModel')}
                             </Button>
                             <Button
                                 type="button"
@@ -187,7 +187,7 @@ export function MediaManager({ mediaObjects, onMediaChange, colors }: MediaManag
                                 className="border-slate-600 text-white hover:bg-slate-700/50"
                             >
                                 <Image className="h-4 w-4 mr-2" />
-                                Add Image
+                                {t('admin.mediaManager.addImage')}
                             </Button>
                             <Button
                                 type="button"
@@ -196,7 +196,7 @@ export function MediaManager({ mediaObjects, onMediaChange, colors }: MediaManag
                                 className="border-slate-600 text-white hover:bg-slate-700/50"
                             >
                                 <Video className="h-4 w-4 mr-2" />
-                                Add Video
+                                {t('admin.mediaManager.addVideo')}
                             </Button>
                         </div>
                     </div>
@@ -225,13 +225,13 @@ export function MediaManager({ mediaObjects, onMediaChange, colors }: MediaManag
                                             </div>
                                             <div>
                                                 <h4 className="text-white font-medium">
-                                                    {media.type === 'model3d' ? '3D Model' : media.type === 'video' ? 'Video' : 'Image'} - {media.color}
+                                                    {media.type === 'model3d' ? t('admin.mediaManager.model3D') : media.type === 'video' ? t('admin.mediaManager.video') : t('admin.mediaManager.image')} - {media.color}
                                                 </h4>
                                                 <p className="text-gray-300 text-sm">
-                                                    Order: {media.order + 1}
+                                                    {t('admin.mediaManager.orderLabel')}: {media.order + 1}
                                                     {media.url && (
                                                         <span className="ml-2">
-                                                            • {isValidUrl(media.url) ? 'Valid URL' : 'Invalid URL'}
+                                                            • {isValidUrl(media.url) ? t('admin.mediaManager.validUrl') : t('admin.mediaManager.invalidUrl')}
                                                         </span>
                                                     )}
                                                 </p>
@@ -279,7 +279,7 @@ export function MediaManager({ mediaObjects, onMediaChange, colors }: MediaManag
                                                     <Button
                                                         type="button"
                                                         size="sm"
-                                                        onClick={() => handleSaveMedia(index)}
+                                                        onClick={() => handleSaveMedia()}
                                                         className="bg-green-600 hover:bg-green-700 text-white"
                                                     >
                                                         <Save className="h-4 w-4" />
@@ -288,7 +288,7 @@ export function MediaManager({ mediaObjects, onMediaChange, colors }: MediaManag
                                                         type="button"
                                                         size="sm"
                                                         variant="outline"
-                                                        onClick={() => handleCancelEdit(index)}
+                                                        onClick={() => handleCancelEdit()}
                                                         className="border-slate-600 text-white hover:bg-slate-700/50"
                                                     >
                                                         <X className="h-4 w-4" />
@@ -327,7 +327,7 @@ export function MediaManager({ mediaObjects, onMediaChange, colors }: MediaManag
                                             <div className="lg:col-span-2">
                                                 <Label className="text-white text-sm font-medium flex items-center gap-2">
                                                     <Link className="h-4 w-4" />
-                                                    {media.type === 'model3d' ? '3D Model URL' : media.type === 'video' ? 'Video URL' : 'Image URL'}
+                                                    {media.type === 'model3d' ? t('admin.mediaManager.model3DUrl') : media.type === 'video' ? t('admin.mediaManager.videoUrl') : t('admin.mediaManager.imageUrl')}
                                                 </Label>
                                                 <Input
                                                     value={media.url}
@@ -335,14 +335,14 @@ export function MediaManager({ mediaObjects, onMediaChange, colors }: MediaManag
                                                     className="bg-slate-700 border-slate-600 text-white placeholder:text-gray-400 focus:border-morpheus-gold-light focus:ring-morpheus-gold-light"
                                                     placeholder={
                                                         media.type === 'model3d'
-                                                            ? 'https://example.com/model.glb'
+                                                            ? t('admin.mediaManager.model3DUrlPlaceholder')
                                                             : media.type === 'video'
-                                                            ? 'https://example.com/video.mp4'
-                                                            : 'https://example.com/image.jpg'
+                                                            ? t('admin.mediaManager.videoUrlPlaceholder')
+                                                            : t('admin.mediaManager.imageUrlPlaceholder')
                                                     }
                                                 />
                                                 {media.url && !isValidUrl(media.url) && (
-                                                    <p className="text-red-400 text-sm mt-1">Please enter a valid URL</p>
+                                                    <p className="text-red-400 text-sm mt-1">{t('admin.mediaManager.pleaseEnterValidUrl')}</p>
                                                 )}
                                             </div>
 
@@ -350,7 +350,7 @@ export function MediaManager({ mediaObjects, onMediaChange, colors }: MediaManag
                                             <div>
                                                 <Label className="text-white text-sm font-medium flex items-center gap-2">
                                                     <Palette className="h-4 w-4" />
-                                                    Associated Color
+                                                    {t('admin.mediaManager.associatedColor')}
                                                 </Label>
                                                 <select
                                                     value={media.color}
@@ -368,13 +368,13 @@ export function MediaManager({ mediaObjects, onMediaChange, colors }: MediaManag
                                             {/* Description */}
                                             <div>
                                                 <Label className="text-white text-sm font-medium">
-                                                    Description (Optional)
+                                                    {t('admin.mediaManager.descriptionOptional')}
                                                 </Label>
                                                 <Input
                                                     value={media.description || ''}
                                                     onChange={(e) => handleUpdateMedia(index, 'description', e.target.value)}
                                                     className="bg-slate-700 border-slate-600 text-white placeholder:text-gray-400 focus:border-morpheus-gold-light focus:ring-morpheus-gold-light"
-                                                    placeholder="Brief description of this media"
+                                                    placeholder={t('admin.mediaManager.briefDescriptionPlaceholder')}
                                                 />
                                             </div>
 
@@ -386,7 +386,7 @@ export function MediaManager({ mediaObjects, onMediaChange, colors }: MediaManag
                                                     onCheckedChange={(checked) => handleUpdateMedia(index, 'isActive', checked)}
                                                 />
                                                 <Label htmlFor={`media-active-${index}`} className="text-white text-sm font-medium">
-                                                    Active (visible to customers)
+                                                    {t('admin.mediaManager.activeStatus')}
                                                 </Label>
                                             </div>
                                         </div>
@@ -395,7 +395,7 @@ export function MediaManager({ mediaObjects, onMediaChange, colors }: MediaManag
                                         {media.url && isValidUrl(media.url) && (
                                             <div className="border-t border-slate-600 pt-4">
                                                 <Label className="text-white text-sm font-medium mb-2 block">
-                                                    Preview
+                                                    {t('admin.mediaManager.preview')}
                                                 </Label>
                                                 {media.type === 'image' ? (
                                                     <div className="w-full h-32 bg-slate-800 rounded-lg flex items-center justify-center border border-slate-600">
@@ -410,7 +410,7 @@ export function MediaManager({ mediaObjects, onMediaChange, colors }: MediaManag
                                                             }}
                                                         />
                                                         <div className="hidden text-gray-400 text-sm">
-                                                            Failed to load image
+                                                            {t('admin.mediaManager.failedToLoadImage')}
                                                         </div>
                                                     </div>
                                                 ) : media.type === 'video' ? (
@@ -426,15 +426,15 @@ export function MediaManager({ mediaObjects, onMediaChange, colors }: MediaManag
                                                             }}
                                                         />
                                                         <div className="hidden text-gray-400 text-sm">
-                                                            Failed to load video
+                                                            {t('admin.mediaManager.failedToLoadVideo')}
                                                         </div>
                                                     </div>
                                                 ) : (
                                                     <div className="w-full h-32 bg-slate-800 rounded-lg flex items-center justify-center border border-slate-600">
                                                         <div className="text-center text-gray-400">
                                                             <Box className="h-8 w-8 mx-auto mb-2" />
-                                                            <p className="text-sm">3D Model Preview</p>
-                                                            <p className="text-xs">Click preview button to view</p>
+                                                            <p className="text-sm">{t('admin.mediaManager.model3DPreview')}</p>
+                                                            <p className="text-xs">{t('admin.mediaManager.clickPreviewButtonToView')}</p>
                                                         </div>
                                                     </div>
                                                 )}
