@@ -8,17 +8,14 @@ import {
     Store,
     Package,
     BarChart3,
-    Settings,
     Menu,
     X,
     ChevronLeft,
     ChevronRight,
-    ShoppingBag,
     Users,
     CheckCircle,
     Eye,
-    DollarSign,
-    Tag,
+    CalendarDays,
 } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
 
@@ -45,6 +42,13 @@ export function ModernSidebar({ isOpen, isCollapsed, onToggle, onCollapse, userR
                 roles: ["admin", "store_admin"],
             },
             {
+                id: "events",
+                label: t("admin.eventManagement"),
+                icon: CalendarDays,
+                href: "/admin/events",
+                roles: ["admin", "store_admin"],
+            },
+            {
                 id: "stores",
                 label: t("admin.storeManagement"),
                 icon: Store,
@@ -63,20 +67,6 @@ export function ModernSidebar({ isOpen, isCollapsed, onToggle, onCollapse, userR
                 label: t("admin.productManagement"),
                 icon: Package,
                 href: "/admin/products",
-                roles: ["admin"],
-            },
-            {
-                id: "currencies",
-                label: "Currency Management",
-                icon: DollarSign,
-                href: "/admin/currencies",
-                roles: ["admin"],
-            },
-            {
-                id: "categories",
-                label: "Category Management",
-                icon: Tag,
-                href: "/admin/categories",
                 roles: ["admin"],
             },
             {
@@ -136,16 +126,10 @@ export function ModernSidebar({ isOpen, isCollapsed, onToggle, onCollapse, userR
                 <div className="p-4 border-b border-slate-700/50">
                     <div className="flex items-center justify-between">
                         {!isCollapsed && (
-                            <Link href="/admin" className="flex items-center gap-3">
-                                <div className="w-8 h-8 bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light rounded-lg flex items-center justify-center">
-                                    <ShoppingBag className="h-5 w-5 text-white" />
-                                </div>
-                                <div>
-                                    <h1 className="text-xl font-bold bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light bg-clip-text text-transparent">
-                                        {t("auth.morpheusMall")}
-                                    </h1>
-                                    <p className="text-xs text-gray-300">{t("admin.adminPanel")}</p>
-                                </div>
+                            <Link href="/admin">
+                                <h1 className="text-xl font-bold bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light bg-clip-text text-transparent">
+                                    {t("admin.adminPanel")}
+                                </h1>
                             </Link>
                         )}
 
@@ -180,8 +164,8 @@ export function ModernSidebar({ isOpen, isCollapsed, onToggle, onCollapse, userR
                 </div>
 
                 {/* Navigation */}
-                <nav className="p-4 space-y-2">
-                    {menuItems.map((item) => {
+                <nav className="py-4">
+                    {menuItems.map((item, key) => {
                         const Icon = item.icon;
 
                         // More precise active state logic
@@ -197,7 +181,7 @@ export function ModernSidebar({ isOpen, isCollapsed, onToggle, onCollapse, userR
                             }
 
                             // Check if current path is a sub-route of this menu item
-                            // But make sure we don't match shorter paths (e.g., /admin shouldn't match /admin/stores)
+                            // But make sure we don't match shorter paths (e.g., /adminv2 shouldn't match /adminv2/stores)
                             if (pathname.startsWith(item.href + "/")) {
                                 return true;
                             }
@@ -206,18 +190,20 @@ export function ModernSidebar({ isOpen, isCollapsed, onToggle, onCollapse, userR
                         })();
 
                         return (
-                            <Link key={item.id} href={item.href}>
-                                <Button
-                                    variant="ghost"
-                                    className={`w-full ${
-                                        isCollapsed ? "justify-center px-2" : "justify-start"
-                                    } text-left transition-all duration-200 ${
-                                        isActive
-                                            ? "bg-gradient-to-r from-morpheus-gold-dark/20 to-morpheus-gold-light/20 text-morpheus-gold-light border border-morpheus-gold-light/30"
-                                            : "text-gray-300 hover:text-white hover:bg-slate-700/50"
-                                    }`}
-                                    title={isCollapsed ? item.label : undefined}
-                                >
+                            <Button
+                                key={key}
+                                variant="ghost"
+                                className={`w-full rounded-none h-12 ${
+                                    isCollapsed ? "justify-center" : "justify-start"
+                                } transition-all duration-200 ${
+                                    isActive
+                                        ? "bg-gradient-to-r from-morpheus-gold-dark/20 to-morpheus-gold-light/20 text-morpheus-gold-light border border-morpheus-gold-light/30"
+                                        : "text-gray-300 hover:text-white hover:bg-slate-700/50"
+                                }`}
+                                title={isCollapsed ? item.label : undefined}
+                                asChild
+                            >
+                                <Link key={item.id} href={item.href}>
                                     <Icon
                                         className={`h-5 w-5 ${isCollapsed ? "" : "mr-3"} ${
                                             isActive ? "text-morpheus-gold-light" : ""
@@ -228,37 +214,11 @@ export function ModernSidebar({ isOpen, isCollapsed, onToggle, onCollapse, userR
                                             {item.label}
                                         </span>
                                     )}
-                                </Button>
-                            </Link>
+                                </Link>
+                            </Button>
                         );
                     })}
                 </nav>
-
-                {/* Footer */}
-                <div className="absolute bottom-4 left-4 right-4">
-                    <div className={`${isCollapsed ? "text-center" : ""}`}>
-                        <div className="text-xs text-gray-400 mb-2">
-                            {!isCollapsed && (
-                                <>
-                                    <div className="capitalize">{userRole.replace("_", " ")}</div>
-                                    <div className="text-morpheus-gold-light">v2.0</div>
-                                </>
-                            )}
-                        </div>
-                        <Link href="/admin/profile">
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                className={`${
-                                    isCollapsed ? "w-8 h-8 p-0" : "w-full"
-                                } text-gray-400 hover:text-white hover:bg-slate-700/50`}
-                            >
-                                <Settings className="h-4 w-4" />
-                                {!isCollapsed && <span className="ml-2">{t("admin.settings")}</span>}
-                            </Button>
-                        </Link>
-                    </div>
-                </div>
             </div>
         </>
     );
