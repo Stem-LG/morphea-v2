@@ -16,6 +16,8 @@ import {
     CheckCircle,
     Eye,
     CalendarDays,
+    DollarSign,
+    FolderTree,
 } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
 
@@ -54,6 +56,20 @@ export function ModernSidebar({ isOpen, isCollapsed, onToggle, onCollapse, userR
                 icon: Store,
                 href: "/admin/stores",
                 roles: ["admin", "store_admin"],
+            },
+            {
+                id: "categories",
+                label: t("admin.categoryManagement"),
+                icon: FolderTree,
+                href: "/admin/categories",
+                roles: ["admin"],
+            },
+            {
+                id: "currencies",
+                label: t("admin.currencyManagement"),
+                icon: DollarSign,
+                href: "/admin/currencies",
+                roles: ["admin"],
             },
             {
                 id: "approvals",
