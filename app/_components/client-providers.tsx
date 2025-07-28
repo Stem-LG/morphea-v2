@@ -1,10 +1,11 @@
 "use client";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { NuqsAdapter } from 'nuqs/adapters/next/app';
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { LanguageProvider } from "@/hooks/useLanguage";
 import NavBar from "./nav_bar";
 import VisitorFormDialog from "./visitor-form-dialog";
+import { Toaster } from "@/components/ui/sonner";
 
 const queryClient = new QueryClient();
 
@@ -20,6 +21,7 @@ export default function ClientProviders({ children }: { children: React.ReactNod
                     <VisitorFormDialog />
                 </LanguageProvider>
             </NuqsAdapter>
+            <Toaster />
         </QueryClientProvider>
     );
 }

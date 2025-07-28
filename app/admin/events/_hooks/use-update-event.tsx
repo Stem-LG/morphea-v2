@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/client";
 import { useMutation } from "@tanstack/react-query";
 import { uploadFile } from "@/app/_hooks/use-upload-file";
+import { useEvents } from "./use-events";
 
 interface useUpdateEventProps {
     eventId: number;
@@ -16,16 +17,17 @@ interface useUpdateEventProps {
 
 export function useUpdateEvent() {
     const supabase = createClient();
+    const { refetch: refetchEvents } = useEvents();
 
     return useMutation({
         mutationFn: async (updateData: useUpdateEventProps) => {
             const { eventId, imagesToAdd, imagesToRemove, ...eventFields } = updateData;
-            
+
             try {
                 // Step 1: Update event basic information if provided
                 if (Object.keys(eventFields).length > 0) {
                     const updateFields: any = {};
-                    
+
                     if (eventFields.code !== undefined) updateFields.yeventcode = eventFields.code;
                     if (eventFields.name !== undefined) updateFields.yeventintitule = eventFields.name;
                     if (eventFields.startDate !== undefined) updateFields.yeventdatedeb = eventFields.startDate;
@@ -62,12 +64,12 @@ export function useUpdateEvent() {
 
                 // Step 3: Add new images if provided
                 const newMediaIds: number[] = [];
-                
+
                 if (imagesToAdd && imagesToAdd.length > 0) {
                     for (const file of imagesToAdd) {
                         // Upload file to storage
                         const fileUrl = await uploadFile({ file, type: "image" });
-                        
+
                         // Create ymedia record
                         const { data: mediaData, error: mediaError } = await supabase
                             .schema("morpheus")
@@ -80,7 +82,7 @@ export function useUpdateEvent() {
                                 ymediaintitule: `Event ${eventId} Image`,
                                 ymediaurl: fileUrl,
                             })
-                            .select('ymediaid')
+                            .select("ymediaid")
                             .single();
 
                         if (mediaError) {
@@ -94,7 +96,7 @@ export function useUpdateEvent() {
 
                     // Create junction records for new images
                     if (newMediaIds.length > 0) {
-                        const junctionRecords = newMediaIds.map(mediaId => ({
+                        const junctionRecords = newMediaIds.map((mediaId) => ({
                             yeventidfk: eventId,
                             ymediaidfk: mediaId,
                         }));
@@ -116,11 +118,14 @@ export function useUpdateEvent() {
                     addedMediaIds: newMediaIds,
                     removedMediaIds: imagesToRemove || [],
                 };
-                
             } catch (error) {
                 console.error("Error in updateEvent:", error);
                 throw error;
             }
+        },
+        onSuccess: async () => {
+            // Invalidate and refetch events query
+            await refetchEvents();
         },
     });
 }

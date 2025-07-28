@@ -10,6 +10,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Calendar, Upload, X, Plus } from "lucide-react";
 import { useUpdateEvent } from "../_hooks/use-update-event";
 import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 interface MediaItem {
     ymediaid: number;
@@ -126,7 +127,7 @@ export function UpdateEventDialog({ children, event }: UpdateEventDialogProps) {
         
         const validationError = validateForm();
         if (validationError) {
-            alert(validationError);
+            toast.error(validationError);
             return;
         }
 
@@ -151,11 +152,12 @@ export function UpdateEventDialog({ children, event }: UpdateEventDialogProps) {
             setIsOpen(false);
             
             // Show success message
-            alert("Event updated successfully!");
+            toast.success("Event updated successfully!");
 
         } catch (error) {
             console.error("Error updating event:", error);
-            alert("Failed to update event. Please try again.");
+            const errorMessage = error instanceof Error ? error.message : "Failed to update event. Please try again.";
+            toast.error(errorMessage);
         } finally {
             setIsSubmitting(false);
         }
@@ -429,20 +431,20 @@ export function UpdateEventDialog({ children, event }: UpdateEventDialogProps) {
                     </div>
 
                     {/* Form Actions */}
-                    <div className="flex justify-end gap-3 pt-4">
+                    <div className="flex gap-3 pt-4">
                         <Button
                             type="button"
                             variant="outline"
                             onClick={() => setIsOpen(false)}
                             disabled={isSubmitting}
-                            className="border-gray-600 text-gray-300 hover:bg-gray-800/50"
+                            className="flex-1 border-gray-600 text-gray-300 hover:bg-gray-800/50"
                         >
                             Cancel
                         </Button>
                         <Button
                             type="submit"
                             disabled={isSubmitting}
-                            className="bg-morpheus-gold-dark hover:bg-morpheus-gold-light text-black font-medium"
+                            className="flex-1 bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-morpheus-gold-dark hover:to-morpheus-gold-light text-white font-semibold transition-all duration-300 hover:scale-105"
                         >
                             {isSubmitting ? "Updating..." : "Update Event"}
                         </Button>

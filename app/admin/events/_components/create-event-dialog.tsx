@@ -10,6 +10,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Calendar, Upload, X } from "lucide-react";
 import { useCreateEvent } from "../_hooks/use-create-event";
 import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 interface CreateEventDialogProps {
     children: React.ReactNode;
@@ -79,7 +80,7 @@ export function CreateEventDialog({ children }: CreateEventDialogProps) {
         
         const validationError = validateForm();
         if (validationError) {
-            alert(validationError);
+            toast.error(validationError);
             return;
         }
 
@@ -108,12 +109,13 @@ export function CreateEventDialog({ children }: CreateEventDialogProps) {
             removeAllFiles();
             setIsOpen(false);
             
-            // Optionally show success message
-            alert("Event created successfully!");
+            // Show success message
+            toast.success("Event created successfully!");
 
         } catch (error) {
             console.error("Error creating event:", error);
-            alert("Failed to create event. Please try again.");
+            const errorMessage = error instanceof Error ? error.message : "Failed to create event. Please try again.";
+            toast.error(errorMessage);
         } finally {
             setIsSubmitting(false);
         }
@@ -289,20 +291,20 @@ export function CreateEventDialog({ children }: CreateEventDialogProps) {
                     </div>
 
                     {/* Form Actions */}
-                    <div className="flex justify-end gap-3 pt-4">
+                    <div className="flex gap-3 pt-4">
                         <Button
                             type="button"
                             variant="outline"
                             onClick={() => setIsOpen(false)}
                             disabled={isSubmitting}
-                            className="border-gray-600 text-gray-300 hover:bg-gray-800/50"
+                            className="flex-1 border-gray-600 text-gray-300 hover:bg-gray-800/50"
                         >
                             Cancel
                         </Button>
                         <Button
                             type="submit"
                             disabled={isSubmitting}
-                            className="bg-morpheus-gold-dark hover:bg-morpheus-gold-light text-black font-medium"
+                            className="flex-1 bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-morpheus-gold-dark hover:to-morpheus-gold-light text-white font-semibold transition-all duration-300 hover:scale-105"
                         >
                             {isSubmitting ? "Creating..." : "Create Event"}
                         </Button>
