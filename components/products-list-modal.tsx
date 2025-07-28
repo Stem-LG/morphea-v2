@@ -12,25 +12,66 @@ interface ProductsListModalProps {
 }
 
 export default function ProductsListModal({ isOpen, onClose, onProductDetailsChange }: ProductsListModalProps) {
-    const sceneId = isOpen;
+    const infospotActionId = isOpen;
 
     const [selectedProduct, setSelectedProduct] = useState<number | null>(null);
     const [showProductDetails, setShowProductDetails] = useState(false);
 
-    const { data: productsData, isLoading } = useSceneProducts(sceneId);
+    const { data: productsData, isLoading } = useSceneProducts(infospotActionId);
 
     const productsList = useMemo(() => {
-        return productsData?.map((product) => ({
-            id: product.yprodid,
-            name: product.yprodintitule,
-            model: "", // No 3D models available from current query
-            image: "/logo.png", // Default image since imageurl doesn't exist in schema
-            description: product.yproddetailstech,
-            backgroundColor: "#f0f0f0", // Default background since yarriereplancouleur doesn't exist
-            models: [], // No 3D models available from current query
-            properties: {},
-            features: [],
-        }));
+        return productsData?.map((product) => {
+            // Get the first variant's media for the product image
+            const firstVariant = product.yvarprod?.[0];
+            const hasMedia = firstVariant?.yobjet3d?.length > 0;
+            
+            // Create 3D models array from all variants
+            const models = product.yvarprod?.flatMap(variant => 
+                variant.yobjet3d?.map(obj => ({
+                    id: obj.yobjet3did,
+                    name: `3D Model ${obj.yobjet3dorder || 1}`,
+                    url: obj.yobjet3durl,
+                    color: obj.yobjet3dcouleur,
+                    action: obj.yobjet3daction
+                })) || []
+            ) || [];
+
+            // Get product pricing info from first variant
+            const pricing = firstVariant ? {
+                catalogPrice: firstVariant.yvarprodprixcatalogue,
+                promotionPrice: firstVariant.yvarprodprixpromotion,
+                currency: firstVariant.xdevise?.xdevisecodealpha || 'EUR',
+                deliveryDays: firstVariant.yvarprodnbrjourlivraison
+            } : null;
+
+            // Get available colors and sizes from variants
+            const availableColors = [...new Set(product.yvarprod?.map(v => v.xcouleur?.xcouleurintitule).filter(Boolean))];
+            const availableSizes = [...new Set(product.yvarprod?.map(v => v.xtaille?.xtailleintitule).filter(Boolean))];
+
+            return {
+                id: product.yprodid,
+                name: product.yprodintitule,
+                model: hasMedia ? "3D Model Available" : "",
+                image: "/logo.png", // Using default logo until we have proper product images
+                description: product.yproddetailstech,
+                backgroundColor: "#f0f0f0",
+                models: models,
+                pricing: pricing,
+                properties: {
+                    code: product.yprodcode,
+                    status: product.yprodstatut,
+                    colors: availableColors,
+                    sizes: availableSizes,
+                    variantCount: product.yvarprod?.length || 0
+                },
+                features: [
+                    `${product.yvarprod?.length || 0} variant${(product.yvarprod?.length || 0) !== 1 ? 's' : ''}`,
+                    `${models.length} 3D model${models.length !== 1 ? 's' : ''}`,
+                    ...(availableColors.length > 0 ? [`Colors: ${availableColors.join(', ')}`] : []),
+                    ...(availableSizes.length > 0 ? [`Sizes: ${availableSizes.join(', ')}`] : [])
+                ].filter(Boolean),
+            };
+        });
     }, [productsData]);
 
     const selectedProductData = productsList?.find((product) => product.id === selectedProduct);
@@ -75,7 +116,7 @@ export default function ProductsListModal({ isOpen, onClose, onProductDetailsCha
                             <div className="text-center">
                                 <h3 className="text-lg sm:text-xl font-semibold text-white mb-2">Chargement des produits...</h3>
                                 <p className="text-gray-300 text-sm sm:text-base">
-                                    Veuillez patienter pendant que nous récupérons les produits du boutique
+                                    Récupération des produits liés à cette zone d&apos;information
                                 </p>
                             </div>
                         </div>
@@ -117,11 +158,59 @@ export default function ProductsListModal({ isOpen, onClose, onProductDetailsCha
                                                 {product.description || "Découvrez ce produit exceptionnel dans notre collection exclusive."}
                                             </p>
 
+                                            {/* Product Features */}
+                                            {product.features && product.features.length > 0 && (
+                                                <div className="mb-3 sm:mb-4">
+                                                    <div className="flex flex-wrap gap-1 sm:gap-2">
+                                                        {product.features.slice(0, 3).map((feature, index) => (
+                                                            <span 
+                                                                key={index}
+                                                                className="text-xs px-2 py-1 bg-morpheus-blue-light/20 text-morpheus-gold-light border border-morpheus-gold-dark/30 rounded"
+                                                            >
+                                                                {feature}
+                                                            </span>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {/* Pricing Information */}
+                                            {product.pricing && (
+                                                <div className="mb-3 sm:mb-4">
+                                                    <div className="flex items-center gap-2 text-sm">
+                                                        {product.pricing.promotionPrice ? (
+                                                            <>
+                                                                <span className="text-morpheus-gold-light font-bold">
+                                                                    {product.pricing.promotionPrice} {product.pricing.currency}
+                                                                </span>
+                                                                <span className="text-gray-400 line-through text-xs">
+                                                                    {product.pricing.catalogPrice} {product.pricing.currency}
+                                                                </span>
+                                                            </>
+                                                        ) : (
+                                                            <span className="text-morpheus-gold-light font-bold">
+                                                                {product.pricing.catalogPrice} {product.pricing.currency}
+                                                            </span>
+                                                        )}
+                                                        {product.pricing.deliveryDays && (
+                                                            <span className="text-xs text-gray-400 ml-auto">
+                                                                Livraison: {product.pricing.deliveryDays}j
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            )}
+
                                             {/* Product ID Badge */}
                                             <div className="inline-flex items-center space-x-2 text-xs text-morpheus-gold-light/80">
                                                 <span className="px-2 py-1 bg-morpheus-gold-dark/20 border border-morpheus-gold-dark/30 rounded">
-                                                    ID: {product.id}
+                                                    Code: {product.properties?.code || product.id}
                                                 </span>
+                                                {product.properties?.variantCount && product.properties.variantCount > 1 && (
+                                                    <span className="px-2 py-1 bg-morpheus-blue-light/20 border border-morpheus-blue-light/30 rounded">
+                                                        {product.properties.variantCount} variantes
+                                                    </span>
+                                                )}
                                             </div>
                                         </div>
 
@@ -130,7 +219,7 @@ export default function ProductsListModal({ isOpen, onClose, onProductDetailsCha
                                             <button className="relative overflow-hidden bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light text-white px-4 sm:px-6 lg:px-8 py-3 sm:py-4 font-semibold shadow-lg transition-all duration-300 hover:shadow-morpheus-gold-light/30 hover:scale-105 rounded group/btn w-full sm:w-auto">
                                                 <span className="relative z-10 text-sm sm:text-base">
                                                     Voir les Détails
-                                                    <span className="block text-xs font-normal opacity-80 mt-1 hidden sm:block">Explorer en 3D</span>
+                                                    <span className="text-xs font-normal opacity-80 mt-1 hidden sm:block">Explorer en 3D</span>
                                                 </span>
                                                 <div className="absolute inset-0 bg-gradient-to-r from-morpheus-gold-light to-morpheus-gold-dark opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300"></div>
                                             </button>
@@ -147,9 +236,9 @@ export default function ProductsListModal({ isOpen, onClose, onProductDetailsCha
                         <div className="flex flex-col items-center justify-center py-12 space-y-4">
                             <div className="text-6xl mb-4">🏪</div>
                             <div className="text-center">
-                                <h3 className="text-lg sm:text-xl font-semibold text-white mb-2">Aucun produit trouvé</h3>
+                                <h3 className="text-lg sm:text-xl font-semibold text-white mb-2">Aucun produit associé</h3>
                                 <p className="text-gray-300 text-sm sm:text-base">
-                                    Il n&apos;y a pas de produits disponibles dans cette section
+                                    Aucun produit n&apos;est actuellement lié à cette zone d&apos;information
                                 </p>
                             </div>
                         </div>

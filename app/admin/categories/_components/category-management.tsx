@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import {
     Plus,
     Edit,
@@ -91,12 +92,13 @@ export function CategoryManagement() {
     };
 
     const handleDelete = async (categoryId: number) => {
-        if (confirm('Are you sure you want to delete this category? This action cannot be undone and will fail if the category is being used by products.')) {
+        if (confirm('Are you sure you want to delete this category? This action cannot be undone.')) {
             try {
                 await deleteCategoryMutation.mutateAsync(categoryId);
             } catch (error) {
                 console.error('Failed to delete category:', error);
-                alert('Failed to delete category. It may be in use by products.');
+                const errorMessage = error instanceof Error ? error.message : 'Failed to delete category. It may be in use by products.';
+                alert(errorMessage);
             }
         }
     };
@@ -344,19 +346,30 @@ export function CategoryManagement() {
                                             <Edit className="h-4 w-4 mr-1" />
                                             Edit
                                         </Button>
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() => handleDelete(category.xcategprodid)}
-                                            disabled={deleteCategoryMutation.isPending}
-                                            className={`px-3 ${isInUse 
-                                                ? "border-orange-600 text-orange-400 hover:bg-orange-600/10" 
-                                                : "border-red-600 text-red-400 hover:bg-red-600/10"
-                                            }`}
-                                            title={isInUse ? "Category is in use - deletion may fail" : "Delete category"}
-                                        >
-                                            {isInUse ? <AlertTriangle className="h-4 w-4" /> : <Trash2 className="h-4 w-4" />}
-                                        </Button>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <span className={isInUse ? "cursor-not-allowed" : ""}>
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        onClick={() => handleDelete(category.xcategprodid)}
+                                                        disabled={deleteCategoryMutation.isPending || isInUse}
+                                                        className={`px-3 ${isInUse 
+                                                            ? "border-gray-600 text-gray-500 cursor-not-allowed" 
+                                                            : "border-red-600 text-red-400 hover:bg-red-600/10"
+                                                        }`}
+                                                    >
+                                                        {isInUse ? <AlertTriangle className="h-4 w-4" /> : <Trash2 className="h-4 w-4" />}
+                                                    </Button>
+                                                </span>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                <p>{isInUse 
+                                                    ? `Cannot delete: category is used by ${productCount} product${productCount !== 1 ? 's' : ''}` 
+                                                    : "Delete category"
+                                                }</p>
+                                            </TooltipContent>
+                                        </Tooltip>
                                     </div>
                                 </CardContent>
                             </Card>

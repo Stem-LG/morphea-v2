@@ -313,7 +313,7 @@ export default function TourAdminViewer({
         const infospot = currentInfospots.find(spot => spot.yinfospotsid === parseInt(infospotId))
         if (infospot) {
           setInlineEditingInfospot(infospot)
-          setPreviewMarkerPosition({ yaw: infospot.yinfospotsaxexyaw, pitch: infospot.yinfospotsaxeypitch })
+          setPreviewMarkerPosition({ yaw: parseFloat(infospot.yinfospotsaxexyaw), pitch: parseFloat(infospot.yinfospotsaxeypitch) })
         }
       } else {
         console.log('View mode detected - showing infospot details')
@@ -621,7 +621,7 @@ export default function TourAdminViewer({
       
       markersPluginInstance.addMarker({
         id: `infospot-${spot.yinfospotsid}`,
-        position: { yaw: spot.yinfospotsaxexyaw, pitch: spot.yinfospotsaxeypitch },
+        position: { yaw: parseFloat(spot.yinfospotsaxexyaw), pitch: parseFloat(spot.yinfospotsaxeypitch) },
         html: infospotHtml,
         anchor: "center center",
         tooltip: {
@@ -684,7 +684,7 @@ export default function TourAdminViewer({
         console.log('Found infospot for editing:', infospot)
         if (infospot) {
           setInlineEditingInfospot(infospot)
-          setPreviewMarkerPosition({ yaw: infospot.yinfospotsaxexyaw, pitch: infospot.yinfospotsaxeypitch })
+          setPreviewMarkerPosition({ yaw: parseFloat(infospot.yinfospotsaxexyaw), pitch: parseFloat(infospot.yinfospotsaxeypitch) })
           // Reset flag after a delay
           setTimeout(() => setIsHandlingEdit(false), 100)
           return // Exit early to prevent any navigation
@@ -715,7 +715,7 @@ export default function TourAdminViewer({
           console.log('Found infospot for editing (ctrl+click):', infospot)
           if (infospot) {
             setInlineEditingInfospot(infospot)
-            setPreviewMarkerPosition({ yaw: infospot.yinfospotsaxexyaw, pitch: infospot.yinfospotsaxeypitch })
+            setPreviewMarkerPosition({ yaw: parseFloat(infospot.yinfospotsaxexyaw), pitch: parseFloat(infospot.yinfospotsaxeypitch) })
             setTimeout(() => setIsHandlingEdit(false), 100)
             return
           }
@@ -1982,8 +1982,8 @@ export default function TourAdminViewer({
                 <div className="grid grid-cols-2 gap-2 text-xs text-gray-500 dark:text-gray-400">
                   <div>
                     <span className="font-medium">{t('admin.tour.position')}:</span>
-                    <div>{t('admin.tour.yaw')}: {viewingInfospot.yinfospotsaxexyaw.toFixed(3)}</div>
-                    <div>{t('admin.tour.pitch')}: {viewingInfospot.yinfospotsaxeypitch.toFixed(3)}</div>
+                    <div>{t('admin.tour.yaw')}: {parseFloat(viewingInfospot.yinfospotsaxexyaw).toFixed(3)}</div>
+                    <div>{t('admin.tour.pitch')}: {parseFloat(viewingInfospot.yinfospotsaxeypitch).toFixed(3)}</div>
                   </div>
                   <div>
                     <span className="font-medium">{t('admin.tour.scene')}:</span>

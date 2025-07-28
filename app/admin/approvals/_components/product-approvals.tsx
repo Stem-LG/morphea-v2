@@ -12,16 +12,28 @@ import {
     Filter,
     Clock,
     Trash2,
-    AlertTriangle
+    AlertTriangle,
+    Palette
 } from "lucide-react";
 import { usePendingProducts, useApproveProduct, useNeedsRevisionProduct } from "@/hooks/useProductApprovals";
 import { useDeleteProduct } from "@/hooks/useProducts";
 import { useLanguage } from "@/hooks/useLanguage";
 import type { ProductWithObjects } from "@/hooks/useProducts";
+
+// Extended type for products with variants
+interface ProductWithVariants extends ProductWithObjects {
+    yvarprod?: Array<{
+        yvarprodid: number;
+        yvarprodstatut?: string;
+        yvarprodintitule: string;
+        [key: string]: any;
+    }>;
+}
 import { ProductDetailsModal } from "./product-details-modal";
 
 interface ApprovalData {
     categoryId: number;
+    infoactionId: number;
     variants: {
         yvarprodid: number;
         yvarprodprixcatalogue: number;
@@ -38,7 +50,7 @@ type SortOption = "newest" | "oldest" | "name" | "code";
 
 export function ProductApprovals() {
     const { t } = useLanguage();
-    const [selectedProduct, setSelectedProduct] = useState<ProductWithObjects | null>(null);
+    const [selectedProduct, setSelectedProduct] = useState<ProductWithVariants | null>(null);
     const [searchTerm, setSearchTerm] = useState("");
     const [filterStatus, setFilterStatus] = useState<FilterStatus>("pending");
     const [sortBy, setSortBy] = useState<SortOption>("newest");
@@ -49,7 +61,7 @@ export function ProductApprovals() {
     const deleteProductMutation = useDeleteProduct();
 
     // Filter and sort products
-    const filteredProducts = pendingProducts?.filter((product: ProductWithObjects) => {
+    const filteredProducts = pendingProducts?.filter((product: ProductWithVariants) => {
         const matchesSearch = product.yprodintitule?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                             product.yprodcode?.toLowerCase().includes(searchTerm.toLowerCase());
         
@@ -222,7 +234,7 @@ export function ProductApprovals() {
             ) : (
                 <>
                     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                        {filteredProducts.map((product: ProductWithObjects) => (
+                        {filteredProducts.map((product: ProductWithVariants) => (
                             <Card
                                 key={product.yprodid}
                                 className="bg-gradient-to-br from-morpheus-blue-dark/40 to-morpheus-blue-light/40 border-slate-700/50 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 group"
@@ -259,6 +271,34 @@ export function ProductApprovals() {
                                             <Package className="h-4 w-4" />
                                             <span>{product.yobjet3d?.length || 0} 3D Objects</span>
                                         </div>
+                                        {(product as ProductWithVariants).yvarprod && (product as ProductWithVariants).yvarprod!.length > 0 && (
+                                            <div className="flex items-center gap-2 text-sm">
+                                                <Palette className="h-4 w-4 text-purple-400" />
+                                                <span className="text-gray-300">{(product as ProductWithVariants).yvarprod!.length} Variants:</span>
+                                                <div className="flex gap-1">
+                                                    {(product as ProductWithVariants).yvarprod!.filter(v => v.yvarprodstatut === 'approved').length > 0 && (
+                                                        <Badge className="px-1 py-0 text-xs bg-green-400/10 text-green-400 border-green-400/20">
+                                                            {(product as ProductWithVariants).yvarprod!.filter(v => v.yvarprodstatut === 'approved').length}✓
+                                                        </Badge>
+                                                    )}
+                                                    {(product as ProductWithVariants).yvarprod!.filter(v => !v.yvarprodstatut || v.yvarprodstatut === 'not_approved').length > 0 && (
+                                                        <Badge className="px-1 py-0 text-xs bg-yellow-400/10 text-yellow-400 border-yellow-400/20">
+                                                            {(product as ProductWithVariants).yvarprod!.filter(v => !v.yvarprodstatut || v.yvarprodstatut === 'not_approved').length}⏳
+                                                        </Badge>
+                                                    )}
+                                                    {(product as ProductWithVariants).yvarprod!.filter(v => v.yvarprodstatut === 'needs_revision').length > 0 && (
+                                                        <Badge className="px-1 py-0 text-xs bg-orange-400/10 text-orange-400 border-orange-400/20">
+                                                            {(product as ProductWithVariants).yvarprod!.filter(v => v.yvarprodstatut === 'needs_revision').length}⚠
+                                                        </Badge>
+                                                    )}
+                                                    {(product as ProductWithVariants).yvarprod!.filter(v => v.yvarprodstatut === 'rejected').length > 0 && (
+                                                        <Badge className="px-1 py-0 text-xs bg-red-400/10 text-red-400 border-red-400/20">
+                                                            {(product as ProductWithVariants).yvarprod!.filter(v => v.yvarprodstatut === 'rejected').length}✕
+                                                        </Badge>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
 
                                     {/* Actions */}

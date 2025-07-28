@@ -92,8 +92,8 @@ export function useInfospots(initialSceneId?: number): UseInfospots {
         yscenesidfk: infospotData.sceneId,
         yinfospotstitle: infospotData.title,
         yinfospotstext: infospotData.text,
-        yinfospotsaxexyaw: infospotData.yaw,
-        yinfospotsaxeypitch: infospotData.pitch,
+        yinfospotsaxexyaw: infospotData.yaw.toString(),
+        yinfospotsaxeypitch: infospotData.pitch.toString(),
         yinfospotactionidfk: infospotData.actionId,
       }
       
@@ -138,8 +138,8 @@ export function useInfospots(initialSceneId?: number): UseInfospots {
       if (updateData.sceneId !== undefined) updateFields.yscenesidfk = updateData.sceneId
       if (updateData.title !== undefined) updateFields.yinfospotstitle = updateData.title
       if (updateData.text !== undefined) updateFields.yinfospotstext = updateData.text
-      if (updateData.yaw !== undefined) updateFields.yinfospotsaxexyaw = updateData.yaw
-      if (updateData.pitch !== undefined) updateFields.yinfospotsaxeypitch = updateData.pitch
+      if (updateData.yaw !== undefined) updateFields.yinfospotsaxexyaw = updateData.yaw.toString()
+      if (updateData.pitch !== undefined) updateFields.yinfospotsaxeypitch = updateData.pitch.toString()
       if (updateData.actionId !== undefined) updateFields.yinfospotactionidfk = updateData.actionId
       
       const { data, error } = await supabase

@@ -90,12 +90,6 @@ function EventCard({ event }) {
 
     const eventStatus = getEventStatus();
 
-    const handleEdit = (e: React.MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        // Edit functionality is now handled by UpdateEventDialog
-    };
-
     const handleDelete = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();

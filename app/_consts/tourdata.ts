@@ -115,7 +115,7 @@ export async function getTourData(): Promise<TourData> {
                 }
                 
                 return {
-                    position: { yaw: infospot.yinfospotsaxexyaw, pitch: infospot.yinfospotsaxeypitch },
+                    position: { yaw: parseFloat(infospot.yinfospotsaxexyaw), pitch: parseFloat(infospot.yinfospotsaxeypitch) },
                     title: infospot.yinfospotstitle,
                     text: infospot.yinfospotstext,
                     action

@@ -43,6 +43,9 @@ export async function GET(request: NextRequest) {
         *,
         yvarprod(
           *,
+          xcouleur(*),
+          xtaille(*),
+          xdevise(*),
           yobjet3d(*)
         )
       `)
@@ -212,13 +215,14 @@ export async function PATCH(request: NextRequest) {
 
       // Start a transaction to update product, category, and variants
       try {
-        // 1. Update product status and category
+        // 1. Update product status, category, and infoaction
         const { data: updatedProduct, error: updateError } = await adminSupabase
           .schema('morpheus')
           .from('yprod')
           .update({
             yprodstatut: 'approved',
             xcategprodidfk: approvalData.categoryId,
+            yinfospotactionsidfk: approvalData.infoactionId,
             sysdate: currentTime,
             sysaction: 'update',
             sysuser: user?.email || 'admin'
