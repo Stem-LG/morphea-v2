@@ -3,9 +3,6 @@
 import { createClient } from "@/lib/client"
 import { useQuery } from "@tanstack/react-query"
 
-
-
-
 export function useStores() {
 
     const supabase = createClient()
@@ -20,7 +17,6 @@ export function useStores() {
             }
 
             return data;
-
         }
     })
 

@@ -12,6 +12,9 @@
     --font-sans: var(--font-geist-sans);
     --font-mono: var(--font-geist-mono);
     --font-parisienne: var(--font-parisienne);
+    --font-agatho: var(--font-agatho);
+    --font-brown-sugar: var(--font-brown-sugar);
+    --font-the-seasons: var(--font-the-seasons);
 
     /* Morpheus Mall Brand Colors */
     --color-morpheus-gold-dark: var(--morpheus-gold-dark);
@@ -219,4 +222,54 @@
 /* Custom spin animation with longer duration */
 .animate-spin-slow {
     animation: spin 20s linear infinite;
+}
+
+/* Local Font Utility Classes */
+.font-agatho {
+    font-family: var(--font-agatho), sans-serif;
+}
+
+.font-brown-sugar {
+    font-family: var(--font-brown-sugar), cursive;
+}
+
+.font-the-seasons {
+    font-family: var(--font-the-seasons), serif;
+}
+
+/* Additional weight variations for Agatho */
+.font-agatho-light {
+    font-family: var(--font-agatho), sans-serif;
+    font-weight: 300;
+}
+
+.font-agatho-regular {
+    font-family: var(--font-agatho), sans-serif;
+    font-weight: 400;
+}
+
+.font-agatho-medium {
+    font-family: var(--font-agatho), sans-serif;
+    font-weight: 500;
+}
+
+.font-agatho-bold {
+    font-family: var(--font-agatho), sans-serif;
+    font-weight: 700;
+}
+
+/* Additional weight variations for The Seasons */
+.font-the-seasons-light {
+    font-family: var(--font-the-seasons), serif;
+    font-weight: 300;
+}
+
+.font-the-seasons-regular {
+    font-family: var(--font-the-seasons), serif;
+    font-weight: 400;
+}
+
+.font-the-seasons-bold {
+    font-family: var(--font-the-seasons), serif;
+    font-weight: 700;
 }
