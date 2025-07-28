@@ -21,13 +21,29 @@ import {
     AlertTriangle
 } from "lucide-react";
 import type { ProductWithObjects } from "@/hooks/useProducts";
+
+// Extended type for products with variants
+interface ProductWithVariants extends ProductWithObjects {
+    yvarprod?: Array<{
+        yvarprodid: number;
+        yvarprodstatut?: string;
+        yvarprodintitule: string;
+        [key: string]: any;
+    }>;
+}
 import { useLanguage } from "@/hooks/useLanguage";
 import { useCategories } from "@/hooks/useCategories";
 import { useProductVariants } from "@/hooks/useProductVariants";
 import { useCurrencies } from "@/hooks/useCurrencies";
+import { 
+    useApproveVariant, 
+    useNeedsRevisionVariant, 
+    useRejectVariant, 
+    useBulkApproveVariants 
+} from "@/hooks/useVariantApprovals";
 
 interface ProductDetailsModalProps {
-    product: ProductWithObjects;
+    product: ProductWithVariants;
     onClose: () => void;
     onApprove: (productId: number, approvalData: ApprovalData) => void;
     onNeedsRevision: (productId: number, comments: string) => void;
@@ -55,7 +71,7 @@ export function ProductDetailsModal({
     onDelete 
 }: ProductDetailsModalProps) {
     const { t } = useLanguage();
-    const [selectedTab, setSelectedTab] = useState<"details" | "objects" | "approval">("details");
+        const [selectedTab, setSelectedTab] = useState<"details" | "objects" | "approval">("details");
     
     // Approval form state
     const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
@@ -72,6 +88,12 @@ export function ProductDetailsModal({
     const { data: categories, isLoading: categoriesLoading } = useCategories();
     const { data: variants, isLoading: variantsLoading } = useProductVariants(product.yprodid);
     const { data: currencies, isLoading: currenciesLoading } = useCurrencies();
+
+    // Variant approval mutations
+    const approveVariantMutation = useApproveVariant();
+    const needsRevisionVariantMutation = useNeedsRevisionVariant();
+    const rejectVariantMutation = useRejectVariant();
+    const bulkApproveVariantsMutation = useBulkApproveVariants();
 
     // Initialize variant data when variants are loaded
     useEffect(() => {
@@ -160,6 +182,148 @@ export function ProductDetailsModal({
 
     const handleNeedsRevision = () => {
         onNeedsRevision(product.yprodid, "");
+    };
+
+    // Individual variant approval handlers
+    const handleApproveVariant = async (variantId: number) => {
+        const vData = variantData[variantId];
+        if (!vData) return;
+
+        const approvalData = {
+            yvarprodprixcatalogue: Number(vData.yvarprodprixcatalogue),
+            yvarprodprixpromotion: vData.yvarprodprixpromotion
+                ? Number(vData.yvarprodprixpromotion)
+                : null,
+            yvarprodpromotiondatedeb: vData.yvarprodpromotiondatedeb || null,
+            yvarprodpromotiondatefin: vData.yvarprodpromotiondatefin || null,
+            yvarprodnbrjourlivraison: Number(vData.yvarprodnbrjourlivraison),
+            currencyId: Number(vData.currencyId),
+        };
+
+        try {
+            await approveVariantMutation.mutateAsync({ variantId, approvalData });
+        } catch (error) {
+            console.error('Failed to approve variant:', error);
+        }
+    };
+
+    const handleNeedsRevisionVariant = async (variantId: number) => {
+        try {
+            await needsRevisionVariantMutation.mutateAsync({ variantId, comments: "" });
+        } catch (error) {
+            console.error('Failed to mark variant as needs revision:', error);
+        }
+    };
+
+    const handleRejectVariant = async (variantId: number) => {
+        if (confirm('Are you sure you want to reject this variant?')) {
+            try {
+                await rejectVariantMutation.mutateAsync({ variantId });
+            } catch (error) {
+                console.error('Failed to reject variant:', error);
+            }
+        }
+    };
+
+    const handleBulkApproveVariants = async () => {
+        if (!variants) return;
+
+        const approvalDataMap: Record<number, any> = {};
+        const variantIds: number[] = [];
+
+        for (const variant of variants) {
+            const data = variantData[variant.yvarprodid];
+            if (data && variant.yvarprodstatut !== 'approved') {
+                variantIds.push(variant.yvarprodid);
+                approvalDataMap[variant.yvarprodid] = {
+                    yvarprodprixcatalogue: Number(data.yvarprodprixcatalogue),
+                    yvarprodprixpromotion: data.yvarprodprixpromotion
+                        ? Number(data.yvarprodprixpromotion)
+                        : null,
+                    yvarprodpromotiondatedeb: data.yvarprodpromotiondatedeb || null,
+                    yvarprodpromotiondatefin: data.yvarprodpromotiondatefin || null,
+                    yvarprodnbrjourlivraison: Number(data.yvarprodnbrjourlivraison),
+                    currencyId: Number(data.currencyId),
+                };
+            }
+        }
+
+        if (variantIds.length > 0) {
+            try {
+                await bulkApproveVariantsMutation.mutateAsync({ 
+                    variantIds, 
+                    approvalData: approvalDataMap 
+                });
+            } catch (error) {
+                console.error('Failed to bulk approve variants:', error);
+            }
+        }
+    };
+
+    const validateVariantData = (variantId: number): boolean => {
+        const data = variantData[variantId];
+        if (!data) return false;
+        
+        // Required fields validation
+        if (!data.yvarprodprixcatalogue ||
+            !data.yvarprodnbrjourlivraison ||
+            !data.currencyId) {
+            return false;
+        }
+
+        // Numeric validation
+        if (isNaN(Number(data.yvarprodprixcatalogue)) ||
+            isNaN(Number(data.yvarprodnbrjourlivraison)) ||
+            isNaN(Number(data.currencyId))) {
+            return false;
+        }
+
+        // If promotion price is provided, validate dates
+        if (data.yvarprodprixpromotion && 
+            (!data.yvarprodpromotiondatedeb || !data.yvarprodpromotiondatefin)) {
+            return false;
+        }
+
+        return true;
+    };
+
+    const getVariantStatusIcon = (status?: string) => {
+        switch (status) {
+            case "approved":
+                return <CheckCircle className="h-4 w-4 text-green-400" />;
+            case "needs_revision":
+                return <AlertTriangle className="h-4 w-4 text-orange-400" />;
+            case "rejected":
+                return <X className="h-4 w-4 text-red-400" />;
+            default:
+                return <Package className="h-4 w-4 text-yellow-400" />;
+        }
+    };
+
+    const getVariantStatusText = (status?: string) => {
+        switch (status) {
+            case "approved":
+                return "Approved";
+            case "needs_revision":
+                return "Needs Revision";
+            case "rejected":
+                return "Rejected";
+            default:
+                return "Pending";
+        }
+    };
+
+    const getVariantStatusColor = (status?: string) => {
+        switch (status) {
+            case "approved":
+                return "text-green-400 bg-green-400/10 border-green-400/20";
+            case "needs_revision":
+                return "text-orange-400 bg-orange-400/10 border-orange-400/20";
+            case "rejected":
+                return "text-red-400 bg-red-400/10 border-red-400/20";
+            default:
+                return "text-yellow-400 bg-yellow-400/10 border-yellow-400/20";
+        }
     };
 
     const getStatusIcon = (status: string) => {
@@ -478,12 +642,36 @@ export function ProductDetailsModal({
                                         <div className="text-gray-400">{t('admin.productApprovalsDetail.loadingVariants')}</div>
                                     ) : variants && variants.length > 0 ? (
                                         <div className="space-y-6">
+                                            {/* Bulk Actions Header */}
+                                            <div className="flex items-center justify-between p-4 bg-morpheus-blue-dark/30 rounded-lg border border-slate-600/30">
+                                                <div className="flex items-center gap-2">
+                                                    <Palette className="h-5 w-5 text-morpheus-gold-light" />
+                                                    <span className="text-white font-medium">
+                                                        {variants.length} Variant{variants.length !== 1 ? 's' : ''}
+                                                    </span>
+                                                </div>
+                                                <Button
+                                                    onClick={handleBulkApproveVariants}
+                                                    disabled={bulkApproveVariantsMutation.isPending || !variants.some(v => v.yvarprodstatut !== 'approved')}
+                                                    className="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white text-sm"
+                                                >
+                                                    <CheckCircle className="h-4 w-4 mr-2" />
+                                                    Approve All Pending
+                                                </Button>
+                                            </div>
+
                                             {variants.map((variant, index) => (
                                                 <div key={variant.yvarprodid} className="p-4 bg-morpheus-blue-dark/20 rounded-lg border border-slate-600/30">
-                                                    <h4 className="text-white font-medium mb-4 flex items-center gap-2">
-                                                        <Palette className="h-4 w-4" />
-                                                        {t('admin.productApprovalsDetail.variant')} {index + 1}: {variant.yvarprodintitule}
-                                                    </h4>
+                                                    <div className="flex items-center justify-between mb-4">
+                                                        <h4 className="text-white font-medium flex items-center gap-2">
+                                                            <Palette className="h-4 w-4" />
+                                                            {t('admin.productApprovalsDetail.variant')} {index + 1}: {variant.yvarprodintitule}
+                                                        </h4>
+                                                        <Badge className={`px-3 py-1 text-sm font-medium flex items-center gap-2 border ${getVariantStatusColor(variant.yvarprodstatut)}`}>
+                                                            {getVariantStatusIcon(variant.yvarprodstatut)}
+                                                            {getVariantStatusText(variant.yvarprodstatut)}
+                                                        </Badge>
+                                                    </div>
                                                     
                                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                         {/* Currency Selection */}
@@ -494,6 +682,7 @@ export function ProductDetailsModal({
                                                                 onChange={(e) => updateVariantField(variant.yvarprodid, 'currencyId', e.target.value)}
                                                                 className="w-full p-3 bg-morpheus-blue-dark/30 border border-slate-600 rounded-md text-white"
                                                                 required
+                                                                disabled={variant.yvarprodstatut === 'approved'}
                                                             >
                                                                 <option value="">Select Currency</option>
                                                                 {currencies?.map(currency => (
@@ -514,6 +703,7 @@ export function ProductDetailsModal({
                                                                 onChange={(e) => updateVariantField(variant.yvarprodid, 'yvarprodprixcatalogue', e.target.value)}
                                                                 className="bg-morpheus-blue-dark/30 border-slate-600 text-white"
                                                                 placeholder="0.00"
+                                                                disabled={variant.yvarprodstatut === 'approved'}
                                                             />
                                                         </div>
 
@@ -526,6 +716,7 @@ export function ProductDetailsModal({
                                                                 onChange={(e) => updateVariantField(variant.yvarprodid, 'yvarprodnbrjourlivraison', e.target.value)}
                                                                 className="bg-morpheus-blue-dark/30 border-slate-600 text-white"
                                                                 placeholder="7"
+                                                                disabled={variant.yvarprodstatut === 'approved'}
                                                             />
                                                         </div>
 
@@ -539,6 +730,7 @@ export function ProductDetailsModal({
                                                                 onChange={(e) => updateVariantField(variant.yvarprodid, 'yvarprodprixpromotion', e.target.value)}
                                                                 className="bg-morpheus-blue-dark/30 border-slate-600 text-white"
                                                                 placeholder="0.00"
+                                                                disabled={variant.yvarprodstatut === 'approved'}
                                                             />
                                                         </div>
 
@@ -550,6 +742,7 @@ export function ProductDetailsModal({
                                                                 value={variantData[variant.yvarprodid]?.yvarprodpromotiondatedeb || ''}
                                                                 onChange={(e) => updateVariantField(variant.yvarprodid, 'yvarprodpromotiondatedeb', e.target.value)}
                                                                 className="bg-morpheus-blue-dark/30 border-slate-600 text-white"
+                                                                disabled={variant.yvarprodstatut === 'approved'}
                                                             />
                                                         </div>
 
@@ -561,6 +754,7 @@ export function ProductDetailsModal({
                                                                 value={variantData[variant.yvarprodid]?.yvarprodpromotiondatefin || ''}
                                                                 onChange={(e) => updateVariantField(variant.yvarprodid, 'yvarprodpromotiondatefin', e.target.value)}
                                                                 className="bg-morpheus-blue-dark/30 border-slate-600 text-white"
+                                                                disabled={variant.yvarprodstatut === 'approved'}
                                                             />
                                                         </div>
                                                     </div>
@@ -571,6 +765,43 @@ export function ProductDetailsModal({
                                                         <span>{t('admin.productApprovalsDetail.size')}: {variant.xtaille?.xtailleintitule || t('admin.productApprovalsDetail.na')}</span>
                                                         <span>{t('admin.productApprovalsDetail.currency')}: {variant.xdevise?.xdeviseintitule || t('admin.productApprovalsDetail.na')}</span>
                                                     </div>
+
+                                                    {/* Individual Variant Actions */}
+                                                    {variant.yvarprodstatut !== 'approved' && (
+                                                        <div className="mt-4 flex gap-2">
+                                                            <Button
+                                                                onClick={() => handleApproveVariant(variant.yvarprodid)}
+                                                                disabled={
+                                                                    !validateVariantData(variant.yvarprodid) ||
+                                                                    approveVariantMutation.isPending
+                                                                }
+                                                                className="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white text-sm disabled:opacity-50"
+                                                            >
+                                                                <CheckCircle className="h-4 w-4 mr-2" />
+                                                                Approve Variant
+                                                            </Button>
+                                                            
+                                                            <Button
+                                                                variant="outline"
+                                                                onClick={() => handleNeedsRevisionVariant(variant.yvarprodid)}
+                                                                disabled={needsRevisionVariantMutation.isPending}
+                                                                className="border-orange-600 text-orange-400 hover:bg-orange-600/10 text-sm"
+                                                            >
+                                                                <AlertTriangle className="h-4 w-4 mr-2" />
+                                                                Needs Revision
+                                                            </Button>
+                                                            
+                                                            <Button
+                                                                variant="outline"
+                                                                onClick={() => handleRejectVariant(variant.yvarprodid)}
+                                                                disabled={rejectVariantMutation.isPending}
+                                                                className="border-red-600 text-red-400 hover:bg-red-600/10 text-sm"
+                                                            >
+                                                                <X className="h-4 w-4 mr-2" />
+                                                                Reject
+                                                            </Button>
+                                                        </div>
+                                                    )}
                                                 </div>
                                             ))}
                                         </div>

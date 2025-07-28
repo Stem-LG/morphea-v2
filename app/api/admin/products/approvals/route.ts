@@ -43,6 +43,9 @@ export async function GET(request: NextRequest) {
         *,
         yvarprod(
           *,
+          xcouleur(*),
+          xtaille(*),
+          xdevise(*),
           yobjet3d(*)
         )
       `)
