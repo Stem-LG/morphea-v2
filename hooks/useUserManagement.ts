@@ -1,9 +1,7 @@
 import { useState } from 'react'
 import {
   UserRole,
-  UpdateRoleRequest,
   UsersListResponse,
-  UpdateRoleResponse,
   ErrorResponse,
   Store,
   StoresListResponse,
@@ -68,39 +66,6 @@ export function useUserManagement() {
       } else {
         throw new Error('Invalid response format')
       }
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'An error occurred'
-      setError(errorMessage)
-      throw new Error(errorMessage)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const updateUserRole = async (email: string, role: 'user' | 'store_admin'): Promise<UpdateRoleResponse> => {
-    try {
-      setLoading(true)
-      setError(null)
-      
-      const requestBody: UpdateRoleRequest = { email, role }
-      
-      const response = await fetch('/api/admin/users/role', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestBody),
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        const errorData = data as ErrorResponse
-        throw new Error(errorData.error || 'Failed to update user role')
-      }
-
-      const successData = data as UpdateRoleResponse
-      return successData
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An error occurred'
       setError(errorMessage)
@@ -195,7 +160,6 @@ export function useUserManagement() {
 
   return {
     fetchUsers,
-    updateUserRole,
     fetchStores,
     assignStores,
     getUserStores,

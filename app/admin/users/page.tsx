@@ -58,10 +58,10 @@ function StoreAssignmentModal({ user, stores, isOpen, onClose, onAssign, loading
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[80vh] flex flex-col">
-                <h2 className="text-xl font-bold mb-4">
-                    {t("admin.users.assignBoutiques")} {user.email}
-                    <span className="text-sm font-normal text-gray-600 ml-2">
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-2xl max-h-[80vh] flex flex-col">
+                <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">
+                    {t("admin.users.manageStores")} {user.email}
+                    <span className="text-sm font-normal text-gray-600 dark:text-gray-300 ml-2">
                         ({selectedStoreIds.length} {t("admin.users.selected")})
                     </span>
                 </h2>
@@ -74,20 +74,20 @@ function StoreAssignmentModal({ user, stores, isOpen, onClose, onAssign, loading
                             placeholder={t("admin.users.searchBoutiques")}
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                         />
                         <div className="flex space-x-2">
                             <button
                                 type="button"
                                 onClick={selectAllStores}
-                                className="text-sm bg-green-100 hover:bg-green-200 text-green-800 px-3 py-1 rounded"
+                                className="text-sm bg-green-100 dark:bg-green-900/30 hover:bg-green-200 dark:hover:bg-green-900/50 text-green-800 dark:text-green-300 px-3 py-1 rounded transition-colors"
                             >
                                 {t("admin.users.selectAll")} ({filteredStores.length})
                             </button>
                             <button
                                 type="button"
                                 onClick={clearAllStores}
-                                className="text-sm bg-red-100 hover:bg-red-200 text-red-800 px-3 py-1 rounded"
+                                className="text-sm bg-red-100 dark:bg-red-900/30 hover:bg-red-200 dark:hover:bg-red-900/50 text-red-800 dark:text-red-300 px-3 py-1 rounded transition-colors"
                             >
                                 {t("admin.users.clearAll")}
                             </button>
@@ -95,9 +95,9 @@ function StoreAssignmentModal({ user, stores, isOpen, onClose, onAssign, loading
                     </div>
 
                     {/* Store list */}
-                    <div className="flex-1 overflow-y-auto border border-gray-200 rounded-md p-3 space-y-2 max-h-96">
+                    <div className="flex-1 overflow-y-auto border border-gray-200 dark:border-gray-600 rounded-md p-3 space-y-2 max-h-96 bg-white dark:bg-gray-700">
                         {filteredStores.length === 0 ? (
-                            <div className="text-center text-gray-500 py-4">
+                            <div className="text-center text-gray-500 dark:text-gray-400 py-4">
                                 {searchTerm ? t("admin.users.noBoutiquesFound") : t("admin.users.noBoutiquesAvailable")}
                             </div>
                         ) : (
@@ -106,24 +106,24 @@ function StoreAssignmentModal({ user, stores, isOpen, onClose, onAssign, loading
                                     key={store.id}
                                     className={`flex items-start space-x-3 p-3 rounded-lg border cursor-pointer transition-colors ${
                                         selectedStoreIds.includes(store.id)
-                                            ? "bg-blue-50 border-blue-200"
-                                            : "bg-gray-50 border-gray-200 hover:bg-gray-100"
+                                            ? "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700"
+                                            : "bg-gray-50 dark:bg-gray-600 border-gray-200 dark:border-gray-500 hover:bg-gray-100 dark:hover:bg-gray-500"
                                     }`}
                                 >
                                     <input
                                         type="checkbox"
                                         checked={selectedStoreIds.includes(store.id)}
                                         onChange={() => toggleStore(store.id)}
-                                        className="mt-1 rounded text-blue-600 focus:ring-blue-500"
+                                        className="mt-1 rounded text-blue-600 focus:ring-blue-500 dark:bg-gray-600 dark:border-gray-500"
                                     />
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center justify-between">
-                                            <h4 className="font-medium text-gray-900 truncate">{store.name}</h4>
-                                            <span className="text-sm text-gray-500 font-mono">{store.code}</span>
+                                            <h4 className="font-medium text-gray-900 dark:text-white truncate">{store.name}</h4>
+                                            <span className="text-sm text-gray-500 dark:text-gray-400 font-mono">{store.code}</span>
                                         </div>
-                                        <p className="text-sm text-gray-600 mt-1">{store.address}</p>
+                                        <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">{store.address}</p>
                                         {store.mallId && (
-                                            <p className="text-xs text-gray-500 mt-1">Mall ID: {store.mallId}</p>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Mall ID: {store.mallId}</p>
                                         )}
                                     </div>
                                 </label>
@@ -132,8 +132,8 @@ function StoreAssignmentModal({ user, stores, isOpen, onClose, onAssign, loading
                     </div>
 
                     {/* Action buttons */}
-                    <div className="flex justify-between items-center mt-4 pt-4 border-t">
-                        <div className="text-sm text-gray-600">
+                    <div className="flex justify-between items-center mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
+                        <div className="text-sm text-gray-600 dark:text-gray-300">
                             {selectedStoreIds.length}{" "}
                             {selectedStoreIds.length !== 1
                                 ? t("admin.users.boutiquesSelected")
@@ -154,12 +154,12 @@ function StoreAssignmentModal({ user, stores, isOpen, onClose, onAssign, loading
                                 className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
                             >
                                 {loading
-                                    ? t("admin.users.assigning")
-                                    : `${t("admin.users.assign")} ${selectedStoreIds.length} ${
+                                    ? t("admin.users.updating")
+                                    : `${t("admin.users.update")} (${selectedStoreIds.length} ${
                                           selectedStoreIds.length !== 1
                                               ? t("admin.users.boutiquesSelected")
                                               : t("admin.users.boutiqueSelected")
-                                      }`}
+                                      })`}
                             </button>
                         </div>
                     </div>
@@ -173,7 +173,6 @@ export default function UsersManagementPage() {
     const { t } = useLanguage();
     const [users, setUsers] = useState<UserRole[]>([]);
     const [stores, setStores] = useState<Store[]>([]);
-    const [updating, setUpdating] = useState<string | null>(null);
     const [selectedUser, setSelectedUser] = useState<UserRole | null>(null);
     const [showStoreModal, setShowStoreModal] = useState(false);
 
@@ -188,7 +187,7 @@ export default function UsersManagementPage() {
     const [serverTotalPages, setServerTotalPages] = useState(0);
     const [isLoadingUsers, setIsLoadingUsers] = useState(false);
 
-    const { fetchUsers, updateUserRole, fetchStores, assignStores, loading, error, clearError } = useUserManagement();
+    const { fetchUsers, fetchStores, assignStores, loading, error, clearError } = useUserManagement();
 
     // Reset to first page when filters change
     useEffect(() => {
@@ -220,19 +219,6 @@ export default function UsersManagementPage() {
         }
     }, [currentPage, itemsPerPage, emailFilter, roleFilter]);
 
-    // Update user role
-    const handleUpdateUserRole = async (email: string, newRole: "user" | "store_admin") => {
-        try {
-            setUpdating(email);
-            await updateUserRole(email, newRole);
-            await loadData(); // Refresh data
-        } catch (err) {
-            console.error("Error updating user role:", err);
-        } finally {
-            setUpdating(null);
-        }
-    };
-
     // Handle store assignment
     const handleAssignStores = async (email: string, storeIds: number[]) => {
         try {
@@ -256,32 +242,32 @@ export default function UsersManagementPage() {
 
     if ((loading || isLoadingUsers) && users.length === 0) {
         return (
-            <div className="p-6">
-                <h1 className="text-2xl font-bold mb-6">{t("admin.userManagement")}</h1>
-                <div className="text-center">{t("common.loading")}</div>
+            <div className="p-6 bg-white dark:bg-gray-900 min-h-screen">
+                <h1 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">{t("admin.userManagement")}</h1>
+                <div className="text-center text-gray-600 dark:text-gray-300">{t("common.loading")}</div>
             </div>
         );
     }
 
     return (
-            <div className="p-6">
-                <h1 className="text-2xl font-bold mb-6">{t("admin.userManagement")}</h1>
+            <div className="p-6 bg-white dark:bg-gray-900 min-h-screen">
+                <h1 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">{t("admin.userManagement")}</h1>
 
                 {error && (
-                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                    <div className="bg-red-100 dark:bg-red-900/20 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-300 px-4 py-3 rounded mb-4">
                         {error}
-                        <button onClick={clearError} className="ml-2 text-red-900 hover:text-red-700">
+                        <button onClick={clearError} className="ml-2 text-red-900 dark:text-red-200 hover:text-red-700 dark:hover:text-red-400">
                             ×
                         </button>
                     </div>
                 )}
 
                 {/* Filter and Search Controls */}
-                <div className="bg-white shadow-md rounded-lg p-4 mb-4">
+                <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-4 mb-4 border dark:border-gray-700">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
                         {/* Email Filter */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 {t("admin.users.filterByEmail")}
                             </label>
                             <input
@@ -289,19 +275,19 @@ export default function UsersManagementPage() {
                                 value={emailFilter}
                                 onChange={(e) => setEmailFilter(e.target.value)}
                                 placeholder={t("admin.users.searchByEmail")}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                             />
                         </div>
 
                         {/* Role Filter */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 {t("admin.users.filterByRole")}
                             </label>
                             <select
                                 value={roleFilter}
                                 onChange={(e) => setRoleFilter(e.target.value)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                             >
                                 <option value="">{t("admin.users.allRoles")}</option>
                                 <option value="admin">{t("admin.users.admin")}</option>
@@ -312,7 +298,7 @@ export default function UsersManagementPage() {
 
                         {/* Items per page */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 {t("admin.users.itemsPerPage")}
                             </label>
                             <select
@@ -321,7 +307,7 @@ export default function UsersManagementPage() {
                                     setItemsPerPage(Number(e.target.value));
                                     setCurrentPage(1);
                                 }}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                             >
                                 <option value={5}>5</option>
                                 <option value={10}>10</option>
@@ -338,7 +324,7 @@ export default function UsersManagementPage() {
                                     setRoleFilter("");
                                     setCurrentPage(1);
                                 }}
-                                className="w-full bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+                                className="w-full bg-gray-500 hover:bg-gray-700 dark:bg-gray-600 dark:hover:bg-gray-700 text-white font-bold py-2 px-4 rounded transition-colors"
                             >
                                 {t("admin.users.clearFilters")}
                             </button>
@@ -346,51 +332,51 @@ export default function UsersManagementPage() {
                     </div>
 
                     {/* Results Summary */}
-                    <div className="mt-4 text-sm text-gray-600">
+                    <div className="mt-4 text-sm text-gray-600 dark:text-gray-300">
                         {t("admin.users.showing")} {(currentPage - 1) * itemsPerPage + 1}-
                         {Math.min(currentPage * itemsPerPage, totalUsers)} {t("admin.users.of")} {totalUsers}{" "}
                         {t("admin.users.results")}
                     </div>
                 </div>
 
-                <div className="bg-white shadow-md rounded-lg overflow-hidden">
-                    <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
+                <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden border dark:border-gray-700">
+                    <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                        <thead className="bg-gray-50 dark:bg-gray-700">
                             <tr>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                     {t("admin.users.email")}
                                 </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                     {t("admin.users.roles")}
                                 </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                     {t("admin.users.assignedStores")}
                                 </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                     {t("admin.users.createdAt")}
                                 </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                     {t("admin.users.actions")}
                                 </th>
                             </tr>
                         </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
+                        <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                             {users.map((user) => (
-                                <tr key={user.id}>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
                                         {user.email}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
                                         <div className="flex flex-wrap gap-1">
                                             {user.roles.map((role) => (
                                                 <span
                                                     key={role}
                                                     className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                                                         role === "admin"
-                                                            ? "bg-red-100 text-red-800"
+                                                            ? "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300"
                                                             : role === "store_admin"
-                                                            ? "bg-blue-100 text-blue-800"
-                                                            : "bg-gray-100 text-gray-800"
+                                                            ? "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300"
+                                                            : "bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300"
                                                     }`}
                                                 >
                                                     {role}
@@ -398,54 +384,34 @@ export default function UsersManagementPage() {
                                             ))}
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4 text-sm text-gray-500">
+                                    <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-300">
                                         {user.store_details && user.store_details.length > 0 ? (
                                             <div className="space-y-1">
                                                 {user.store_details.map((store) => (
                                                     <div key={store.id} className="text-xs">
-                                                        <span className="font-medium">{store.name}</span> ({store.code})
+                                                        <span className="font-medium text-gray-900 dark:text-white">{store.name}</span> 
+                                                        <span className="text-gray-600 dark:text-gray-400">({store.code})</span>
                                                     </div>
                                                 ))}
                                             </div>
                                         ) : (
-                                            <span className="text-gray-400">{t("admin.users.noStoresAssigned")}</span>
+                                            <span className="text-gray-400 dark:text-gray-500">{t("admin.users.noStoresAssigned")}</span>
                                         )}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
                                         {new Date(user.created_at).toLocaleDateString()}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         {!user.roles.includes("admin") && (
                                             <div className="flex space-x-2">
-                                                {user.roles.includes("store_admin") ? (
-                                                    <>
-                                                        <button
-                                                            onClick={() => handleUpdateUserRole(user.email, "user")}
-                                                            disabled={updating === user.email}
-                                                            className="text-red-600 hover:text-red-900 disabled:opacity-50"
-                                                        >
-                                                            {updating === user.email
-                                                                ? t("admin.users.updating")
-                                                                : t("admin.users.removeStoreAdmin")}
-                                                        </button>
-                                                        <button
-                                                            onClick={() => openStoreModal(user)}
-                                                            className="text-green-600 hover:text-green-900"
-                                                        >
-                                                            {t("admin.users.assignStores")}
-                                                        </button>
-                                                    </>
-                                                ) : (
-                                                    <button
-                                                        onClick={() => handleUpdateUserRole(user.email, "store_admin")}
-                                                        disabled={updating === user.email}
-                                                        className="text-blue-600 hover:text-blue-900 disabled:opacity-50"
-                                                    >
-                                                        {updating === user.email
-                                                            ? t("admin.users.updating")
-                                                            : t("admin.users.makeStoreAdmin")}
-                                                    </button>
-                                                )}
+                                                <button
+                                                    onClick={() => openStoreModal(user)}
+                                                    className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
+                                                >
+                                                    {user.store_details && user.store_details.length > 0
+                                                        ? t("admin.users.manageStores")
+                                                        : t("admin.users.assignStores")}
+                                                </button>
                                             </div>
                                         )}
                                     </td>
@@ -457,26 +423,26 @@ export default function UsersManagementPage() {
 
                 {/* Pagination Controls */}
                 {serverTotalPages > 1 && (
-                    <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6 mt-4">
+                    <div className="bg-white dark:bg-gray-800 px-4 py-3 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 sm:px-6 mt-4 rounded-lg">
                         <div className="flex-1 flex justify-between sm:hidden">
                             <button
                                 onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                                 disabled={currentPage === 1 || isLoadingUsers}
-                                className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             >
                                 {t("admin.users.previous")}
                             </button>
                             <button
                                 onClick={() => setCurrentPage(Math.min(serverTotalPages, currentPage + 1))}
                                 disabled={currentPage === serverTotalPages || isLoadingUsers}
-                                className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             >
                                 {t("admin.users.next")}
                             </button>
                         </div>
                         <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                             <div>
-                                <p className="text-sm text-gray-700">
+                                <p className="text-sm text-gray-700 dark:text-gray-300">
                                     {t("admin.users.page")} {currentPage} {t("admin.users.of")} {serverTotalPages} -{" "}
                                     {t("admin.users.showing")} {(currentPage - 1) * itemsPerPage + 1}-
                                     {Math.min(currentPage * itemsPerPage, totalUsers)} {t("admin.users.of")}{" "}
@@ -491,7 +457,7 @@ export default function UsersManagementPage() {
                                     <button
                                         onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                                         disabled={currentPage === 1 || isLoadingUsers}
-                                        className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm font-medium text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                                     >
                                         <span className="sr-only">{t("admin.users.previous")}</span>
                                         <svg
@@ -521,10 +487,10 @@ export default function UsersManagementPage() {
                                                     key={page}
                                                     onClick={() => setCurrentPage(page)}
                                                     disabled={isLoadingUsers}
-                                                    className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium disabled:opacity-50 ${
+                                                    className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium disabled:opacity-50 transition-colors ${
                                                         page === currentPage
-                                                            ? "z-10 bg-blue-50 border-blue-500 text-blue-600"
-                                                            : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
+                                                            ? "z-10 bg-blue-50 dark:bg-blue-900/20 border-blue-500 dark:border-blue-600 text-blue-600 dark:text-blue-400"
+                                                            : "bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600"
                                                     }`}
                                                 >
                                                     {page}
@@ -534,7 +500,7 @@ export default function UsersManagementPage() {
                                             return (
                                                 <span
                                                     key={page}
-                                                    className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700"
+                                                    className="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300"
                                                 >
                                                     ...
                                                 </span>
@@ -546,7 +512,7 @@ export default function UsersManagementPage() {
                                     <button
                                         onClick={() => setCurrentPage(Math.min(serverTotalPages, currentPage + 1))}
                                         disabled={currentPage === serverTotalPages || isLoadingUsers}
-                                        className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm font-medium text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                                     >
                                         <span className="sr-only">{t("admin.users.next")}</span>
                                         <svg
@@ -573,7 +539,7 @@ export default function UsersManagementPage() {
                     <button
                         onClick={loadData}
                         disabled={loading}
-                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
+                        className="bg-blue-500 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-bold py-2 px-4 rounded disabled:opacity-50 transition-colors"
                     >
                         {loading ? t("admin.users.refreshing") : t("admin.users.refreshData")}
                     </button>

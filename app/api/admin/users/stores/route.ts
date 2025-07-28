@@ -77,16 +77,9 @@ export async function PUT(request: NextRequest) {
       )
     }
 
-    // Check if user has store_admin role
+    // Get current metadata and roles
     const currentMetadata = targetUser.app_metadata || {}
     const currentRoles = currentMetadata.roles || ['user']
-    
-    if (!currentRoles.includes('store_admin')) {
-      return NextResponse.json(
-        { error: 'User must have store_admin role to be assigned stores' },
-        { status: 400 }
-      )
-    }
 
     // Verify that all store IDs exist in the database
     if (validStoreIds.length > 0) {
@@ -115,13 +108,31 @@ export async function PUT(request: NextRequest) {
       }
     }
 
-    // Update user metadata with assigned stores
+    // Determine new roles based on store assignments
+    let newRoles = [...currentRoles]
+    
+    if (validStoreIds.length > 0) {
+      // User has stores assigned, ensure they have store_admin role
+      if (!newRoles.includes('store_admin')) {
+        newRoles.push('store_admin')
+      }
+    } else {
+      // User has no stores assigned, remove store_admin role if present
+      newRoles = newRoles.filter(role => role !== 'store_admin')
+      // Ensure user role is present
+      if (!newRoles.includes('user')) {
+        newRoles.push('user')
+      }
+    }
+
+    // Update user metadata with assigned stores and updated roles
     const { data: updatedUser, error: updateError } = await adminSupabase.auth.admin.updateUserById(
       targetUser.id,
       {
         app_metadata: {
           ...currentMetadata,
-          assigned_stores: validStoreIds
+          assigned_stores: validStoreIds,
+          roles: newRoles
         }
       }
     )
@@ -155,7 +166,7 @@ export async function PUT(request: NextRequest) {
       user: {
         id: updatedUser.user.id,
         email: updatedUser.user.email,
-        roles: currentRoles,
+        roles: newRoles,
         assigned_stores: validStoreIds,
         store_details: assignedStoreDetails
       }
