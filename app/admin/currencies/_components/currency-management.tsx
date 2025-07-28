@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import {
     Plus,
     Edit,
@@ -13,10 +14,12 @@ import {
     Search,
     CheckCircle,
     X,
-    Save
+    Save,
+    AlertTriangle,
+    Package
 } from "lucide-react";
 import {
-    useCurrencies,
+    useCurrenciesWithStats,
     useCreateCurrency,
     useUpdateCurrency,
     useDeleteCurrency
@@ -42,7 +45,7 @@ export function CurrencyManagement() {
         xdeviseboolautorisepaiement: "false"
     });
 
-    const { data: currencies, isLoading } = useCurrencies();
+    const { data: currencies, isLoading } = useCurrenciesWithStats();
     const createCurrencyMutation = useCreateCurrency();
     const updateCurrencyMutation = useUpdateCurrency();
     const deleteCurrencyMutation = useDeleteCurrency();
@@ -102,8 +105,14 @@ export function CurrencyManagement() {
                 await deleteCurrencyMutation.mutateAsync(currencyId);
             } catch (error) {
                 console.error('Failed to delete currency:', error);
+                const errorMessage = error instanceof Error ? error.message : 'Failed to delete currency';
+                alert(errorMessage);
             }
         }
+    };
+
+    const getVariantCount = (currency: any) => {
+        return currency.yvarprod?.[0]?.count || 0;
     };
 
     const validateForm = () => {
@@ -145,6 +154,55 @@ export function CurrencyManagement() {
                     <Plus className="h-4 w-4 mr-2" />
                     Add Currency
                 </Button>
+            </div>
+
+            {/* Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Card className="bg-gradient-to-br from-morpheus-blue-dark/40 to-morpheus-blue-light/40 border-slate-700/50">
+                    <CardContent className="p-4">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-morpheus-gold-light/20 rounded-lg">
+                                <DollarSign className="h-5 w-5 text-morpheus-gold-light" />
+                            </div>
+                            <div>
+                                <p className="text-sm text-gray-400">Total Currencies</p>
+                                <p className="text-2xl font-bold text-white">{currencies?.length || 0}</p>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+                
+                <Card className="bg-gradient-to-br from-morpheus-blue-dark/40 to-morpheus-blue-light/40 border-slate-700/50">
+                    <CardContent className="p-4">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-green-500/20 rounded-lg">
+                                <Package className="h-5 w-5 text-green-400" />
+                            </div>
+                            <div>
+                                <p className="text-sm text-gray-400">Currencies in Use</p>
+                                <p className="text-2xl font-bold text-white">
+                                    {currencies?.filter(curr => getVariantCount(curr) > 0).length || 0}
+                                </p>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <Card className="bg-gradient-to-br from-morpheus-blue-dark/40 to-morpheus-blue-light/40 border-slate-700/50">
+                    <CardContent className="p-4">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-blue-500/20 rounded-lg">
+                                <CheckCircle className="h-5 w-5 text-blue-400" />
+                            </div>
+                            <div>
+                                <p className="text-sm text-gray-400">Payment Enabled</p>
+                                <p className="text-2xl font-bold text-white">
+                                    {currencies?.filter(curr => curr.xdeviseboolautorisepaiement === "Y").length || 0}
+                                </p>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
             </div>
 
             {/* Search */}
@@ -272,72 +330,98 @@ export function CurrencyManagement() {
                 </div>
             ) : (
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                    {filteredCurrencies.map((currency) => (
-                        <Card
-                            key={currency.xdeviseid}
-                            className="bg-gradient-to-br from-morpheus-blue-dark/40 to-morpheus-blue-light/40 border-slate-700/50 shadow-xl hover:shadow-2xl transition-all duration-300"
-                        >
-                            <CardHeader className="pb-3">
-                                <div className="flex items-start justify-between">
-                                    <CardTitle className="text-white text-lg">
-                                        {currency.xdeviseintitule}
-                                    </CardTitle>
-                                    <div className="flex items-center gap-2">
-                                        {currency.xdeviseboolautorisepaiement === "Y" && (
-                                            <Badge className="px-2 py-1 text-xs font-medium flex items-center gap-1 border text-green-400 bg-green-400/10 border-green-400/20">
-                                                <CheckCircle className="h-3 w-3" />
-                                                Payment
-                                            </Badge>
-                                        )}
+                    {filteredCurrencies.map((currency) => {
+                        const variantCount = getVariantCount(currency);
+                        const isInUse = variantCount > 0;
+                        
+                        return (
+                            <Card
+                                key={currency.xdeviseid}
+                                className="bg-gradient-to-br from-morpheus-blue-dark/40 to-morpheus-blue-light/40 border-slate-700/50 shadow-xl hover:shadow-2xl transition-all duration-300"
+                            >
+                                <CardHeader className="pb-3">
+                                    <div className="flex items-start justify-between">
+                                        <CardTitle className="text-white text-lg">
+                                            {currency.xdeviseintitule}
+                                        </CardTitle>
+                                        <div className="flex items-center gap-2">
+                                            {currency.xdeviseboolautorisepaiement === "Y" && (
+                                                <Badge className="px-2 py-1 text-xs font-medium flex items-center gap-1 border text-green-400 bg-green-400/10 border-green-400/20">
+                                                    <CheckCircle className="h-3 w-3" />
+                                                    Payment
+                                                </Badge>
+                                            )}
+                                            {isInUse && (
+                                                <Badge className="px-2 py-1 text-xs font-medium flex items-center gap-1 border text-blue-400 bg-blue-400/10 border-blue-400/20">
+                                                    <Package className="h-3 w-3" />
+                                                    {variantCount} variants
+                                                </Badge>
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
-                            </CardHeader>
-                            
-                            <CardContent className="space-y-3">
-                                <div className="grid grid-cols-2 gap-3 text-sm">
-                                    <div>
-                                        <span className="text-gray-400">Alpha Code:</span>
-                                        <p className="text-white font-medium">{currency.xdevisecodealpha}</p>
+                                </CardHeader>
+                                
+                                <CardContent className="space-y-3">
+                                    <div className="grid grid-cols-2 gap-3 text-sm">
+                                        <div>
+                                            <span className="text-gray-400">Alpha Code:</span>
+                                            <p className="text-white font-medium">{currency.xdevisecodealpha}</p>
+                                        </div>
+                                        <div>
+                                            <span className="text-gray-400">Numeric:</span>
+                                            <p className="text-white font-medium">{currency.xdevisecodenum}</p>
+                                        </div>
+                                        <div>
+                                            <span className="text-gray-400">Decimals:</span>
+                                            <p className="text-white font-medium">{currency.xdevisenbrdec}</p>
+                                        </div>
+                                        <div>
+                                            <span className="text-gray-400">Status:</span>
+                                            <p className={`font-medium ${isInUse ? "text-green-400" : "text-gray-400"}`}>
+                                                {isInUse ? `Active (${variantCount} variants)` : "Unused"}
+                                            </p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <span className="text-gray-400">Numeric:</span>
-                                        <p className="text-white font-medium">{currency.xdevisecodenum}</p>
-                                    </div>
-                                    <div>
-                                        <span className="text-gray-400">Decimals:</span>
-                                        <p className="text-white font-medium">{currency.xdevisenbrdec}</p>
-                                    </div>
-                                    <div>
-                                        <span className="text-gray-400">Status:</span>
-                                        <p className={`font-medium ${currency.xdeviseboolautorisepaiement === "Y" ? "text-green-400" : "text-gray-400"}`}>
-                                            {currency.xdeviseboolautorisepaiement === "Y" ? "Active" : "Inactive"}
-                                        </p>
-                                    </div>
-                                </div>
 
-                                <div className="flex gap-2 pt-2">
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => handleEdit(currency)}
-                                        className="flex-1 border-slate-600 text-white hover:bg-slate-700/50"
-                                    >
-                                        <Edit className="h-4 w-4 mr-1" />
-                                        Edit
-                                    </Button>
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => handleDelete(currency.xdeviseid)}
-                                        disabled={deleteCurrencyMutation.isPending}
-                                        className="px-3 border-red-600 text-red-400 hover:bg-red-600/10"
-                                    >
-                                        <Trash2 className="h-4 w-4" />
-                                    </Button>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    ))}
+                                    <div className="flex gap-2 pt-2">
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => handleEdit(currency)}
+                                            className="flex-1 border-slate-600 text-white hover:bg-slate-700/50"
+                                        >
+                                            <Edit className="h-4 w-4 mr-1" />
+                                            Edit
+                                        </Button>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <span className={isInUse ? "cursor-not-allowed" : ""}>
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        onClick={() => handleDelete(currency.xdeviseid)}
+                                                        disabled={deleteCurrencyMutation.isPending || isInUse}
+                                                        className={`px-3 ${isInUse 
+                                                            ? "border-gray-600 text-gray-500 cursor-not-allowed" 
+                                                            : "border-red-600 text-red-400 hover:bg-red-600/10"
+                                                        }`}
+                                                    >
+                                                        {isInUse ? <AlertTriangle className="h-4 w-4" /> : <Trash2 className="h-4 w-4" />}
+                                                    </Button>
+                                                </span>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                <p>{isInUse 
+                                                    ? `Cannot delete: currency is used by ${variantCount} product variant${variantCount !== 1 ? 's' : ''}` 
+                                                    : "Delete currency"
+                                                }</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        );
+                    })}
                 </div>
             )}
         </div>

@@ -3,6 +3,7 @@ import { createAdminClient } from '@/lib/supabase-admin'
 import { createClient } from '@/lib/server'
 
 // Helper function to check if user has admin role
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function checkAdminRole(request: NextRequest) {
   const supabase = await createClient()
   
@@ -19,15 +20,6 @@ async function checkAdminRole(request: NextRequest) {
   return { isAdmin, error: null, user }
 }
 
-interface VariantApprovalData {
-    yvarprodprixcatalogue: number;
-    yvarprodprixpromotion: number | null;
-    yvarprodpromotiondatedeb: string | null;
-    yvarprodpromotiondatefin: string | null;
-    yvarprodnbrjourlivraison: number;
-    currencyId: number;
-}
-
 // PATCH /api/admin/products/variants/approvals - Approve, reject, or mark for revision a variant
 export async function PATCH(request: NextRequest) {
   try {
@@ -42,7 +34,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { variantId, action, approvalData, comments, variants } = body
+    const { variantId, action, approvalData, variants } = body
 
     if (!action) {
       return NextResponse.json(

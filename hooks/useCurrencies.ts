@@ -93,6 +93,7 @@ export function useCreateCurrency() {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['currencies'] });
+            queryClient.invalidateQueries({ queryKey: ['currencies-with-stats'] });
         },
     });
 }
@@ -134,6 +135,7 @@ export function useUpdateCurrency() {
         },
         onSuccess: (data) => {
             queryClient.invalidateQueries({ queryKey: ['currencies'] });
+            queryClient.invalidateQueries({ queryKey: ['currencies-with-stats'] });
             queryClient.invalidateQueries({ queryKey: ['currency', data.xdeviseid] });
         },
     });
@@ -146,6 +148,23 @@ export function useDeleteCurrency() {
 
     return useMutation({
         mutationFn: async (currencyId: number) => {
+            // First check if currency is being used by any product variants
+            const { data: variantsUsingCurrency, error: checkError } = await supabase
+                .schema("morpheus")
+                .from("yvarprod")
+                .select("yvarprodid")
+                .eq("xdeviseidfk", currencyId)
+                .limit(1);
+
+            if (checkError) {
+                console.error("Error checking currency usage:", checkError);
+                throw checkError;
+            }
+
+            if (variantsUsingCurrency && variantsUsingCurrency.length > 0) {
+                throw new Error("Cannot delete currency: it is being used by one or more product variants");
+            }
+
             const { error } = await supabase
                 .schema("morpheus")
                 .from("xdevise")
@@ -161,6 +180,7 @@ export function useDeleteCurrency() {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['currencies'] });
+            queryClient.invalidateQueries({ queryKey: ['currencies-with-stats'] });
         },
     });
 }
@@ -185,6 +205,32 @@ export function usePaymentCurrencies() {
             }
 
             return data as Currency[];
+        },
+    });
+}
+
+// Hook to get currencies with usage stats
+export function useCurrenciesWithStats() {
+    const supabase = createClient();
+
+    return useQuery({
+        queryKey: ['currencies-with-stats'],
+        queryFn: async () => {
+            const { data, error } = await supabase
+                .schema("morpheus")
+                .from("xdevise")
+                .select(`
+                    *,
+                    yvarprod(count)
+                `)
+                .order("xdeviseintitule", { ascending: true });
+
+            if (error) {
+                console.error("Error fetching currencies with stats:", error);
+                throw error;
+            }
+
+            return data as (Currency & { yvarprod: { count: number }[] })[];
         },
     });
 }
