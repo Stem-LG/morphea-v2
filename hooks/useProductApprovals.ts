@@ -7,6 +7,7 @@ type Product = Database['morpheus']['Tables']['yprod']['Row'];
 
 interface ApprovalData {
     categoryId: number;
+    infoactionId: number;
     variants: {
         yvarprodid: number;
         yvarprodprixcatalogue: number;

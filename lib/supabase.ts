@@ -574,8 +574,8 @@ export type Database = {
           sysdate: string | null
           sysuser: string | null
           yinfospotactionidfk: number
-          yinfospotsaxexyaw: number
-          yinfospotsaxeypitch: number
+          yinfospotsaxexyaw: string
+          yinfospotsaxeypitch: string
           yinfospotsid: number
           yinfospotstext: string
           yinfospotstitle: string
@@ -587,8 +587,8 @@ export type Database = {
           sysdate?: string | null
           sysuser?: string | null
           yinfospotactionidfk: number
-          yinfospotsaxexyaw: number
-          yinfospotsaxeypitch: number
+          yinfospotsaxexyaw: string
+          yinfospotsaxeypitch: string
           yinfospotsid: number
           yinfospotstext: string
           yinfospotstitle: string
@@ -600,8 +600,8 @@ export type Database = {
           sysdate?: string | null
           sysuser?: string | null
           yinfospotactionidfk?: number
-          yinfospotsaxexyaw?: number
-          yinfospotsaxeypitch?: number
+          yinfospotsaxexyaw?: string
+          yinfospotsaxeypitch?: string
           yinfospotsid?: number
           yinfospotstext?: string
           yinfospotstitle?: string
@@ -904,6 +904,7 @@ export type Database = {
           sysuser: string | null
           xcategprodidfk: number | null
           ydesignidfk: number
+          yinfospotactionsidfk: number | null
           yprodcode: string
           yproddetailstech: string
           yprodid: number
@@ -918,6 +919,7 @@ export type Database = {
           sysuser?: string | null
           xcategprodidfk?: number | null
           ydesignidfk: number
+          yinfospotactionsidfk?: number | null
           yprodcode: string
           yproddetailstech: string
           yprodid: number
@@ -932,6 +934,7 @@ export type Database = {
           sysuser?: string | null
           xcategprodidfk?: number | null
           ydesignidfk?: number
+          yinfospotactionsidfk?: number | null
           yprodcode?: string
           yproddetailstech?: string
           yprodid?: number
@@ -953,6 +956,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "ydesign"
             referencedColumns: ["ydesignid"]
+          },
+          {
+            foreignKeyName: "yprod_yinfospotactionsidfk_fkey"
+            columns: ["yinfospotactionsidfk"]
+            isOneToOne: false
+            referencedRelation: "yinfospotactions"
+            referencedColumns: ["yinfospotactionsid"]
           },
         ]
       }

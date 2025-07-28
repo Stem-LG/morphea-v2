@@ -35,6 +35,7 @@ import { useLanguage } from "@/hooks/useLanguage";
 import { useCategories } from "@/hooks/useCategories";
 import { useProductVariants } from "@/hooks/useProductVariants";
 import { useCurrencies } from "@/hooks/useCurrencies";
+import { useInfoactions } from "@/hooks/useInfoactions";
 import { 
     useApproveVariant, 
     useNeedsRevisionVariant, 
@@ -52,6 +53,7 @@ interface ProductDetailsModalProps {
 
 interface ApprovalData {
     categoryId: number;
+    infoactionId: number;
     variants: {
         yvarprodid: number;
         yvarprodprixcatalogue: number;
@@ -75,6 +77,7 @@ export function ProductDetailsModal({
     
     // Approval form state
     const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
+    const [selectedInfoactionId, setSelectedInfoactionId] = useState<number | null>(null);
     const [variantData, setVariantData] = useState<Record<number, {
         yvarprodprixcatalogue: string;
         yvarprodprixpromotion: string;
@@ -88,6 +91,7 @@ export function ProductDetailsModal({
     const { data: categories, isLoading: categoriesLoading } = useCategories();
     const { data: variants, isLoading: variantsLoading } = useProductVariants(product.yprodid);
     const { data: currencies, isLoading: currenciesLoading } = useCurrencies();
+    const { actions: infoactions, loading: infoactionsLoading } = useInfoactions();
 
     // Variant approval mutations
     const approveVariantMutation = useApproveVariant();
@@ -124,7 +128,7 @@ export function ProductDetailsModal({
     };
 
     const validateApprovalData = (): boolean => {
-        if (!selectedCategoryId) return false;
+        if (!selectedCategoryId || !selectedInfoactionId) return false;
         
         if (!variants || variants.length === 0) return false;
 
@@ -164,6 +168,7 @@ export function ProductDetailsModal({
 
         const approvalData: ApprovalData = {
             categoryId: selectedCategoryId!,
+            infoactionId: selectedInfoactionId!,
             variants: variants!.map(variant => ({
                 yvarprodid: variant.yvarprodid,
                 yvarprodprixcatalogue: Number(variantData[variant.yvarprodid].yvarprodprixcatalogue),
@@ -621,6 +626,37 @@ export function ProductDetailsModal({
                                                 {categories?.map(category => (
                                                     <option key={category.xcategprodid} value={category.xcategprodid}>
                                                         {category.xcategprodintitule}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        )}
+                                    </div>
+                                </CardContent>
+                            </Card>
+
+                            {/* Infoaction Selection */}
+                            <Card className="bg-gradient-to-br from-morpheus-blue-dark/20 to-morpheus-blue-light/20 border-slate-700/50">
+                                <CardHeader>
+                                    <CardTitle className="text-white flex items-center gap-2">
+                                        <Tag className="h-5 w-5 text-morpheus-gold-light" />
+                                        Product Infoaction
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="space-y-2">
+                                        <Label className="text-gray-300">Select Infoaction *</Label>
+                                        {infoactionsLoading ? (
+                                            <div className="text-gray-400">Loading infoactions...</div>
+                                        ) : (
+                                            <select
+                                                value={selectedInfoactionId || ''}
+                                                onChange={(e) => setSelectedInfoactionId(Number(e.target.value) || null)}
+                                                className="w-full p-3 bg-morpheus-blue-dark/30 border border-slate-600 rounded-md text-white"
+                                            >
+                                                <option value="">Select an infoaction...</option>
+                                                {infoactions?.map(infoaction => (
+                                                    <option key={infoaction.yinfospotactionsid} value={infoaction.yinfospotactionsid}>
+                                                        {infoaction.yinfospotactionstitle} ({infoaction.yinfospotactionstype})
                                                     </option>
                                                 ))}
                                             </select>

@@ -33,6 +33,7 @@ import { ProductDetailsModal } from "./product-details-modal";
 
 interface ApprovalData {
     categoryId: number;
+    infoactionId: number;
     variants: {
         yvarprodid: number;
         yvarprodprixcatalogue: number;
