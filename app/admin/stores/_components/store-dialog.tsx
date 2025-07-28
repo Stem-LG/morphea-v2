@@ -212,14 +212,14 @@ export function StoreDialog({ isOpen, onClose, onSubmit, store, isLoading = fals
                             variant="outline"
                             onClick={handleClose}
                             disabled={isLoading}
-                            className="border-gray-600 text-gray-300 hover:bg-gray-800/50 hover:text-white"
+                            className="flex-1 border-gray-600 text-gray-300 hover:bg-gray-800/50 hover:text-white"
                         >
                             {t("common.cancel")}
                         </Button>
                         <Button
                             type="submit"
                             disabled={isLoading}
-                            className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-morpheus-gold-dark hover:to-morpheus-gold-light text-white font-semibold"
+                            className="flex-1 bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-morpheus-gold-dark hover:to-morpheus-gold-light text-white font-semibold"
                         >
                             {isLoading
                                 ? (store ? t("admin.updatingStore") : t("admin.creatingStore"))
