@@ -1126,7 +1126,6 @@ export type Database = {
           yeventdatefin: string
           yeventid: number
           yeventintitule: string
-          ymediaidfk: number | null
         }
         Insert: {
           sysaction?: string | null
@@ -1138,7 +1137,6 @@ export type Database = {
           yeventdatefin: string
           yeventid?: number
           yeventintitule: string
-          ymediaidfk?: number | null
         }
         Update: {
           sysaction?: string | null
@@ -1150,11 +1148,47 @@ export type Database = {
           yeventdatefin?: string
           yeventid?: number
           yeventintitule?: string
+        }
+        Relationships: []
+      }
+      yeventmedia: {
+        Row: {
+          sysaction: string | null
+          sysadresseip: string | null
+          sysdate: string | null
+          sysuser: string | null
+          yeventidfk: number | null
+          yeventmediaid: number
+          ymediaidfk: number | null
+        }
+        Insert: {
+          sysaction?: string | null
+          sysadresseip?: string | null
+          sysdate?: string | null
+          sysuser?: string | null
+          yeventidfk?: number | null
+          yeventmediaid?: number
+          ymediaidfk?: number | null
+        }
+        Update: {
+          sysaction?: string | null
+          sysadresseip?: string | null
+          sysdate?: string | null
+          sysuser?: string | null
+          yeventidfk?: number | null
+          yeventmediaid?: number
           ymediaidfk?: number | null
         }
         Relationships: [
           {
-            foreignKeyName: "yevent_ymediaidfk_fkey"
+            foreignKeyName: "yeventmedia_yEventIdFk_fkey"
+            columns: ["yeventidfk"]
+            isOneToOne: false
+            referencedRelation: "yevent"
+            referencedColumns: ["yeventid"]
+          },
+          {
+            foreignKeyName: "yeventmedia_yMediaIdFk_fkey"
             columns: ["ymediaidfk"]
             isOneToOne: false
             referencedRelation: "ymedia"
@@ -1416,6 +1450,7 @@ export type Database = {
           sysuser: string | null
           ymediaboolphotoevent: string
           ymediaboolphotoprod: string
+          ymediaboolvideo: boolean
           ymediaboolvideocapsule: string
           ymediacode: string
           ymediaid: number
@@ -1429,6 +1464,7 @@ export type Database = {
           sysuser?: string | null
           ymediaboolphotoevent: string
           ymediaboolphotoprod: string
+          ymediaboolvideo?: boolean
           ymediaboolvideocapsule: string
           ymediacode: string
           ymediaid?: number
@@ -1442,6 +1478,7 @@ export type Database = {
           sysuser?: string | null
           ymediaboolphotoevent?: string
           ymediaboolphotoprod?: string
+          ymediaboolvideo?: boolean
           ymediaboolvideocapsule?: string
           ymediacode?: string
           ymediaid?: number
@@ -1565,7 +1602,7 @@ export type Database = {
           yprodid: number
           yprodinfobulle: string
           yprodintitule: string
-          yprodstatut: string
+          yprodstatut?: string
         }
         Update: {
           sysaction?: string | null
@@ -1710,6 +1747,7 @@ export type Database = {
           yvarprodprixpromotion: number | null
           yvarprodpromotiondatedeb: string | null
           yvarprodpromotiondatefin: string | null
+          yvarprodstatut: string
         }
         Insert: {
           sysaction?: string | null
@@ -1729,6 +1767,7 @@ export type Database = {
           yvarprodprixpromotion?: number | null
           yvarprodpromotiondatedeb?: string | null
           yvarprodpromotiondatefin?: string | null
+          yvarprodstatut?: string
         }
         Update: {
           sysaction?: string | null
@@ -1748,6 +1787,7 @@ export type Database = {
           yvarprodprixpromotion?: number | null
           yvarprodpromotiondatedeb?: string | null
           yvarprodpromotiondatefin?: string | null
+          yvarprodstatut?: string
         }
         Relationships: [
           {

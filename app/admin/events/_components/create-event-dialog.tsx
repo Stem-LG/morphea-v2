@@ -6,10 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Calendar, Upload, X } from "lucide-react";
 import { useCreateEvent } from "../_hooks/use-create-event";
-import { useUploadFile } from "@/app/_hooks/use-upload-file";
-import { useCreateMedia } from "@/app/_hooks/use-create-media";
 import { useQueryClient } from "@tanstack/react-query";
 
 interface CreateEventDialogProps {
@@ -24,14 +23,12 @@ export function CreateEventDialog({ children }: CreateEventDialogProps) {
         startDate: "",
         endDate: "",
     });
-    const [selectedFile, setSelectedFile] = useState<File | null>(null);
-    const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+    const [imagePreviews, setImagePreviews] = useState<string[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const queryClient = useQueryClient();
     const createEventMutation = useCreateEvent();
-    const uploadFileMutation = useUploadFile();
-    const createMediaMutation = useCreateMedia();
 
     const handleInputChange = (field: string, value: string) => {
         setFormData(prev => ({
@@ -41,21 +38,30 @@ export function CreateEventDialog({ children }: CreateEventDialogProps) {
     };
 
     const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (file) {
-            setSelectedFile(file);
-            // Create preview URL
-            const previewUrl = URL.createObjectURL(file);
-            setImagePreview(previewUrl);
+        const files = Array.from(event.target.files || []);
+        if (files.length > 0) {
+            setSelectedFiles(prev => [...prev, ...files]);
+            // Create preview URLs
+            const newPreviews = files.map(file => URL.createObjectURL(file));
+            setImagePreviews(prev => [...prev, ...newPreviews]);
         }
     };
 
-    const removeSelectedFile = () => {
-        setSelectedFile(null);
-        if (imagePreview) {
-            URL.revokeObjectURL(imagePreview);
-            setImagePreview(null);
+    const removeSelectedFile = (index: number) => {
+        // Revoke the object URL to prevent memory leaks
+        if (imagePreviews[index]) {
+            URL.revokeObjectURL(imagePreviews[index]);
         }
+        
+        setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+        setImagePreviews(prev => prev.filter((_, i) => i !== index));
+    };
+
+    const removeAllFiles = () => {
+        // Revoke all object URLs
+        imagePreviews.forEach(url => URL.revokeObjectURL(url));
+        setSelectedFiles([]);
+        setImagePreviews([]);
     };
 
     const validateForm = () => {
@@ -80,36 +86,13 @@ export function CreateEventDialog({ children }: CreateEventDialogProps) {
         setIsSubmitting(true);
 
         try {
-            let mediaId: number | undefined;
-
-            // If there's a selected file, upload it and create media record
-            if (selectedFile) {
-                // Upload file to storage
-                const fileUrl = await uploadFileMutation.mutateAsync({
-                    file: selectedFile,
-                    type: "image"
-                });
-
-                // Create media record in database
-                const mediaData = await createMediaMutation.mutateAsync({
-                    name: `${formData.name} Image`,
-                    type: "eventImage",
-                    url: fileUrl
-                });
-
-                // Get the media ID from the created record
-                if (mediaData && mediaData.length > 0) {
-                    mediaId = mediaData[0].ymediaid;
-                }
-            }
-
-            // Create the event
+            // Create the event with image files
             await createEventMutation.mutateAsync({
                 code: formData.code.trim() || undefined,
                 name: formData.name.trim(),
                 startDate: formData.startDate,
                 endDate: formData.endDate,
-                mediaId
+                imageFiles: selectedFiles.length > 0 ? selectedFiles : undefined
             });
 
             // Invalidate and refetch events
@@ -122,7 +105,7 @@ export function CreateEventDialog({ children }: CreateEventDialogProps) {
                 startDate: "",
                 endDate: "",
             });
-            removeSelectedFile();
+            removeAllFiles();
             setIsOpen(false);
             
             // Optionally show success message
@@ -143,7 +126,7 @@ export function CreateEventDialog({ children }: CreateEventDialogProps) {
             startDate: "",
             endDate: "",
         });
-        removeSelectedFile();
+        removeAllFiles();
     };
 
     const handleDialogChange = (open: boolean) => {
@@ -155,10 +138,8 @@ export function CreateEventDialog({ children }: CreateEventDialogProps) {
 
     return (
         <Dialog open={isOpen} onOpenChange={handleDialogChange}>
-            <DialogTrigger asChild>
-                {children}
-            </DialogTrigger>
-            <DialogContent className="bg-gradient-to-br from-morpheus-purple/20 to-morpheus-blue/10 border-morpheus-purple/30 backdrop-blur-sm max-w-2xl">
+            <DialogTrigger asChild>{children}</DialogTrigger>
+            <DialogContent className="bg-gradient-to-br from-morpheus-blue-dark to-morpheus-blue-light max-w-4xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle className="text-white flex items-center gap-2">
                         <Calendar className="h-5 w-5 text-morpheus-gold-light" />
@@ -219,69 +200,91 @@ export function CreateEventDialog({ children }: CreateEventDialogProps) {
 
                     {/* Image Upload Section */}
                     <div className="space-y-4">
-                        <Label className="text-gray-300">Event Image (Optional)</Label>
-                        
-                        {!selectedFile ? (
-                            <Card className="bg-gray-800/30 border-gray-600 border-dashed">
-                                <CardContent className="flex flex-col items-center justify-center py-8">
-                                    <Upload className="h-12 w-12 text-gray-400 mb-4" />
-                                    <div className="text-center">
-                                        <Label
-                                            htmlFor="image-upload"
-                                            className="text-morpheus-gold-light hover:text-morpheus-gold-dark cursor-pointer"
-                                        >
-                                            Click to upload image
-                                        </Label>
-                                        <p className="text-sm text-gray-400 mt-1">
-                                            PNG, JPG, GIF up to 10MB
-                                        </p>
+                        <div className="flex items-center justify-between">
+                            <Label className="text-gray-300">Event Images (Optional)</Label>
+                            {selectedFiles.length > 0 && (
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={removeAllFiles}
+                                    className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                                    disabled={isSubmitting}
+                                >
+                                    Clear All
+                                </Button>
+                            )}
+                        </div>
+
+                        {/* Upload Area */}
+                        <Card className="bg-gray-800/30 border-gray-600 border-dashed">
+                            <CardContent className="flex flex-col items-center justify-center py-8">
+                                <Upload className="h-12 w-12 text-gray-400 mb-4" />
+                                <div className="text-center">
+                                    <Label
+                                        htmlFor="image-upload"
+                                        className="text-morpheus-gold-light hover:text-morpheus-gold-dark cursor-pointer"
+                                    >
+                                        Click to upload images
+                                    </Label>
+                                    <p className="text-sm text-gray-400 mt-1">
+                                        PNG, JPG, GIF up to 10MB each • Multiple files supported
+                                    </p>
+                                </div>
+                                <Input
+                                    id="image-upload"
+                                    type="file"
+                                    accept="image/*"
+                                    multiple
+                                    onChange={handleFileSelect}
+                                    className="hidden"
+                                    disabled={isSubmitting}
+                                />
+                            </CardContent>
+                        </Card>
+
+                        {/* Image Previews */}
+                        {selectedFiles.length > 0 && (
+                            <div className="space-y-3">
+                                <Label className="text-gray-300 text-sm">
+                                    Selected Images ({selectedFiles.length})
+                                </Label>
+                                <ScrollArea className="h-60">
+                                    <div className="grid grid-cols-1 gap-3 pr-4">
+                                        {selectedFiles.map((file, index) => (
+                                            <Card key={index} className="bg-gray-800/30 border-gray-600">
+                                                <CardContent className="p-3">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-700 flex-shrink-0">
+                                                            <img
+                                                                src={imagePreviews[index]}
+                                                                alt={`Preview ${index + 1}`}
+                                                                className="w-full h-full object-cover"
+                                                            />
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <p className="text-white font-medium truncate">{file.name}</p>
+                                                            <p className="text-sm text-gray-400">
+                                                                {(file.size / 1024 / 1024).toFixed(2)} MB
+                                                            </p>
+                                                        </div>
+                                                        <Button
+                                                            type="button"
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={() => removeSelectedFile(index)}
+                                                            className="text-red-400 hover:text-red-300 hover:bg-red-900/20 flex-shrink-0"
+                                                            disabled={isSubmitting}
+                                                        >
+                                                            <X className="h-4 w-4" />
+                                                        </Button>
+                                                    </div>
+                                                </CardContent>
+                                            </Card>
+                                        ))}
                                     </div>
-                                    <Input
-                                        id="image-upload"
-                                        type="file"
-                                        accept="image/*"
-                                        onChange={handleFileSelect}
-                                        className="hidden"
-                                        disabled={isSubmitting}
-                                    />
-                                </CardContent>
-                            </Card>
-                        ) : (
-                            <Card className="bg-gray-800/30 border-gray-600">
-                                <CardContent className="p-4">
-                                    <div className="flex items-start gap-4">
-                                        <div className="flex-1">
-                                            <div className="flex items-center justify-between mb-2">
-                                                <span className="text-white font-medium">
-                                                    {selectedFile.name}
-                                                </span>
-                                                <Button
-                                                    type="button"
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    onClick={removeSelectedFile}
-                                                    className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
-                                                    disabled={isSubmitting}
-                                                >
-                                                    <X className="h-4 w-4" />
-                                                </Button>
-                                            </div>
-                                            <p className="text-sm text-gray-400">
-                                                Size: {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
-                                            </p>
-                                        </div>
-                                        {imagePreview && (
-                                            <div className="w-20 h-20 rounded-lg overflow-hidden bg-gray-700">
-                                                <img
-                                                    src={imagePreview}
-                                                    alt="Preview"
-                                                    className="w-full h-full object-cover"
-                                                />
-                                            </div>
-                                        )}
-                                    </div>
-                                </CardContent>
-                            </Card>
+                                </ScrollArea>
+                            </div>
                         )}
                     </div>
 

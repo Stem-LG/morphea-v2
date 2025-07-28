@@ -7,20 +7,20 @@ export function useEvents() {
     return useQuery({
         queryKey: ["events"],
         queryFn: async () => {
-            const { data, error } = await supabase.schema("morpheus")
-                .from("yevent")
-                .select(`
+            const { data, error } = await supabase.schema("morpheus").from("yevent").select(`
                     *,
-                    ymedia:ymediaidfk (
-                        ymediaid,
-                        ymediaurl,
-                        ymediaintitule
+                    yeventmedia(
+                        ymedia(
+                            *
+                        )
                     )
                 `);
 
             if (error) {
                 throw new Error(error.message || error.code);
             }
+
+            console.log("useEvents data", data);
 
             return data;
         },

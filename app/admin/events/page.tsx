@@ -7,6 +7,7 @@ import { useEvents } from "./_hooks/use-events";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CreateEventDialog } from "./_components/create-event-dialog";
+import { UpdateEventDialog } from "./_components/update-event-dialog";
 
 // Event Card Skeleton Component
 function EventCardSkeleton() {
@@ -92,8 +93,7 @@ function EventCard({ event }) {
     const handleEdit = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
-        // TODO: Implement edit functionality
-        console.log("Edit event:", event);
+        // Edit functionality is now handled by UpdateEventDialog
     };
 
     const handleDelete = (e: React.MouseEvent) => {
@@ -108,11 +108,11 @@ function EventCard({ event }) {
             <CardHeader>
                 <div className="flex items-center gap-3">
                     <div className="relative">
-                        {event.ymedia?.ymediaurl ? (
+                        {event.yeventmedia?.[0]?.ymedia?.ymediaurl ? (
                             <div className="h-10 w-10 rounded-lg overflow-hidden bg-gray-700">
                                 <img
-                                    src={event.ymedia.ymediaurl}
-                                    alt={event.ymedia.ymediaintitule || event.yeventintitule}
+                                    src={event.yeventmedia[0].ymedia.ymediaurl}
+                                    alt={event.yeventmedia[0].ymedia.ymediaintitule || event.yeventintitule}
                                     className="w-full h-full object-cover"
                                 />
                             </div>
@@ -136,15 +136,16 @@ function EventCard({ event }) {
                     </div>
                     {isAdmin && (
                         <div className="flex gap-1">
-                            <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={handleEdit}
-                                className="h-8 w-8 p-0 border-gray-600 text-gray-300 hover:bg-gray-800/50 hover:text-white hover:border-morpheus-gold-light/50"
-                                title="Edit Event"
-                            >
-                                <Edit className="h-3 w-3" />
-                            </Button>
+                            <UpdateEventDialog event={event}>
+                                <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="h-8 w-8 p-0 border-gray-600 text-gray-300 hover:bg-gray-800/50 hover:text-white hover:border-morpheus-gold-light/50"
+                                    title="Edit Event"
+                                >
+                                    <Edit className="h-3 w-3" />
+                                </Button>
+                            </UpdateEventDialog>
                             <Button
                                 size="sm"
                                 variant="outline"
