@@ -112,7 +112,7 @@ const SuperSelect = forwardRef<HTMLButtonElement, SuperSelectProps>(
                                             }}
                                         >
                                             <Plus className="h-4 w-4" />
-                                            {createButtonLabel} "{search}"
+                                            {createButtonLabel} &ldquo;{search}&rdquo;
                                         </Button>
                                     </div>
                                 )}

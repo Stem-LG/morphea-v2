@@ -3,9 +3,7 @@
 import { createClient } from "@/lib/client";
 import { useQuery } from "@tanstack/react-query";
 
-interface useCategoriesProps {}
-
-export function useCategories({}: useCategoriesProps) {
+export function useCategories() {
     const supabase = createClient();
 
     return useQuery({

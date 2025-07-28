@@ -54,7 +54,7 @@ export function DeleteConfirmationDialog({
                     </p>
                     <div className="bg-red-900/20 border border-red-700/30 rounded-lg p-4">
                         <p className="text-red-300 font-medium text-center">
-                            "{storeName}"
+                            &ldquo;{storeName}&rdquo;
                         </p>
                     </div>
                     <p className="text-gray-300 text-sm">

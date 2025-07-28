@@ -2,13 +2,12 @@
 import { Suspense } from "react";
 import { useLanguage } from "@/hooks/useLanguage";
 import TourAdminViewer from "../_components/tour-admin-viewer";
-import { AdminV2Layout } from "../_components/admin-v2-layout";
 
 export default function TourAdminPage() {
     const { t } = useLanguage();
 
     return (
-        <AdminV2Layout>
+
             <Suspense
                 fallback={
                     <div className="w-full h-full flex items-center justify-center bg-gray-100">
@@ -21,6 +20,5 @@ export default function TourAdminPage() {
             >
                 <TourAdminViewer height="calc(100vh - 4rem)" className="w-full h-full" />
             </Suspense>
-        </AdminV2Layout>
     );
 }

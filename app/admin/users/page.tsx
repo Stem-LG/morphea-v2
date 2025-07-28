@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback } from "react";
 import { UserRole, Store } from "@/lib/types/user";
 import { useUserManagement } from "@/hooks/useUserManagement";
 import { useLanguage } from "@/hooks/useLanguage";
-import { AdminV2Layout } from "../_components/admin-v2-layout";
 
 interface StoreAssignmentModalProps {
     user: UserRole | null;
@@ -265,7 +264,6 @@ export default function UsersManagementPage() {
     }
 
     return (
-        <AdminV2Layout>
             <div className="p-6">
                 <h1 className="text-2xl font-bold mb-6">{t("admin.userManagement")}</h1>
 
@@ -593,6 +591,5 @@ export default function UsersManagementPage() {
                     loading={loading}
                 />
             </div>
-        </AdminV2Layout>
     );
 }

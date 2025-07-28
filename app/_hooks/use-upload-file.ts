@@ -37,7 +37,7 @@ export async function uploadFile({ file, type }: UploadFileParams) {
     const filePath = `${folder}/${fileName}`
 
     // Upload file to Supabase storage
-    const { data: uploadData, error: uploadError } = await supabase.storage
+    const { error: uploadError } = await supabase.storage
         .from('morpheus')
         .upload(filePath, file, {
             cacheControl: '3600',

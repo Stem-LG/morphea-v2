@@ -1,9 +1,8 @@
 "use client";
 
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/hooks/useAuth";
-import { Calendar, CalendarDays, Clock, Plus, Edit, Trash2, Eye } from "lucide-react";
+import { Calendar, CalendarDays, Plus, Edit, Trash2, Eye } from "lucide-react";
 import { useEvents } from "./_hooks/use-events";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -43,7 +42,6 @@ function EventCardSkeleton() {
 
 // Event Card Component
 function EventCard({ event }) {
-    const { t } = useLanguage();
     const { data: user } = useAuth();
 
     const isAdmin = user?.app_metadata?.roles?.includes("admin");

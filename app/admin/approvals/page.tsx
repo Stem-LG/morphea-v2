@@ -1,7 +1,5 @@
 "use client";
 import React from "react";
-import { AdminV2Layout } from "../_components/admin-v2-layout";
-
 import { useAuth } from "@/hooks/useAuth";
 import { AccessDenied } from "../_components/access-denied";
 import { LoadingScreen } from "../_components/loading-screen";
@@ -25,8 +23,6 @@ export default function ApprovalsPage() {
     }
 
     return (
-        <AdminV2Layout>
-            <ProductApprovals />
-        </AdminV2Layout>
+        <ProductApprovals />
     );
 }

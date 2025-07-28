@@ -2,20 +2,11 @@
 
 import { createClient } from "@/lib/client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useLanguage } from "@/hooks/useLanguage";
 
 interface StoreFormData {
     yboutiqueintitule: string;
     yboutiqueadressemall?: string;
     ymallidfk: number;
-}
-
-interface StoreData extends StoreFormData {
-    yboutiquecode: string;
-}
-
-interface Store extends StoreData {
-    yboutiqueid: number;
 }
 
 export function useCreateStore() {
@@ -67,7 +58,6 @@ export function useCreateStore() {
 export function useUpdateStore() {
     const supabase = createClient();
     const queryClient = useQueryClient();
-    const { t } = useLanguage();
 
     return useMutation({
         mutationFn: async ({ id, storeData }: { id: number; storeData: StoreFormData }) => {
@@ -104,7 +94,6 @@ export function useUpdateStore() {
 export function useDeleteStore() {
     const supabase = createClient();
     const queryClient = useQueryClient();
-    const { t } = useLanguage();
 
     return useMutation({
         mutationFn: async (storeId: number) => {

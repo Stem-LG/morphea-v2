@@ -15,8 +15,8 @@ import { useInfospots } from '@/hooks/useInfospots'
 import { useSceneLinks } from '@/hooks/useSceneLinks'
 import { useInfoactions } from '@/hooks/useInfoactions'
 import { useLanguage } from '@/hooks/useLanguage'
-import { useStores } from '@/app/admin/_hooks/use-stores'
 import { Database } from '@/lib/supabase'
+import { useStores } from '../stores/_hooks/use-stores'
 
 type Scene = Database['morpheus']['Tables']['yscenes']['Row']
 type InfoSpot = Database['morpheus']['Tables']['yinfospots']['Row']
