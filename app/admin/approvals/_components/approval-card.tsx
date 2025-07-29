@@ -1,0 +1,200 @@
+"use client";
+
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+    Clock,
+    Package,
+    AlertTriangle,
+    Image as ImageIcon,
+    Play,
+    Box,
+    FileSearch
+} from "lucide-react";
+
+interface ApprovalCardProps {
+    product: any;
+    onAudit: () => void;
+    categories?: any[];
+}
+
+export function ApprovalCard({
+    product,
+    onAudit,
+    categories = []
+}: ApprovalCardProps) {
+    // Get category name
+    const category = categories.find(cat => cat.xcategprodid === product.xcategprodidfk);
+    
+    // Get status info
+    const getStatusInfo = () => {
+        if (product.yprodstatut === 'not_approved') {
+            return {
+                badge: (
+                    <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30">
+                        <Clock className="h-3 w-3 mr-1" />
+                        Pending
+                    </Badge>
+                ),
+                color: 'border-yellow-500/30'
+            };
+        } else if (product.yprodstatut === 'needs_revision') {
+            return {
+                badge: (
+                    <Badge variant="secondary" className="bg-orange-500/20 text-orange-300 border-orange-500/30">
+                        <AlertTriangle className="h-3 w-3 mr-1" />
+                        Needs Revision
+                    </Badge>
+                ),
+                color: 'border-orange-500/30'
+            };
+        } else if (product.yvarprod?.some((v: any) => v.yvarprodstatut === 'not_approved')) {
+            return {
+                badge: (
+                    <Badge variant="secondary" className="bg-blue-500/20 text-blue-300 border-blue-500/30">
+                        <Package className="h-3 w-3 mr-1" />
+                        Variant Approval
+                    </Badge>
+                ),
+                color: 'border-blue-500/30'
+            };
+        }
+        return {
+            badge: null,
+            color: 'border-gray-700/50'
+        };
+    };
+
+    const statusInfo = getStatusInfo();
+
+    // Get media preview
+    const getMediaPreview = () => {
+        const media = product.media?.[0];
+        if (!media) return null;
+
+        if (media.ymediaboolvideo) {
+            return (
+                <div className="relative w-full h-32 bg-gray-800 rounded-lg flex items-center justify-center">
+                    <Play className="h-8 w-8 text-gray-400" />
+                    <div className="absolute top-2 right-2">
+                        <Badge variant="secondary" className="bg-purple-500/20 text-purple-300 border-purple-500/30 text-xs">
+                            Video
+                        </Badge>
+                    </div>
+                </div>
+            );
+        } else {
+            return (
+                <div className="relative w-full h-32 bg-gray-800 rounded-lg overflow-hidden">
+                    <img
+                        src={media.ymediaurl}
+                        alt={media.ymediaintitule}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                            target.parentElement!.innerHTML = `
+                                <div class="w-full h-full flex items-center justify-center">
+                                    <svg class="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                </div>
+                            `;
+                        }}
+                    />
+                </div>
+            );
+        }
+    };
+
+    // Count variants needing approval
+    const variantsNeedingApproval = product.yvarprod?.filter((v: any) => v.yvarprodstatut === 'not_approved').length || 0;
+
+    return (
+        <Card className={`bg-gradient-to-br from-gray-900/50 to-gray-800/30 backdrop-blur-sm transition-all duration-200 hover:scale-[1.02] ${statusInfo.color}`}>
+            <CardHeader className="pb-3">
+                <div className="flex items-start justify-between">
+                    <div>
+                        <h3 className="font-semibold text-white text-sm line-clamp-2">
+                            {product.yprodintitule}
+                        </h3>
+                        <p className="text-xs text-gray-400 font-mono">
+                            {product.yprodcode}
+                        </p>
+                    </div>
+                    {statusInfo.badge}
+                </div>
+            </CardHeader>
+            
+            <CardContent className="space-y-3">
+                {/* Media Preview */}
+                {getMediaPreview() || (
+                    <div className="w-full h-32 bg-gray-800 rounded-lg flex items-center justify-center">
+                        <ImageIcon className="h-8 w-8 text-gray-400" />
+                    </div>
+                )}
+
+                {/* Product Info */}
+                <div className="space-y-2">
+                    <div className="flex items-center justify-between text-xs">
+                        <span className="text-gray-400">Category:</span>
+                        <Badge variant="secondary" className="bg-blue-500/20 text-blue-300 border-blue-500/30 text-xs">
+                            {category?.xcategprodintitule || "Unknown"}
+                        </Badge>
+                    </div>
+                    
+                    <div className="flex items-center justify-between text-xs">
+                        <span className="text-gray-400">Store:</span>
+                        <span className="text-white">
+                            {product.store?.yboutiqueintitule || "Unknown Store"}
+                        </span>
+                    </div>
+
+                    <div className="flex items-center justify-between text-xs">
+                        <span className="text-gray-400">Variants:</span>
+                        <div className="flex items-center gap-1">
+                            <span className="text-white">{product.yvarprod?.length || 0}</span>
+                            {variantsNeedingApproval > 0 && (
+                                <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30 text-xs">
+                                    {variantsNeedingApproval} pending
+                                </Badge>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* 3D Models indicator */}
+                    {product.yobjet3d?.length > 0 && (
+                        <div className="flex items-center justify-between text-xs">
+                            <span className="text-gray-400">3D Models:</span>
+                            <div className="flex items-center gap-1">
+                                <Box className="h-3 w-3 text-purple-400" />
+                                <span className="text-purple-400">{product.yobjet3d.length}</span>
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="flex items-center justify-between text-xs">
+                        <span className="text-gray-400">Created:</span>
+                        <span className="text-white">
+                            {new Date(product.sysdate).toLocaleDateString()}
+                        </span>
+                    </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex items-center pt-2 border-t border-gray-700/50">
+                    <Button
+                        size="sm"
+                        onClick={onAudit}
+                        className="w-full h-9 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white"
+                        title="Audit Product"
+                    >
+                        <FileSearch className="h-4 w-4 mr-2" />
+                        Audit Product
+                    </Button>
+                </div>
+            </CardContent>
+        </Card>
+    );
+}

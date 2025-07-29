@@ -60,3 +60,4 @@ Example structure:
 -   Use the context7 tools for getting information about the different libraries that are used or to be used in the project before making decisions, to get an idea about up to date features and usage examples.
 -   Use `nuqs` library for using url parameters as state in components, it provides a simple way to manage URL parameters and synchronize them with component state, especially in combination with the data-table component for page and filter state. (use context7 to get more information about it)
 -   Use `lucide-react` for icons, as it provides a wide range of icons that are easy to use and customize.
+-   Try to not create or use any api routes, instead use supabase client directly, especially since we can just rely on supabase RLS policies for data access control.

@@ -1,0 +1,619 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { SuperSelect } from "@/components/super-select";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+    CheckCircle,
+    AlertTriangle,
+    Package,
+    Play,
+    Box,
+    Image as ImageIcon,
+    X
+} from "lucide-react";
+import { useApprovalOperations } from "../_hooks/use-approval-operations";
+import { useCategories } from "../../stores/[storeId]/_hooks/use-categories";
+import { createClient } from "@/lib/client";
+import { useQuery } from "@tanstack/react-query";
+
+interface ApprovalFormData {
+    categoryId: number;
+    infoactionId?: number;
+    variants: Array<{
+        yvarprodid: number;
+        yvarprodprixcatalogue: number;
+        yvarprodprixpromotion?: number;
+        yvarprodpromotiondatedeb?: string;
+        yvarprodpromotiondatefin?: string;
+        yvarprodnbrjourlivraison: number;
+        currencyId: number;
+    }>;
+}
+
+interface ApprovalFormProps {
+    isOpen: boolean;
+    onClose: () => void;
+    productId?: number;
+}
+
+export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) {
+    const [formData, setFormData] = useState<ApprovalFormData>({
+        categoryId: 0,
+        infoactionId: undefined,
+        variants: []
+    });
+    const { approveProduct, markNeedsRevision, denyProduct, isLoading } = useApprovalOperations();
+    const { data: categories } = useCategories();
+    const supabase = createClient();
+
+    // Fetch product details
+    const { data: product, isLoading: productLoading } = useQuery({
+        queryKey: ["product-details", productId],
+        queryFn: async () => {
+            if (!productId) return null;
+            
+            const { data, error } = await supabase
+                .schema("morpheus")
+                .from("yprod")
+                .select(`
+                    *,
+                    yvarprod(
+                        *,
+                        xcouleur(*),
+                        xtaille(*),
+                        xdevise(*),
+                        yobjet3d(*),
+                        yvarprodmedia(
+                            ymedia:ymediaidfk(*)
+                        )
+                    ),
+                    ydetailsevent(
+                        yboutique:yboutiqueidfk(*)
+                    )
+                `)
+                .eq("yprodid", productId)
+                .single();
+
+            if (error) throw new Error(error.message);
+            return data;
+        },
+        enabled: !!productId && isOpen,
+    });
+
+    // Fetch currencies
+    const { data: currencies } = useQuery({
+        queryKey: ["currencies"],
+        queryFn: async () => {
+            const { data, error } = await supabase
+                .schema("morpheus")
+                .from("xdevise")
+                .select("*")
+                .order("xdeviseintitule");
+
+            if (error) throw new Error(error.message);
+            return data;
+        },
+        enabled: isOpen,
+    });
+
+    // Fetch info actions
+    const { data: infoActions } = useQuery({
+        queryKey: ["info-actions"],
+        queryFn: async () => {
+            const { data, error } = await supabase
+                .schema("morpheus")
+                .from("yinfospotactions")
+                .select("*")
+                .order("yinfospotactionstitle");
+
+            if (error) throw new Error(error.message);
+            return data;
+        },
+        enabled: isOpen,
+    });
+
+    // Update form when product data loads
+    useEffect(() => {
+        if (product) {
+            setFormData({
+                categoryId: product.xcategprodidfk || 0,
+                infoactionId: product.yinfospotactionsidfk || undefined,
+                variants: product.yvarprod?.map((variant: any) => ({
+                    yvarprodid: variant.yvarprodid,
+                    yvarprodprixcatalogue: variant.yvarprodprixcatalogue || 0,
+                    yvarprodprixpromotion: variant.yvarprodprixpromotion || undefined,
+                    yvarprodpromotiondatedeb: variant.yvarprodpromotiondatedeb || undefined,
+                    yvarprodpromotiondatefin: variant.yvarprodpromotiondatefin || undefined,
+                    yvarprodnbrjourlivraison: variant.yvarprodnbrjourlivraison || 0,
+                    currencyId: variant.xdeviseidfk || 0,
+                })) || []
+            });
+        }
+    }, [product]);
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!productId) return;
+
+        try {
+            await approveProduct.mutateAsync({
+                productId,
+                approvalData: formData
+            });
+            onClose();
+        } catch {
+            // Error is handled by the mutation
+        }
+    };
+
+    const updateFormData = (field: keyof ApprovalFormData, value: any) => {
+        setFormData(prev => ({ ...prev, [field]: value }));
+    };
+
+    const updateVariant = (index: number, field: string, value: any) => {
+        setFormData(prev => ({
+            ...prev,
+            variants: prev.variants.map((variant, i) =>
+                i === index ? { ...variant, [field]: value } : variant
+            )
+        }));
+    };
+
+    const handleMarkNeedsRevision = async () => {
+        if (!productId) return;
+
+        try {
+            await markNeedsRevision.mutateAsync(productId);
+            onClose();
+        } catch {
+            // Error is handled by the mutation
+        }
+    };
+
+    const handleConfirm = async () => {
+        if (!productId) return;
+
+        try {
+            await approveProduct.mutateAsync({
+                productId,
+                approvalData: formData
+            });
+            onClose();
+        } catch {
+            // Error is handled by the mutation
+        }
+    };
+
+    const handleDeny = async () => {
+        if (!productId) return;
+
+        try {
+            await denyProduct.mutateAsync(productId);
+            onClose();
+        } catch {
+            // Error is handled by the mutation
+        }
+    };
+
+    // Get status badge
+    const getStatusBadge = () => {
+        if (!product) return null;
+
+        if (product.yprodstatut === 'not_approved') {
+            return (
+                <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30">
+                    <AlertTriangle className="h-3 w-3 mr-1" />
+                    Pending Approval
+                </Badge>
+            );
+        } else if (product.yprodstatut === 'needs_revision') {
+            return (
+                <Badge variant="secondary" className="bg-orange-500/20 text-orange-300 border-orange-500/30">
+                    <AlertTriangle className="h-3 w-3 mr-1" />
+                    Needs Revision
+                </Badge>
+            );
+        } else if (product.yvarprod?.some((v: any) => v.yvarprodstatut === 'not_approved')) {
+            return (
+                <Badge variant="secondary" className="bg-blue-500/20 text-blue-300 border-blue-500/30">
+                    <Package className="h-3 w-3 mr-1" />
+                    Variant Approval Required
+                </Badge>
+            );
+        }
+        return null;
+    };
+
+    // Prepare options
+    const categoryOptions = categories?.map(cat => ({
+        value: cat.xcategprodid,
+        label: cat.xcategprodintitule
+    })) || [];
+
+    const currencyOptions = currencies?.map(currency => ({
+        value: currency.xdeviseid,
+        label: `${currency.xdeviseintitule} (${currency.xdevisecodealpha})`
+    })) || [];
+
+    const infoActionOptions = infoActions?.map(action => ({
+        value: action.yinfospotactionsid,
+        label: action.yinfospotactionstitle
+    })) || [];
+
+    if (productLoading) {
+        return (
+            <Dialog open={isOpen} onOpenChange={onClose}>
+                <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-gray-900 border-gray-700">
+                    <div className="flex items-center justify-center py-12">
+                        <div className="h-8 w-8 animate-spin rounded-full border-2 border-morpheus-gold-light border-t-transparent" />
+                    </div>
+                </DialogContent>
+            </Dialog>
+        );
+    }
+
+    if (!product) {
+        return null;
+    }
+
+    return (
+        <Dialog open={isOpen} onOpenChange={onClose}>
+            <DialogContent className="max-w-7xl max-h-[95vh] bg-gray-900 border-gray-700 p-0">
+                <DialogHeader className="px-6 py-4 border-b border-gray-700">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <DialogTitle className="text-xl text-white">
+                                Product Audit: {product.yprodintitule}
+                            </DialogTitle>
+                            <p className="text-sm text-gray-400 font-mono mt-1">
+                                {product.yprodcode}
+                            </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            {getStatusBadge()}
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={onClose}
+                                className="h-8 w-8 p-0 text-gray-400 hover:text-white"
+                            >
+                                <X className="h-4 w-4" />
+                            </Button>
+                        </div>
+                    </div>
+                </DialogHeader>
+
+                <div className="flex h-[calc(95vh-180px)]">
+                    {/* Left Panel - Product Info & Settings */}
+                    <div className="w-1/2 border-r border-gray-700">
+                        <ScrollArea className="h-full">
+                            <div className="p-6 space-y-6">
+                                {/* Basic Information */}
+                                <Card className="bg-gray-800/50 border-gray-700">
+                                    <CardHeader>
+                                        <CardTitle className="text-white text-lg">Basic Information</CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="space-y-4">
+                                        <div className="grid grid-cols-1 gap-4">
+                                            <div>
+                                                <Label className="text-gray-300">Product Name</Label>
+                                                <Input
+                                                    value={product.yprodintitule}
+                                                    disabled
+                                                    className="bg-gray-700 border-gray-600 text-gray-300"
+                                                />
+                                            </div>
+                                            <div>
+                                                <Label className="text-gray-300">Product Code</Label>
+                                                <Input
+                                                    value={product.yprodcode}
+                                                    disabled
+                                                    className="bg-gray-700 border-gray-600 text-gray-300 font-mono"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <Label className="text-gray-300">Technical Details</Label>
+                                            <textarea
+                                                value={product.yproddetailstech || ''}
+                                                disabled
+                                                className="w-full h-20 px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-gray-300 resize-none text-sm"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <Label className="text-gray-300">Info Bubble</Label>
+                                            <textarea
+                                                value={product.yprodinfobulle || ''}
+                                                disabled
+                                                className="w-full h-16 px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-gray-300 resize-none text-sm"
+                                            />
+                                        </div>
+                                    </CardContent>
+                                </Card>
+
+                                {/* Approval Settings */}
+                                <Card className="bg-gray-800/50 border-gray-700">
+                                    <CardHeader>
+                                        <CardTitle className="text-white text-lg">Approval Settings</CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="space-y-4">
+                                        <div>
+                                            <Label className="text-gray-300">Category *</Label>
+                                            <SuperSelect
+                                                value={formData.categoryId}
+                                                onValueChange={(value) => updateFormData("categoryId", value as number)}
+                                                options={categoryOptions}
+                                                placeholder="Select category"
+                                                className="bg-gray-700 border-gray-600"
+                                            />
+                                        </div>
+                                        <div>
+                                            <Label className="text-gray-300">Info Action</Label>
+                                            <SuperSelect
+                                                value={formData.infoactionId || "none"}
+                                                onValueChange={(value) => updateFormData("infoactionId", value === "none" ? undefined : value as number)}
+                                                options={[
+                                                    { value: "none", label: "No action" },
+                                                    ...infoActionOptions
+                                                ]}
+                                                placeholder="Select info action"
+                                                className="bg-gray-700 border-gray-600"
+                                            />
+                                        </div>
+                                        <div>
+                                            <Label className="text-gray-300">Store</Label>
+                                            <Input
+                                                value={product.ydetailsevent?.[0]?.yboutique?.yboutiqueintitule || "Unknown Store"}
+                                                disabled
+                                                className="bg-gray-700 border-gray-600 text-gray-300"
+                                            />
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </div>
+                        </ScrollArea>
+                    </div>
+
+                    {/* Right Panel - Variants with Media */}
+                    <div className="w-1/2">
+                        <ScrollArea className="h-full">
+                            <div className="p-6">
+                                <div className="mb-4">
+                                    <h3 className="text-lg font-semibold text-white mb-2">
+                                        Product Variants ({product.yvarprod?.length || 0})
+                                    </h3>
+                                    <p className="text-sm text-gray-400">
+                                        Review and configure each variant with its media and pricing
+                                    </p>
+                                </div>
+
+                                <div className="space-y-4">
+                                    {product.yvarprod?.map((variant: any, index: number) => (
+                                        <Card key={variant.yvarprodid} className="bg-gray-800/50 border-gray-700">
+                                            <CardHeader className="pb-3">
+                                                <div className="flex items-center justify-between">
+                                                    <CardTitle className="text-white text-base">
+                                                        {variant.yvarprodintitule}
+                                                    </CardTitle>
+                                                    <div className="flex items-center gap-2">
+                                                        <Badge variant="secondary" className="bg-blue-500/20 text-blue-300 border-blue-500/30 text-xs">
+                                                            {variant.xcouleur?.xcouleurintitule}
+                                                        </Badge>
+                                                        <Badge variant="secondary" className="bg-green-500/20 text-green-300 border-green-500/30 text-xs">
+                                                            {variant.xtaille?.xtailleintitule}
+                                                        </Badge>
+                                                        {variant.yvarprodstatut === 'not_approved' && (
+                                                            <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30 text-xs">
+                                                                Needs Approval
+                                                            </Badge>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </CardHeader>
+                                            <CardContent className="space-y-4">
+                                                {/* Variant Media */}
+                                                {variant.yvarprodmedia && variant.yvarprodmedia.length > 0 && (
+                                                    <div>
+                                                        <Label className="text-gray-300 text-sm mb-2 block">Variant Media</Label>
+                                                        <div className="grid grid-cols-3 gap-2">
+                                                            {variant.yvarprodmedia.map((mediaItem: any, mediaIndex: number) => {
+                                                                const media = mediaItem.ymedia;
+                                                                return (
+                                                                    <div key={mediaIndex} className="relative group">
+                                                                        {media.ymediaboolvideo ? (
+                                                                            <div className="aspect-square bg-gray-700 rounded-lg flex items-center justify-center">
+                                                                                <Play className="h-6 w-6 text-gray-400" />
+                                                                            </div>
+                                                                        ) : (
+                                                                            <img
+                                                                                src={media.ymediaurl}
+                                                                                alt={media.ymediaintitule}
+                                                                                className="aspect-square object-cover rounded-lg"
+                                                                                onError={(e) => {
+                                                                                    const target = e.target as HTMLImageElement;
+                                                                                    target.src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTQgMTZMMTAuNTg2IDkuNDE0QTIgMiAwIDAxMTMuNDE0IDkuNDE0TDE2IDE2TTYgMjBIMThBMiAyIDAgMDAyMCAxOFY2QTIgMiAwIDAwMTggNEg2QTIgMiAwIDAwNCA2VjE4QTIgMiAwIDAwNiAyMFpNMTUuNSA5LjVBMS41IDEuNSAwIDEwMTMgOEExLjUgMS41IDAgMDAxNS41IDkuNVoiIHN0cm9rZT0iIzlDQTNBRiIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPC9zdmc+";
+                                                                                }}
+                                                                            />
+                                                                        )}
+                                                                        <div className="absolute bottom-1 left-1">
+                                                                            <Badge variant="secondary" className="bg-black/50 text-white text-xs">
+                                                                                {media.ymediaboolvideo ? 'Video' : 'Image'}
+                                                                            </Badge>
+                                                                        </div>
+                                                                    </div>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {/* 3D Models for this variant */}
+                                                {variant.yobjet3d && variant.yobjet3d.length > 0 && (
+                                                    <div>
+                                                        <Label className="text-gray-300 text-sm mb-2 block">3D Models</Label>
+                                                        <div className="space-y-2">
+                                                            {variant.yobjet3d.map((obj3d: any, obj3dIndex: number) => (
+                                                                <div key={obj3dIndex} className="p-3 bg-gray-700/50 rounded-lg">
+                                                                    <div className="flex items-center gap-2 mb-1">
+                                                                        <Box className="h-4 w-4 text-purple-400" />
+                                                                        <span className="text-white text-sm">3D Model {obj3dIndex + 1}</span>
+                                                                    </div>
+                                                                    <p className="text-xs text-gray-400 break-all">
+                                                                        {obj3d.yobjet3durl}
+                                                                    </p>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {/* No media message */}
+                                                {(!variant.yvarprodmedia || variant.yvarprodmedia.length === 0) && 
+                                                 (!variant.yobjet3d || variant.yobjet3d.length === 0) && (
+                                                    <div className="flex items-center justify-center py-6 text-gray-400">
+                                                        <ImageIcon className="h-8 w-8 mr-2" />
+                                                        <span>No media available for this variant</span>
+                                                    </div>
+                                                )}
+
+                                                {/* Pricing Configuration */}
+                                                <div className="border-t border-gray-700 pt-4">
+                                                    <Label className="text-gray-300 text-sm mb-3 block">Pricing Configuration</Label>
+                                                    <div className="grid grid-cols-2 gap-3">
+                                                        <div>
+                                                            <Label className="text-gray-300 text-xs">Catalog Price *</Label>
+                                                            <Input
+                                                                type="number"
+                                                                step="0.01"
+                                                                value={formData.variants[index]?.yvarprodprixcatalogue || 0}
+                                                                onChange={(e) => updateVariant(index, 'yvarprodprixcatalogue', parseFloat(e.target.value) || 0)}
+                                                                className="bg-gray-700 border-gray-600 text-white text-sm"
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <Label className="text-gray-300 text-xs">Promotion Price</Label>
+                                                            <Input
+                                                                type="number"
+                                                                step="0.01"
+                                                                value={formData.variants[index]?.yvarprodprixpromotion || ''}
+                                                                onChange={(e) => updateVariant(index, 'yvarprodprixpromotion', parseFloat(e.target.value) || undefined)}
+                                                                className="bg-gray-700 border-gray-600 text-white text-sm"
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <Label className="text-gray-300 text-xs">Delivery Days *</Label>
+                                                            <Input
+                                                                type="number"
+                                                                value={formData.variants[index]?.yvarprodnbrjourlivraison || 0}
+                                                                onChange={(e) => updateVariant(index, 'yvarprodnbrjourlivraison', parseInt(e.target.value) || 0)}
+                                                                className="bg-gray-700 border-gray-600 text-white text-sm"
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <Label className="text-gray-300 text-xs">Currency *</Label>
+                                                            <SuperSelect
+                                                                value={formData.variants[index]?.currencyId || 0}
+                                                                onValueChange={(value) => updateVariant(index, 'currencyId', value as number)}
+                                                                options={currencyOptions}
+                                                                placeholder="Select currency"
+                                                                className="bg-gray-700 border-gray-600 text-sm"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <div className="grid grid-cols-2 gap-3 mt-3">
+                                                        <div>
+                                                            <Label className="text-gray-300 text-xs">Promotion Start</Label>
+                                                            <Input
+                                                                type="date"
+                                                                value={formData.variants[index]?.yvarprodpromotiondatedeb || ''}
+                                                                onChange={(e) => updateVariant(index, 'yvarprodpromotiondatedeb', e.target.value || undefined)}
+                                                                className="bg-gray-700 border-gray-600 text-white text-sm"
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <Label className="text-gray-300 text-xs">Promotion End</Label>
+                                                            <Input
+                                                                type="date"
+                                                                value={formData.variants[index]?.yvarprodpromotiondatefin || ''}
+                                                                onChange={(e) => updateVariant(index, 'yvarprodpromotiondatefin', e.target.value || undefined)}
+                                                                className="bg-gray-700 border-gray-600 text-white text-sm"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </CardContent>
+                                        </Card>
+                                    ))}
+                                </div>
+                            </div>
+                        </ScrollArea>
+                    </div>
+                </div>
+
+                <DialogFooter className="px-6 py-4 border-t border-gray-700 flex gap-2">
+                    <Button
+                        type="button"
+                        variant="outline"
+                        onClick={onClose}
+                        disabled={isLoading}
+                        className="border-gray-600 text-gray-300 hover:bg-gray-800/50"
+                    >
+                        Cancel
+                    </Button>
+                    <Button
+                        type="button"
+                        variant="outline"
+                        onClick={handleDeny}
+                        disabled={isLoading}
+                        className="border-red-600 text-red-400 hover:bg-red-900/50"
+                    >
+                        Deny
+                    </Button>
+                    <Button
+                        type="button"
+                        variant="outline"
+                        onClick={handleMarkNeedsRevision}
+                        disabled={isLoading}
+                        className="border-orange-600 text-orange-400 hover:bg-orange-900/50"
+                    >
+                        <AlertTriangle className="h-4 w-4 mr-2" />
+                        Ask for Revision
+                    </Button>
+                    <Button
+                        type="button"
+                        onClick={handleConfirm}
+                        disabled={isLoading}
+                        className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white"
+                    >
+                        {isLoading ? (
+                            <div className="flex items-center gap-2">
+                                <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                                Confirming...
+                            </div>
+                        ) : (
+                            <>
+                                <CheckCircle className="h-4 w-4 mr-2" />
+                                Confirm
+                            </>
+                        )}
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
+}
