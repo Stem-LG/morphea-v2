@@ -6,8 +6,6 @@ import { Button } from "@/components/ui/button";
 import {
     LayoutDashboard,
     Store,
-    Package,
-    BarChart3,
     Menu,
     X,
     ChevronLeft,
@@ -78,20 +76,7 @@ export function ModernSidebar({ isOpen, isCollapsed, onToggle, onCollapse, userR
                 href: "/admin/approvals",
                 roles: ["admin"],
             },
-            {
-                id: "products",
-                label: t("admin.productManagement"),
-                icon: Package,
-                href: "/admin/products",
-                roles: ["admin"],
-            },
-            {
-                id: "analytics",
-                label: t("admin.analytics"),
-                icon: BarChart3,
-                href: "/admin/analytics",
-                roles: ["admin", "store_admin"],
-            },
+
             {
                 id: "users",
                 label: t("admin.userManagement"),

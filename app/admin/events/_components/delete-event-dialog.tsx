@@ -8,6 +8,7 @@ import {
     DialogTitle,
     DialogFooter,
 } from "@/components/ui/dialog";
+import { useLanguage } from "@/hooks/useLanguage";
 import { AlertTriangle } from "lucide-react";
 
 interface DeleteEventDialogProps {
@@ -25,6 +26,8 @@ export function DeleteEventDialog({
     eventName,
     isLoading = false
 }: DeleteEventDialogProps) {
+    const { t } = useLanguage();
+    
     const handleClose = () => {
         if (!isLoading) {
             onClose();
@@ -40,14 +43,14 @@ export function DeleteEventDialog({
                             <AlertTriangle className="h-5 w-5 text-red-400" />
                         </div>
                         <DialogTitle className="text-xl font-semibold text-white">
-                            Delete Event
+                            {t('admin.events.deleteEventTitle')}
                         </DialogTitle>
                     </div>
                 </DialogHeader>
 
                 <div className="space-y-4">
                     <p className="text-white">
-                        Are you sure you want to delete this event?
+                        {t('admin.events.deleteEventConfirm')}
                     </p>
                     <div className="bg-red-900/20 border border-red-700/30 rounded-lg p-4">
                         <p className="text-red-300 font-medium text-center">
@@ -55,7 +58,7 @@ export function DeleteEventDialog({
                         </p>
                     </div>
                     <p className="text-gray-300 text-sm">
-                        This action cannot be undone. The event and all its associated data will be permanently removed.
+                        {t('admin.events.deleteEventWarning')}
                     </p>
                 </div>
 
@@ -67,7 +70,7 @@ export function DeleteEventDialog({
                         disabled={isLoading}
                         className="flex-1 border-gray-600 text-gray-300 hover:bg-gray-800/50 hover:text-white"
                     >
-                        Cancel
+                        {t('common.cancel')}
                     </Button>
                     <Button
                         type="button"
@@ -75,7 +78,7 @@ export function DeleteEventDialog({
                         disabled={isLoading}
                         className="flex-1 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold transition-all duration-300 hover:scale-105"
                     >
-                        {isLoading ? "Deleting..." : "Delete Event"}
+                        {isLoading ? t('admin.events.deleting') : t('admin.events.deleteEvent')}
                     </Button>
                 </DialogFooter>
             </DialogContent>

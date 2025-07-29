@@ -10,6 +10,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Calendar, Upload, X, Plus } from "lucide-react";
 import { useUpdateEvent } from "../_hooks/use-update-event";
 import { useQueryClient } from "@tanstack/react-query";
+import { useLanguage } from "@/hooks/useLanguage";
 import { toast } from "sonner";
 
 interface MediaItem {
@@ -50,6 +51,7 @@ export function UpdateEventDialog({ children, event }: UpdateEventDialogProps) {
 
     const queryClient = useQueryClient();
     const updateEventMutation = useUpdateEvent();
+    const { t } = useLanguage();
 
     // Initialize form data when event changes or dialog opens
     useEffect(() => {
@@ -113,11 +115,11 @@ export function UpdateEventDialog({ children, event }: UpdateEventDialogProps) {
     };
 
     const validateForm = () => {
-        if (!formData.name.trim()) return "Event name is required";
-        if (!formData.startDate) return "Start date is required";
-        if (!formData.endDate) return "End date is required";
+        if (!formData.name.trim()) return t('admin.events.validation.nameRequired');
+        if (!formData.startDate) return t('admin.events.validation.startDateRequired');
+        if (!formData.endDate) return t('admin.events.validation.endDateRequired');
         if (new Date(formData.startDate) >= new Date(formData.endDate)) {
-            return "End date must be after start date";
+            return t('admin.events.validation.endDateAfterStart');
         }
         return null;
     };
@@ -152,11 +154,11 @@ export function UpdateEventDialog({ children, event }: UpdateEventDialogProps) {
             setIsOpen(false);
             
             // Show success message
-            toast.success("Event updated successfully!");
+            toast.success(t('admin.events.eventUpdatedSuccess'));
 
         } catch (error) {
             console.error("Error updating event:", error);
-            const errorMessage = error instanceof Error ? error.message : "Failed to update event. Please try again.";
+            const errorMessage = error instanceof Error ? error.message : t('common.error');
             toast.error(errorMessage);
         } finally {
             setIsSubmitting(false);
@@ -196,7 +198,7 @@ export function UpdateEventDialog({ children, event }: UpdateEventDialogProps) {
                 <DialogHeader>
                     <DialogTitle className="text-white flex items-center gap-2">
                         <Calendar className="h-5 w-5 text-morpheus-gold-light" />
-                        Update Event
+                        {t('admin.events.updateEventTitle')}
                     </DialogTitle>
                 </DialogHeader>
 
@@ -204,22 +206,22 @@ export function UpdateEventDialog({ children, event }: UpdateEventDialogProps) {
                     {/* Basic Event Information */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label className="text-gray-300">Event Code</Label>
+                            <Label className="text-gray-300">{t('admin.events.eventCode')}</Label>
                             <Input
                                 value={formData.code}
                                 onChange={(e) => handleInputChange("code", e.target.value)}
-                                placeholder="Event code"
+                                placeholder={t('admin.events.eventCodePlaceholder')}
                                 className="bg-gray-800/50 border-gray-600 text-white placeholder-gray-400"
                                 disabled={isSubmitting}
                             />
                         </div>
 
                         <div className="space-y-2">
-                            <Label className="text-gray-300">Event Name</Label>
+                            <Label className="text-gray-300">{t('admin.events.eventName')}</Label>
                             <Input
                                 value={formData.name}
                                 onChange={(e) => handleInputChange("name", e.target.value)}
-                                placeholder="Enter event name"
+                                placeholder={t('admin.events.eventNamePlaceholder')}
                                 className="bg-gray-800/50 border-gray-600 text-white placeholder-gray-400"
                                 disabled={isSubmitting}
                             />
@@ -229,7 +231,7 @@ export function UpdateEventDialog({ children, event }: UpdateEventDialogProps) {
                     {/* Date Range */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label className="text-gray-300">Start Date</Label>
+                            <Label className="text-gray-300">{t('admin.events.startDate')}</Label>
                             <Input
                                 type="datetime-local"
                                 value={formData.startDate}
@@ -240,7 +242,7 @@ export function UpdateEventDialog({ children, event }: UpdateEventDialogProps) {
                         </div>
 
                         <div className="space-y-2">
-                            <Label className="text-gray-300">End Date</Label>
+                            <Label className="text-gray-300">{t('admin.events.endDate')}</Label>
                             <Input
                                 type="datetime-local"
                                 value={formData.endDate}
@@ -253,14 +255,14 @@ export function UpdateEventDialog({ children, event }: UpdateEventDialogProps) {
 
                     {/* Image Management Section */}
                     <div className="space-y-4">
-                        <Label className="text-gray-300">Event Images</Label>
+                        <Label className="text-gray-300">{t('admin.events.eventImages')}</Label>
 
                         {/* Existing Images */}
                         {existingImages.length > 0 && (
                             <div className="space-y-3">
                                 <div className="flex items-center justify-between">
                                     <Label className="text-gray-300 text-sm">
-                                        Current Images ({getVisibleExistingImages().length})
+                                        {t('admin.events.currentImages')} ({getVisibleExistingImages().length})
                                     </Label>
                                     {imagesToRemove.length > 0 && (
                                         <Button
@@ -271,7 +273,7 @@ export function UpdateEventDialog({ children, event }: UpdateEventDialogProps) {
                                             className="text-blue-400 hover:text-blue-300 hover:bg-blue-900/20"
                                             disabled={isSubmitting}
                                         >
-                                            Restore All
+                                            {t('admin.events.restoreAll')}
                                         </Button>
                                     )}
                                 </div>
@@ -303,8 +305,8 @@ export function UpdateEventDialog({ children, event }: UpdateEventDialogProps) {
                                                             </p>
                                                             <p className="text-sm text-gray-400">
                                                                 {isMarkedForRemoval
-                                                                    ? "Marked for removal"
-                                                                    : "Current image"}
+                                                                    ? t('admin.events.markedForRemoval')
+                                                                    : t('admin.events.currentImage')}
                                                             </p>
                                                         </div>
                                                         <Button
@@ -342,7 +344,7 @@ export function UpdateEventDialog({ children, event }: UpdateEventDialogProps) {
                         {/* Add New Images */}
                         <div className="space-y-3">
                             <div className="flex items-center justify-between">
-                                <Label className="text-gray-300 text-sm">Add New Images</Label>
+                                <Label className="text-gray-300 text-sm">{t('admin.events.addNewImages')}</Label>
                                 {newFiles.length > 0 && (
                                     <Button
                                         type="button"
@@ -352,7 +354,7 @@ export function UpdateEventDialog({ children, event }: UpdateEventDialogProps) {
                                         className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
                                         disabled={isSubmitting}
                                     >
-                                        Clear All
+                                        {t('admin.events.clearAll')}
                                     </Button>
                                 )}
                             </div>
@@ -366,10 +368,10 @@ export function UpdateEventDialog({ children, event }: UpdateEventDialogProps) {
                                             htmlFor="new-image-upload"
                                             className="text-morpheus-gold-light hover:text-morpheus-gold-dark cursor-pointer"
                                         >
-                                            Click to add more images
+                                            {t('admin.events.clickToAddMore')}
                                         </Label>
                                         <p className="text-sm text-gray-400 mt-1">
-                                            PNG, JPG, GIF up to 10MB each • Multiple files supported
+                                            {t('admin.events.fileSupport')}
                                         </p>
                                     </div>
                                     <Input
@@ -387,7 +389,7 @@ export function UpdateEventDialog({ children, event }: UpdateEventDialogProps) {
                             {/* New Image Previews */}
                             {newFiles.length > 0 && (
                                 <div className="space-y-3">
-                                    <Label className="text-gray-300 text-sm">New Images ({newFiles.length})</Label>
+                                    <Label className="text-gray-300 text-sm">{t('admin.events.newImages')} ({newFiles.length})</Label>
                                     <ScrollArea className="h-40">
                                         <div className="grid grid-cols-1 gap-3 pr-4">
                                         {newFiles.map((file, index) => (
@@ -406,7 +408,7 @@ export function UpdateEventDialog({ children, event }: UpdateEventDialogProps) {
                                                                 {file.name}
                                                             </p>
                                                             <p className="text-sm text-gray-400">
-                                                                {(file.size / 1024 / 1024).toFixed(2)} MB • New image
+                                                                {(file.size / 1024 / 1024).toFixed(2)} MB • {t('admin.events.newImage')}
                                                             </p>
                                                         </div>
                                                         <Button
@@ -439,14 +441,14 @@ export function UpdateEventDialog({ children, event }: UpdateEventDialogProps) {
                             disabled={isSubmitting}
                             className="flex-1 border-gray-600 text-gray-300 hover:bg-gray-800/50"
                         >
-                            Cancel
+                            {t('common.cancel')}
                         </Button>
                         <Button
                             type="submit"
                             disabled={isSubmitting}
                             className="flex-1 bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-morpheus-gold-dark hover:to-morpheus-gold-light text-white font-semibold transition-all duration-300 hover:scale-105"
                         >
-                            {isSubmitting ? "Updating..." : "Update Event"}
+                            {isSubmitting ? t('admin.events.updating') : t('admin.events.updateEvent')}
                         </Button>
                     </div>
                 </form>

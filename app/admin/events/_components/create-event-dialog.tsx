@@ -10,6 +10,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Calendar, Upload, X } from "lucide-react";
 import { useCreateEvent } from "../_hooks/use-create-event";
 import { useQueryClient } from "@tanstack/react-query";
+import { useLanguage } from "@/hooks/useLanguage";
 import { toast } from "sonner";
 
 interface CreateEventDialogProps {
@@ -30,6 +31,7 @@ export function CreateEventDialog({ children }: CreateEventDialogProps) {
 
     const queryClient = useQueryClient();
     const createEventMutation = useCreateEvent();
+    const { t } = useLanguage();
 
     const handleInputChange = (field: string, value: string) => {
         setFormData(prev => ({
@@ -66,11 +68,11 @@ export function CreateEventDialog({ children }: CreateEventDialogProps) {
     };
 
     const validateForm = () => {
-        if (!formData.name.trim()) return "Event name is required";
-        if (!formData.startDate) return "Start date is required";
-        if (!formData.endDate) return "End date is required";
+        if (!formData.name.trim()) return t('admin.events.validation.nameRequired');
+        if (!formData.startDate) return t('admin.events.validation.startDateRequired');
+        if (!formData.endDate) return t('admin.events.validation.endDateRequired');
         if (new Date(formData.startDate) >= new Date(formData.endDate)) {
-            return "End date must be after start date";
+            return t('admin.events.validation.endDateAfterStart');
         }
         return null;
     };
@@ -110,11 +112,11 @@ export function CreateEventDialog({ children }: CreateEventDialogProps) {
             setIsOpen(false);
             
             // Show success message
-            toast.success("Event created successfully!");
+            toast.success(t('admin.events.eventCreatedSuccess'));
 
         } catch (error) {
             console.error("Error creating event:", error);
-            const errorMessage = error instanceof Error ? error.message : "Failed to create event. Please try again.";
+            const errorMessage = error instanceof Error ? error.message : t('common.error');
             toast.error(errorMessage);
         } finally {
             setIsSubmitting(false);
@@ -145,7 +147,7 @@ export function CreateEventDialog({ children }: CreateEventDialogProps) {
                 <DialogHeader>
                     <DialogTitle className="text-white flex items-center gap-2">
                         <Calendar className="h-5 w-5 text-morpheus-gold-light" />
-                        Create New Event
+                        {t('admin.events.createNewEvent')}
                     </DialogTitle>
                 </DialogHeader>
 
@@ -153,22 +155,22 @@ export function CreateEventDialog({ children }: CreateEventDialogProps) {
                     {/* Basic Event Information */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label className="text-gray-300">Event Code (Optional)</Label>
+                            <Label className="text-gray-300">{t('admin.events.eventCodeOptional')}</Label>
                             <Input
                                 value={formData.code}
                                 onChange={(e) => handleInputChange("code", e.target.value)}
-                                placeholder="Auto-generated if empty"
+                                placeholder={t('admin.events.eventCodePlaceholder')}
                                 className="bg-gray-800/50 border-gray-600 text-white placeholder-gray-400"
                                 disabled={isSubmitting}
                             />
                         </div>
 
                         <div className="space-y-2">
-                            <Label className="text-gray-300">Event Name</Label>
+                            <Label className="text-gray-300">{t('admin.events.eventName')}</Label>
                             <Input
                                 value={formData.name}
                                 onChange={(e) => handleInputChange("name", e.target.value)}
-                                placeholder="Enter event name"
+                                placeholder={t('admin.events.eventNamePlaceholder')}
                                 className="bg-gray-800/50 border-gray-600 text-white placeholder-gray-400"
                                 disabled={isSubmitting}
                             />
@@ -178,7 +180,7 @@ export function CreateEventDialog({ children }: CreateEventDialogProps) {
                     {/* Date Range */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label className="text-gray-300">Start Date</Label>
+                            <Label className="text-gray-300">{t('admin.events.startDate')}</Label>
                             <Input
                                 type="datetime-local"
                                 value={formData.startDate}
@@ -189,7 +191,7 @@ export function CreateEventDialog({ children }: CreateEventDialogProps) {
                         </div>
 
                         <div className="space-y-2">
-                            <Label className="text-gray-300">End Date</Label>
+                            <Label className="text-gray-300">{t('admin.events.endDate')}</Label>
                             <Input
                                 type="datetime-local"
                                 value={formData.endDate}
@@ -203,7 +205,7 @@ export function CreateEventDialog({ children }: CreateEventDialogProps) {
                     {/* Image Upload Section */}
                     <div className="space-y-4">
                         <div className="flex items-center justify-between">
-                            <Label className="text-gray-300">Event Images (Optional)</Label>
+                            <Label className="text-gray-300">{t('admin.events.eventImagesOptional')}</Label>
                             {selectedFiles.length > 0 && (
                                 <Button
                                     type="button"
@@ -213,7 +215,7 @@ export function CreateEventDialog({ children }: CreateEventDialogProps) {
                                     className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
                                     disabled={isSubmitting}
                                 >
-                                    Clear All
+                                    {t('admin.events.clearAll')}
                                 </Button>
                             )}
                         </div>
@@ -227,10 +229,10 @@ export function CreateEventDialog({ children }: CreateEventDialogProps) {
                                         htmlFor="image-upload"
                                         className="text-morpheus-gold-light hover:text-morpheus-gold-dark cursor-pointer"
                                     >
-                                        Click to upload images
+                                        {t('admin.events.clickToUpload')}
                                     </Label>
                                     <p className="text-sm text-gray-400 mt-1">
-                                        PNG, JPG, GIF up to 10MB each • Multiple files supported
+                                        {t('admin.events.fileSupport')}
                                     </p>
                                 </div>
                                 <Input
@@ -249,7 +251,7 @@ export function CreateEventDialog({ children }: CreateEventDialogProps) {
                         {selectedFiles.length > 0 && (
                             <div className="space-y-3">
                                 <Label className="text-gray-300 text-sm">
-                                    Selected Images ({selectedFiles.length})
+                                    {t('admin.events.selectedImages')} ({selectedFiles.length})
                                 </Label>
                                 <ScrollArea className="h-60">
                                     <div className="grid grid-cols-1 gap-3 pr-4">
@@ -299,14 +301,14 @@ export function CreateEventDialog({ children }: CreateEventDialogProps) {
                             disabled={isSubmitting}
                             className="flex-1 border-gray-600 text-gray-300 hover:bg-gray-800/50"
                         >
-                            Cancel
+                            {t('common.cancel')}
                         </Button>
                         <Button
                             type="submit"
                             disabled={isSubmitting}
                             className="flex-1 bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-morpheus-gold-dark hover:to-morpheus-gold-light text-white font-semibold transition-all duration-300 hover:scale-105"
                         >
-                            {isSubmitting ? "Creating..." : "Create Event"}
+                            {isSubmitting ? t('admin.events.creating') : t('admin.events.createEvent')}
                         </Button>
                     </div>
                 </form>

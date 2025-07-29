@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
+import { useLanguage } from "@/hooks/useLanguage";
 import { Calendar, Edit, Trash2, CalendarDays, Eye } from "lucide-react";
 import { UpdateEventDialog } from "./update-event-dialog";
 import { DeleteEventDialog } from "./delete-event-dialog";
@@ -14,6 +15,7 @@ import { toast } from "sonner";
 // Event Card Component
 export function EventCard({ event }) {
     const { data: user } = useAuth();
+    const { t } = useLanguage();
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const deleteEventMutation = useDeleteEvent();
 
@@ -39,21 +41,21 @@ export function EventCard({ event }) {
         if (now < startDate) {
             return {
                 status: "upcoming",
-                label: "Upcoming",
+                label: t('admin.events.eventStatus.upcoming'),
                 variant: "secondary" as const,
                 className: "bg-blue-500/20 text-blue-300 border-blue-500/30",
             };
         } else if (now > endDate) {
             return {
                 status: "ended",
-                label: "Ended",
+                label: t('admin.events.eventStatus.ended'),
                 variant: "outline" as const,
                 className: "bg-gray-500/20 text-gray-400 border-gray-500/30",
             };
         } else {
             return {
                 status: "active",
-                label: "Active",
+                label: t('admin.events.eventStatus.active'),
                 variant: "default" as const,
                 className: "bg-green-500/20 text-green-300 border-green-500/30",
             };
@@ -71,10 +73,10 @@ export function EventCard({ event }) {
     const handleConfirmDelete = async () => {
         try {
             await deleteEventMutation.mutateAsync({ eventId: event.yeventid });
-            toast.success("Event deleted successfully!");
+            toast.success(t('admin.events.eventDeletedSuccess'));
             setShowDeleteDialog(false);
         } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : "Failed to delete event";
+            const errorMessage = error instanceof Error ? error.message : t('common.error');
             toast.error(errorMessage);
             console.error("Delete error:", error);
         }
@@ -106,7 +108,7 @@ export function EventCard({ event }) {
                                 {eventStatus.label}
                             </Badge>
                         </div>
-                        <p className="text-sm text-gray-400">Code: {event.yeventcode}</p>
+                        <p className="text-sm text-gray-400">{t('admin.events.eventCode')}: {event.yeventcode}</p>
                     </div>
                     {isAdmin && (
                         <div className="flex gap-1">
@@ -115,7 +117,7 @@ export function EventCard({ event }) {
                                     size="sm"
                                     variant="outline"
                                     className="h-8 w-8 p-0 border-gray-600 text-gray-300 hover:bg-gray-800/50 hover:text-white hover:border-morpheus-gold-light/50"
-                                    title="Edit Event"
+                                    title={t('admin.events.editEvent')}
                                 >
                                     <Edit className="h-3 w-3" />
                                 </Button>
@@ -125,7 +127,7 @@ export function EventCard({ event }) {
                                 variant="outline"
                                 onClick={handleDelete}
                                 className="h-8 w-8 p-0 border-gray-600 text-gray-300 hover:bg-red-900/50 hover:text-red-400 hover:border-red-500/50"
-                                title="Delete Event"
+                                title={t('admin.events.deleteEvent')}
                             >
                                 <Trash2 className="h-3 w-3" />
                             </Button>
@@ -148,7 +150,7 @@ export function EventCard({ event }) {
                     onClick={() => console.log("View event details:", event)}
                 >
                     <Eye className="h-4 w-4 mr-2" />
-                    View Details
+                    {t('admin.events.viewDetails')}
                 </Button>
             </CardFooter>
             
