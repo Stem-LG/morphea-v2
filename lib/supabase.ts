@@ -770,7 +770,7 @@ export type Database = {
           sysuser?: string | null
           xcouleurcode: string
           xcouleurhexa: string
-          xcouleurid: number
+          xcouleurid?: number
           xcouleurintitule: string
           xcouleurrvb: string
         }
@@ -846,7 +846,7 @@ export type Database = {
           sysuser?: string | null
           xtaillecode: string
           xtailleeur?: string | null
-          xtailleid: number
+          xtailleid?: number
           xtailleintitule: string
           xtailleus?: string | null
           xtaillex?: string | null
@@ -1049,8 +1049,8 @@ export type Database = {
           yboutiqueidfk: number | null
           ydesignidfk: number | null
           ydetailseventid: number
-          yeventidfk: number
-          ymallidfk: number
+          yeventidfk: number | null
+          ymallidfk: number | null
           yprodidfk: number | null
         }
         Insert: {
@@ -1060,9 +1060,9 @@ export type Database = {
           sysuser?: string | null
           yboutiqueidfk?: number | null
           ydesignidfk?: number | null
-          ydetailseventid: number
-          yeventidfk: number
-          ymallidfk: number
+          ydetailseventid?: number
+          yeventidfk?: number | null
+          ymallidfk?: number | null
           yprodidfk?: number | null
         }
         Update: {
@@ -1073,8 +1073,8 @@ export type Database = {
           yboutiqueidfk?: number | null
           ydesignidfk?: number | null
           ydetailseventid?: number
-          yeventidfk?: number
-          ymallidfk?: number
+          yeventidfk?: number | null
+          ymallidfk?: number | null
           yprodidfk?: number | null
         }
         Relationships: [
@@ -1448,6 +1448,7 @@ export type Database = {
           sysadresseip: string | null
           sysdate: string | null
           sysuser: string | null
+          ymediaboolphotoeditoriale: boolean | null
           ymediaboolphotoevent: string
           ymediaboolphotoprod: string
           ymediaboolvideo: boolean
@@ -1462,10 +1463,11 @@ export type Database = {
           sysadresseip?: string | null
           sysdate?: string | null
           sysuser?: string | null
-          ymediaboolphotoevent: string
-          ymediaboolphotoprod: string
+          ymediaboolphotoeditoriale?: boolean | null
+          ymediaboolphotoevent?: string
+          ymediaboolphotoprod?: string
           ymediaboolvideo?: boolean
-          ymediaboolvideocapsule: string
+          ymediaboolvideocapsule?: string
           ymediacode: string
           ymediaid?: number
           ymediaintitule: string
@@ -1476,6 +1478,7 @@ export type Database = {
           sysadresseip?: string | null
           sysdate?: string | null
           sysuser?: string | null
+          ymediaboolphotoeditoriale?: boolean | null
           ymediaboolphotoevent?: string
           ymediaboolphotoprod?: string
           ymediaboolvideo?: boolean
@@ -1493,10 +1496,7 @@ export type Database = {
           sysadresseip: string | null
           sysdate: string | null
           sysuser: string | null
-          yobjet3daction: string | null
-          yobjet3dcouleur: string
           yobjet3did: number
-          yobjet3dorder: number
           yobjet3durl: string
           yvarprodidfk: number
         }
@@ -1505,10 +1505,7 @@ export type Database = {
           sysadresseip?: string | null
           sysdate?: string | null
           sysuser?: string | null
-          yobjet3daction?: string | null
-          yobjet3dcouleur: string
           yobjet3did?: number
-          yobjet3dorder: number
           yobjet3durl: string
           yvarprodidfk: number
         }
@@ -1517,10 +1514,7 @@ export type Database = {
           sysadresseip?: string | null
           sysdate?: string | null
           sysuser?: string | null
-          yobjet3daction?: string | null
-          yobjet3dcouleur?: string
           yobjet3did?: number
-          yobjet3dorder?: number
           yobjet3durl?: string
           yvarprodidfk?: number
         }
@@ -1745,7 +1739,7 @@ export type Database = {
           sysdate: string | null
           sysuser: string | null
           xcouleuridfk: number
-          xdeviseidfk: number
+          xdeviseidfk: number | null
           xtailleidfk: number
           yprodidfk: number | null
           yvarprodcode: string
@@ -1765,15 +1759,15 @@ export type Database = {
           sysdate?: string | null
           sysuser?: string | null
           xcouleuridfk: number
-          xdeviseidfk: number
+          xdeviseidfk?: number | null
           xtailleidfk: number
           yprodidfk?: number | null
           yvarprodcode: string
           yvarprodgenre: string
-          yvarprodid: number
+          yvarprodid?: number
           yvarprodintitule: string
           yvarprodnbrjourlivraison: number
-          yvarprodprixcatalogue: number
+          yvarprodprixcatalogue?: number
           yvarprodprixpromotion?: number | null
           yvarprodpromotiondatedeb?: string | null
           yvarprodpromotiondatefin?: string | null
@@ -1785,7 +1779,7 @@ export type Database = {
           sysdate?: string | null
           sysuser?: string | null
           xcouleuridfk?: number
-          xdeviseidfk?: number
+          xdeviseidfk?: number | null
           xtailleidfk?: number
           yprodidfk?: number | null
           yvarprodcode?: string
@@ -1847,7 +1841,7 @@ export type Database = {
           sysuser?: string | null
           ymediaidfk: number
           yvarprodidfk: number
-          yvarprodmediaid: number
+          yvarprodmediaid?: number
         }
         Update: {
           sysaction?: string | null

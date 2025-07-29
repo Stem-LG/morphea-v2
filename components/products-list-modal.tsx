@@ -29,10 +29,7 @@ export default function ProductsListModal({ isOpen, onClose, onProductDetailsCha
             const models = product.yvarprod?.flatMap(variant => 
                 variant.yobjet3d?.map(obj => ({
                     id: obj.yobjet3did,
-                    name: `3D Model ${obj.yobjet3dorder || 1}`,
                     url: obj.yobjet3durl,
-                    color: obj.yobjet3dcouleur,
-                    action: obj.yobjet3daction
                 })) || []
             ) || [];
 

@@ -149,7 +149,7 @@ export function DataTable<T extends object>({
                 <div>{actions}</div>
             </div>
             {/* Table */}
-            <div className="rounded-md border bg-background">
+            <div className="rounded-md border bg-gradient-to-br from-morpheus-blue-dark to-morpheus-blue-light">
                 <Table>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
@@ -335,7 +335,7 @@ export function PaginationControl({
                         <PaginationItem key={`page-${item}`}>
                             <PaginationLink
                                 href="#"
-                                onClick={(e:any) => {
+                                onClick={(e: any) => {
                                     e.preventDefault();
                                     onPageChange(Number(item));
                                 }}

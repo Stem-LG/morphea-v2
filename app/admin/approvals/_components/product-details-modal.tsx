@@ -539,30 +539,10 @@ export function ProductDetailsModal({
                                                         <Box className="h-5 w-5 text-morpheus-gold-light" />
                                                         {t('admin.productApprovalsDetail.threeDObject')} {index + 1}
                                                     </span>
-                                                    <Badge variant="outline" className="border-slate-600 text-gray-300">
-                                                        {t('admin.productApprovalsDetail.order')}: {obj.yobjet3dorder || t('admin.productApprovalsDetail.na')}
-                                                    </Badge>
+                                                    
                                                 </CardTitle>
                                             </CardHeader>
-                                            <CardContent className="space-y-3">
-                                                {obj.yobjet3dcouleur && (
-                                                    <div>
-                                                        <label className="text-sm font-medium text-gray-400">{t('admin.productApprovalsDetail.color')}</label>
-                                                        <div className="flex items-center gap-2">
-                                                            <div 
-                                                                className="w-4 h-4 rounded border border-slate-600"
-                                                                style={{ backgroundColor: obj.yobjet3dcouleur }}
-                                                            ></div>
-                                                            <span className="text-white">{obj.yobjet3dcouleur}</span>
-                                                        </div>
-                                                    </div>
-                                                )}
-                                                
-                                                <div>
-                                                    <label className="text-sm font-medium text-gray-400">{t('admin.productApprovalsDetail.action')}</label>
-                                                    <p className="text-white">{obj.yobjet3daction}</p>
-                                                </div>
-                                                
+                                            <CardContent className="space-y-3">                
                                                 {obj.yobjet3durl && (
                                                     <div>
                                                         <label className="text-sm font-medium text-gray-400">{t('admin.productApprovalsDetail.threeDModel')}</label>

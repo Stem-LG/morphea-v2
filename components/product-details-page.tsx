@@ -17,7 +17,7 @@ function LoadingSpinner() {
     return (
         <Html center>
             <div className="flex flex-col items-center justify-center text-white bg-black/50 backdrop-blur-sm px-6 py-4">
-                <div className="w-12 h-12 border-4 border-morpheus-gold-dark rounded rounded-full border-t-morpheus-gold-light animate-spin mb-3"></div>
+                <div className="w-12 h-12 border-4 border-morpheus-gold-dark rounded-full border-t-morpheus-gold-light animate-spin mb-3"></div>
                 <div className="text-lg font-medium bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light bg-clip-text text-transparent font-parisienne">
                     {t('productDetails.loading3DModel')}
                 </div>
@@ -141,7 +141,6 @@ interface ProductDetailsPageProps {
         backgroundColor?: string;
         models: Array<{
             url: string;
-            color: string;
             id: number;
         }>;
     };
@@ -175,37 +174,36 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
     const availableColors = useMemo(() => {
         return productData.models.map((model, index) => {
             // Create a better display name for hex colors
-            const getColorName = (color: string | null | undefined) => {
-                if (!color) return `${t('productDetails.variant')} ${index + 1}`;
+            // const getColorName = (color: string | null | undefined) => {
+            //     if (!color) return `${t('productDetails.variant')} ${index + 1}`;
 
-                if (color.startsWith('#')) {
-                    // Convert common hex colors to names based on language
-                    const hexToNameMap: { [key: string]: string } = {
-                        '#ff0000': t('productDetails.color') === 'Couleur' ? 'Rouge' : 'Red',
-                        '#0000ff': t('productDetails.color') === 'Couleur' ? 'Bleu' : 'Blue',
-                        '#00ff00': t('productDetails.color') === 'Couleur' ? 'Vert' : 'Green',
-                        '#ffff00': t('productDetails.color') === 'Couleur' ? 'Jaune' : 'Yellow',
-                        '#ff00ff': t('productDetails.color') === 'Couleur' ? 'Magenta' : 'Magenta',
-                        '#00ffff': t('productDetails.color') === 'Couleur' ? 'Cyan' : 'Cyan',
-                        '#000000': t('productDetails.color') === 'Couleur' ? 'Noir' : 'Black',
-                        '#ffffff': t('productDetails.color') === 'Couleur' ? 'Blanc' : 'White',
-                        '#808080': t('productDetails.color') === 'Couleur' ? 'Gris' : 'Gray',
-                        '#ffa500': t('productDetails.color') === 'Couleur' ? 'Orange' : 'Orange',
-                        '#800080': t('productDetails.color') === 'Couleur' ? 'Violet' : 'Purple',
-                        '#ffc0cb': t('productDetails.color') === 'Couleur' ? 'Rose' : 'Pink',
-                        '#a52a2a': t('productDetails.color') === 'Couleur' ? 'Marron' : 'Brown'
-                    };
+            //     if (color.startsWith('#')) {
+            //         // Convert common hex colors to names based on language
+            //         const hexToNameMap: { [key: string]: string } = {
+            //             '#ff0000': t('productDetails.color') === 'Couleur' ? 'Rouge' : 'Red',
+            //             '#0000ff': t('productDetails.color') === 'Couleur' ? 'Bleu' : 'Blue',
+            //             '#00ff00': t('productDetails.color') === 'Couleur' ? 'Vert' : 'Green',
+            //             '#ffff00': t('productDetails.color') === 'Couleur' ? 'Jaune' : 'Yellow',
+            //             '#ff00ff': t('productDetails.color') === 'Couleur' ? 'Magenta' : 'Magenta',
+            //             '#00ffff': t('productDetails.color') === 'Couleur' ? 'Cyan' : 'Cyan',
+            //             '#000000': t('productDetails.color') === 'Couleur' ? 'Noir' : 'Black',
+            //             '#ffffff': t('productDetails.color') === 'Couleur' ? 'Blanc' : 'White',
+            //             '#808080': t('productDetails.color') === 'Couleur' ? 'Gris' : 'Gray',
+            //             '#ffa500': t('productDetails.color') === 'Couleur' ? 'Orange' : 'Orange',
+            //             '#800080': t('productDetails.color') === 'Couleur' ? 'Violet' : 'Purple',
+            //             '#ffc0cb': t('productDetails.color') === 'Couleur' ? 'Rose' : 'Pink',
+            //             '#a52a2a': t('productDetails.color') === 'Couleur' ? 'Marron' : 'Brown'
+            //         };
 
-                    return hexToNameMap[color.toLowerCase()] || `${t('productDetails.color')} ${index + 1}`;
-                }
+            //         return hexToNameMap[color.toLowerCase()] || `${t('productDetails.color')} ${index + 1}`;
+            //     }
 
-                return color;
-            };
+            //     return color;
+            // };
 
             return {
                 ...model,
                 index,
-                displayName: getColorName(model.color)
             };
         });
     }, [productData.models, t]);
@@ -550,47 +548,46 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                                     </h3>
                                     <div className="flex flex-wrap gap-1.5 sm:gap-2 lg:gap-3">
                                         {availableColors.map((colorOption) => {
-                                            // Handle both hex codes and color names
-                                            const getColorValue = (colorInput: string | null | undefined) => {
-                                                if (!colorInput) return '#6b7280'; // Default gray
+                                            // // Handle both hex codes and color names
+                                            // const getColorValue = (colorInput: string | null | undefined) => {
+                                            //     if (!colorInput) return '#6b7280'; // Default gray
 
-                                                // If it's already a hex code, use it directly
-                                                if (colorInput.startsWith('#')) {
-                                                    return colorInput;
-                                                }
+                                            //     // If it's already a hex code, use it directly
+                                            //     if (colorInput.startsWith('#')) {
+                                            //         return colorInput;
+                                            //     }
 
-                                                // If it's a color name, convert to hex
-                                                const colorMap: { [key: string]: string } = {
-                                                    'red': '#ef4444',
-                                                    'rouge': '#ef4444',
-                                                    'blue': '#3b82f6',
-                                                    'bleu': '#3b82f6',
-                                                    'green': '#10b981',
-                                                    'vert': '#10b981',
-                                                    'yellow': '#eab308',
-                                                    'jaune': '#eab308',
-                                                    'purple': '#8b5cf6',
-                                                    'violet': '#8b5cf6',
-                                                    'pink': '#ec4899',
-                                                    'rose': '#ec4899',
-                                                    'orange': '#f97316',
-                                                    'brown': '#a3a3a3',
-                                                    'marron': '#a3a3a3',
-                                                    'black': '#000000',
-                                                    'noir': '#000000',
-                                                    'white': '#ffffff',
-                                                    'blanc': '#ffffff',
-                                                    'gray': '#6b7280',
-                                                    'grey': '#6b7280',
-                                                    'gris': '#6b7280',
-                                                    'default': '#6b7280'
-                                                };
+                                            //     // If it's a color name, convert to hex
+                                            //     const colorMap: { [key: string]: string } = {
+                                            //         'red': '#ef4444',
+                                            //         'rouge': '#ef4444',
+                                            //         'blue': '#3b82f6',
+                                            //         'bleu': '#3b82f6',
+                                            //         'green': '#10b981',
+                                            //         'vert': '#10b981',
+                                            //         'yellow': '#eab308',
+                                            //         'jaune': '#eab308',
+                                            //         'purple': '#8b5cf6',
+                                            //         'violet': '#8b5cf6',
+                                            //         'pink': '#ec4899',
+                                            //         'rose': '#ec4899',
+                                            //         'orange': '#f97316',
+                                            //         'brown': '#a3a3a3',
+                                            //         'marron': '#a3a3a3',
+                                            //         'black': '#000000',
+                                            //         'noir': '#000000',
+                                            //         'white': '#ffffff',
+                                            //         'blanc': '#ffffff',
+                                            //         'gray': '#6b7280',
+                                            //         'grey': '#6b7280',
+                                            //         'gris': '#6b7280',
+                                            //         'default': '#6b7280'
+                                            //     };
 
-                                                const normalizedColor = colorInput.toLowerCase().trim();
-                                                return colorMap[normalizedColor] || colorInput; // Return original if not found
-                                            };
+                                            //     const normalizedColor = colorInput.toLowerCase().trim();
+                                            //     return colorMap[normalizedColor] || colorInput; // Return original if not found
+                                            // };
 
-                                            const colorHex = getColorValue(colorOption.color);
 
                                             return (
                                                 <button
@@ -600,8 +597,6 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                                                             ? "border-morpheus-gold-light scale-110 shadow-lg shadow-morpheus-gold-light/40"
                                                             : "border-morpheus-gold-dark/30 hover:border-morpheus-gold-light/60 hover:scale-105"
                                                         }`}
-                                                    style={{ backgroundColor: colorHex }}
-                                                    title={colorOption.displayName}
                                                 >
                                                     {/* Inner border for white/light colors visibility */}
                                                     <div className="absolute inset-1 border border-gray-400/20 rounded"></div>
@@ -617,7 +612,6 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
 
                                                     {/* Tooltip */}
                                                     <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 bg-black/90 backdrop-blur-sm text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
-                                                        {colorOption.displayName}
                                                     </div>
                                                 </button>
                                             );

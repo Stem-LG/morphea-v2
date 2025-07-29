@@ -6,7 +6,7 @@ import { useMutation } from "@tanstack/react-query"
 interface createMediaParams {
     code?: string,
     name: string,
-    type: "eventImage" | "productImage" | "capsuleVideo",
+    type: "eventImage" | "productImage" | "editorialImage" | "capsuleVideo" | "video",
     url: string
 }
 
@@ -27,6 +27,8 @@ export function useCreateMedia() {
                 ymediaboolphotoevent: media.type == "eventImage" ? "1" : "0",
                 ymediaboolphotoprod: media.type == "productImage" ? "1" : "0",
                 ymediaboolvideocapsule: media.type == "capsuleVideo" ? "1" : "0",
+                ymediaboolphotoeditoriale: media.type == "editorialImage" ? true : false,
+                ymediaboolvideo: media.type == "video" ? true : false,
                 ymediaintitule: media.name,
                 ymediaurl: media.url,
             }).select('*')
