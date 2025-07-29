@@ -47,7 +47,10 @@ Example structure:
 -   Use kebab-case for file names (e.g., `use-create-event.ts`).
 -   Group related hooks and components together in their respective directories.
 -   Always check for existing hooks or components before creating new ones to avoid duplication.
+-   Make sure to look at existing pages, components and hooks before creating new ones to get an idea about the structure and naming conventions used in the project.
 -   Keep the directory structure organized and intuitive.
+-   To make queries or mutations, use `@tanstack/react-query` for data fetching and state management inside custom hooks, with file structure as mentioned in the example above.
+-   Check `app/lib/supabase.ts` to get an idea about the supabase data structure and types.
 -   Don't create unnecessary types, for Supabase queries, let the Supabase client infer types automatically, otherwise define them on top of the file.
 -   Use shadcn UI components for consistent styling.
 -   To install shadcn UI components, use the command `bunx shadcn@latest install` don't create them from scratch.
@@ -55,4 +58,5 @@ Example structure:
 -   For select inputs, use the `@/components/super-select` component for consistent styling and functionality.
 -   Use `sonner` for notifications and toasts, and create a `Toaster` component in the `_components` directory.
 -   Use the context7 tools for getting information about the different libraries that are used or to be used in the project before making decisions, to get an idea about up to date features and usage examples.
--   Use `nuqs` library for using url parameters as state in components, it provides a simple way to manage URL parameters and synchronize them with component state, especially in combination with the data-table component. (use context7 to get more information about it)
+-   Use `nuqs` library for using url parameters as state in components, it provides a simple way to manage URL parameters and synchronize them with component state, especially in combination with the data-table component for page and filter state. (use context7 to get more information about it)
+-   Use `lucide-react` for icons, as it provides a wide range of icons that are easy to use and customize.
