@@ -275,7 +275,7 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
 
     // Fetch product details
     const { data: product, isLoading: productLoading } = useQuery({
-        queryKey: ["product-details", productId],
+        queryKey: ["product-details-approval", productId],
         queryFn: async () => {
             if (!productId) return null;
 

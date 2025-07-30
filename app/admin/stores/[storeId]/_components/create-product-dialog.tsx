@@ -388,7 +388,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                         <Loader2 className="h-8 w-8 animate-spin text-morpheus-gold-light mb-4" />
                         <span className="text-lg text-gray-300">Loading product details...</span>
                     </div>
-                ) : isEditMode && (productDetailsError || !productDetails) ? (
+                ) : isEditMode && productDetailsError ? (
                     <div className="flex flex-col items-center justify-center min-h-[300px] py-12">
                         <div className="flex items-center gap-2 mb-2">
                             <Info className="h-6 w-6 text-red-400" />
