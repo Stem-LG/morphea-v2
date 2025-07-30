@@ -199,7 +199,7 @@ export function useUpdateProduct() {
         // Handle images
         for (const image of variant.images) {
             if (image instanceof File) {
-                // New image file - upload and create media record
+
                 mediaPromises.push(
                     uploadFile.mutateAsync({ file: image, type: "image" }).then(async (url) => {
                         const mediaData = await createMedia.mutateAsync({
@@ -220,10 +220,8 @@ export function useUpdateProduct() {
                     })
                 );
             }
-            // Existing images are kept as-is (already linked)
         }
 
-        // Handle videos
         for (const video of variant.videos) {
             if (video instanceof File) {
                 // New video file - upload and create media record
@@ -247,13 +245,11 @@ export function useUpdateProduct() {
                     })
                 );
             }
-            // Existing videos are kept as-is (already linked)
         }
 
-        // Handle 3D models
         for (const model of variant.models3d) {
             if (model instanceof File) {
-                // New 3D model file - upload and create record
+
                 mediaPromises.push(
                     uploadFile.mutateAsync({ file: model, type: "3dmodel" }).then(async (url) => {
                         await create3dModel.mutateAsync({
@@ -263,10 +259,9 @@ export function useUpdateProduct() {
                     })
                 );
             }
-            // Existing 3D models are kept as-is (already linked)
+
         }
 
-        // Wait for all media operations to complete
         await Promise.all(mediaPromises);
     }
 }
