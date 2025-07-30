@@ -32,8 +32,8 @@ export function useProductDetails({ productId, enabled = true }: UseProductDetai
                 .from("yvarprod")
                 .select(`
                     *,
-                    xcouleur:xcouleuridfk(xcouleurid, xcouleurcode, xcouleurintitule, xcouleurhex, xcouleurrgb),
-                    xtaille:xtailleidfk(xtailleid, xtaillecode, xtailleintitule, xtailleeur, xtailleus, xtaillex)
+                    xcouleuridfk(*),
+                    xtailleidfk(*)
                 `)
                 .eq("yprodidfk", productId);
 
