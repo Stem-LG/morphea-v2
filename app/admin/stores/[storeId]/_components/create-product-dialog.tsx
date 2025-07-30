@@ -211,7 +211,14 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
     const handleFileUpload = (variantId: string, type: 'images' | 'videos' | 'models3d', files: FileList) => {
         const fileArray = Array.from(files);
         setVariants(variants.map(v => 
-            v.id === variantId ? { ...v, [type]: [...v[type], ...fileArray] } : v
+            v.id === variantId
+                ? {
+                    ...v,
+                    [type]: type === 'models3d'
+                        ? fileArray.slice(0, 1) // Only allow one 3D model
+                        : [...v[type], ...fileArray]
+                }
+                : v
         ));
     };
 
@@ -817,7 +824,8 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                         <span className="text-sm text-gray-300">3D Models</span>
                                                         <input
                                                             type="file"
-                                                            multiple
+                                                            // Only allow one file for 3D models
+                                                            multiple={false}
                                                             accept=".glb,.gltf,.obj,.fbx"
                                                             onChange={(e) => e.target.files && handleFileUpload(variant.id, 'models3d', e.target.files)}
                                                             className="hidden"
