@@ -1,14 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase-admin'
 import { createClient } from '@/lib/server'
+import { User } from '@supabase/supabase-js'
 
 // Helper function to check if user has admin role
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function checkAdminRole(request: NextRequest) {
   const supabase = await createClient()
-  
+
   const { data: { user }, error } = await supabase.auth.getUser()
-  
+
   if (error || !user) {
     return { isAdmin: false, error: 'Unauthorized' }
   }
@@ -25,7 +26,7 @@ export async function GET(request: NextRequest) {
   try {
     // Check if current user is admin
     const { isAdmin, error } = await checkAdminRole(request)
-    
+
     if (!isAdmin) {
       return NextResponse.json(
         { error: error || 'Access denied. Admin role required.' },
@@ -42,9 +43,12 @@ export async function GET(request: NextRequest) {
 
     // Use admin client to list all users
     const adminSupabase = createAdminClient()
-    
-    const { data, error: listError } = await adminSupabase.auth.admin.listUsers()
-    
+
+    const { data, error: listError } = await adminSupabase.auth.admin.listUsers({
+      page: 1,
+      perPage: 10000000000
+    })
+
     if (listError) {
       console.error('Error listing users:', listError)
       return NextResponse.json(
@@ -54,7 +58,12 @@ export async function GET(request: NextRequest) {
     }
 
     // Transform users and apply filtering
-    let filteredUsers = data.users.map((user) => {
+    let filteredUsers = data.users.filter((user) => {
+      if (user && !(user as User).is_anonymous) {
+        return true
+      }
+      return false
+    }).map((user) => {
       const userMetadata = user.app_metadata || {}
       return {
         id: user.id,
@@ -94,7 +103,7 @@ export async function GET(request: NextRequest) {
     const usersWithStores = await Promise.all(
       paginatedUsers.map(async (user) => {
         const assignedStoreIds = user.assigned_stores
-        
+
         let storeDetails = []
         if (assignedStoreIds.length > 0) {
           const { data: stores } = await adminSupabase
@@ -132,7 +141,7 @@ export async function GET(request: NextRequest) {
       page,
       limit
     })
-    
+
   } catch (error) {
     console.error('Error in GET /api/admin/users:', error)
     return NextResponse.json(
