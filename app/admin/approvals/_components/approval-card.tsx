@@ -68,8 +68,33 @@ export function ApprovalCard({
 
     const statusInfo = getStatusInfo();
 
-    // Get media preview
+    // Get media preview - prioritize 3D models when available
     const getMediaPreview = () => {
+        // Check if product has 3D models first
+        const has3DModels = product.yobjet3d?.length > 0;
+        
+        if (has3DModels) {
+            return (
+                <div className="relative w-full h-32 bg-gradient-to-br from-purple-900/30 to-blue-900/30 rounded-lg flex items-center justify-center border border-purple-500/30">
+                    <div className="flex flex-col items-center">
+                        <Box className="h-10 w-10 text-purple-400 mb-2" />
+                        <span className="text-purple-300 text-xs font-medium">3D Model Available</span>
+                    </div>
+                    <div className="absolute top-2 right-2">
+                        <Badge variant="secondary" className="bg-purple-500/20 text-purple-300 border-purple-500/30 text-xs">
+                            3D Preview
+                        </Badge>
+                    </div>
+                    <div className="absolute top-2 left-2">
+                        <Badge variant="secondary" className="bg-blue-500/20 text-blue-300 border-blue-500/30 text-xs">
+                            {product.yobjet3d.length} Model{product.yobjet3d.length > 1 ? 's' : ''}
+                        </Badge>
+                    </div>
+                </div>
+            );
+        }
+
+        // Fallback to regular media preview
         const media = product.media?.[0];
         if (!media) return null;
 
@@ -132,6 +157,7 @@ export function ApprovalCard({
                 {getMediaPreview() || (
                     <div className="w-full h-32 bg-gray-800 rounded-lg flex items-center justify-center">
                         <ImageIcon className="h-8 w-8 text-gray-400" />
+                        <span className="text-gray-500 text-sm ml-2">No Media</span>
                     </div>
                 )}
 

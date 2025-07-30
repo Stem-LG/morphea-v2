@@ -22,12 +22,202 @@ import {
     Play,
     Box,
     Image as ImageIcon,
-    X
+    Loader2
 } from "lucide-react";
 import { useApprovalOperations } from "../_hooks/use-approval-operations";
 import { useCategories } from "../../stores/[storeId]/_hooks/use-categories";
 import { createClient } from "@/lib/client";
 import { useQuery } from "@tanstack/react-query";
+import Product3DViewer from "@/components/product-3d-viewer";
+import { useProduct3DMedia } from "../_hooks/use-product-3d-media";
+
+// Separate component to handle the hook properly
+interface VariantApprovalCardProps {
+    variant: any;
+    index: number;
+    product: any;
+    formData: any;
+    updateVariant: (index: number, field: string, value: any) => void;
+    currencyOptions: Array<{ value: number; label: string }>;
+}
+
+function VariantApprovalCard({ variant, index, product, formData, updateVariant, currencyOptions }: VariantApprovalCardProps) {
+    const { models3d, images, videos, isLoading } = useProduct3DMedia(variant.yvarprodid);
+    
+    return (
+        <Card className="bg-gray-800/50 border-gray-700">
+            <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                    <CardTitle className="text-white text-base">
+                        {variant.yvarprodintitule}
+                    </CardTitle>
+                    <div className="flex items-center gap-2">
+                        <Badge variant="secondary" className="bg-blue-500/20 text-blue-300 border-blue-500/30 text-xs">
+                            {variant.xcouleur?.xcouleurintitule}
+                        </Badge>
+                        <Badge variant="secondary" className="bg-green-500/20 text-green-300 border-green-500/30 text-xs">
+                            {variant.xtaille?.xtailleintitule}
+                        </Badge>
+                        {variant.yvarprodstatut === 'not_approved' && (
+                            <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30 text-xs">
+                                Needs Approval
+                            </Badge>
+                        )}
+                    </div>
+                </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                {/* Variant Media */}
+                {variant.yvarprodmedia && variant.yvarprodmedia.length > 0 && (
+                    <div>
+                        <Label className="text-gray-300 text-sm mb-2 block">Variant Media</Label>
+                        <div className="grid grid-cols-3 gap-2">
+                            {variant.yvarprodmedia.map((mediaItem: any, mediaIndex: number) => {
+                                const media = mediaItem.ymedia;
+                                return (
+                                    <div key={mediaIndex} className="relative group">
+                                        {media.ymediaboolvideo ? (
+                                            <div className="aspect-square bg-gray-700 rounded-lg flex items-center justify-center">
+                                                <Play className="h-6 w-6 text-gray-400" />
+                                            </div>
+                                        ) : (
+                                            <img
+                                                src={media.ymediaurl}
+                                                alt={media.ymediaintitule}
+                                                className="aspect-square object-cover rounded-lg"
+                                                onError={(e) => {
+                                                    const target = e.target as HTMLImageElement;
+                                                    target.src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTQgMTZMMTAuNTg2IDkuNDE0QTIgMiAwIDAxMTMuNDE0IDkuNDE0TDE2IDE2TTYgMjBIMThBMiAyIDAgMDAyMCAxOFY2QTIgMiAwIDAwMTggNEg2QTIgMiAwIDAwNCA2VjE4QTIgMiAwIDAwNiAyMFpNMTUuNSA5LjVBMS41IDEuNSAwIDEwMTMgOEExLjUgMS41IDAgMDAxNS41IDkuNVoiIHN0cm9rZT0iIzlDQTNBRiIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPC9zdmc+";
+                                                }}
+                                            />
+                                        )}
+                                        <div className="absolute bottom-1 left-1">
+                                            <Badge variant="secondary" className="bg-black/50 text-white text-xs">
+                                                {media.ymediaboolvideo ? 'Video' : 'Image'}
+                                            </Badge>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
+
+                {/* 3D Viewer for this variant */}
+                {isLoading ? (
+                    <div className="flex items-center justify-center py-6 text-gray-400">
+                        <Loader2 className="h-6 w-6 animate-spin mr-2" />
+                        <span>Loading 3D media...</span>
+                    </div>
+                ) : (!models3d || models3d.length === 0) ? (
+                    <div className="flex items-center justify-center py-6 text-gray-400">
+                        <Box className="h-8 w-8 mr-2" />
+                        <span>No 3D model available for this variant</span>
+                    </div>
+                ) : (
+                    <Product3DViewer
+                        modelUrl={models3d[0]}
+                        productName={`${product.yprodintitule} - ${variant.yvarprodintitule}`}
+                        media={[
+                            ...images.map((img: any) => ({
+                                id: img.ymediaid,
+                                url: img.ymediaurl,
+                                title: img.ymediaintitule || 'Image',
+                                type: 'image' as const
+                            })),
+                            ...videos.map((vid: any) => ({
+                                id: vid.ymediaid,
+                                url: vid.ymediaurl,
+                                title: vid.ymediaintitule || 'Video',
+                                type: 'video' as const
+                            }))
+                        ]}
+                        height="300px"
+                        showControls={true}
+                        autoRotate={false}
+                        compact={true}
+                        className="border border-gray-600 w-full max-w-full"
+                    />
+                )}
+
+                {/* No media message */}
+                {(!variant.yvarprodmedia || variant.yvarprodmedia.length === 0) &&
+                 (!variant.yobjet3d || variant.yobjet3d.length === 0) && (
+                    <div className="flex items-center justify-center py-6 text-gray-400">
+                        <ImageIcon className="h-8 w-8 mr-2" />
+                        <span>No media available for this variant</span>
+                    </div>
+                )}
+
+                {/* Pricing Configuration */}
+                <div className="border-t border-gray-700 pt-4">
+                    <Label className="text-gray-300 text-sm mb-3 block">Pricing Configuration</Label>
+                    <div className="grid grid-cols-2 gap-3">
+                        <div>
+                            <Label className="text-gray-300 text-xs">Catalog Price *</Label>
+                            <Input
+                                type="number"
+                                step="0.01"
+                                value={formData.variants[index]?.yvarprodprixcatalogue || 0}
+                                onChange={(e) => updateVariant(index, 'yvarprodprixcatalogue', parseFloat(e.target.value) || 0)}
+                                className="bg-gray-700 border-gray-600 text-white text-sm"
+                            />
+                        </div>
+                        <div>
+                            <Label className="text-gray-300 text-xs">Promotion Price</Label>
+                            <Input
+                                type="number"
+                                step="0.01"
+                                value={formData.variants[index]?.yvarprodprixpromotion || ''}
+                                onChange={(e) => updateVariant(index, 'yvarprodprixpromotion', parseFloat(e.target.value) || undefined)}
+                                className="bg-gray-700 border-gray-600 text-white text-sm"
+                            />
+                        </div>
+                        <div>
+                            <Label className="text-gray-300 text-xs">Delivery Days *</Label>
+                            <Input
+                                type="number"
+                                value={formData.variants[index]?.yvarprodnbrjourlivraison || 0}
+                                onChange={(e) => updateVariant(index, 'yvarprodnbrjourlivraison', parseInt(e.target.value) || 0)}
+                                className="bg-gray-700 border-gray-600 text-white text-sm"
+                            />
+                        </div>
+                        <div>
+                            <Label className="text-gray-300 text-xs">Currency *</Label>
+                            <SuperSelect
+                                value={formData.variants[index]?.currencyId || 0}
+                                onValueChange={(value) => updateVariant(index, 'currencyId', value as number)}
+                                options={currencyOptions}
+                                placeholder="Select currency"
+                                className="bg-gray-700 border-gray-600 text-sm"
+                            />
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3 mt-3">
+                        <div>
+                            <Label className="text-gray-300 text-xs">Promotion Start</Label>
+                            <Input
+                                type="date"
+                                value={formData.variants[index]?.yvarprodpromotiondatedeb || ''}
+                                onChange={(e) => updateVariant(index, 'yvarprodpromotiondatedeb', e.target.value || undefined)}
+                                className="bg-gray-700 border-gray-600 text-white text-sm"
+                            />
+                        </div>
+                        <div>
+                            <Label className="text-gray-300 text-xs">Promotion End</Label>
+                            <Input
+                                type="date"
+                                value={formData.variants[index]?.yvarprodpromotiondatefin || ''}
+                                onChange={(e) => updateVariant(index, 'yvarprodpromotiondatefin', e.target.value || undefined)}
+                                className="bg-gray-700 border-gray-600 text-white text-sm"
+                            />
+                        </div>
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
+    );
+}
 
 interface ApprovalFormData {
     categoryId: number;
@@ -144,20 +334,7 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
         }
     }, [product]);
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!productId) return;
-
-        try {
-            await approveProduct.mutateAsync({
-                productId,
-                approvalData: formData
-            });
-            onClose();
-        } catch {
-            // Error is handled by the mutation
-        }
-    };
+    // (removed unused handleSubmit)
 
     const updateFormData = (field: keyof ApprovalFormData, value: any) => {
         setFormData(prev => ({ ...prev, [field]: value }));
@@ -284,14 +461,6 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                         </div>
                         <div className="flex items-center gap-2">
                             {getStatusBadge()}
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={onClose}
-                                className="h-8 w-8 p-0 text-gray-400 hover:text-white"
-                            >
-                                <X className="h-4 w-4" />
-                            </Button>
                         </div>
                     </div>
                 </DialogHeader>
@@ -403,162 +572,17 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                 </div>
 
                                 <div className="space-y-4">
-                                    {product.yvarprod?.map((variant: any, index: number) => (
-                                        <Card key={variant.yvarprodid} className="bg-gray-800/50 border-gray-700">
-                                            <CardHeader className="pb-3">
-                                                <div className="flex items-center justify-between">
-                                                    <CardTitle className="text-white text-base">
-                                                        {variant.yvarprodintitule}
-                                                    </CardTitle>
-                                                    <div className="flex items-center gap-2">
-                                                        <Badge variant="secondary" className="bg-blue-500/20 text-blue-300 border-blue-500/30 text-xs">
-                                                            {variant.xcouleur?.xcouleurintitule}
-                                                        </Badge>
-                                                        <Badge variant="secondary" className="bg-green-500/20 text-green-300 border-green-500/30 text-xs">
-                                                            {variant.xtaille?.xtailleintitule}
-                                                        </Badge>
-                                                        {variant.yvarprodstatut === 'not_approved' && (
-                                                            <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30 text-xs">
-                                                                Needs Approval
-                                                            </Badge>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            </CardHeader>
-                                            <CardContent className="space-y-4">
-                                                {/* Variant Media */}
-                                                {variant.yvarprodmedia && variant.yvarprodmedia.length > 0 && (
-                                                    <div>
-                                                        <Label className="text-gray-300 text-sm mb-2 block">Variant Media</Label>
-                                                        <div className="grid grid-cols-3 gap-2">
-                                                            {variant.yvarprodmedia.map((mediaItem: any, mediaIndex: number) => {
-                                                                const media = mediaItem.ymedia;
-                                                                return (
-                                                                    <div key={mediaIndex} className="relative group">
-                                                                        {media.ymediaboolvideo ? (
-                                                                            <div className="aspect-square bg-gray-700 rounded-lg flex items-center justify-center">
-                                                                                <Play className="h-6 w-6 text-gray-400" />
-                                                                            </div>
-                                                                        ) : (
-                                                                            <img
-                                                                                src={media.ymediaurl}
-                                                                                alt={media.ymediaintitule}
-                                                                                className="aspect-square object-cover rounded-lg"
-                                                                                onError={(e) => {
-                                                                                    const target = e.target as HTMLImageElement;
-                                                                                    target.src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTQgMTZMMTAuNTg2IDkuNDE0QTIgMiAwIDAxMTMuNDE0IDkuNDE0TDE2IDE2TTYgMjBIMThBMiAyIDAgMDAyMCAxOFY2QTIgMiAwIDAwMTggNEg2QTIgMiAwIDAwNCA2VjE4QTIgMiAwIDAwNiAyMFpNMTUuNSA5LjVBMS41IDEuNSAwIDEwMTMgOEExLjUgMS41IDAgMDAxNS41IDkuNVoiIHN0cm9rZT0iIzlDQTNBRiIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPC9zdmc+";
-                                                                                }}
-                                                                            />
-                                                                        )}
-                                                                        <div className="absolute bottom-1 left-1">
-                                                                            <Badge variant="secondary" className="bg-black/50 text-white text-xs">
-                                                                                {media.ymediaboolvideo ? 'Video' : 'Image'}
-                                                                            </Badge>
-                                                                        </div>
-                                                                    </div>
-                                                                );
-                                                            })}
-                                                        </div>
-                                                    </div>
-                                                )}
-
-                                                {/* 3D Models for this variant */}
-                                                {variant.yobjet3d && variant.yobjet3d.length > 0 && (
-                                                    <div>
-                                                        <Label className="text-gray-300 text-sm mb-2 block">3D Models</Label>
-                                                        <div className="space-y-2">
-                                                            {variant.yobjet3d.map((obj3d: any, obj3dIndex: number) => (
-                                                                <div key={obj3dIndex} className="p-3 bg-gray-700/50 rounded-lg">
-                                                                    <div className="flex items-center gap-2 mb-1">
-                                                                        <Box className="h-4 w-4 text-purple-400" />
-                                                                        <span className="text-white text-sm">3D Model {obj3dIndex + 1}</span>
-                                                                    </div>
-                                                                    <p className="text-xs text-gray-400 break-all">
-                                                                        {obj3d.yobjet3durl}
-                                                                    </p>
-                                                                </div>
-                                                            ))}
-                                                        </div>
-                                                    </div>
-                                                )}
-
-                                                {/* No media message */}
-                                                {(!variant.yvarprodmedia || variant.yvarprodmedia.length === 0) && 
-                                                 (!variant.yobjet3d || variant.yobjet3d.length === 0) && (
-                                                    <div className="flex items-center justify-center py-6 text-gray-400">
-                                                        <ImageIcon className="h-8 w-8 mr-2" />
-                                                        <span>No media available for this variant</span>
-                                                    </div>
-                                                )}
-
-                                                {/* Pricing Configuration */}
-                                                <div className="border-t border-gray-700 pt-4">
-                                                    <Label className="text-gray-300 text-sm mb-3 block">Pricing Configuration</Label>
-                                                    <div className="grid grid-cols-2 gap-3">
-                                                        <div>
-                                                            <Label className="text-gray-300 text-xs">Catalog Price *</Label>
-                                                            <Input
-                                                                type="number"
-                                                                step="0.01"
-                                                                value={formData.variants[index]?.yvarprodprixcatalogue || 0}
-                                                                onChange={(e) => updateVariant(index, 'yvarprodprixcatalogue', parseFloat(e.target.value) || 0)}
-                                                                className="bg-gray-700 border-gray-600 text-white text-sm"
-                                                            />
-                                                        </div>
-                                                        <div>
-                                                            <Label className="text-gray-300 text-xs">Promotion Price</Label>
-                                                            <Input
-                                                                type="number"
-                                                                step="0.01"
-                                                                value={formData.variants[index]?.yvarprodprixpromotion || ''}
-                                                                onChange={(e) => updateVariant(index, 'yvarprodprixpromotion', parseFloat(e.target.value) || undefined)}
-                                                                className="bg-gray-700 border-gray-600 text-white text-sm"
-                                                            />
-                                                        </div>
-                                                        <div>
-                                                            <Label className="text-gray-300 text-xs">Delivery Days *</Label>
-                                                            <Input
-                                                                type="number"
-                                                                value={formData.variants[index]?.yvarprodnbrjourlivraison || 0}
-                                                                onChange={(e) => updateVariant(index, 'yvarprodnbrjourlivraison', parseInt(e.target.value) || 0)}
-                                                                className="bg-gray-700 border-gray-600 text-white text-sm"
-                                                            />
-                                                        </div>
-                                                        <div>
-                                                            <Label className="text-gray-300 text-xs">Currency *</Label>
-                                                            <SuperSelect
-                                                                value={formData.variants[index]?.currencyId || 0}
-                                                                onValueChange={(value) => updateVariant(index, 'currencyId', value as number)}
-                                                                options={currencyOptions}
-                                                                placeholder="Select currency"
-                                                                className="bg-gray-700 border-gray-600 text-sm"
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                    <div className="grid grid-cols-2 gap-3 mt-3">
-                                                        <div>
-                                                            <Label className="text-gray-300 text-xs">Promotion Start</Label>
-                                                            <Input
-                                                                type="date"
-                                                                value={formData.variants[index]?.yvarprodpromotiondatedeb || ''}
-                                                                onChange={(e) => updateVariant(index, 'yvarprodpromotiondatedeb', e.target.value || undefined)}
-                                                                className="bg-gray-700 border-gray-600 text-white text-sm"
-                                                            />
-                                                        </div>
-                                                        <div>
-                                                            <Label className="text-gray-300 text-xs">Promotion End</Label>
-                                                            <Input
-                                                                type="date"
-                                                                value={formData.variants[index]?.yvarprodpromotiondatefin || ''}
-                                                                onChange={(e) => updateVariant(index, 'yvarprodpromotiondatefin', e.target.value || undefined)}
-                                                                className="bg-gray-700 border-gray-600 text-white text-sm"
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </CardContent>
-                                        </Card>
-                                    ))}
+                                                    {product.yvarprod?.map((variant: any, index: number) => (
+                                                        <VariantApprovalCard
+                                                            key={variant.yvarprodid}
+                                                            variant={variant}
+                                                            index={index}
+                                                            product={product}
+                                                            formData={formData}
+                                                            updateVariant={updateVariant}
+                                                            currencyOptions={currencyOptions}
+                                                        />
+                                                    ))}
                                 </div>
                             </div>
                         </ScrollArea>

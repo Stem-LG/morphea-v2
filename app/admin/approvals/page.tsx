@@ -13,7 +13,6 @@ import {
     Clock,
     Package,
     Filter,
-    Eye,
     AlertTriangle,
     FileSearch
 } from "lucide-react";
