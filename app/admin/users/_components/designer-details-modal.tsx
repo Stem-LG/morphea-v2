@@ -6,7 +6,7 @@ import { DesignerForm, DesignerFormData } from "./designer-form";
 import { useHasDesigner, useUpdateDesigner } from "../_hooks/use-designer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { User, Mail, Phone, MapPin, Briefcase, Palette, Edit, Eye } from "lucide-react";
+import { User, Mail, Phone, MapPin, Briefcase, Palette, Edit } from "lucide-react";
 
 interface DesignerDetailsModalProps {
     userId: string | null;

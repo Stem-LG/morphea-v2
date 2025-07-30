@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -124,48 +123,6 @@ export function DesignerForm({ userEmail, onFormChange, initialData, disabled = 
         };
     }, [t]);
 
-    const validateForm = () => {
-        const errors: Record<string, string> = {};
-        
-        // Basic step validation
-        if (step === 'basic') {
-            if (!formData.ydesignnom.trim()) {
-                errors.ydesignnom = t("admin.users.designer.nameRequired") || "Designer name is required";
-            }
-            
-            if (!formData.ydesigncontactpersonne.trim()) {
-                errors.ydesigncontactpersonne = t("admin.users.designer.contactPersonRequired") || "Contact person is required";
-            }
-            
-            if (!formData.ydesigncontactemail.trim()) {
-                errors.ydesigncontactemail = t("admin.users.designer.emailRequired") || "Email is required";
-            } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.ydesigncontactemail)) {
-                errors.ydesigncontactemail = t("admin.users.designer.emailInvalid") || "Please enter a valid email address";
-            }
-            
-            if (!formData.ydesigncontacttelephone.trim()) {
-                errors.ydesigncontacttelephone = t("admin.users.designer.phoneRequired") || "Phone number is required";
-            }
-        }
-        
-        // Additional step validation
-        if (step === 'additional') {
-            if (!formData.ydesignmarque.trim()) {
-                errors.ydesignmarque = t("admin.users.designer.brandRequired") || "Brand name is required";
-            }
-            
-            if (!formData.ydesignpays.trim()) {
-                errors.ydesignpays = t("admin.users.designer.countryRequired") || "Country is required";
-            }
-            
-            if (!formData.ydesignspecialite.trim()) {
-                errors.ydesignspecialite = t("admin.users.designer.specialtyRequired") || "Specialty is required";
-            }
-        }
-
-        setFormErrors(errors);
-        return Object.keys(errors).length === 0;
-    };
 
     const handleInputChange = (field: keyof DesignerFormData, value: string) => {
         const newFormData = { ...formData, [field]: value };
