@@ -31,7 +31,7 @@ export function useCreateMedia() {
                 ymediaboolvideo: media.type == "video" ? true : false,
                 ymediaintitule: media.name,
                 ymediaurl: media.url,
-            }).select('*')
+            }).select('*').single()
 
             if (error) {
                 throw new Error(error.code)

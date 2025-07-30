@@ -44,6 +44,8 @@ export function useProductDetails({ productId, enabled = true }: UseProductDetai
             // Fetch media for each variant
             const variantsWithMedia = await Promise.all(
                 (variants || []).map(async (variant) => {
+
+                        
                     // Fetch variant media
                     const { data: variantMedia, error: mediaError } = await supabase
                         .schema("morpheus")

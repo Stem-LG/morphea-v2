@@ -105,7 +105,11 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
     const { data: colors, isLoading: colorsLoading } = useColors();
     const { data: sizes, isLoading: sizesLoading } = useSizes();
     const { data: designer, isLoading: designerLoading } = useDesigner();
-    const { data: productDetails, isLoading: productDetailsLoading } = useProductDetails({
+    const {
+        data: productDetails,
+        isLoading: productDetailsLoading,
+        isError: productDetailsError,
+    } = useProductDetails({
         productId: productId!,
         enabled: isEditMode,
     });
@@ -116,7 +120,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
 
     // Effect to populate form when editing
     useEffect(() => {
-        if (isEditMode && productDetails) {
+        if (isEditMode && productDetails && productDetails.product) {
             const { product, variants: productVariants } = productDetails;
 
             // Populate product fields
@@ -378,11 +382,22 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                     </DialogTitle>
                 </DialogHeader>
 
-                {/* Loading state when editing and fetching product details */}
+                {/* Loading and error states */}
                 {isEditMode && productDetailsLoading ? (
                     <div className="flex flex-col items-center justify-center min-h-[300px] py-12">
                         <Loader2 className="h-8 w-8 animate-spin text-morpheus-gold-light mb-4" />
                         <span className="text-lg text-gray-300">Loading product details...</span>
+                    </div>
+                ) : isEditMode && (productDetailsError || !productDetails) ? (
+                    <div className="flex flex-col items-center justify-center min-h-[300px] py-12">
+                        <div className="flex items-center gap-2 mb-2">
+                            <Info className="h-6 w-6 text-red-400" />
+                            <span className="text-lg text-red-300 font-semibold">Failed to load product details</span>
+                        </div>
+                        <span className="text-gray-400 mb-2">{"Please try again or contact support."}</span>
+                        <Button onClick={onClose} className="bg-gray-700 text-white">
+                            Close
+                        </Button>
                     </div>
                 ) : (
                     <ScrollArea className="max-h-[80vh] pr-4">
@@ -997,7 +1012,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                         onClick={onClose}
                         variant="outline"
                         className="border-gray-600 text-gray-300 hover:bg-gray-700"
-                        disabled={isEditMode && productDetailsLoading}
+                        disabled={(isEditMode && productDetailsLoading) || (isEditMode && productDetailsError)}
                     >
                         Cancel
                     </Button>
@@ -1007,7 +1022,8 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                             createProductMutation.isPending ||
                             updateProductMutation.isPending ||
                             designerLoading ||
-                            (isEditMode && productDetailsLoading)
+                            (isEditMode && productDetailsLoading) ||
+                            (isEditMode && productDetailsError)
                         }
                         className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-morpheus-gold-dark hover:to-morpheus-gold-light text-white font-semibold transition-all duration-300 hover:scale-105"
                     >

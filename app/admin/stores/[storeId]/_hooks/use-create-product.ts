@@ -132,21 +132,20 @@ export function useCreateProduct() {
                     for (const imageFile of variant.images) {
                         mediaPromises.push(
                             uploadFile.mutateAsync({ file: imageFile, type: "image" }).then(async (url) => {
-                                // Create media record using existing hook
+
                                 const mediaData = await createMedia.mutateAsync({
                                     name: `${variant.name} - Image`,
                                     type: "productImage",
                                     url: url,
                                 });
 
-                                if (mediaData && mediaData[0]) {
-                                    // Link media to variant
+                                if (mediaData) {
                                     await supabase
                                         .schema("morpheus")
                                         .from("yvarprodmedia")
                                         .insert({
                                             yvarprodidfk: createdVariant.yvarprodid,
-                                            ymediaidfk: mediaData[0].ymediaid,
+                                            ymediaidfk: mediaData.ymediaid,
                                         });
                                 }
                             })
@@ -164,14 +163,14 @@ export function useCreateProduct() {
                                     url: url,
                                 });
 
-                                if (mediaData && mediaData[0]) {
+                                if (mediaData) {
                                     // Link media to variant
                                     await supabase
                                         .schema("morpheus")
                                         .from("yvarprodmedia")
                                         .insert({
                                             yvarprodidfk: createdVariant.yvarprodid,
-                                            ymediaidfk: mediaData[0].ymediaid,
+                                            ymediaidfk: mediaData.ymediaid,
                                         });
                                 }
                             })

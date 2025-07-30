@@ -63,7 +63,7 @@ export function useUpdateProduct() {
 
                 // Step 2: Handle variants
                 const updatedVariants = [];
-                
+
                 for (const variant of productData.variants) {
                     if (variant.isDeleted && variant.yvarprodid) {
                         // Delete existing variant
@@ -72,7 +72,7 @@ export function useUpdateProduct() {
                     }
 
                     let variantRecord;
-                    
+
                     if (variant.yvarprodid) {
                         // Update existing variant
                         variantRecord = await updateVariant(variant);
@@ -83,7 +83,7 @@ export function useUpdateProduct() {
 
                     // Handle media updates for this variant
                     await handleVariantMedia(variant, variantRecord.yvarprodid);
-                    
+
                     updatedVariants.push(variantRecord);
                 }
 
@@ -208,13 +208,13 @@ export function useUpdateProduct() {
                             url: url,
                         });
 
-                        if (mediaData && mediaData[0]) {
+                        if (mediaData) {
                             await supabase
                                 .schema("morpheus")
                                 .from("yvarprodmedia")
                                 .insert({
                                     yvarprodidfk: variantId,
-                                    ymediaidfk: mediaData[0].ymediaid,
+                                    ymediaidfk: mediaData.ymediaid,
                                 });
                         }
                     })
@@ -235,13 +235,13 @@ export function useUpdateProduct() {
                             url: url,
                         });
 
-                        if (mediaData && mediaData[0]) {
+                        if (mediaData) {
                             await supabase
                                 .schema("morpheus")
                                 .from("yvarprodmedia")
                                 .insert({
                                     yvarprodidfk: variantId,
-                                    ymediaidfk: mediaData[0].ymediaid,
+                                    ymediaidfk: mediaData.ymediaid,
                                 });
                         }
                     })
