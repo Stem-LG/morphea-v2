@@ -5,6 +5,13 @@ import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/hooks/useLanguage";
 import { createClient } from "@/lib/client";
 import { Database } from "@/lib/supabase";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CheckCircle, Circle, User, Users, ArrowLeft, ArrowRight } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 type VisitorFormData = {
   name: string;
@@ -30,8 +37,24 @@ type VisitorFormData = {
 
 const VISITOR_FORM_STORAGE_KEY = "morpheus_visitor_form_skipped";
 
+const STEPS = [
+  {
+    id: 1,
+    title: "basicInformation",
+    icon: User,
+    description: "Personal details"
+  },
+  {
+    id: 2,
+    title: "visitorTypes",
+    icon: Users,
+    description: "Select all that apply"
+  }
+];
+
 export default function VisitorFormDialog() {
   const [isOpen, setIsOpen] = useState(false);
+  const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<VisitorFormData>({
     name: "",
@@ -79,9 +102,7 @@ export default function VisitorFormDialog() {
     setIsOpen(false);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
+  const handleSubmit = async () => {
     if (!currentUser || !formData.name.trim()) {
       return;
     }
@@ -170,138 +191,251 @@ export default function VisitorFormDialog() {
     }));
   };
 
+  const isStep1Valid = () => {
+    return formData.name.trim().length > 0;
+  };
+
+  const canProceedToNextStep = () => {
+    if (currentStep === 1) return isStep1Valid();
+    return true;
+  };
+
+  const handleNext = () => {
+    if (canProceedToNextStep() && currentStep < STEPS.length) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  const handlePrevious = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const StepIndicator = ({ step, isActive, isCompleted }: { step: typeof STEPS[0], isActive: boolean, isCompleted: boolean }) => {
+    const Icon = step.icon;
+    
+    return (
+      <div className="flex items-center space-x-3">
+        <div className={cn(
+          "flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all duration-300",
+          isCompleted 
+            ? "bg-morpheus-gold-light border-morpheus-gold-light text-white" 
+            : isActive 
+              ? "border-morpheus-gold-light text-morpheus-gold-light bg-morpheus-gold-light/10" 
+              : "border-gray-400 text-gray-400"
+        )}>
+          {isCompleted ? (
+            <CheckCircle className="w-5 h-5" />
+          ) : (
+            <Icon className="w-5 h-5" />
+          )}
+        </div>
+        <div className="flex-1">
+          <h3 className={cn(
+            "text-sm font-medium transition-colors duration-300",
+            isActive ? "text-morpheus-gold-light" : "text-gray-300"
+          )}>
+            {t(`visitorForm.${step.title}`)}
+          </h3>
+          <p className="text-xs text-gray-400">{step.description}</p>
+        </div>
+      </div>
+    );
+  };
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
-      {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
-      
-      {/* Dialog */}
-      <div className="relative bg-gradient-to-br from-morpheus-blue-dark to-morpheus-blue-light rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        {/* Header */}
-        <div className="p-6 border-b border-morpheus-gold-dark/20">
-          <h2 className="text-2xl font-bold text-morpheus-gold-light mb-2">
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden bg-gradient-to-br from-morpheus-blue-dark to-morpheus-blue-light border-morpheus-gold-dark/30">
+        <DialogHeader className="border-b border-morpheus-gold-dark/20 pb-6">
+          <DialogTitle className="text-2xl font-bold text-morpheus-gold-light">
             {t("visitorForm.title")}
-          </h2>
-          <p className="text-gray-300">
+          </DialogTitle>
+          <p className="text-gray-300 mt-2">
             {t("visitorForm.subtitle")}
           </p>
+        </DialogHeader>
+
+        <div className="flex gap-8 overflow-y-auto">
+          {/* Step Indicator Sidebar */}
+          <div className="w-64 flex-shrink-0 space-y-6 py-6">
+            {STEPS.map((step, index) => (
+              <StepIndicator
+                key={step.id}
+                step={step}
+                isActive={currentStep === step.id}
+                isCompleted={currentStep > step.id}
+              />
+            ))}
+          </div>
+
+          {/* Form Content */}
+          <div className="flex-1 py-6 pr-6">
+            <Card className="bg-morpheus-blue-dark/30 border-morpheus-gold-dark/20">
+              <CardHeader>
+                <CardTitle className="text-lg text-morpheus-gold-light">
+                  {currentStep === 1 && t("visitorForm.basicInformation")}
+                  {currentStep === 2 && t("visitorForm.visitorTypes")}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Step 1: Basic Information */}
+                {currentStep === 1 && (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="name" className="text-gray-300">
+                          {t("visitorForm.nameRequired")}
+                        </Label>
+                        <Input
+                          id="name"
+                          type="text"
+                          required
+                          value={formData.name}
+                          onChange={(e) => handleInputChange('name', e.target.value)}
+                          className="bg-morpheus-blue-dark/50 border-morpheus-gold-dark/30 text-white placeholder-gray-400 focus:border-morpheus-gold-light"
+                          placeholder={t("visitorForm.namePlaceholder")}
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="email" className="text-gray-300">
+                          {t("visitorForm.email")}
+                        </Label>
+                        <Input
+                          id="email"
+                          type="email"
+                          value={formData.email}
+                          onChange={(e) => handleInputChange('email', e.target.value)}
+                          className="bg-morpheus-blue-dark/50 border-morpheus-gold-dark/30 text-white placeholder-gray-400 focus:border-morpheus-gold-light"
+                          placeholder={t("visitorForm.emailPlaceholder")}
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="phone" className="text-gray-300">
+                          {t("visitorForm.phone")}
+                        </Label>
+                        <Input
+                          id="phone"
+                          type="tel"
+                          value={formData.phone}
+                          onChange={(e) => handleInputChange('phone', e.target.value)}
+                          className="bg-morpheus-blue-dark/50 border-morpheus-gold-dark/30 text-white placeholder-gray-400 focus:border-morpheus-gold-light"
+                          placeholder={t("visitorForm.phonePlaceholder")}
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="address" className="text-gray-300">
+                          {t("visitorForm.address")}
+                        </Label>
+                        <Input
+                          id="address"
+                          type="text"
+                          value={formData.address}
+                          onChange={(e) => handleInputChange('address', e.target.value)}
+                          className="bg-morpheus-blue-dark/50 border-morpheus-gold-dark/30 text-white placeholder-gray-400 focus:border-morpheus-gold-light"
+                          placeholder={t("visitorForm.addressPlaceholder")}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Step 2: Visitor Types */}
+                {currentStep === 2 && (
+                  <div className="space-y-4">
+                    <p className="text-gray-300 text-sm mb-4">
+                      Select all categories that describe you:
+                    </p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {[
+                        { key: 'grandpublic', labelKey: 'grandpublic' },
+                        { key: 'clientprive', labelKey: 'clientprive' },
+                        { key: 'acheteurluxe', labelKey: 'acheteurluxe' },
+                        { key: 'acheteurpro', labelKey: 'acheteurpro' },
+                        { key: 'artisan', labelKey: 'artisan' },
+                        { key: 'createur', labelKey: 'createur' },
+                        { key: 'collectionneur', labelKey: 'collectionneur' },
+                        { key: 'investisseur', labelKey: 'investisseur' },
+                        { key: 'influenceur', labelKey: 'influenceur' },
+                        { key: 'journaliste', labelKey: 'journaliste' },
+                        { key: 'pressespecialisee', labelKey: 'pressespecialisee' },
+                        { key: 'culturel', labelKey: 'culturel' },
+                        { key: 'vip', labelKey: 'vip' },
+                      ].map(({ key, labelKey }) => (
+                        <label key={key} className="flex items-center space-x-3 cursor-pointer p-3 rounded-lg hover:bg-morpheus-blue-dark/30 transition-colors">
+                          <input
+                            type="checkbox"
+                            checked={formData.visitorTypes[key as keyof VisitorFormData['visitorTypes']]}
+                            onChange={(e) => handleVisitorTypeChange(key as keyof VisitorFormData['visitorTypes'], e.target.checked)}
+                            className="w-4 h-4 text-morpheus-gold-light bg-morpheus-blue-dark border-morpheus-gold-dark/30 rounded focus:ring-morpheus-gold-light focus:ring-2"
+                          />
+                          <span className="text-gray-300 text-sm">{t(`visitorForm.visitorTypeLabels.${labelKey}`)}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Navigation Buttons */}
+            <div className="flex justify-between items-center mt-8 pt-6 border-t border-morpheus-gold-dark/20">
+              <div className="flex gap-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleSkip}
+                  disabled={isSubmitting}
+                  className="border-morpheus-gold-dark/30 text-gray-300 hover:text-white hover:border-morpheus-gold-light/50"
+                >
+                  {t("visitorForm.skipForNow")}
+                </Button>
+              </div>
+
+              <div className="flex gap-3">
+                {currentStep > 1 && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handlePrevious}
+                    disabled={isSubmitting}
+                    className="border-morpheus-gold-dark/30 text-gray-300 hover:text-white hover:border-morpheus-gold-light/50"
+                  >
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    {t("common.back")}
+                  </Button>
+                )}
+
+                {currentStep < STEPS.length ? (
+                  <Button
+                    type="button"
+                    onClick={handleNext}
+                    disabled={!canProceedToNextStep() || isSubmitting}
+                    className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light text-white hover:from-morpheus-gold-light hover:to-morpheus-gold-dark"
+                  >
+                    {t("common.back") === "Back" ? "Next" : "Suivant"}
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
+                ) : (
+                  <Button
+                    type="button"
+                    onClick={handleSubmit}
+                    disabled={isSubmitting || !formData.name.trim()}
+                    className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light text-white hover:from-morpheus-gold-light hover:to-morpheus-gold-dark"
+                  >
+                    {isSubmitting ? t("visitorForm.submitting") : t("visitorForm.submit")}
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
-
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          {/* Basic Information */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-morpheus-gold-light">{t("visitorForm.basicInformation")}</h3>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                {t("visitorForm.nameRequired")}
-              </label>
-              <input
-                type="text"
-                required
-                value={formData.name}
-                onChange={(e) => handleInputChange('name', e.target.value)}
-                className="w-full px-3 py-2 bg-morpheus-blue-dark/50 border border-morpheus-gold-dark/30 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-morpheus-gold-light focus:border-transparent"
-                placeholder={t("visitorForm.namePlaceholder")}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                {t("visitorForm.email")}
-              </label>
-              <input
-                type="email"
-                value={formData.email}
-                onChange={(e) => handleInputChange('email', e.target.value)}
-                className="w-full px-3 py-2 bg-morpheus-blue-dark/50 border border-morpheus-gold-dark/30 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-morpheus-gold-light focus:border-transparent"
-                placeholder={t("visitorForm.emailPlaceholder")}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                {t("visitorForm.phone")}
-              </label>
-              <input
-                type="tel"
-                value={formData.phone}
-                onChange={(e) => handleInputChange('phone', e.target.value)}
-                className="w-full px-3 py-2 bg-morpheus-blue-dark/50 border border-morpheus-gold-dark/30 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-morpheus-gold-light focus:border-transparent"
-                placeholder={t("visitorForm.phonePlaceholder")}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                {t("visitorForm.address")}
-              </label>
-              <textarea
-                value={formData.address}
-                onChange={(e) => handleInputChange('address', e.target.value)}
-                rows={3}
-                className="w-full px-3 py-2 bg-morpheus-blue-dark/50 border border-morpheus-gold-dark/30 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-morpheus-gold-light focus:border-transparent"
-                placeholder={t("visitorForm.addressPlaceholder")}
-              />
-            </div>
-          </div>
-
-          {/* Visitor Types */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-morpheus-gold-light">{t("visitorForm.visitorTypes")}</h3>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {[
-                { key: 'grandpublic', labelKey: 'grandpublic' },
-                { key: 'clientprive', labelKey: 'clientprive' },
-                { key: 'acheteurluxe', labelKey: 'acheteurluxe' },
-                { key: 'acheteurpro', labelKey: 'acheteurpro' },
-                { key: 'artisan', labelKey: 'artisan' },
-                { key: 'createur', labelKey: 'createur' },
-                { key: 'collectionneur', labelKey: 'collectionneur' },
-                { key: 'investisseur', labelKey: 'investisseur' },
-                { key: 'influenceur', labelKey: 'influenceur' },
-                { key: 'journaliste', labelKey: 'journaliste' },
-                { key: 'pressespecialisee', labelKey: 'pressespecialisee' },
-                { key: 'culturel', labelKey: 'culturel' },
-                { key: 'vip', labelKey: 'vip' },
-              ].map(({ key, labelKey }) => (
-                <label key={key} className="flex items-center space-x-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={formData.visitorTypes[key as keyof VisitorFormData['visitorTypes']]}
-                    onChange={(e) => handleVisitorTypeChange(key as keyof VisitorFormData['visitorTypes'], e.target.checked)}
-                    className="w-4 h-4 text-morpheus-gold-light bg-morpheus-blue-dark border-morpheus-gold-dark/30 rounded focus:ring-morpheus-gold-light focus:ring-2"
-                  />
-                  <span className="text-gray-300 text-sm">{t(`visitorForm.visitorTypeLabels.${labelKey}`)}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          {/* Actions */}
-          <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-morpheus-gold-dark/20">
-            <button
-              type="button"
-              onClick={handleSkip}
-              disabled={isSubmitting}
-              className="flex-1 px-6 py-3 text-gray-300 hover:text-white border border-morpheus-gold-dark/30 hover:border-morpheus-gold-light/50 rounded-md transition-all duration-300 disabled:opacity-50"
-            >
-              {t("visitorForm.skipForNow")}
-            </button>
-            <button
-              type="submit"
-              disabled={isSubmitting || !formData.name.trim()}
-              className="flex-1 px-6 py-3 bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light text-white font-semibold rounded-md hover:from-morpheus-gold-light hover:to-morpheus-gold-dark transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isSubmitting ? t("visitorForm.submitting") : t("visitorForm.submit")}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
