@@ -66,20 +66,11 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
             ) : (
                 <>
                     {/* Header */}
-                    <div className="text-center space-y-4">
-                        <Link href="/" className="inline-block">
-                            <h1 className="text-4xl font-extrabold text-white font-parisienne">
-                                <span className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light bg-clip-text text-transparent">
-                                    {t("auth.morpheusMall")}
-                                </span>
-                            </h1>
-                        </Link>
-                        <div>
-                            <h2 className="text-3xl font-bold text-white mb-2 font-parisienne">
-                                {t("auth.resetPassword")}
-                            </h2>
-                            <p className="text-lg text-gray-300">{t("auth.resetPasswordSubtitle")}</p>
-                        </div>
+                    <div className="text-center">
+                        <h2 className="text-3xl font-bold text-white mb-2 font-parisienne">
+                            {t("auth.resetPassword")}
+                        </h2>
+                        <p className="text-lg text-gray-300">{t("auth.resetPasswordSubtitle")}</p>
                     </div>
 
                     {/* Form Card */}
