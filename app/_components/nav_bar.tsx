@@ -10,7 +10,7 @@ import { CartDropdown } from "@/components/cart-dropdown";
 import { WishlistDropdown } from "@/components/wishlist-dropdown";
 import ProductDetailsPage from "@/components/product-details-page";
 import Link from "next/link";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 export default function NavBar() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -31,6 +31,10 @@ export default function NavBar() {
     const { t } = useLanguage();
 
     const { data: currentUser, isLoading } = useAuth();
+
+    const userRoles = useMemo(() => {
+        return currentUser?.app_metadata?.roles || [];
+    }, [currentUser]);
 
     const { cart } = useCart();
     const { wishlist } = useWishlist();
@@ -79,13 +83,15 @@ export default function NavBar() {
                                 <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light group-hover:w-full transition-all duration-300"></span>
                             </Link>
 
-                            <Link
-                                href="/admin"
-                                className="relative text-gray-300 hover:text-morpheus-gold-light transition-all duration-300 font-medium group"
-                            >
-                                {t("nav.administration")}
-                                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light group-hover:w-full transition-all duration-300"></span>
-                            </Link>
+                            {(userRoles.includes("admin") || userRoles.includes("store_admin")) && (
+                                <Link
+                                    href="/admin"
+                                    className="relative text-gray-300 hover:text-morpheus-gold-light transition-all duration-300 font-medium group"
+                                >
+                                    {t("nav.administration")}
+                                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light group-hover:w-full transition-all duration-300"></span>
+                                </Link>
+                            )}
 
                             {/* Cart & Wishlist - Only show when logged in (not anonymous) */}
                             {currentUser && !currentUser.is_anonymous && (
