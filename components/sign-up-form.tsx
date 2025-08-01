@@ -101,14 +101,8 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
     <div className={cn('flex flex-col gap-8', className)} {...props}>
       {/* Header */}
       <div className="text-center space-y-4">
-        <Link href="/" className="inline-block">
-          <h1 className="text-4xl font-extrabold text-white font-parisienne">
-            <span className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light bg-clip-text text-transparent">{t('auth.morpheusMall')}</span>
-          </h1>
-        </Link>
         <div>
-          <h2 className="text-3xl font-bold text-white mb-2 font-parisienne">{t('auth.joinTheFuture')}</h2>
-          <p className="text-lg text-gray-300">{t('auth.signUpSubtitle')}</p>
+          <h2 className="text-3xl font-bold text-white mb-2">{t('auth.signUp')}</h2>
         </div>
       </div>
 
@@ -208,7 +202,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
           href="/" 
           className="text-gray-400 hover:text-white transition-colors inline-flex items-center gap-2"
         >
-          {t('auth.backToMorpheusMall')}
+          {t('auth.backToHome')}
         </Link>
       </div>
     </div>
