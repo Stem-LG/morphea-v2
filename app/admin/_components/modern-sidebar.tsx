@@ -1,21 +1,23 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
     LayoutDashboard,
-    Store,
     Menu,
     X,
     ChevronLeft,
     ChevronRight,
+    ChevronDown,
+    ChevronUp,
     Users,
     CheckCircle,
     Eye,
     CalendarDays,
     DollarSign,
     FolderTree,
+    Package,
 } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
 
@@ -30,6 +32,16 @@ interface ModernSidebarProps {
 export function ModernSidebar({ isOpen, isCollapsed, onToggle, onCollapse, userRole }: ModernSidebarProps) {
     const { t } = useLanguage();
     const pathname = usePathname();
+    const [openDropdowns, setOpenDropdowns] = useState<string[]>([]);
+
+    // Toggle dropdown state
+    const toggleDropdown = (itemId: string) => {
+        setOpenDropdowns(prev =>
+            prev.includes(itemId)
+                ? prev.filter(id => id !== itemId)
+                : [...prev, itemId]
+        );
+    };
 
     // Define menu items based on user role
     const getMenuItems = () => {
@@ -49,18 +61,27 @@ export function ModernSidebar({ isOpen, isCollapsed, onToggle, onCollapse, userR
                 roles: ["admin", "store_admin"],
             },
             {
-                id: "stores",
-                label: t("admin.storeManagement"),
-                icon: Store,
-                href: "/admin/stores",
-                roles: ["admin", "store_admin"],
-            },
-            {
-                id: "categories",
-                label: t("admin.categoryManagement"),
-                icon: FolderTree,
-                href: "/admin/categories",
+                id: "produit",
+                label: t("admin.productManagement"),
+                icon: Package,
                 roles: ["admin"],
+                isDropdown: true,
+                children: [
+                    {
+                        id: "categories",
+                        label: t("admin.categoryManagement"),
+                        icon: FolderTree,
+                        href: "/admin/categories",
+                        roles: ["admin"],
+                    },
+                    {
+                        id: "approvals",
+                        label: "Approbation",
+                        icon: CheckCircle,
+                        href: "/admin/approvals",
+                        roles: ["admin"],
+                    },
+                ],
             },
             {
                 id: "currencies",
@@ -69,14 +90,6 @@ export function ModernSidebar({ isOpen, isCollapsed, onToggle, onCollapse, userR
                 href: "/admin/currencies",
                 roles: ["admin"],
             },
-            {
-                id: "approvals",
-                label: "Product Approvals",
-                icon: CheckCircle,
-                href: "/admin/approvals",
-                roles: ["admin"],
-            },
-
             {
                 id: "users",
                 label: t("admin.userManagement"),
@@ -97,6 +110,17 @@ export function ModernSidebar({ isOpen, isCollapsed, onToggle, onCollapse, userR
     };
 
     const menuItems = getMenuItems();
+
+    // Check if any child of a dropdown is active
+    const isDropdownActive = (item: any) => {
+        if (!item.children) return false;
+        return item.children.some((child: any) => {
+            if (child.href === "/admin") {
+                return pathname === "/admin";
+            }
+            return pathname === child.href || pathname.startsWith(child.href + "/");
+        });
+    };
 
     return (
         <>
@@ -169,7 +193,96 @@ export function ModernSidebar({ isOpen, isCollapsed, onToggle, onCollapse, userR
                     {menuItems.map((item, key) => {
                         const Icon = item.icon;
 
-                        // More precise active state logic
+                        // Handle dropdown items
+                        if (item.isDropdown) {
+                            const isDropdownOpen = openDropdowns.includes(item.id);
+                            const hasActiveChild = isDropdownActive(item);
+
+                            return (
+                                <div key={key}>
+                                    {/* Dropdown trigger */}
+                                    <Button
+                                        variant="ghost"
+                                        className={`w-full rounded-none h-12 ${
+                                            isCollapsed ? "justify-center" : "justify-start"
+                                        } transition-all duration-200 ${
+                                            hasActiveChild
+                                                ? "bg-gradient-to-r from-morpheus-gold-dark/20 to-morpheus-gold-light/20 text-morpheus-gold-light border border-morpheus-gold-light/30"
+                                                : "text-gray-300 hover:text-white hover:bg-slate-700/50"
+                                        }`}
+                                        title={isCollapsed ? item.label : undefined}
+                                        onClick={() => !isCollapsed && toggleDropdown(item.id)}
+                                    >
+                                        <Icon
+                                            className={`h-5 w-5 ${isCollapsed ? "" : "mr-3"} ${
+                                                hasActiveChild ? "text-morpheus-gold-light" : ""
+                                            }`}
+                                        />
+                                        {!isCollapsed && (
+                                            <>
+                                                <span className={`flex-1 text-left ${hasActiveChild ? "text-morpheus-gold-light font-medium" : ""}`}>
+                                                    {item.label}
+                                                </span>
+                                                {isDropdownOpen ? (
+                                                    <ChevronUp className="h-4 w-4" />
+                                                ) : (
+                                                    <ChevronDown className="h-4 w-4" />
+                                                )}
+                                            </>
+                                        )}
+                                    </Button>
+
+                                    {/* Dropdown content */}
+                                    {!isCollapsed && isDropdownOpen && item.children && (
+                                        <div className="ml-4 border-l border-slate-600/50">
+                                            {item.children.map((child: any, childKey: number) => {
+                                                const ChildIcon = child.icon;
+                                                
+                                                // More precise active state logic for children
+                                                const isChildActive = (() => {
+                                                    if (child.href === "/admin") {
+                                                        return pathname === "/admin";
+                                                    }
+                                                    if (pathname === child.href) {
+                                                        return true;
+                                                    }
+                                                    if (pathname.startsWith(child.href + "/")) {
+                                                        return true;
+                                                    }
+                                                    return false;
+                                                })();
+
+                                                return (
+                                                    <Button
+                                                        key={childKey}
+                                                        variant="ghost"
+                                                        className={`w-full rounded-none h-10 justify-start ml-4 transition-all duration-200 ${
+                                                            isChildActive
+                                                                ? "bg-gradient-to-r from-morpheus-gold-dark/20 to-morpheus-gold-light/20 text-morpheus-gold-light border border-morpheus-gold-light/30"
+                                                                : "text-gray-300 hover:text-white hover:bg-slate-700/50"
+                                                        }`}
+                                                        asChild
+                                                    >
+                                                        <Link href={child.href}>
+                                                            <ChildIcon
+                                                                className={`h-4 w-4 mr-3 ${
+                                                                    isChildActive ? "text-morpheus-gold-light" : ""
+                                                                }`}
+                                                            />
+                                                            <span className={isChildActive ? "text-morpheus-gold-light font-medium" : ""}>
+                                                                {child.label}
+                                                            </span>
+                                                        </Link>
+                                                    </Button>
+                                                );
+                                            })}
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        }
+
+                        // Handle regular menu items
                         const isActive = (() => {
                             // Dashboard should only be active on exact match
                             if (item.href === "/admin") {
@@ -182,7 +295,6 @@ export function ModernSidebar({ isOpen, isCollapsed, onToggle, onCollapse, userR
                             }
 
                             // Check if current path is a sub-route of this menu item
-                            // But make sure we don't match shorter paths (e.g., /adminv2 shouldn't match /adminv2/stores)
                             if (pathname.startsWith(item.href + "/")) {
                                 return true;
                             }

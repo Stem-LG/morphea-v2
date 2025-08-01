@@ -1,10 +1,9 @@
 "use client";
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Store, Package, BarChart3, TrendingUp, Users, ShoppingBag, Plus, ArrowRight } from "lucide-react";
+import { Store, Package, BarChart3, TrendingUp, ShoppingBag } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/hooks/useAuth";
-import Link from "next/link";
 
 export default function DashboardContent() {
     const { t } = useLanguage();
@@ -23,53 +22,8 @@ export default function DashboardContent() {
         monthlyGrowth: 12.5,
     };
 
-    const quickActions = [
-        {
-            title: t("admin.manageStores"),
-            description: t("admin.manageStoresDesc"),
-            icon: Store,
-            href: "/adminv2/stores",
-            color: "from-blue-500 to-blue-600",
-            available: true,
-        },
-        {
-            title: t("admin.addProduct"),
-            description: t("admin.addProductDesc"),
-            icon: Plus,
-            href: "/adminv2/stores",
-            color: "from-green-500 to-green-600",
-            available: true,
-        },
-        {
-            title: t("admin.viewAnalytics"),
-            description: t("admin.viewAnalyticsDesc"),
-            icon: BarChart3,
-            href: "/adminv2/analytics",
-            color: "from-purple-500 to-purple-600",
-            available: true,
-        },
-        {
-            title: t("admin.manageUsers"),
-            description: t("admin.manageUsersDesc"),
-            icon: Users,
-            href: "/adminv2/users",
-            color: "from-orange-500 to-orange-600",
-            available: isAdmin,
-        },
-    ].filter((action) => action.available);
-
     return (
         <div className="p-6 space-y-6">
-            {/* Welcome Header */}
-            <div className="text-center lg:text-left">
-                <h1 className="text-3xl lg:text-4xl font-bold text-white mb-2">
-                    {t("admin.welcomeBack")}, {user?.email?.split("@")[0] || "Admin"}
-                </h1>
-                <p className="text-lg text-gray-300">
-                    {isAdmin ? t("admin.adminDashboardSubtitle") : t("admin.storeAdminDashboardSubtitle")}
-                </p>
-            </div>
-
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
                 <Card className="bg-gradient-to-br from-morpheus-blue-dark/40 to-morpheus-blue-light/40 border-slate-700/50 shadow-xl">
@@ -80,10 +34,7 @@ export default function DashboardContent() {
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-white mb-1">{dashboardStats.totalStores}</div>
-                        <p className="text-sm text-gray-300">
-                            {isAdmin ? t("admin.acrossAllMalls") : t("admin.assignedToYou")}
-                        </p>
+                        <div className="text-2xl font-bold text-white">{dashboardStats.totalStores}</div>
                     </CardContent>
                 </Card>
 
@@ -95,8 +46,7 @@ export default function DashboardContent() {
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-white mb-1">{dashboardStats.totalProducts}</div>
-                        <p className="text-sm text-gray-300">{t("admin.activeProducts")}</p>
+                        <div className="text-2xl font-bold text-white">{dashboardStats.totalProducts}</div>
                     </CardContent>
                 </Card>
 
@@ -109,8 +59,7 @@ export default function DashboardContent() {
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold text-white mb-1">{dashboardStats.pendingApprovals}</div>
-                            <p className="text-sm text-gray-300">{t("admin.awaitingReview")}</p>
+                            <div className="text-2xl font-bold text-white">{dashboardStats.pendingApprovals}</div>
                         </CardContent>
                     </Card>
                 )}
@@ -123,43 +72,9 @@ export default function DashboardContent() {
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-white mb-1">+{dashboardStats.monthlyGrowth}%</div>
-                        <p className="text-sm text-gray-300">{t("admin.fromLastMonth")}</p>
+                        <div className="text-2xl font-bold text-white">+{dashboardStats.monthlyGrowth}%</div>
                     </CardContent>
                 </Card>
-            </div>
-
-            {/* Quick Actions */}
-            <div>
-                <h2 className="text-2xl font-bold text-white mb-4">{t("admin.quickActions")}</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
-                    {quickActions.map((action, index) => {
-                        const Icon = action.icon;
-                        return (
-                            <Link key={index} href={action.href}>
-                                <Card className="bg-gradient-to-br from-morpheus-blue-dark/40 to-morpheus-blue-light/40 border-slate-700/50 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 cursor-pointer group">
-                                    <CardHeader className="pb-3">
-                                        <CardTitle className="flex items-center gap-3 text-white">
-                                            <div
-                                                className={`w-10 h-10 bg-gradient-to-r ${action.color} rounded-lg flex items-center justify-center`}
-                                            >
-                                                <Icon className="h-5 w-5 text-white" />
-                                            </div>
-                                            <span className="text-lg">{action.title}</span>
-                                        </CardTitle>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <p className="text-gray-300 mb-4">{action.description}</p>
-                                        <div className="flex items-center text-morpheus-gold-light group-hover:text-morpheus-gold-dark transition-colors">
-                                            <span className="text-sm font-medium">{t("admin.getStarted")}</span>
-                                            <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            </Link>
-                        );
-                    })}
-                </div>
             </div>
 
             {/* Recent Activity - Placeholder */}
