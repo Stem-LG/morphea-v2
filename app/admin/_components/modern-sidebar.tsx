@@ -18,6 +18,7 @@ import {
     DollarSign,
     FolderTree,
     Package,
+    Store,
 } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
 
@@ -58,6 +59,13 @@ export function ModernSidebar({ isOpen, isCollapsed, onToggle, onCollapse, userR
                 label: t("admin.eventManagement"),
                 icon: CalendarDays,
                 href: "/admin/events",
+                roles: ["admin", "store_admin"],
+            },
+            {
+                id: "boutique",
+                label: "Boutique",
+                icon: Store,
+                href: "/admin/stores",
                 roles: ["admin", "store_admin"],
             },
             {
@@ -234,7 +242,7 @@ export function ModernSidebar({ isOpen, isCollapsed, onToggle, onCollapse, userR
 
                                     {/* Dropdown content */}
                                     {!isCollapsed && isDropdownOpen && item.children && (
-                                        <div className="ml-4 border-l border-slate-600/50">
+                                        <div className="border-l border-slate-600/50 ml-4">
                                             {item.children.map((child: any, childKey: number) => {
                                                 const ChildIcon = child.icon;
                                                 
@@ -256,20 +264,20 @@ export function ModernSidebar({ isOpen, isCollapsed, onToggle, onCollapse, userR
                                                     <Button
                                                         key={childKey}
                                                         variant="ghost"
-                                                        className={`w-full rounded-none h-10 justify-start ml-4 transition-all duration-200 ${
+                                                        className={`w-full rounded-none h-10 justify-start pl-8 pr-4 transition-all duration-200 ${
                                                             isChildActive
                                                                 ? "bg-gradient-to-r from-morpheus-gold-dark/20 to-morpheus-gold-light/20 text-morpheus-gold-light border border-morpheus-gold-light/30"
                                                                 : "text-gray-300 hover:text-white hover:bg-slate-700/50"
                                                         }`}
                                                         asChild
                                                     >
-                                                        <Link href={child.href}>
+                                                        <Link href={child.href} className="flex items-center w-full overflow-hidden">
                                                             <ChildIcon
-                                                                className={`h-4 w-4 mr-3 ${
+                                                                className={`h-4 w-4 mr-3 flex-shrink-0 ${
                                                                     isChildActive ? "text-morpheus-gold-light" : ""
                                                                 }`}
                                                             />
-                                                            <span className={isChildActive ? "text-morpheus-gold-light font-medium" : ""}>
+                                                            <span className={`truncate ${isChildActive ? "text-morpheus-gold-light font-medium" : ""}`}>
                                                                 {child.label}
                                                             </span>
                                                         </Link>

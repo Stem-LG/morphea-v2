@@ -159,28 +159,72 @@ export default function ApprovalsPage() {
     };
 
 
-    // Get status badge
+    // Get status badge with enhanced variant information
     const getStatusBadge = (product: Product) => {
+        const variants = product.yvarprod || [];
+        const pendingVariants = variants.filter(v => v.yvarprodstatut === 'not_approved').length;
+        const approvedVariants = variants.filter(v => v.yvarprodstatut === 'approved').length;
+        const revisionVariants = variants.filter(v => v.yvarprodstatut === 'needs_revision').length;
+        const deniedVariants = variants.filter(v => v.yvarprodstatut === 'denied').length;
+
         if (product.yprodstatut === 'not_approved') {
             return (
-                <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30">
-                    <Clock className="h-3 w-3 mr-1" />
-                    Pending
-                </Badge>
+                <div className="flex items-center gap-2">
+                    <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30">
+                        <Clock className="h-3 w-3 mr-1" />
+                        Product Pending
+                    </Badge>
+                    {variants.length > 0 && (
+                        <Badge variant="secondary" className="bg-gray-500/20 text-gray-300 border-gray-500/30 text-xs">
+                            {variants.length} variants
+                        </Badge>
+                    )}
+                </div>
             );
         } else if (product.yprodstatut === 'needs_revision') {
             return (
-                <Badge variant="secondary" className="bg-orange-500/20 text-orange-300 border-orange-500/30">
-                    <AlertTriangle className="h-3 w-3 mr-1" />
-                    Needs Revision
-                </Badge>
+                <div className="flex items-center gap-2">
+                    <Badge variant="secondary" className="bg-orange-500/20 text-orange-300 border-orange-500/30">
+                        <AlertTriangle className="h-3 w-3 mr-1" />
+                        Needs Revision
+                    </Badge>
+                    {variants.length > 0 && (
+                        <Badge variant="secondary" className="bg-gray-500/20 text-gray-300 border-gray-500/30 text-xs">
+                            {variants.length} variants
+                        </Badge>
+                    )}
+                </div>
             );
-        } else if (product.yvarprod?.some(v => v.yvarprodstatut === 'not_approved')) {
+        } else if (pendingVariants > 0 || revisionVariants > 0) {
             return (
-                <Badge variant="secondary" className="bg-blue-500/20 text-blue-300 border-blue-500/30">
-                    <Package className="h-3 w-3 mr-1" />
-                    Variant Approval
-                </Badge>
+                <div className="flex items-center gap-2">
+                    <Badge variant="secondary" className="bg-blue-500/20 text-blue-300 border-blue-500/30">
+                        <Package className="h-3 w-3 mr-1" />
+                        Variant Issues
+                    </Badge>
+                    <div className="flex items-center gap-1">
+                        {pendingVariants > 0 && (
+                            <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30 text-xs">
+                                {pendingVariants} pending
+                            </Badge>
+                        )}
+                        {revisionVariants > 0 && (
+                            <Badge variant="secondary" className="bg-orange-500/20 text-orange-300 border-orange-500/30 text-xs">
+                                {revisionVariants} revision
+                            </Badge>
+                        )}
+                        {deniedVariants > 0 && (
+                            <Badge variant="secondary" className="bg-red-500/20 text-red-300 border-red-500/30 text-xs">
+                                {deniedVariants} denied
+                            </Badge>
+                        )}
+                        {approvedVariants > 0 && (
+                            <Badge variant="secondary" className="bg-green-500/20 text-green-300 border-green-500/30 text-xs">
+                                {approvedVariants} approved
+                            </Badge>
+                        )}
+                    </div>
+                </div>
             );
         }
         return null;
