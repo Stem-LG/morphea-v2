@@ -10,7 +10,7 @@ import {
     Image as ImageIcon,
     Play,
     Box,
-    FileSearch
+    FileSearch,
 } from "lucide-react";
 
 interface ApprovalCardProps {
@@ -27,35 +27,79 @@ export function ApprovalCard({
     // Get category name
     const category = categories.find(cat => cat.xcategprodid === product.xcategprodidfk);
     
-    // Get status info
+    // Get enhanced status info with variant details
     const getStatusInfo = () => {
+        const variants = product.yvarprod || [];
+        const pendingVariants = variants.filter((v: any) => v.yvarprodstatut === 'not_approved').length;
+        const approvedVariants = variants.filter((v: any) => v.yvarprodstatut === 'approved').length;
+        const revisionVariants = variants.filter((v: any) => v.yvarprodstatut === 'needs_revision').length;
+        const deniedVariants = variants.filter((v: any) => v.yvarprodstatut === 'denied').length;
+
         if (product.yprodstatut === 'not_approved') {
             return {
                 badge: (
-                    <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30">
-                        <Clock className="h-3 w-3 mr-1" />
-                        Pending
-                    </Badge>
+                    <div className="flex flex-col items-end gap-1">
+                        <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30">
+                            <Clock className="h-3 w-3 mr-1" />
+                            Product Pending
+                        </Badge>
+                        {variants.length > 0 && (
+                            <Badge variant="secondary" className="bg-gray-500/20 text-gray-300 border-gray-500/30 text-xs">
+                                {variants.length} variants
+                            </Badge>
+                        )}
+                    </div>
                 ),
                 color: 'border-yellow-500/30'
             };
         } else if (product.yprodstatut === 'needs_revision') {
             return {
                 badge: (
-                    <Badge variant="secondary" className="bg-orange-500/20 text-orange-300 border-orange-500/30">
-                        <AlertTriangle className="h-3 w-3 mr-1" />
-                        Needs Revision
-                    </Badge>
+                    <div className="flex flex-col items-end gap-1">
+                        <Badge variant="secondary" className="bg-orange-500/20 text-orange-300 border-orange-500/30">
+                            <AlertTriangle className="h-3 w-3 mr-1" />
+                            Needs Revision
+                        </Badge>
+                        {variants.length > 0 && (
+                            <Badge variant="secondary" className="bg-gray-500/20 text-gray-300 border-gray-500/30 text-xs">
+                                {variants.length} variants
+                            </Badge>
+                        )}
+                    </div>
                 ),
                 color: 'border-orange-500/30'
             };
-        } else if (product.yvarprod?.some((v: any) => v.yvarprodstatut === 'not_approved')) {
+        } else if (pendingVariants > 0 || revisionVariants > 0) {
             return {
                 badge: (
-                    <Badge variant="secondary" className="bg-blue-500/20 text-blue-300 border-blue-500/30">
-                        <Package className="h-3 w-3 mr-1" />
-                        Variant Approval
-                    </Badge>
+                    <div className="flex flex-col items-end gap-1">
+                        <Badge variant="secondary" className="bg-blue-500/20 text-blue-300 border-blue-500/30">
+                            <Package className="h-3 w-3 mr-1" />
+                            Variant Issues
+                        </Badge>
+                        <div className="flex flex-wrap gap-1 justify-end">
+                            {pendingVariants > 0 && (
+                                <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30 text-xs">
+                                    {pendingVariants} pending
+                                </Badge>
+                            )}
+                            {revisionVariants > 0 && (
+                                <Badge variant="secondary" className="bg-orange-500/20 text-orange-300 border-orange-500/30 text-xs">
+                                    {revisionVariants} revision
+                                </Badge>
+                            )}
+                            {deniedVariants > 0 && (
+                                <Badge variant="secondary" className="bg-red-500/20 text-red-300 border-red-500/30 text-xs">
+                                    {deniedVariants} denied
+                                </Badge>
+                            )}
+                            {approvedVariants > 0 && (
+                                <Badge variant="secondary" className="bg-green-500/20 text-green-300 border-green-500/30 text-xs">
+                                    {approvedVariants} approved
+                                </Badge>
+                            )}
+                        </div>
+                    </div>
                 ),
                 color: 'border-blue-500/30'
             };
@@ -133,8 +177,14 @@ export function ApprovalCard({
         }
     };
 
-    // Count variants needing approval
-    const variantsNeedingApproval = product.yvarprod?.filter((v: any) => v.yvarprodstatut === 'not_approved').length || 0;
+    // Get variant status counts
+    const variants = product.yvarprod || [];
+    const variantCounts = {
+        pending: variants.filter((v: any) => v.yvarprodstatut === 'not_approved').length,
+        approved: variants.filter((v: any) => v.yvarprodstatut === 'approved').length,
+        revision: variants.filter((v: any) => v.yvarprodstatut === 'needs_revision').length,
+        denied: variants.filter((v: any) => v.yvarprodstatut === 'denied').length,
+    };
 
     return (
         <Card className={`bg-gradient-to-br from-gray-900/50 to-gray-800/30 backdrop-blur-sm transition-all duration-200 hover:scale-[1.02] ${statusInfo.color}`}>
@@ -179,11 +229,26 @@ export function ApprovalCard({
 
                     <div className="flex items-center justify-between text-xs">
                         <span className="text-gray-400">Variants:</span>
-                        <div className="flex items-center gap-1">
-                            <span className="text-white">{product.yvarprod?.length || 0}</span>
-                            {variantsNeedingApproval > 0 && (
+                        <div className="flex items-center gap-1 flex-wrap justify-end">
+                            <span className="text-white">{variants.length || 0}</span>
+                            {variantCounts.pending > 0 && (
                                 <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30 text-xs">
-                                    {variantsNeedingApproval} pending
+                                    {variantCounts.pending} pending
+                                </Badge>
+                            )}
+                            {variantCounts.revision > 0 && (
+                                <Badge variant="secondary" className="bg-orange-500/20 text-orange-300 border-orange-500/30 text-xs">
+                                    {variantCounts.revision} revision
+                                </Badge>
+                            )}
+                            {variantCounts.denied > 0 && (
+                                <Badge variant="secondary" className="bg-red-500/20 text-red-300 border-red-500/30 text-xs">
+                                    {variantCounts.denied} denied
+                                </Badge>
+                            )}
+                            {variantCounts.approved > 0 && (
+                                <Badge variant="secondary" className="bg-green-500/20 text-green-300 border-green-500/30 text-xs">
+                                    {variantCounts.approved} approved
                                 </Badge>
                             )}
                         </div>

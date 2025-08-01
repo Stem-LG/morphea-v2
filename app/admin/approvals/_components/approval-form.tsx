@@ -9,8 +9,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SuperSelect } from "@/components/super-select";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { CheckCircle, AlertTriangle, Package, Play, Box, Image as ImageIcon, Loader2 } from "lucide-react";
+import { CheckCircle, AlertTriangle, Package, Box, Image as ImageIcon, Loader2, X, RotateCcw } from "lucide-react";
 import { useApprovalOperations } from "../_hooks/use-approval-operations";
+import { useVariantApprovalOperations } from "../_hooks/use-variant-approval-operations";
 import { useCategories } from "../../stores/[storeId]/_hooks/use-categories";
 import { createClient } from "@/lib/client";
 import { useQuery } from "@tanstack/react-query";
@@ -25,6 +26,7 @@ interface VariantApprovalCardProps {
     formData: any;
     updateVariant: (index: number, field: string, value: any) => void;
     currencyOptions: Array<{ value: number; label: string }>;
+    onVariantAction?: (action: 'approve' | 'deny' | 'revision' | 'reset', variantId: number) => void;
 }
 
 function VariantApprovalCard({
@@ -34,34 +36,108 @@ function VariantApprovalCard({
     formData,
     updateVariant,
     currencyOptions,
+    onVariantAction,
 }: VariantApprovalCardProps) {
     const { models3d, images, videos, isLoading } = useProduct3DMedia(variant.yvarprodid);
+
+    const getVariantStatusBadge = () => {
+        switch (variant.yvarprodstatut) {
+            case "not_approved":
+                return (
+                    <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30 text-xs">
+                        Needs Approval
+                    </Badge>
+                );
+            case "approved":
+                return (
+                    <Badge variant="secondary" className="bg-green-500/20 text-green-300 border-green-500/30 text-xs">
+                        <CheckCircle className="h-3 w-3 mr-1" />
+                        Approved
+                    </Badge>
+                );
+            case "needs_revision":
+                return (
+                    <Badge variant="secondary" className="bg-orange-500/20 text-orange-300 border-orange-500/30 text-xs">
+                        <AlertTriangle className="h-3 w-3 mr-1" />
+                        Needs Revision
+                    </Badge>
+                );
+            case "denied":
+                return (
+                    <Badge variant="secondary" className="bg-red-500/20 text-red-300 border-red-500/30 text-xs">
+                        <X className="h-3 w-3 mr-1" />
+                        Denied
+                    </Badge>
+                );
+            default:
+                return null;
+        }
+    };
 
     return (
         <Card className="bg-gray-800/50 border-gray-700">
             <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
-                    <CardTitle className="text-white text-base">{variant.yvarprodintitule}</CardTitle>
+                    <div className="flex-1">
+                        <CardTitle className="text-white text-base">{variant.yvarprodintitule}</CardTitle>
+                        <div className="flex items-center gap-3 mt-1 text-sm text-gray-400">
+                            <span>Color: <span className="text-gray-300">{variant.xcouleur?.xcouleurintitule}</span></span>
+                            <span>•</span>
+                            <span>Size: <span className="text-gray-300">{variant.xtaille?.xtailleintitule}</span></span>
+                        </div>
+                    </div>
                     <div className="flex items-center gap-2">
-                        <Badge variant="secondary" className="bg-blue-500/20 text-blue-300 border-blue-500/30 text-xs">
-                            {variant.xcouleur?.xcouleurintitule}
-                        </Badge>
-                        <Badge
-                            variant="secondary"
-                            className="bg-green-500/20 text-green-300 border-green-500/30 text-xs"
-                        >
-                            {variant.xtaille?.xtailleintitule}
-                        </Badge>
-                        {variant.yvarprodstatut === "not_approved" && (
-                            <Badge
-                                variant="secondary"
-                                className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30 text-xs"
-                            >
-                                Needs Approval
-                            </Badge>
-                        )}
+                        {getVariantStatusBadge()}
                     </div>
                 </div>
+                
+                {/* Variant Action Buttons */}
+                {onVariantAction && (
+                    <div className="flex items-center gap-2 mt-3">
+                        {variant.yvarprodstatut === "not_approved" && (
+                            <>
+                                <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => onVariantAction('approve', variant.yvarprodid)}
+                                    className="h-7 px-2 text-xs border-green-600 text-green-400 hover:bg-green-900/50"
+                                >
+                                    <CheckCircle className="h-3 w-3 mr-1" />
+                                    Approve
+                                </Button>
+                                <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => onVariantAction('revision', variant.yvarprodid)}
+                                    className="h-7 px-2 text-xs border-orange-600 text-orange-400 hover:bg-orange-900/50"
+                                >
+                                    <AlertTriangle className="h-3 w-3 mr-1" />
+                                    Revision
+                                </Button>
+                                <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => onVariantAction('deny', variant.yvarprodid)}
+                                    className="h-7 px-2 text-xs border-red-600 text-red-400 hover:bg-red-900/50"
+                                >
+                                    <X className="h-3 w-3 mr-1" />
+                                    Deny
+                                </Button>
+                            </>
+                        )}
+                        {(variant.yvarprodstatut === "approved" || variant.yvarprodstatut === "denied" || variant.yvarprodstatut === "needs_revision") && (
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => onVariantAction('reset', variant.yvarprodid)}
+                                className="h-7 px-2 text-xs border-gray-600 text-gray-400 hover:bg-gray-800/50"
+                            >
+                                <RotateCcw className="h-3 w-3 mr-1" />
+                                Reset
+                            </Button>
+                        )}
+                    </div>
+                )}
             </CardHeader>
             <CardContent className="space-y-4">
                 {/* Variant Media */}
@@ -270,6 +346,14 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
         variants: [],
     });
     const { approveProduct, markNeedsRevision, denyProduct, isLoading } = useApprovalOperations();
+    const {
+        approveVariant,
+        markVariantNeedsRevision,
+        denyVariant,
+        resetVariantStatus,
+        bulkApproveVariants,
+        isLoading: variantLoading
+    } = useVariantApprovalOperations();
     const { data: categories } = useCategories();
     const supabase = createClient();
 
@@ -343,23 +427,25 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
 
     // Update form when product data loads
     useEffect(() => {
-        if (product) {
+        if (product && currencies && currencies.length > 0) {
+            const defaultCurrencyId = currencies[0]?.xdeviseid || 1;
+            
             setFormData({
                 categoryId: product.xcategprodidfk || 0,
                 infoactionId: product.yinfospotactionsidfk || undefined,
                 variants:
                     product.yvarprod?.map((variant: any) => ({
                         yvarprodid: variant.yvarprodid,
-                        yvarprodprixcatalogue: variant.yvarprodprixcatalogue || 0,
-                        yvarprodprixpromotion: variant.yvarprodprixpromotion || undefined,
+                        yvarprodprixcatalogue: Number(variant.yvarprodprixcatalogue) || 1, // Default to 1 instead of 0
+                        yvarprodprixpromotion: variant.yvarprodprixpromotion ? Number(variant.yvarprodprixpromotion) : undefined,
                         yvarprodpromotiondatedeb: variant.yvarprodpromotiondatedeb || undefined,
                         yvarprodpromotiondatefin: variant.yvarprodpromotiondatefin || undefined,
-                        yvarprodnbrjourlivraison: variant.yvarprodnbrjourlivraison || 0,
-                        currencyId: variant.xdeviseidfk || 0,
+                        yvarprodnbrjourlivraison: Number(variant.yvarprodnbrjourlivraison) || 1, // Default to 1 instead of 0
+                        currencyId: Number(variant.xdeviseidfk) || defaultCurrencyId,
                     })) || [],
             });
         }
-    }, [product]);
+    }, [product, currencies]);
 
     // (removed unused handleSubmit)
 
@@ -386,16 +472,24 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
     };
 
     const handleConfirm = async () => {
-        if (!productId) return;
+        if (!productId || !product) return;
 
         try {
+            // Check if at least one variant is approved
+            const approvedVariants = product.yvarprod?.filter((v: any) => v.yvarprodstatut === 'approved') || [];
+            
+            if (approvedVariants.length === 0) {
+                throw new Error('At least one variant must be approved before approving the product');
+            }
+
             await approveProduct.mutateAsync({
                 productId,
                 approvalData: formData,
             });
             onClose();
-        } catch {
-            // Error is handled by the mutation
+        } catch (error: any) {
+            console.error('Product approval error:', error);
+            // The error will be shown via toast from the mutation
         }
     };
 
@@ -410,16 +504,127 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
         }
     };
 
+    const handleVariantAction = async (action: 'approve' | 'deny' | 'revision' | 'reset', variantId: number) => {
+        const variantIndex = formData.variants.findIndex(v => v.yvarprodid === variantId);
+        
+        try {
+            switch (action) {
+                case 'approve':
+                    if (variantIndex >= 0) {
+                        const variantData = formData.variants[variantIndex];
+                        
+                        // Validate required fields with more lenient checks
+                        const catalogPrice = Number(variantData.yvarprodprixcatalogue) || 0;
+                        const deliveryDays = Number(variantData.yvarprodnbrjourlivraison) || 0;
+                        const currencyId = Number(variantData.currencyId) || 0;
+                        
+                        if (catalogPrice <= 0) {
+                            throw new Error('Please set a catalog price greater than 0');
+                        }
+                        if (deliveryDays <= 0) {
+                            throw new Error('Please set delivery days greater than 0');
+                        }
+                        if (currencyId <= 0) {
+                            throw new Error('Please select a currency');
+                        }
+                        
+                        await approveVariant.mutateAsync({
+                            variantId,
+                            approvalData: {
+                                yvarprodprixcatalogue: catalogPrice,
+                                yvarprodprixpromotion: variantData.yvarprodprixpromotion ? Number(variantData.yvarprodprixpromotion) : undefined,
+                                yvarprodpromotiondatedeb: variantData.yvarprodpromotiondatedeb,
+                                yvarprodpromotiondatefin: variantData.yvarprodpromotiondatefin,
+                                yvarprodnbrjourlivraison: deliveryDays,
+                                currencyId: currencyId,
+                            }
+                        });
+                    } else {
+                        throw new Error('Variant data not found');
+                    }
+                    break;
+                case 'deny':
+                    await denyVariant.mutateAsync(variantId);
+                    break;
+                case 'revision':
+                    await markVariantNeedsRevision.mutateAsync(variantId);
+                    break;
+                case 'reset':
+                    await resetVariantStatus.mutateAsync(variantId);
+                    break;
+            }
+        } catch (error: any) {
+            // Show specific error message
+            console.error('Variant action error:', error);
+        }
+    };
+
+    const handleBulkApproveVariants = async () => {
+        if (!productId || !product?.yvarprod) return;
+
+        const pendingVariants = product.yvarprod
+            .filter((variant: any) => variant.yvarprodstatut === 'not_approved')
+            .map((variant: any) => {
+                const variantIndex = formData.variants.findIndex(v => v.yvarprodid === variant.yvarprodid);
+                if (variantIndex >= 0) {
+                    const variantData = formData.variants[variantIndex];
+                    
+                    // Validate each variant before bulk approval
+                    const catalogPrice = Number(variantData.yvarprodprixcatalogue) || 0;
+                    const deliveryDays = Number(variantData.yvarprodnbrjourlivraison) || 0;
+                    const currencyId = Number(variantData.currencyId) || 0;
+                    
+                    if (catalogPrice <= 0 || deliveryDays <= 0 || currencyId <= 0) {
+                        throw new Error(`Variant ${variant.yvarprodintitule} has incomplete pricing information`);
+                    }
+                    
+                    return {
+                        variantId: variant.yvarprodid,
+                        approvalData: {
+                            yvarprodprixcatalogue: catalogPrice,
+                            yvarprodprixpromotion: variantData.yvarprodprixpromotion ? Number(variantData.yvarprodprixpromotion) : undefined,
+                            yvarprodpromotiondatedeb: variantData.yvarprodpromotiondatedeb,
+                            yvarprodpromotiondatefin: variantData.yvarprodpromotiondatefin,
+                            yvarprodnbrjourlivraison: deliveryDays,
+                            currencyId: currencyId,
+                        }
+                    };
+                }
+                return null;
+            })
+            .filter(Boolean);
+
+        if (pendingVariants.length > 0) {
+            try {
+                await bulkApproveVariants.mutateAsync({
+                    variantApprovals: pendingVariants
+                });
+            } catch (error: any) {
+                console.error('Bulk approval error:', error);
+            }
+        }
+    };
+
     // Get status badge
     const getStatusBadge = () => {
         if (!product) return null;
 
+        const approvedVariants = product.yvarprod?.filter((v: any) => v.yvarprodstatut === 'approved') || [];
+        const hasApprovedVariants = approvedVariants.length > 0;
+
         if (product.yprodstatut === "not_approved") {
             return (
-                <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30">
-                    <AlertTriangle className="h-3 w-3 mr-1" />
-                    Pending Approval
-                </Badge>
+                <div className="flex flex-col items-end gap-1">
+                    <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30">
+                        <AlertTriangle className="h-3 w-3 mr-1" />
+                        Pending Approval
+                    </Badge>
+                    {!hasApprovedVariants && (
+                        <Badge variant="secondary" className="bg-red-500/20 text-red-300 border-red-500/30 text-xs">
+                            Needs approved variants
+                        </Badge>
+                    )}
+                </div>
             );
         } else if (product.yprodstatut === "needs_revision") {
             return (
@@ -437,6 +642,12 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
             );
         }
         return null;
+    };
+
+    // Check if product can be approved (at least one variant must be approved)
+    const canApproveProduct = () => {
+        if (!product?.yvarprod) return false;
+        return product.yvarprod.some((v: any) => v.yvarprodstatut === 'approved');
     };
 
     // Prepare options
@@ -574,12 +785,12 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                         <div>
                                             <Label className="text-gray-300">Store</Label>
                                             <Input
-                                                defaultValue=""
                                                 value={
                                                     product.ydetailsevent?.[0]?.yboutique?.yboutiqueintitule ||
                                                     "Unknown Store"
                                                 }
                                                 disabled
+                                                readOnly
                                                 className="bg-gray-700 border-gray-600 text-gray-300"
                                             />
                                         </div>
@@ -603,6 +814,23 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                 </div>
 
                                 <div className="space-y-4">
+                                    {/* Bulk Actions */}
+                                    {product.yvarprod?.some((v: any) => v.yvarprodstatut === 'not_approved') && (
+                                        <div className="flex items-center gap-2 p-3 bg-gray-800/30 rounded-lg border border-gray-700">
+                                            <span className="text-sm text-gray-300">Bulk Actions:</span>
+                                            <Button
+                                                size="sm"
+                                                variant="outline"
+                                                onClick={handleBulkApproveVariants}
+                                                disabled={variantLoading}
+                                                className="h-7 px-2 text-xs border-green-600 text-green-400 hover:bg-green-900/50"
+                                            >
+                                                <CheckCircle className="h-3 w-3 mr-1" />
+                                                Approve All Pending
+                                            </Button>
+                                        </div>
+                                    )}
+                                    
                                     {product.yvarprod?.map((variant: any, index: number) => (
                                         <VariantApprovalCard
                                             key={variant.yvarprodid}
@@ -612,6 +840,7 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                             formData={formData}
                                             updateVariant={updateVariant}
                                             currencyOptions={currencyOptions}
+                                            onVariantAction={handleVariantAction}
                                         />
                                     ))}
                                 </div>
@@ -625,7 +854,7 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                         type="button"
                         variant="outline"
                         onClick={onClose}
-                        disabled={isLoading}
+                        disabled={isLoading || variantLoading}
                         className="border-gray-600 text-gray-300 hover:bg-gray-800/50"
                     >
                         Cancel
@@ -634,7 +863,7 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                         type="button"
                         variant="outline"
                         onClick={handleDeny}
-                        disabled={isLoading}
+                        disabled={isLoading || variantLoading}
                         className="border-red-600 text-red-400 hover:bg-red-900/50"
                     >
                         Deny
@@ -643,7 +872,7 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                         type="button"
                         variant="outline"
                         onClick={handleMarkNeedsRevision}
-                        disabled={isLoading}
+                        disabled={isLoading || variantLoading}
                         className="border-orange-600 text-orange-400 hover:bg-orange-900/50"
                     >
                         <AlertTriangle className="h-4 w-4 mr-2" />
@@ -652,10 +881,15 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                     <Button
                         type="button"
                         onClick={handleConfirm}
-                        disabled={isLoading}
-                        className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white"
+                        disabled={isLoading || variantLoading || !canApproveProduct()}
+                        className={`${
+                            canApproveProduct()
+                                ? "bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white"
+                                : "bg-gray-600 text-gray-400 cursor-not-allowed"
+                        }`}
+                        title={!canApproveProduct() ? "At least one variant must be approved first" : "Approve product"}
                     >
-                        {isLoading ? (
+                        {isLoading || variantLoading ? (
                             <div className="flex items-center gap-2">
                                 <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
                                 Confirming...
@@ -663,7 +897,7 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                         ) : (
                             <>
                                 <CheckCircle className="h-4 w-4 mr-2" />
-                                Confirm
+                                {canApproveProduct() ? "Approve Product" : "Need Approved Variants"}
                             </>
                         )}
                     </Button>

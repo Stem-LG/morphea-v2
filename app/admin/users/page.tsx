@@ -498,10 +498,10 @@ export default function UsersManagementPage() {
     };
 
     // Helper function to determine if user can assign stores
-    const canAssignStores = (user: UserRole) => {
-        const hasValidRole = user.roles.some((role) => role === "admin" || role === "store_admin");
-        return hasValidRole;
-    };
+    // const canAssignStores = (user: UserRole) => {
+    //     const hasValidRole = user.roles.some((role) => role === "admin" || role === "store_admin");
+    //     return hasValidRole;
+    // };
 
     // Helper function to determine if current user can edit designer details
     const canEditDesigner = () => {
