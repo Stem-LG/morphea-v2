@@ -6,6 +6,10 @@ import { Canvas } from "@react-three/fiber";
 import { OrbitControls, useGLTF, Html } from "@react-three/drei";
 import { Suspense } from "react";
 import { useLanguage } from "@/hooks/useLanguage";
+import { useAddToCart } from "@/app/_hooks/cart/useAddToCart";
+import { useAddToWishlist } from "@/app/_hooks/wishlist/useAddToWishlist";
+import { useRemoveFromWishlist } from "@/app/_hooks/wishlist/useRemoveFromWishlist";
+import { useIsInWishlist } from "@/app/_hooks/wishlist/useIsInWishlist";
 import * as THREE from "three";
 
 // Loading component for 3D model
@@ -179,7 +183,7 @@ interface ProductDetailsPageProps {
     onClose: () => void;
 }
 
-export default function ProductDetailsPage({ productData, onClose }: ProductDetailsPageProps) {
+export function ProductDetailsPage({ productData, onClose }: ProductDetailsPageProps) {
     const { t } = useLanguage();
     const [selectedMediaIndex, setSelectedMediaIndex] = useState(0);
     const [selectedColorId, setSelectedColorId] = useState<number>(() => {
@@ -193,37 +197,10 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
     const [viewMode, setViewMode] = useState<"media" | "3d">("media");
     const [quantity, setQuantity] = useState(1);
 
-    const productId = productData.yprodid;
-
-    // Early return if no variants
-    if (!productData.yvarprod || productData.yvarprod.length === 0) {
-        return (
-            <div className="fixed inset-0 z-[70] bg-black/90 backdrop-blur-sm flex items-center justify-center p-4">
-                <div className="bg-gradient-to-br from-morpheus-blue-dark via-morpheus-blue-dark/95 to-morpheus-blue-light/90 backdrop-blur-md shadow-2xl shadow-black/50 rounded-lg p-8 max-w-md w-full text-center">
-                    <button
-                        onClick={onClose}
-                        className="absolute top-4 right-4 text-white/80 hover:text-morpheus-gold-light transition-colors"
-                    >
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M6 18L18 6M6 6l12 12"
-                            />
-                        </svg>
-                    </button>
-                    <h2 className="text-2xl font-bold text-white mb-4">
-                        {t("productDetails.noVariantsAvailable") || "No Variants Available"}
-                    </h2>
-                    <p className="text-gray-300">
-                        {t("productDetails.noVariantsMessage") || "This product currently has no available variants."}
-                    </p>
-                </div>
-            </div>
-        );
-    }
-
+    // Hooks for cart and wishlist functionality
+    const addToCartMutation = useAddToCart();
+    const addToWishlistMutation = useAddToWishlist();
+    const removeFromWishlistMutation = useRemoveFromWishlist();
     // Get all unique colors and sizes from variants
     const availableColors = useMemo(() => {
         if (!productData.yvarprod || productData.yvarprod.length === 0) return [];
@@ -263,6 +240,9 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
             ) || productData.yvarprod[0]
         );
     }, [productData.yvarprod, selectedColorId, selectedSizeId]);
+
+    // Check if current variant is in wishlist
+    const { data: isInWishlist } = useIsInWishlist(selectedVariant?.yvarprodid || 0);
 
     // Get all media from all variants for the carousel
     const allMedia = useMemo(() => {
@@ -338,7 +318,14 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
         setSelectedSizeId(sizeId);
     };
 
-    const handleAddToCart = () => {};
+    const handleAddToCart = () => {
+        if (!selectedVariant) return;
+
+        addToCartMutation.mutate({
+            yvarprodidfk: selectedVariant.yvarprodid,
+            ypanierqte: quantity,
+        });
+    };
 
     const handleDirectOrder = () => {
         // Implementation for direct order
@@ -351,7 +338,48 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
         // You would redirect to checkout or open order modal here
     };
 
-    const toggleWishlist = () => {};
+    const toggleWishlist = () => {
+        if (!selectedVariant) return;
+
+        if (isInWishlist) {
+            removeFromWishlistMutation.mutate({
+                yvarprodidfk: selectedVariant.yvarprodid,
+            });
+        } else {
+            addToWishlistMutation.mutate({
+                yvarprodidfk: selectedVariant.yvarprodid,
+            });
+        }
+    };
+
+    // Early return if no variants
+    if (!productData.yvarprod || productData.yvarprod.length === 0) {
+        return (
+            <div className="fixed inset-0 z-[70] bg-black/90 backdrop-blur-sm flex items-center justify-center p-4">
+                <div className="bg-gradient-to-br from-morpheus-blue-dark via-morpheus-blue-dark/95 to-morpheus-blue-light/90 backdrop-blur-md shadow-2xl shadow-black/50 rounded-lg p-8 max-w-md w-full text-center">
+                    <button
+                        onClick={onClose}
+                        className="absolute top-4 right-4 text-white/80 hover:text-morpheus-gold-light transition-colors"
+                    >
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M6 18L18 6M6 6l12 12"
+                            />
+                        </svg>
+                    </button>
+                    <h2 className="text-2xl font-bold text-white mb-4">
+                        {t("productDetails.noVariantsAvailable") || "No Variants Available"}
+                    </h2>
+                    <p className="text-gray-300">
+                        {t("productDetails.noVariantsMessage") || "This product currently has no available variants."}
+                    </p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="fixed inset-0 z-[70] bg-black/90 backdrop-blur-sm">
@@ -687,12 +715,57 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                                 <div className="flex gap-4">
                                     <button
                                         onClick={handleAddToCart}
-                                        className="flex-1 bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light text-white py-4 px-6 font-semibold rounded-lg shadow-lg hover:shadow-morpheus-gold-light/30 transition-all duration-300 group"
+                                        disabled={addToCartMutation.isPending || !selectedVariant}
+                                        className={`flex-1 bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light text-white py-4 px-6 font-semibold rounded-lg shadow-lg hover:shadow-morpheus-gold-light/30 transition-all duration-300 group ${
+                                            addToCartMutation.isPending || !selectedVariant
+                                                ? "opacity-50 cursor-not-allowed"
+                                                : ""
+                                        }`}
                                     >
                                         <span className="flex items-center justify-center">
+                                            {addToCartMutation.isPending ? (
+                                                <div className="w-5 h-5 border-2 border-white border-t-transparent animate-spin rounded-full mr-2"></div>
+                                            ) : (
+                                                <svg
+                                                    className="w-5 h-5 mr-2"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    viewBox="0 0 24 24"
+                                                >
+                                                    <path
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        strokeWidth={2}
+                                                        d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                                                    />
+                                                </svg>
+                                            )}
+                                            {addToCartMutation.isPending
+                                                ? "Adding..."
+                                                : t("productDetails.addToCart") || "Add to Cart"}
+                                        </span>
+                                    </button>
+                                    <button
+                                        onClick={toggleWishlist}
+                                        disabled={
+                                            addToWishlistMutation.isPending || removeFromWishlistMutation.isPending
+                                        }
+                                        className={`w-14 h-14 rounded-lg border-2 transition-all duration-300 flex items-center justify-center ${
+                                            isInWishlist
+                                                ? "border-red-500 text-red-500 bg-red-50"
+                                                : "border-white/30 text-gray-300 hover:border-white/60 hover:text-white"
+                                        } ${
+                                            addToWishlistMutation.isPending || removeFromWishlistMutation.isPending
+                                                ? "opacity-50 cursor-not-allowed"
+                                                : ""
+                                        }`}
+                                    >
+                                        {addToWishlistMutation.isPending || removeFromWishlistMutation.isPending ? (
+                                            <div className="w-4 h-4 border-2 border-current border-t-transparent animate-spin rounded-full"></div>
+                                        ) : (
                                             <svg
-                                                className="w-5 h-5 mr-2"
-                                                fill="none"
+                                                className="w-6 h-6"
+                                                fill={isInWishlist ? "currentColor" : "none"}
                                                 stroke="currentColor"
                                                 viewBox="0 0 24 24"
                                             >
@@ -700,29 +773,10 @@ export default function ProductDetailsPage({ productData, onClose }: ProductDeta
                                                     strokeLinecap="round"
                                                     strokeLinejoin="round"
                                                     strokeWidth={2}
-                                                    d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                                                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
                                                 />
                                             </svg>
-                                            {t("productDetails.addToCart") || "Add to Cart"}
-                                        </span>
-                                    </button>
-                                    <button
-                                        onClick={toggleWishlist}
-                                        className={`w-14 h-14 rounded-lg border-2 transition-all duration-300 flex items-center justify-center`}
-                                    >
-                                        <svg
-                                            className="w-6 h-6"
-                                            fill={"currentColor"}
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24"
-                                        >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth={2}
-                                                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                                            />
-                                        </svg>
+                                        )}
                                     </button>
                                 </div>
 

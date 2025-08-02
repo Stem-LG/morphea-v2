@@ -3,52 +3,34 @@
 import { LogoutButton } from "@/components/logout-button";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/hooks/useLanguage";
-import { useCart } from "@/hooks/useCart";
-import { useWishlist } from "@/hooks/useWishlist";
 import { LanguageSwitcher } from "@/components/language-switcher";
-import { CartDropdown } from "@/components/cart-dropdown";
-import { WishlistDropdown } from "@/components/wishlist-dropdown";
+import { CartDialog } from "@/app/_components/cart-dialog";
+import { WishlistDialog } from "@/app/_components/wishlist-dialog";
+import { useCart } from "@/app/_hooks/cart/useCart";
+import { useWishlist } from "@/app/_hooks/wishlist/useWishlist";
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import ProductDetailsPage from "../main/_components/product-details-page";
+import { ProductDetailsPage } from "../main/_components/product-details-page";
 
 export default function NavBar() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isCartOpen, setIsCartOpen] = useState(false);
     const [isWishlistOpen, setIsWishlistOpen] = useState(false);
-    const [selectedProduct, setSelectedProduct] = useState<{
-        id: number;
-        name: string;
-        description: string;
-        image: string;
-        backgroundColor?: string;
-        models: Array<{
-            url: string;
-            color: string;
-            id: number;
-        }>;
-    } | null>(null);
+    const [selectedProduct, setSelectedProduct] = useState(null);
     const { t } = useLanguage();
 
     const { data: currentUser, isLoading } = useAuth();
+    const { data: cartItems = [] } = useCart();
+    const { data: wishlistItems = [] } = useWishlist();
 
     const userRoles = useMemo(() => {
         return currentUser?.app_metadata?.roles || [];
     }, [currentUser]);
 
-    const { cart } = useCart();
-    const { wishlist } = useWishlist();
+    const cartItemCount = cartItems.length;
+    const wishlistItemCount = wishlistItems.length;
 
     const closeMobileMenu = () => setIsMobileMenuOpen(false);
-
-    const handleProductClick = (productData: typeof selectedProduct) => {
-        setSelectedProduct(productData);
-        setIsCartOpen(false);
-        setIsWishlistOpen(false);
-    };
-
-    const totalCartItems = cart.reduce((sum, item) => sum + item.ypanierqte, 0);
-    const totalWishlistItems = wishlist.length;
 
     return (
         <>
@@ -115,16 +97,15 @@ export default function NavBar() {
                                                     d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
                                                 />
                                             </svg>
-                                            {totalWishlistItems > 0 && (
-                                                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold">
-                                                    {totalWishlistItems}
+                                            {wishlistItemCount > 0 && (
+                                                <span className="absolute -top-1 -right-1 bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-lg">
+                                                    {wishlistItemCount > 99 ? "99+" : wishlistItemCount}
                                                 </span>
                                             )}
                                         </button>
-                                        <WishlistDropdown
+                                        <WishlistDialog
                                             isOpen={isWishlistOpen}
                                             onClose={() => setIsWishlistOpen(false)}
-                                            onProductClick={handleProductClick}
                                         />
                                     </div>
 
@@ -147,17 +128,13 @@ export default function NavBar() {
                                                     d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
                                                 />
                                             </svg>
-                                            {totalCartItems > 0 && (
-                                                <span className="absolute -top-1 -right-1 bg-morpheus-gold-light text-morpheus-blue-dark text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold">
-                                                    {totalCartItems}
+                                            {cartItemCount > 0 && (
+                                                <span className="absolute -top-1 -right-1 bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-lg">
+                                                    {cartItemCount > 99 ? "99+" : cartItemCount}
                                                 </span>
                                             )}
                                         </button>
-                                        <CartDropdown
-                                            isOpen={isCartOpen}
-                                            onClose={() => setIsCartOpen(false)}
-                                            onProductClick={handleProductClick}
-                                        />
+                                        <CartDialog isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
                                     </div>
                                 </>
                             )}
@@ -266,25 +243,27 @@ export default function NavBar() {
                                                 setIsWishlistOpen(true);
                                                 closeMobileMenu();
                                             }}
-                                            className="text-gray-300 hover:text-morpheus-gold-light hover:bg-morpheus-gold-dark/10 flex items-center px-4 py-3 text-base font-medium transition-all duration-300 rounded w-full"
+                                            className="text-gray-300 hover:text-morpheus-gold-light hover:bg-morpheus-gold-dark/10 flex items-center justify-between px-4 py-3 text-base font-medium transition-all duration-300 rounded w-full"
                                         >
-                                            <svg
-                                                className="w-5 h-5 mr-3"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                viewBox="0 0 24 24"
-                                            >
-                                                <path
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    strokeWidth={2}
-                                                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                                                />
-                                            </svg>
-                                            Wishlist
-                                            {totalWishlistItems > 0 && (
-                                                <span className="ml-auto bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold">
-                                                    {totalWishlistItems}
+                                            <div className="flex items-center">
+                                                <svg
+                                                    className="w-5 h-5 mr-3"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    viewBox="0 0 24 24"
+                                                >
+                                                    <path
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        strokeWidth={2}
+                                                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                                                    />
+                                                </svg>
+                                                Wishlist
+                                            </div>
+                                            {wishlistItemCount > 0 && (
+                                                <span className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light text-white text-xs font-bold rounded-full px-2 py-1 min-w-[20px] text-center">
+                                                    {wishlistItemCount > 99 ? "99+" : wishlistItemCount}
                                                 </span>
                                             )}
                                         </button>
@@ -294,25 +273,27 @@ export default function NavBar() {
                                                 setIsCartOpen(true);
                                                 closeMobileMenu();
                                             }}
-                                            className="text-gray-300 hover:text-morpheus-gold-light hover:bg-morpheus-gold-dark/10 flex items-center px-4 py-3 text-base font-medium transition-all duration-300 rounded w-full"
+                                            className="text-gray-300 hover:text-morpheus-gold-light hover:bg-morpheus-gold-dark/10 flex items-center justify-between px-4 py-3 text-base font-medium transition-all duration-300 rounded w-full"
                                         >
-                                            <svg
-                                                className="w-5 h-5 mr-3"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                viewBox="0 0 24 24"
-                                            >
-                                                <path
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    strokeWidth={2}
-                                                    d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-                                                />
-                                            </svg>
-                                            Cart
-                                            {totalCartItems > 0 && (
-                                                <span className="ml-auto bg-morpheus-gold-light text-morpheus-blue-dark text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold">
-                                                    {totalCartItems}
+                                            <div className="flex items-center">
+                                                <svg
+                                                    className="w-5 h-5 mr-3"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    viewBox="0 0 24 24"
+                                                >
+                                                    <path
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        strokeWidth={2}
+                                                        d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                                                    />
+                                                </svg>
+                                                Cart
+                                            </div>
+                                            {cartItemCount > 0 && (
+                                                <span className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light text-white text-xs font-bold rounded-full px-2 py-1 min-w-[20px] text-center">
+                                                    {cartItemCount > 99 ? "99+" : cartItemCount}
                                                 </span>
                                             )}
                                         </button>

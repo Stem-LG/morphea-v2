@@ -665,6 +665,7 @@ export const enTranslations = {
     "added": "Added",
     "addToCart": "Add to Cart",
     "moveToCart": "Move to Cart",
+    "moveAllToCart": "Move All to Cart",
     "processing": "Processing...",
     "continueShopping": "Continue Shopping",
     "removeFromWishlist": "Remove from wishlist",

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import ProductDetailsPage from "./product-details-page";
+import { ProductDetailsPage } from "./product-details-page";
 import { useSceneProducts } from "../_hooks/useSceneProducts";
 import Image from "next/image";
 
@@ -23,7 +23,7 @@ export default function ProductsListModal({ isOpen, onClose, onProductDetailsCha
         return productsData?.map((product) => {
             // Get the first variant for pricing and media
             const firstVariant = product.yvarprod?.[0];
-            
+
             // Get the first picture media from the first variant
             const firstPicture = firstVariant?.yvarprodmedia?.find(
                 (media) => media.ymedia && !media.ymedia.ymediaboolvideo
@@ -47,8 +47,6 @@ export default function ProductsListModal({ isOpen, onClose, onProductDetailsCha
             };
         });
     }, [productsData]);
-
-    const selectedProductData = productsList?.find((product) => product.id === selectedProduct);
 
     if (!isOpen) return null;
     return (
@@ -173,9 +171,7 @@ export default function ProductsListModal({ isOpen, onClose, onProductDetailsCha
                                                 }}
                                                 className="relative overflow-hidden bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light text-white px-4 sm:px-6 lg:px-8 py-3 sm:py-4 font-semibold shadow-lg transition-all duration-300 hover:shadow-morpheus-gold-light/30 hover:scale-105 rounded group/btn w-full sm:w-auto"
                                             >
-                                                <span className="relative z-10 text-sm sm:text-base">
-                                                    Voir
-                                                </span>
+                                                <span className="relative z-10 text-sm sm:text-base">Voir</span>
                                                 <div className="absolute inset-0 bg-gradient-to-r from-morpheus-gold-light to-morpheus-gold-dark opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300"></div>
                                             </button>
                                         </div>
@@ -206,7 +202,7 @@ export default function ProductsListModal({ isOpen, onClose, onProductDetailsCha
             {/* Product Details Modal */}
             {showProductDetails && selectedProduct && productsData && (
                 <ProductDetailsPage
-                    productData={productsData.find(p => p.yprodid === selectedProduct)!}
+                    productData={productsData.find((p) => p.yprodid === selectedProduct)!}
                     onClose={() => {
                         setShowProductDetails(false);
                         onProductDetailsChange?.(false);

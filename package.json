@@ -45,7 +45,8 @@
         "sonner": "^2.0.6",
         "supabase": "^2.31.8",
         "tailwind-merge": "^3.3.1",
-        "three": "^0.178.0"
+        "three": "^0.178.0",
+        "vaul": "^1.1.2"
     },
     "devDependencies": {
         "@eslint/eslintrc": "^3",

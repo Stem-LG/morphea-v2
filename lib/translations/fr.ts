@@ -664,6 +664,7 @@ export const frTranslations = {
     "added": "Ajouté",
     "addToCart": "Ajouter au panier",
     "moveToCart": "Déplacer vers le panier",
+    "moveAllToCart": "Tout déplacer vers le panier",
     "processing": "Traitement...",
     "continueShopping": "Continuer les achats",
     "removeFromWishlist": "Retirer de la liste de souhaits",

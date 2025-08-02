@@ -1,47 +1,33 @@
 "use client";
 
-import { useCart } from "@/hooks/useCart";
+import { useCart } from "@/app/_hooks/cart/useCart";
+import { useUpdateCart } from "@/app/_hooks/cart/useUpdateCart";
+import { useDeleteFromCart } from "@/app/_hooks/cart/useDeleteFromCart";
 import { useLanguage } from "@/hooks/useLanguage";
-import { useState } from "react";
 import Link from "next/link";
 
 export default function CartPage() {
-    const { cart, updateQuantity, removeFromCart, isLoading } = useCart();
+    const { data: cart = [], isLoading } = useCart();
+    const updateCartMutation = useUpdateCart();
+    const deleteFromCartMutation = useDeleteFromCart();
     const { t } = useLanguage();
-    const [updatingItems, setUpdatingItems] = useState<Set<number>>(new Set());
 
     const totalItems = cart.reduce((sum, item) => sum + item.ypanierqte, 0);
     const totalPrice = cart.reduce((sum, item) => {
-        const price = item.yvarprod?.yvarprodprixpromotion || item.yvarprod?.yvarprodprixcatalogue || 99;
+        const price = item.yvarprod?.yvarprodprixpromotion || item.yvarprod?.yvarprodprixcatalogue || 0;
         return sum + price * item.ypanierqte;
     }, 0);
 
-    const handleQuantityChange = async (itemId: number, newQuantity: number) => {
-        if (newQuantity < 1) return;
-
-        setUpdatingItems((prev) => new Set(prev).add(itemId));
-        try {
-            await updateQuantity({ itemId, quantity: newQuantity });
-        } finally {
-            setUpdatingItems((prev) => {
-                const newSet = new Set(prev);
-                newSet.delete(itemId);
-                return newSet;
-            });
+    const handleQuantityChange = (itemId: number, newQuantity: number) => {
+        if (newQuantity < 1) {
+            deleteFromCartMutation.mutate({ ypanierid: itemId });
+        } else {
+            updateCartMutation.mutate({ ypanierid: itemId, ypanierqte: newQuantity });
         }
     };
 
-    const handleRemoveItem = async (itemId: number) => {
-        setUpdatingItems((prev) => new Set(prev).add(itemId));
-        try {
-            await removeFromCart(itemId);
-        } finally {
-            setUpdatingItems((prev) => {
-                const newSet = new Set(prev);
-                newSet.delete(itemId);
-                return newSet;
-            });
-        }
+    const handleRemoveItem = (itemId: number) => {
+        deleteFromCartMutation.mutate({ ypanierid: itemId });
     };
 
     if (isLoading) {
@@ -62,10 +48,11 @@ export default function CartPage() {
                 {/* Header */}
                 <div className="text-center mb-8">
                     <h1 className="text-4xl font-bold font-parisienne bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light bg-clip-text text-transparent mb-4">
-                        {t('cart.title')}
+                        {t("cart.title")}
                     </h1>
                     <p className="text-gray-300">
-                        {totalItems} {totalItems === 1 ? t('cart.oneItem') : t('cart.multipleItems')} {t('cart.inYourCart')}
+                        {totalItems} {totalItems === 1 ? t("cart.oneItem") : t("cart.multipleItems")}{" "}
+                        {t("cart.inYourCart")}
                     </p>
                 </div>
 
@@ -82,13 +69,13 @@ export default function CartPage() {
                                 />
                             </svg>
                         </div>
-                        <h2 className="text-2xl font-semibold text-white mb-4">{t('cart.empty')}</h2>
-                        <p className="text-gray-300 mb-8">{t('cart.emptyDescription')}</p>
+                        <h2 className="text-2xl font-semibold text-white mb-4">{t("cart.empty")}</h2>
+                        <p className="text-gray-300 mb-8">{t("cart.emptyDescription")}</p>
                         <Link
                             href="/main"
                             className="inline-block bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light text-white px-8 py-3 font-semibold hover:from-morpheus-gold-light hover:to-morpheus-gold-dark transition-all duration-300"
                         >
-                            {t('cart.continueShopping')}
+                            {t("cart.continueShopping")}
                         </Link>
                     </div>
                 ) : (
@@ -130,26 +117,35 @@ export default function CartPage() {
                                         {/* Product Details */}
                                         <div className="flex-1">
                                             <h3 className="text-white font-semibold text-lg mb-1">
-                                                {item.yvarprod?.yvarprodintitule || item.yvarprod?.yprod?.yprodintitule || t('cart.unknownProduct')}
+                                                {item.yvarprod?.yvarprodintitule || t("cart.unknownProduct")}
                                             </h3>
-                                            {item.yvarprod?.yprod?.yproddetailstech && (
-                                                <p className="text-gray-300 text-sm mb-2 line-clamp-2">
-                                                    {item.yvarprod.yprod.yproddetailstech}
-                                                </p>
-                                            )}
                                             <div className="flex items-center gap-4">
                                                 <span className="text-morpheus-gold-light font-semibold">
-                                                    ${(item.yvarprod?.yvarprodprixpromotion || item.yvarprod?.yvarprodprixcatalogue || 99).toFixed(2)}
+                                                    $
+                                                    {(
+                                                        item.yvarprod?.yvarprodprixpromotion ||
+                                                        item.yvarprod?.yvarprodprixcatalogue ||
+                                                        0
+                                                    ).toFixed(2)}
                                                 </span>
+                                                {item.yvarprod?.yvarprodprixpromotion && item.yvarprod?.yvarprodprixcatalogue && (
+                                                    <span className="text-gray-300 text-sm line-through">
+                                                        ${item.yvarprod.yvarprodprixcatalogue.toFixed(2)}
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <div className="flex items-center gap-2 text-sm text-gray-300 mt-1">
                                                 {item.yvarprod?.xcouleur && (
-                                                    <span className="text-gray-300 text-sm">
+                                                    <span className="flex items-center gap-1">
+                                                        <div
+                                                            className="w-3 h-3 rounded-full border"
+                                                            style={{ backgroundColor: item.yvarprod.xcouleur.xcouleurhexa }}
+                                                        />
                                                         {item.yvarprod.xcouleur.xcouleurintitule}
                                                     </span>
                                                 )}
                                                 {item.yvarprod?.xtaille && (
-                                                    <span className="text-gray-300 text-sm">
-                                                        {item.yvarprod.xtaille.xtailleintitule}
-                                                    </span>
+                                                    <span>• {item.yvarprod.xtaille.xtailleintitule}</span>
                                                 )}
                                             </div>
                                         </div>
@@ -157,23 +153,27 @@ export default function CartPage() {
                                         {/* Quantity Controls */}
                                         <div className="flex items-center gap-3">
                                             <button
-                                                onClick={() => handleQuantityChange(item.ypanierid, item.ypanierqte - 1)}
-                                                disabled={updatingItems.has(item.ypanierid) || item.ypanierqte <= 1}
-                                                className="w-8 h-8 bg-gradient-to-r from-morpheus-gold-dark/20 to-morpheus-gold-light/20 border border-morpheus-gold-dark/40 text-morpheus-gold-light flex items-center justify-center hover:from-morpheus-gold-dark/30 hover:to-morpheus-gold-light/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                onClick={() =>
+                                                    handleQuantityChange(item.ypanierid, item.ypanierqte - 1)
+                                                }
+                                                disabled={updateCartMutation.isPending || deleteFromCartMutation.isPending || item.ypanierqte <= 1}
+                                                className="w-8 h-8 bg-gradient-to-r from-morpheus-gold-dark/20 to-morpheus-gold-light/20 border border-morpheus-gold-dark/40 text-morpheus-gold-light flex items-center justify-center hover:from-morpheus-gold-dark/30 hover:to-morpheus-gold-light/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed rounded"
                                             >
                                                 -
                                             </button>
                                             <span className="text-white font-semibold min-w-[2rem] text-center">
-                                                {updatingItems.has(item.ypanierid) ? (
+                                                {updateCartMutation.isPending ? (
                                                     <div className="w-4 h-4 border-2 border-morpheus-gold-dark border-t-morpheus-gold-light animate-spin rounded-full mx-auto"></div>
                                                 ) : (
                                                     item.ypanierqte
                                                 )}
                                             </span>
                                             <button
-                                                onClick={() => handleQuantityChange(item.ypanierid, item.ypanierqte + 1)}
-                                                disabled={updatingItems.has(item.ypanierid)}
-                                                className="w-8 h-8 bg-gradient-to-r from-morpheus-gold-dark/20 to-morpheus-gold-light/20 border border-morpheus-gold-dark/40 text-morpheus-gold-light flex items-center justify-center hover:from-morpheus-gold-dark/30 hover:to-morpheus-gold-light/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                onClick={() =>
+                                                    handleQuantityChange(item.ypanierid, item.ypanierqte + 1)
+                                                }
+                                                disabled={updateCartMutation.isPending || deleteFromCartMutation.isPending}
+                                                className="w-8 h-8 bg-gradient-to-r from-morpheus-gold-dark/20 to-morpheus-gold-light/20 border border-morpheus-gold-dark/40 text-morpheus-gold-light flex items-center justify-center hover:from-morpheus-gold-dark/30 hover:to-morpheus-gold-light/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed rounded"
                                             >
                                                 +
                                             </button>
@@ -182,9 +182,9 @@ export default function CartPage() {
                                         {/* Remove Button */}
                                         <button
                                             onClick={() => handleRemoveItem(item.ypanierid)}
-                                            disabled={updatingItems.has(item.ypanierid)}
+                                            disabled={deleteFromCartMutation.isPending}
                                             className="text-red-400 hover:text-red-300 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                                            title={t('cart.removeFromCart')}
+                                            title={t("cart.removeFromCart")}
                                         >
                                             <svg
                                                 className="w-5 h-5"
@@ -205,9 +205,14 @@ export default function CartPage() {
                                     {/* Item Total */}
                                     <div className="mt-4 pt-4 border-t border-morpheus-gold-dark/30">
                                         <div className="flex justify-between items-center">
-                                            <span className="text-gray-300">{t('cart.itemTotal')}:</span>
+                                            <span className="text-gray-300">{t("cart.itemTotal")}</span>
                                             <span className="text-morpheus-gold-light font-semibold">
-                                                ${((item.yvarprod?.yvarprodprixpromotion || item.yvarprod?.yvarprodprixcatalogue || 99) * item.ypanierqte).toFixed(2)}
+                                                $
+                                                {(
+                                                    (item.yvarprod?.yvarprodprixpromotion ||
+                                                        item.yvarprod?.yvarprodprixcatalogue ||
+                                                        0) * item.ypanierqte
+                                                ).toFixed(2)}
                                             </span>
                                         </div>
                                     </div>
@@ -218,24 +223,26 @@ export default function CartPage() {
                         {/* Order Summary */}
                         <div className="lg:col-span-1">
                             <div className="bg-gradient-to-br from-morpheus-blue-dark/60 to-morpheus-blue-light/40 border border-morpheus-gold-dark/30 p-6 backdrop-blur-sm sticky top-4">
-                                <h2 className="text-xl font-semibold text-white mb-6">{t('cart.orderSummary')}</h2>
+                                <h2 className="text-xl font-semibold text-white mb-6">{t("cart.orderSummary")}</h2>
 
                                 <div className="space-y-4 mb-6">
                                     <div className="flex justify-between items-center">
-                                        <span className="text-gray-300">{t('cart.items')} ({totalItems}):</span>
+                                        <span className="text-gray-300">
+                                            {t("cart.items")} ({totalItems}):
+                                        </span>
                                         <span className="text-white">${totalPrice.toFixed(2)}</span>
                                     </div>
                                     <div className="flex justify-between items-center">
-                                        <span className="text-gray-300">{t('cart.shipping')}:</span>
-                                        <span className="text-white">{t('cart.free')}</span>
+                                        <span className="text-gray-300">{t("cart.shipping")}:</span>
+                                        <span className="text-white">{t("cart.free")}</span>
                                     </div>
                                     <div className="flex justify-between items-center">
-                                        <span className="text-gray-300">{t('cart.tax')}:</span>
-                                        <span className="text-white">{t('cart.calculatedAtCheckout')}</span>
+                                        <span className="text-gray-300">{t("cart.tax")}:</span>
+                                        <span className="text-white">{t("cart.calculatedAtCheckout")}</span>
                                     </div>
                                     <div className="border-t border-morpheus-gold-dark/30 pt-4">
                                         <div className="flex justify-between items-center">
-                                            <span className="text-lg font-semibold text-white">{t('cart.total')}:</span>
+                                            <span className="text-lg font-semibold text-white">{t("cart.total")}</span>
                                             <span className="text-xl font-bold text-morpheus-gold-light">
                                                 ${totalPrice.toFixed(2)}
                                             </span>
@@ -244,14 +251,14 @@ export default function CartPage() {
                                 </div>
 
                                 <button className="w-full bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light text-white py-3 px-6 font-semibold hover:from-morpheus-gold-light hover:to-morpheus-gold-dark transition-all duration-300 mb-4">
-                                    {t('cart.proceedToCheckout')}
+                                    {t("cart.proceedToCheckout")}
                                 </button>
 
                                 <Link
                                     href="/main"
                                     className="block w-full text-center bg-gradient-to-r from-morpheus-gold-dark/20 to-morpheus-gold-light/20 border border-morpheus-gold-dark/40 text-morpheus-gold-light py-3 px-6 font-medium hover:from-morpheus-gold-dark/30 hover:to-morpheus-gold-light/30 transition-all duration-300"
                                 >
-                                    {t('cart.continueShopping')}
+                                    {t("cart.continueShopping")}
                                 </Link>
                             </div>
                         </div>
