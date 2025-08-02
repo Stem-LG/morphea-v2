@@ -26,16 +26,16 @@ export function useDashboardStats(): DashboardStats {
     queryKey: ["dashboard-stats", user?.id, isAdmin, assignedStores],
     queryFn: async () => {
       try {
-        // Get current and previous month dates
-        const now = new Date();
-        const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-        const previousMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-        const previousMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0);
+        // Get current and previous month dates (kept for future use)
+        // const now = new Date();
+        // const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+        // const previousMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+        // const previousMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0);
 
-        // Format dates for SQL queries
-        const currentMonthStartStr = currentMonthStart.toISOString().split('T')[0];
-        const previousMonthStartStr = previousMonthStart.toISOString().split('T')[0];
-        const previousMonthEndStr = previousMonthEnd.toISOString().split('T')[0];
+        // Format dates for SQL queries (currently unused but kept for future use)
+        // const currentMonthStartStr = currentMonthStart.toISOString().split('T')[0];
+        // const previousMonthStartStr = previousMonthStart.toISOString().split('T')[0];
+        // const previousMonthEndStr = previousMonthEnd.toISOString().split('T')[0];
 
         // 1. Get total stores count
         let storesQuery = supabase.schema("morpheus").from("yboutique").select("*", { count: "exact", head: true });
@@ -49,7 +49,7 @@ export function useDashboardStats(): DashboardStats {
         if (storesError) throw new Error(`Stores query failed: ${storesError.message}`);
 
         // 2. Get total products count
-        let productsQuery = supabase.schema("morpheus").from("yprod").select("*", { count: "exact", head: true });
+        const productsQuery = supabase.schema("morpheus").from("yprod").select("*", { count: "exact", head: true });
         
         // Filter by assigned stores for store admins
         if (!isAdmin && assignedStores.length > 0) {
@@ -66,7 +66,7 @@ export function useDashboardStats(): DashboardStats {
         if (productsError) throw new Error(`Products query failed: ${productsError.message}`);
 
         // 3. Get pending approvals count
-        let pendingApprovalsQuery = supabase
+        const pendingApprovalsQuery = supabase
           .schema("morpheus")
           .from("yprod")
           .select("*", { count: "exact", head: true })
@@ -84,7 +84,7 @@ export function useDashboardStats(): DashboardStats {
         if (pendingApprovalsError) throw new Error(`Pending approvals query failed: ${pendingApprovalsError.message}`);
 
         // 4. Get total visitors count
-        let visitorsQuery = supabase.schema("morpheus").from("yvisiteur").select("*", { count: "exact", head: true });
+        const visitorsQuery = supabase.schema("morpheus").from("yvisiteur").select("*", { count: "exact", head: true });
         
         // Apply same role-based filtering as other statistics if needed
         // For now, we'll get all visitors regardless of role since visitors aren't tied to specific stores

@@ -3,10 +3,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { createClient } from "@/lib/client";
+import { useYDetailsEventOperations } from "./use-ydetailsevent-operations";
 
 interface ApprovalData {
     categoryId?: number;
     infoactionId?: number;
+    selectedEventId?: number;
     variants?: Array<{
         yvarprodid: number;
         yvarprodprixcatalogue: number;
@@ -21,6 +23,7 @@ interface ApprovalData {
 export function useApprovalOperations() {
     const queryClient = useQueryClient();
     const supabase = createClient();
+    const { assignProductToEvent } = useYDetailsEventOperations();
 
     // Individual product approval
     const approveProduct = useMutation({
@@ -71,9 +74,53 @@ export function useApprovalOperations() {
                 }
             }
 
+            // Handle event-based approval if eventId is provided
+            if (approvalData.selectedEventId) {
+                // Get product details to extract designer and boutique information
+                const { data: productDetails, error: productError } = await supabase
+                    .schema('morpheus')
+                    .from('yprod')
+                    .select(`
+                        *,
+                        ydetailsevent(
+                            ydesignidfk,
+                            yboutiqueidfk,
+                            ymallidfk
+                        )
+                    `)
+                    .eq('yprodid', productId)
+                    .single();
+
+                if (productError) {
+                    throw new Error(`Failed to get product details for event assignment: ${productError.message}`);
+                }
+
+                const eventDetails = productDetails.ydetailsevent?.[0];
+                if (!eventDetails) {
+                    throw new Error('Product must have associated event details for event-based approval');
+                }
+
+                if (!eventDetails.ydesignidfk || !eventDetails.yboutiqueidfk) {
+                    throw new Error('Product must have both designer and boutique information for event assignment');
+                }
+
+                // Assign product to the selected event
+                await assignProductToEvent.mutateAsync({
+                    eventId: approvalData.selectedEventId,
+                    designerId: eventDetails.ydesignidfk,
+                    boutiqueId: eventDetails.yboutiqueidfk,
+                    mallId: eventDetails.ymallidfk || undefined,
+                    productId: productId
+                });
+            }
+
+            const message = approvalData.selectedEventId
+                ? `Product approved and assigned to event successfully with ${approvalData.variants?.length || 0} variants updated`
+                : `Product approved successfully with ${approvalData.variants?.length || 0} variants updated`;
+
             return {
                 product: updatedProduct,
-                message: `Product approved successfully with ${approvalData.variants?.length || 0} variants updated`
+                message
             };
         },
         onSuccess: (data) => {
@@ -246,6 +293,6 @@ export function useApprovalOperations() {
         markNeedsRevision,
         deleteProduct,
         denyProduct,
-        isLoading: approveProduct.isPending || markNeedsRevision.isPending || deleteProduct.isPending || denyProduct.isPending
+        isLoading: approveProduct.isPending || markNeedsRevision.isPending || deleteProduct.isPending || denyProduct.isPending || assignProductToEvent.isPending
     };
 }
