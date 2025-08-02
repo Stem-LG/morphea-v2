@@ -599,12 +599,15 @@ export const frTranslations = {
     "modelPreview": "aperçu du modèle 3D",
     "productDetails": "Détails du produit",
     "images": "Images",
+    "media": "Images",
     "view3D": "Vue 3D",
+    "preview3D": "Aperçu 3D",
     "freeShippingAvailable": "Livraison gratuite disponible",
     "availableVariants": "Variantes disponibles",
     "availableVariant": "Variante disponible",
     "quantity": "Quantité",
     "addToCart": "Ajouter au panier",
+    "buyNow": "Acheter maintenant",
     "orderNow": "Commander maintenant",
     "features": "Caractéristiques",
     "highQuality3DModel": "Modèle 3D de haute qualité",
@@ -613,7 +616,10 @@ export const frTranslations = {
     "freeShipping": "Livraison gratuite disponible",
     "variant": "Variante",
     "color": "Couleur",
-    "view": "Vue"
+    "size": "Taille",
+    "view": "Vue",
+    "deliveryIn": "Livraison en",
+    "days": "jours"
   },
   "cart": {
     "title": "Panier",

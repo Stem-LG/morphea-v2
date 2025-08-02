@@ -8,9 +8,9 @@ import { useWishlist } from "@/hooks/useWishlist";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { CartDropdown } from "@/components/cart-dropdown";
 import { WishlistDropdown } from "@/components/wishlist-dropdown";
-import ProductDetailsPage from "@/components/product-details-page";
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import ProductDetailsPage from "../main/_components/product-details-page";
 
 export default function NavBar() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);

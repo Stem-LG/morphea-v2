@@ -9,6 +9,12 @@ const nextConfig: NextConfig = {
         hostname: "*.ufs.sh",
         port: "",
         pathname: "/**"
+      },
+      {
+        protocol: "https",
+        hostname: "*.supabase.co",
+        port: "",
+        pathname: "/**"
       }
     ]
   }

@@ -600,12 +600,15 @@ export const enTranslations = {
     "modelPreview": "3D model preview",
     "productDetails": "Product Details",
     "images": "Images",
+    "media": "Images",
     "view3D": "3D View",
+    "preview3D": "3D Preview",
     "freeShippingAvailable": "Free shipping available",
     "availableVariants": "Available Variants",
     "availableVariant": "Available Variant",
     "quantity": "Quantity",
     "addToCart": "Add to Cart",
+    "buyNow": "Buy Now",
     "orderNow": "Order Now",
     "features": "Features",
     "highQuality3DModel": "High-quality 3D model",
@@ -614,7 +617,10 @@ export const enTranslations = {
     "freeShipping": "Free shipping available",
     "variant": "Variant",
     "color": "Color",
-    "view": "View"
+    "size": "Size",
+    "view": "View",
+    "deliveryIn": "Delivery in",
+    "days": "days"
   },
   "cart": {
     "title": "Shopping Cart",
