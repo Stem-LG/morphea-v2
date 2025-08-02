@@ -153,8 +153,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
         <div className={cn("flex flex-col gap-8 max-w-6xl mx-auto", className)} {...props}>
             {/* Header */}
             <div className="text-center">
-                <h2 className="text-3xl font-bold text-white mb-2 font-parisienne">{t("auth.joinTheFuture")}</h2>
-                <p className="text-lg text-gray-300">{t("auth.signUpSubtitle")}</p>
+                <h2 className="text-3xl font-bold text-white mb-2">{t("auth.joinTheFuture")}</h2>
             </div>
 
             {/* Form Card */}
@@ -368,5 +367,6 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
                 </Link>
             </div>
         </div>
-    );
+    )
 }
+
