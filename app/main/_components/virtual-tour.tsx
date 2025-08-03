@@ -30,16 +30,16 @@ export default function VirtualTour({
     const containerRef = useRef<HTMLDivElement>(null);
     const viewerRef = useRef<Viewer | null>(null);
     const markersPluginRef = useRef<MarkersPlugin | null>(null);
-    
+
     // Get scene from URL on initial load only
     const getInitialScene = useCallback(() => {
-        if (typeof window !== 'undefined') {
+        if (typeof window !== "undefined") {
             const params = new URLSearchParams(window.location.search);
-            return params.get('scene') || startingScene;
+            return params.get("scene") || startingScene;
         }
         return startingScene;
     }, [startingScene]);
-    
+
     const [currentScene, setCurrentScene] = useState(getInitialScene);
     const [productsList, setProductsList] = useState<string | null>(null);
     const [isProductDetailsOpen, setIsProductDetailsOpen] = useState(false);
@@ -68,13 +68,12 @@ export default function VirtualTour({
     // Function to preload all scene images
     const preloadSceneImages = useCallback(async (scenes: Scene[]) => {
         if (scenes.length === 0) return;
-        
-        
-        const imagePromises = scenes.map(scene => {
-            return new Promise<string>((resolve,) => {
+
+        const imagePromises = scenes.map((scene) => {
+            return new Promise<string>((resolve) => {
                 const img = new Image();
                 img.onload = () => {
-                    setPreloadedImages(prev => new Set(prev).add(scene.panorama));
+                    setPreloadedImages((prev) => new Set(prev).add(scene.panorama));
                     resolve(scene.panorama);
                 };
                 img.onerror = () => {
@@ -89,7 +88,7 @@ export default function VirtualTour({
         try {
             await Promise.all(imagePromises);
         } catch (error) {
-            console.error('Error preloading scene images:', error);
+            console.error("Error preloading scene images:", error);
         }
     }, []);
 
@@ -107,61 +106,67 @@ export default function VirtualTour({
     };
 
     // Find closest scene in a given direction
-    const findClosestSceneInDirection = useCallback((direction: 'forward' | 'backward' | 'left' | 'right'): string | null => {
-        const currentSceneData = tourData.scenes.find(scene => scene.id === currentScene);
-        if (!currentSceneData || !currentSceneData.links.length) return null;
+    const findClosestSceneInDirection = useCallback(
+        (direction: "forward" | "backward" | "left" | "right"): string | null => {
+            const currentSceneData = tourData.scenes.find((scene) => scene.id === currentScene);
+            if (!currentSceneData || !currentSceneData.links.length) return null;
 
-        const currentYaw = currentPosition.yaw;
-        let targetYaw = currentYaw;
+            const currentYaw = currentPosition.yaw;
+            let targetYaw = currentYaw;
 
-        switch (direction) {
-            case 'forward':
-                targetYaw = currentYaw; // Same direction
-                break;
-            case 'backward':
-                targetYaw = normalizeAngle(currentYaw + Math.PI); // Opposite direction
-                break;
-            case 'left':
-                targetYaw = normalizeAngle(currentYaw - Math.PI / 2); // 90 degrees left
-                break;
-            case 'right':
-                targetYaw = normalizeAngle(currentYaw + Math.PI / 2); // 90 degrees right
-                break;
-        }
-
-        // Find the closest link in the target direction
-        let closestLink = null;
-        let minDistance = Infinity;
-
-        currentSceneData.links.forEach(link => {
-            const linkYaw = link.position.yaw;
-            const distance = angularDistance(targetYaw, linkYaw);
-            
-            if (distance < minDistance) {
-                minDistance = distance;
-                closestLink = link;
+            switch (direction) {
+                case "forward":
+                    targetYaw = currentYaw; // Same direction
+                    break;
+                case "backward":
+                    targetYaw = normalizeAngle(currentYaw + Math.PI); // Opposite direction
+                    break;
+                case "left":
+                    targetYaw = normalizeAngle(currentYaw - Math.PI / 2); // 90 degrees left
+                    break;
+                case "right":
+                    targetYaw = normalizeAngle(currentYaw + Math.PI / 2); // 90 degrees right
+                    break;
             }
-        });
 
-        return closestLink ? closestLink.nodeId : null;
-    }, [currentScene, currentPosition.yaw, tourData.scenes, angularDistance]);
+            // Find the closest link in the target direction
+            let closestLink = null;
+            let minDistance = Infinity;
+
+            currentSceneData.links.forEach((link) => {
+                const linkYaw = link.position.yaw;
+                const distance = angularDistance(targetYaw, linkYaw);
+
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closestLink = link;
+                }
+            });
+
+            return closestLink ? closestLink.nodeId : null;
+        },
+        [currentScene, currentPosition.yaw, tourData.scenes, angularDistance]
+    );
 
     // Handle key press/release for smooth movement
-    const handleKeyDown = useCallback((event: KeyboardEvent) => {
-        if (!viewerRef.current || isTransitioning) return;
+    const handleKeyDown = useCallback(
+        (event: KeyboardEvent) => {
+            if (!viewerRef.current || isTransitioning) return;
 
-        const key = event.key;
-        if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(key)) {
-            event.preventDefault();
-            setPressedKeys(prev => new Set(prev).add(key));
-        }
-    }, [isTransitioning]);
+            const key = event.key;
+            if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(key)) {
+                event.preventDefault();
+                setPressedKeys((prev) => new Set(prev).add(key));
+            }
+        },
+        [isTransitioning]
+    );
 
     const handleKeyUp = useCallback((event: KeyboardEvent) => {
         const key = event.key;
-        if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(key)) {
+        if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(key)) {
             event.preventDefault();
-            setPressedKeys(prev => {
+            setPressedKeys((prev) => {
                 const newSet = new Set(prev);
                 newSet.delete(key);
                 return newSet;
@@ -183,17 +188,17 @@ export default function VirtualTour({
                 const rotationSpeed = 0.02; // Smooth rotation speed (radians per frame)
 
                 // Handle zoom controls
-                if (pressedKeys.has('ArrowUp')) {
-                    setCurrentZoom(prev => {
+                if (pressedKeys.has("ArrowUp")) {
+                    setCurrentZoom((prev) => {
                         if (prev < maxZoom) {
                             const newZoom = Math.min(prev + zoomSpeed, maxZoom);
                             viewer.zoom(newZoom);
                             return newZoom;
                         } else {
                             // Navigate to closest scene forward when at max zoom
-                            const currentSceneData = tourData.scenes.find(scene => scene.id === currentScene);
+                            const currentSceneData = tourData.scenes.find((scene) => scene.id === currentScene);
                             if (currentSceneData && currentSceneData.links.length > 0) {
-                                const nextScene = findClosestSceneInDirection('forward');
+                                const nextScene = findClosestSceneInDirection("forward");
                                 if (nextScene) {
                                     setCurrentScene(nextScene);
                                     viewer.zoom(60);
@@ -207,17 +212,17 @@ export default function VirtualTour({
                     });
                 }
 
-                if (pressedKeys.has('ArrowDown')) {
-                    setCurrentZoom(prev => {
+                if (pressedKeys.has("ArrowDown")) {
+                    setCurrentZoom((prev) => {
                         if (prev > minZoom) {
                             const newZoom = Math.max(prev - zoomSpeed, minZoom);
                             viewer.zoom(newZoom);
                             return newZoom;
                         } else {
                             // Navigate to closest scene backward when at min zoom
-                            const currentSceneData = tourData.scenes.find(scene => scene.id === currentScene);
+                            const currentSceneData = tourData.scenes.find((scene) => scene.id === currentScene);
                             if (currentSceneData && currentSceneData.links.length > 0) {
-                                const nextScene = findClosestSceneInDirection('backward');
+                                const nextScene = findClosestSceneInDirection("backward");
                                 if (nextScene) {
                                     setCurrentScene(nextScene);
                                     viewer.zoom(60);
@@ -232,23 +237,23 @@ export default function VirtualTour({
                 }
 
                 // Handle rotation controls
-                if (pressedKeys.has('ArrowLeft')) {
-                    setCurrentPosition(prev => {
+                if (pressedKeys.has("ArrowLeft")) {
+                    setCurrentPosition((prev) => {
                         const newYaw = normalizeAngle(prev.yaw - rotationSpeed);
                         viewer.rotate({
                             yaw: newYaw,
-                            pitch: prev.pitch
+                            pitch: prev.pitch,
                         });
                         return { ...prev, yaw: newYaw };
                     });
                 }
 
-                if (pressedKeys.has('ArrowRight')) {
-                    setCurrentPosition(prev => {
+                if (pressedKeys.has("ArrowRight")) {
+                    setCurrentPosition((prev) => {
                         const newYaw = normalizeAngle(prev.yaw + rotationSpeed);
                         viewer.rotate({
                             yaw: newYaw,
-                            pitch: prev.pitch
+                            pitch: prev.pitch,
                         });
                         return { ...prev, yaw: newYaw };
                     });
@@ -269,12 +274,12 @@ export default function VirtualTour({
 
     // Add keyboard event listeners
     useEffect(() => {
-        window.addEventListener('keydown', handleKeyDown);
-        window.addEventListener('keyup', handleKeyUp);
+        window.addEventListener("keydown", handleKeyDown);
+        window.addEventListener("keyup", handleKeyUp);
 
         return () => {
-            window.removeEventListener('keydown', handleKeyDown);
-            window.removeEventListener('keyup', handleKeyUp);
+            window.removeEventListener("keydown", handleKeyDown);
+            window.removeEventListener("keyup", handleKeyUp);
             if (animationIntervalRef.current) {
                 clearInterval(animationIntervalRef.current);
                 animationIntervalRef.current = null;
@@ -291,20 +296,20 @@ export default function VirtualTour({
                 setIsLoading(true);
                 const data = await getTourData();
                 setTourData(data);
-                
+
                 // Update starting scene if the data has scenes and the default scene doesn't exist
                 if (data.scenes.length > 0) {
                     const initialSceneId = getInitialScene();
-                    const sceneExists = data.scenes.some(scene => scene.id === initialSceneId);
+                    const sceneExists = data.scenes.some((scene) => scene.id === initialSceneId);
                     if (!sceneExists) {
                         setCurrentScene(data.scenes[0].id);
                     }
-                    
+
                     // Start preloading all scene images
                     preloadSceneImages(data.scenes);
                 }
             } catch (error) {
-                console.error('Failed to fetch tour data:', error);
+                console.error("Failed to fetch tour data:", error);
             } finally {
                 setIsLoading(false);
             }
@@ -348,13 +353,13 @@ export default function VirtualTour({
                 if (viewerRef.current) {
                     viewerRef.current.rotate({
                         yaw: startingYaw,
-                        pitch: startingPitch
+                        pitch: startingPitch,
                     });
                 }
                 addMarkers();
             });
             markersPluginRef.current?.addEventListener("select-marker", handleMarkerClick);
-            
+
             // Listen for position changes
             viewerRef.current.addEventListener("position-updated", (event: any) => {
                 setCurrentPosition({ yaw: event.position.yaw, pitch: event.position.pitch });
@@ -364,7 +369,6 @@ export default function VirtualTour({
             viewerRef.current.addEventListener("zoom-updated", (event: any) => {
                 setCurrentZoom(event.zoomLevel);
             });
-            
         };
 
         // Only initialize viewer once
@@ -390,28 +394,28 @@ export default function VirtualTour({
 
         const transitionToScene = async () => {
             try {
-                console.log('Starting transition to scene:', currentSceneData.id, 'Initial load:', isInitialLoad);
-                
+                console.log("Starting transition to scene:", currentSceneData.id, "Initial load:", isInitialLoad);
+
                 if (isInitialLoad) {
                     await viewerRef.current!.setPanorama(currentSceneData.panorama, {
                         transition: false, // Disable transition on initial load
                         showLoader: false,
                     });
-                    
+
                     setTimeout(() => {
                         addMarkers();
                     }, 200);
-                    
+
                     setIsInitialLoad(false);
                     return;
                 }
-                
+
                 // Normal transition for scene changes
                 setIsTransitioning(true);
 
                 // Check if image is preloaded for faster transition
                 const isImagePreloaded = preloadedImages.has(currentSceneData.panorama);
-                
+
                 // Use setPanorama for smooth transitions
                 await viewerRef.current!.setPanorama(currentSceneData.panorama, {
                     transition: true, // Enable smooth transition
@@ -421,26 +425,22 @@ export default function VirtualTour({
                 // Update markers after transition with reduced delay for faster feel
                 const delay = isImagePreloaded ? 0 : 100; // Reduced delay from 200ms to 100ms
                 setTimeout(() => {
-                    console.log('Transition completed, updating markers');
+                    console.log("Transition completed, updating markers");
                     addMarkers();
                     setIsTransitioning(false);
-                    
+
                     // Update URL after transition is complete using simple history API
                     setTimeout(() => {
                         if (!isUpdatingUrlRef.current) {
                             isUpdatingUrlRef.current = true;
                             const currentUrl = new URL(window.location.href);
-                            const currentSceneParam = currentUrl.searchParams.get('scene');
-                            
+                            const currentSceneParam = currentUrl.searchParams.get("scene");
+
                             if (currentSceneParam !== currentSceneData.id) {
-                                currentUrl.searchParams.set('scene', currentSceneData.id);
-                                window.history.replaceState(
-                                    { ...window.history.state },
-                                    '',
-                                    currentUrl.toString()
-                                );
+                                currentUrl.searchParams.set("scene", currentSceneData.id);
+                                window.history.replaceState({ ...window.history.state }, "", currentUrl.toString());
                             }
-                            
+
                             // Reset the flag after a short delay
                             setTimeout(() => {
                                 isUpdatingUrlRef.current = false;
@@ -460,14 +460,14 @@ export default function VirtualTour({
     // Effect to dynamically show/hide navbar based on modal states
     useEffect(() => {
         if (!viewerRef.current) return;
-        
+
         // Get the navbar element and hide/show it with CSS
-        const navbarElement = viewerRef.current.container.querySelector('.psv-navbar');
+        const navbarElement = viewerRef.current.container.querySelector(".psv-navbar");
         if (navbarElement) {
             if (isProductDetailsOpen || isProductsListOpen) {
-                (navbarElement as HTMLElement).style.display = 'none';
+                (navbarElement as HTMLElement).style.display = "none";
             } else {
-                (navbarElement as HTMLElement).style.display = '';
+                (navbarElement as HTMLElement).style.display = "";
             }
         }
     }, [isProductDetailsOpen, isProductsListOpen]);
@@ -551,13 +551,13 @@ export default function VirtualTour({
 
     // Handle different action types dynamically
     const handleInfoSpotAction = (action: InfoSpotAction, title: string, text: string) => {
-        console.log('InfoSpot action triggered:', { action, title, text, currentScene });
-        
+        console.log("InfoSpot action triggered:", { action, title, text, currentScene });
+
         switch (action.type) {
             case "modal":
                 if (action.modalType === "products-list") {
                     // Use the action ID to fetch products linked to this infospot action
-                    console.log('Opening products list for action ID:', action.id);
+                    console.log("Opening products list for action ID:", action.id);
                     setProductsList(action.id || currentScene);
                     setIsProductsListOpen(true);
                 }
@@ -581,32 +581,40 @@ export default function VirtualTour({
     };
 
     // Handle marker clicks
-    const handleMarkerClick = useCallback((e: {
-        marker: { data?: { nodeId?: string; type?: string; title?: string; text?: string; action?: InfoSpotAction } };
-    }) => {
-        console.log('Marker clicked:', e.marker);
-        console.log('Is transitioning:', isTransitioning);
-        
-        if (isTransitioning) {
-            console.log('Ignoring click - transitioning');
-            return; // Prevent clicks during transitions
-        }
+    const handleMarkerClick = useCallback(
+        (e: {
+            marker: {
+                data?: { nodeId?: string; type?: string; title?: string; text?: string; action?: InfoSpotAction };
+            };
+        }) => {
+            console.log("Marker clicked:", e.marker);
+            console.log("Is transitioning:", isTransitioning);
 
-        const marker = e.marker;
-        if (marker.data?.nodeId) {
-            // Navigate to another scene
-            console.log('Navigating to scene:', marker.data.nodeId);
-            setCurrentScene(marker.data.nodeId);
-        } else if (marker.data?.type === "info" && marker.data.action) {
-            // Handle info spot action dynamically
-            console.log('Handling info spot action');
-            handleInfoSpotAction(marker.data.action, marker.data.title || "", marker.data.text || "");
-        }
-    }, [isTransitioning, handleInfoSpotAction]);
+            if (isTransitioning) {
+                console.log("Ignoring click - transitioning");
+                return; // Prevent clicks during transitions
+            }
+
+            const marker = e.marker;
+            if (marker.data?.nodeId) {
+                // Navigate to another scene
+                console.log("Navigating to scene:", marker.data.nodeId);
+                setCurrentScene(marker.data.nodeId);
+            } else if (marker.data?.type === "info" && marker.data.action) {
+                // Handle info spot action dynamically
+                console.log("Handling info spot action");
+                handleInfoSpotAction(marker.data.action, marker.data.title || "", marker.data.text || "");
+            }
+        },
+        [isTransitioning, handleInfoSpotAction]
+    );
 
     if (isLoading) {
         return (
-            <div className={`relative ${className} flex items-center justify-center bg-gray-100`} style={{ height: actualHeight, width }}>
+            <div
+                className={`relative ${className} flex items-center justify-center bg-gray-100`}
+                style={{ height: actualHeight, width }}
+            >
                 <div className="text-center">
                     <img src="/loading.gif" alt="Loading" className="h-12 w-12 mx-auto mb-4" />
                     <p className="text-gray-600">Chargement de la visite virtuelle...</p>
@@ -617,7 +625,10 @@ export default function VirtualTour({
 
     if (!tourData.scenes.length) {
         return (
-            <div className={`relative ${className} flex items-center justify-center bg-gray-100`} style={{ height: actualHeight, width }}>
+            <div
+                className={`relative ${className} flex items-center justify-center bg-gray-100`}
+                style={{ height: actualHeight, width }}
+            >
                 <div className="text-center">
                     <p className="text-gray-600">Aucune scène de visite disponible</p>
                 </div>

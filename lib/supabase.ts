@@ -1049,8 +1049,8 @@ export type Database = {
           yboutiqueidfk: number | null
           ydesignidfk: number | null
           ydetailseventid: number
-          yeventidfk: number | null
-          ymallidfk: number | null
+          yeventidfk: number
+          ymallidfk: number
           yprodidfk: number | null
         }
         Insert: {
@@ -1061,8 +1061,8 @@ export type Database = {
           yboutiqueidfk?: number | null
           ydesignidfk?: number | null
           ydetailseventid?: number
-          yeventidfk?: number | null
-          ymallidfk?: number | null
+          yeventidfk: number
+          ymallidfk: number
           yprodidfk?: number | null
         }
         Update: {
@@ -1073,8 +1073,8 @@ export type Database = {
           yboutiqueidfk?: number | null
           ydesignidfk?: number | null
           ydetailseventid?: number
-          yeventidfk?: number | null
-          ymallidfk?: number | null
+          yeventidfk?: number
+          ymallidfk?: number
           yprodidfk?: number | null
         }
         Relationships: [
