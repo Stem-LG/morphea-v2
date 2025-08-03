@@ -82,6 +82,66 @@ export function useEventValidation(
           (detail: any) => detail.yprodidfk === null
         ) || [];
 
+        // NEW LOGIC: If both designer and boutique are provided, check for complete match
+        if (designerId !== null && boutiqueId !== null) {
+          // Find a registration record that matches both designer and boutique
+          const matchingRegistration = registrationRecords.find(
+            (detail: any) =>
+              detail.ydesignidfk === designerId &&
+              detail.yboutiqueidfk === boutiqueId
+          );
+
+          if (!matchingRegistration) {
+            console.log("Event validation debug - No matching registration:", {
+              eventId,
+              designerId,
+              boutiqueId,
+              eventDetails: eventData.ydetailsevent,
+              registrationRecords: registrationRecords.map(r => ({
+                ydesignidfk: r.ydesignidfk,
+                yboutiqueidfk: r.yboutiqueidfk,
+                ymallidfk: r.ymallidfk,
+                yeventidfk: r.yeventidfk
+              }))
+            });
+
+            return {
+              isValid: false,
+              message: "No matching registration found for this designer/boutique combination in this event",
+              eventDetails: eventData
+            };
+          }
+
+          // Validate that the registration has a mall ID
+          if (!matchingRegistration.ymallidfk) {
+            return {
+              isValid: false,
+              message: "Registration found but mall information is missing",
+              eventDetails: eventData
+            };
+          }
+
+          console.log("Event validation success - Complete match found:", {
+            eventId,
+            designerId,
+            boutiqueId,
+            mallId: matchingRegistration.ymallidfk,
+            registrationRecord: {
+              ydesignidfk: matchingRegistration.ydesignidfk,
+              yboutiqueidfk: matchingRegistration.yboutiqueidfk,
+              ymallidfk: matchingRegistration.ymallidfk,
+              yeventidfk: matchingRegistration.yeventidfk
+            }
+          });
+
+          return {
+            isValid: true,
+            message: "Event is valid - complete registration found for designer/boutique combination",
+            eventDetails: eventData
+          };
+        }
+
+        // Fallback to original logic for individual checks
         // Check designer registration
         if (designerId !== null) {
           const hasDesignerRegistration = registrationRecords.some(

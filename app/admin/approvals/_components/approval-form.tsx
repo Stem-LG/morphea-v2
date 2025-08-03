@@ -688,18 +688,32 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
         const hasApprovedVariants = product.yvarprod.some((v: any) => v.yvarprodstatut === 'approved');
         if (!hasApprovedVariants) return false;
         
-        // Check if there are available events for this designer/boutique combination
-        const availableEvents = [
-            ...(designerEvents?.data || [])
-                .filter(event => event.registrationCount && event.registrationCount > 0),
-            ...(boutiqueEvents?.data || [])
-                .filter(event =>
-                    event.registrationCount &&
-                    event.registrationCount > 0 &&
-                    !(designerEvents?.data || []).some(de => de.yeventid === event.yeventid)
-                )
-        ];
-        
+        // NEW LOGIC: Use the same filtering logic as the dropdown
+        const getValidEventsForDesignerBoutique = (events: any[]) => {
+            if (!designerId || !boutiqueId) return events;
+            
+            return events.filter(event => {
+                // Check if there's a registration record with matching designer and boutique
+                const hasMatchingRegistration = event.ydetailsevent?.some((detail: any) =>
+                    detail.ydesignidfk === designerId &&
+                    detail.yboutiqueidfk === boutiqueId &&
+                    detail.yprodidfk === null && // Registration record
+                    detail.ymallidfk !== null // Must have mall ID
+                );
+                
+                return hasMatchingRegistration;
+            });
+        };
+
+        // Apply the new filtering logic to both designer and boutique events
+        const validDesignerEvents = getValidEventsForDesignerBoutique(designerEvents?.data || []);
+        const validBoutiqueEvents = getValidEventsForDesignerBoutique(
+            (boutiqueEvents?.data || []).filter(event =>
+                !validDesignerEvents.some(de => de.yeventid === event.yeventid)
+            )
+        );
+
+        const availableEvents = [...validDesignerEvents, ...validBoutiqueEvents];
         const hasAvailableEvents = availableEvents.length > 0;
         
         // If there are available events, an event must be selected
@@ -723,18 +737,32 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
         const hasApprovedVariants = product.yvarprod.some((v: any) => v.yvarprodstatut === 'approved');
         if (!hasApprovedVariants) return "At least one variant must be approved first";
         
-        // Check if there are available events for this designer/boutique combination
-        const availableEvents = [
-            ...(designerEvents?.data || [])
-                .filter(event => event.registrationCount && event.registrationCount > 0),
-            ...(boutiqueEvents?.data || [])
-                .filter(event =>
-                    event.registrationCount &&
-                    event.registrationCount > 0 &&
-                    !(designerEvents?.data || []).some(de => de.yeventid === event.yeventid)
-                )
-        ];
-        
+        // NEW LOGIC: Use the same filtering logic as the dropdown
+        const getValidEventsForDesignerBoutique = (events: any[]) => {
+            if (!designerId || !boutiqueId) return events;
+            
+            return events.filter(event => {
+                // Check if there's a registration record with matching designer and boutique
+                const hasMatchingRegistration = event.ydetailsevent?.some((detail: any) =>
+                    detail.ydesignidfk === designerId &&
+                    detail.yboutiqueidfk === boutiqueId &&
+                    detail.yprodidfk === null && // Registration record
+                    detail.ymallidfk !== null // Must have mall ID
+                );
+                
+                return hasMatchingRegistration;
+            });
+        };
+
+        // Apply the new filtering logic to both designer and boutique events
+        const validDesignerEvents = getValidEventsForDesignerBoutique(designerEvents?.data || []);
+        const validBoutiqueEvents = getValidEventsForDesignerBoutique(
+            (boutiqueEvents?.data || []).filter(event =>
+                !validDesignerEvents.some(de => de.yeventid === event.yeventid)
+            )
+        );
+
+        const availableEvents = [...validDesignerEvents, ...validBoutiqueEvents];
         const hasAvailableEvents = availableEvents.length > 0;
         
         // If there are available events but none is selected, require event selection
@@ -744,7 +772,7 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
         
         // If no events are available, show appropriate message
         if (!hasAvailableEvents) {
-            return "No active events available for this designer/boutique combination";
+            return "No events with matching registration found for this designer/boutique combination";
         }
         
         if (formData.selectedEventId && eventValidation && !eventValidation.isValid) {
@@ -897,17 +925,45 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                                 
                                                 <div>
                                                     {(() => {
-                                                        // Check if there are available events
-                                                        const availableEvents = [
-                                                            ...(designerEvents?.data || [])
-                                                                .filter(event => event.registrationCount && event.registrationCount > 0),
-                                                            ...(boutiqueEvents?.data || [])
-                                                                .filter(event =>
-                                                                    event.registrationCount &&
-                                                                    event.registrationCount > 0 &&
-                                                                    !(designerEvents?.data || []).some(de => de.yeventid === event.yeventid)
-                                                                )
-                                                        ];
+                                                        // NEW LOGIC: Filter events to only show those with complete registration matches
+                                                        // This ensures only events with matching yeventidfk, ymallidfk, yboutiqueidfk, and ydesignidfk are shown
+                                                        const getValidEventsForDesignerBoutique = (events: any[]) => {
+                                                            if (!designerId || !boutiqueId) return events;
+                                                            
+                                                            return events.filter(event => {
+                                                                // Check if there's a registration record with matching designer and boutique
+                                                                const hasMatchingRegistration = event.ydetailsevent?.some((detail: any) =>
+                                                                    detail.ydesignidfk === designerId &&
+                                                                    detail.yboutiqueidfk === boutiqueId &&
+                                                                    detail.yprodidfk === null && // Registration record
+                                                                    detail.ymallidfk !== null // Must have mall ID
+                                                                );
+                                                                
+                                                                console.log(`Event ${event.yeventid} (${event.yeventintitule}) validation for dropdown:`, {
+                                                                    designerId,
+                                                                    boutiqueId,
+                                                                    hasMatchingRegistration,
+                                                                    registrationRecords: event.ydetailsevent?.filter((d: any) => d.yprodidfk === null).map((d: any) => ({
+                                                                        ydesignidfk: d.ydesignidfk,
+                                                                        yboutiqueidfk: d.yboutiqueidfk,
+                                                                        ymallidfk: d.ymallidfk,
+                                                                        yeventidfk: d.yeventidfk
+                                                                    }))
+                                                                });
+                                                                
+                                                                return hasMatchingRegistration;
+                                                            });
+                                                        };
+
+                                                        // Apply the new filtering logic to both designer and boutique events
+                                                        const validDesignerEvents = getValidEventsForDesignerBoutique(designerEvents?.data || []);
+                                                        const validBoutiqueEvents = getValidEventsForDesignerBoutique(
+                                                            (boutiqueEvents?.data || []).filter(event =>
+                                                                !validDesignerEvents.some(de => de.yeventid === event.yeventid)
+                                                            )
+                                                        );
+
+                                                        const availableEvents = [...validDesignerEvents, ...validBoutiqueEvents];
                                                         const hasAvailableEvents = availableEvents.length > 0;
                                                         
                                                         return (
@@ -938,22 +994,14 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                                                             value: "none",
                                                                             label: hasAvailableEvents ? "Select an event (required)" : "No event selected"
                                                                         },
-                                                                        ...(designerEvents?.data || [])
-                                                                            .filter(event => event.registrationCount && event.registrationCount > 0)
-                                                                            .map(event => ({
-                                                                                value: event.yeventid,
-                                                                                label: `${event.yeventintitule} (${event.registrationCount} registrations, ${event.assignmentCount} assignments)`
-                                                                            })) || [],
-                                                                        ...(boutiqueEvents?.data || [])
-                                                                            .filter(event =>
-                                                                                event.registrationCount &&
-                                                                                event.registrationCount > 0 &&
-                                                                                !(designerEvents?.data || []).some(de => de.yeventid === event.yeventid)
-                                                                            )
-                                                                            .map(event => ({
-                                                                                value: event.yeventid,
-                                                                                label: `${event.yeventintitule} (${event.registrationCount} registrations, ${event.assignmentCount} assignments)`
-                                                                            })) || []
+                                                                        ...validDesignerEvents.map(event => ({
+                                                                            value: event.yeventid,
+                                                                            label: `${event.yeventintitule} (${event.registrationCount} registrations, ${event.assignmentCount} assignments)`
+                                                                        })),
+                                                                        ...validBoutiqueEvents.map(event => ({
+                                                                            value: event.yeventid,
+                                                                            label: `${event.yeventintitule} (${event.registrationCount} registrations, ${event.assignmentCount} assignments)`
+                                                                        }))
                                                                     ]}
                                                                     placeholder={hasAvailableEvents ? "Select an event (required)" : "Select an event"}
                                                                     className={`bg-gray-700 border-gray-600 ${hasAvailableEvents && !formData.selectedEventId ? 'border-red-500/50' : ''}`}
@@ -962,6 +1010,11 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                                                     <div className="flex items-center gap-2 text-xs text-red-400 mt-1">
                                                                         <AlertTriangle className="h-3 w-3" />
                                                                         <span>Event selection is required for product approval</span>
+                                                                    </div>
+                                                                )}
+                                                                {!hasAvailableEvents && (designerId && boutiqueId) && (
+                                                                    <div className="text-sm text-gray-400 bg-gray-800/30 rounded-lg p-3">
+                                                                        No events found with matching registration for this designer/boutique combination.
                                                                     </div>
                                                                 )}
                                                             </>

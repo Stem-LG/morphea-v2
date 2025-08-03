@@ -155,13 +155,61 @@ export function useEvents({
           return true;
         }
 
+        // NEW LOGIC: Check for complete registration record with matching designer, boutique, and mall
+        // This ensures there's a record in ydetailsevent with same yeventidfk, ymallidfk, yboutiqueidfk, and ydesignidfk
+        if (designerId !== null && boutiqueId !== null) {
+          // Find registration records (yprodidfk is null) that match both designer and boutique
+          const matchingRegistration = event.ydetailsevent?.find(detail =>
+            detail.ydesignidfk === designerId &&
+            detail.yboutiqueidfk === boutiqueId &&
+            detail.yprodidfk === null // This is a registration record, not an assignment
+          );
+
+          if (!matchingRegistration) {
+            // Debug logging for troubleshooting
+            console.log(`Event ${event.yeventid} (${event.yeventintitule}) - No matching registration found:`, {
+              designerId,
+              boutiqueId,
+              registrationRecords: event.ydetailsevent?.filter(d => d.yprodidfk === null).map(d => ({
+                ydesignidfk: d.ydesignidfk,
+                yboutiqueidfk: d.yboutiqueidfk,
+                ymallidfk: d.ymallidfk,
+                yprodidfk: d.yprodidfk
+              }))
+            });
+            return false;
+          }
+
+          // Additional validation: ensure the mall ID matches
+          const mallId = matchingRegistration.ymallidfk;
+          if (mallId === null) {
+            console.log(`Event ${event.yeventid} - Registration found but no mall ID specified`);
+            return false;
+          }
+
+          console.log(`Event ${event.yeventid} (${event.yeventintitule}) - Valid registration found:`, {
+            designerId,
+            boutiqueId,
+            mallId,
+            registrationRecord: {
+              ydesignidfk: matchingRegistration.ydesignidfk,
+              yboutiqueidfk: matchingRegistration.yboutiqueidfk,
+              ymallidfk: matchingRegistration.ymallidfk,
+              yeventidfk: matchingRegistration.yeventidfk
+            }
+          });
+
+          return true;
+        }
+
+        // Fallback to original logic for cases where only one filter is provided
         // Check if designer has registration records for this event
         const hasDesignerRegistration = designerId !== null ?
           event.ydetailsevent?.some(detail =>
             detail.ydesignidfk === designerId && detail.yprodidfk === null
           ) : true;
         
-        // Check if boutique has registration records for this event  
+        // Check if boutique has registration records for this event
         const hasBoutiqueRegistration = boutiqueId !== null ?
           event.ydetailsevent?.some(detail =>
             detail.yboutiqueidfk === boutiqueId && detail.yprodidfk === null
@@ -174,24 +222,14 @@ export function useEvents({
         const shouldInclude = hasDesignerRegistration && hasBoutiqueRegistration && hasRegistrations;
         
         // Debug logging for troubleshooting
-        console.log(`Event ${event.yeventid} (${event.yeventintitule}) filtering:`, {
+        console.log(`Event ${event.yeventid} (${event.yeventintitule}) filtering (fallback logic):`, {
           designerId,
           boutiqueId,
           onlyWithRegistrations,
           hasDesignerRegistration,
           hasBoutiqueRegistration,
           hasRegistrations,
-          shouldInclude,
-          registrationRecords: event.ydetailsevent?.filter(d => d.yprodidfk === null).map(d => ({
-            ydesignidfk: d.ydesignidfk,
-            yboutiqueidfk: d.yboutiqueidfk,
-            yprodidfk: d.yprodidfk
-          })),
-          assignmentRecords: event.ydetailsevent?.filter(d => d.yprodidfk !== null).map(d => ({
-            ydesignidfk: d.ydesignidfk,
-            yboutiqueidfk: d.yboutiqueidfk,
-            yprodidfk: d.yprodidfk
-          }))
+          shouldInclude
         });
         
         return shouldInclude;
