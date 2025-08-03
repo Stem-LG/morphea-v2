@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SuperSelect } from "@/components/super-select";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { CheckCircle, AlertTriangle, Package, Box, Image as ImageIcon, Loader2, X, RotateCcw } from "lucide-react";
+import { CheckCircle, AlertTriangle, Package, Box, Image as ImageIcon, Loader2, X, RotateCcw, Calendar } from "lucide-react";
 import { useApprovalOperations } from "../_hooks/use-approval-operations";
 import { useVariantApprovalOperations } from "../_hooks/use-variant-approval-operations";
 import { useCategories } from "../../stores/[storeId]/_hooks/use-categories";
@@ -17,6 +17,8 @@ import { createClient } from "@/lib/client";
 import { useQuery } from "@tanstack/react-query";
 import Product3DViewer from "@/components/product-3d-viewer";
 import { useProduct3DMedia } from "../_hooks/use-product-3d-media";
+import { useDesignerEvents, useBoutiqueEvents } from "../_hooks/use-events";
+import { useEventValidation } from "../_hooks/use-event-validation";
 
 // Separate component to handle the hook properly
 interface VariantApprovalCardProps {
@@ -322,6 +324,7 @@ function VariantApprovalCard({
 interface ApprovalFormData {
     categoryId: number;
     infoactionId?: number;
+    selectedEventId?: number;
     variants: Array<{
         yvarprodid: number;
         yvarprodprixcatalogue: number;
@@ -343,6 +346,7 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
     const [formData, setFormData] = useState<ApprovalFormData>({
         categoryId: 0,
         infoactionId: undefined,
+        selectedEventId: undefined,
         variants: [],
     });
     const { approveProduct, markNeedsRevision, denyProduct, isLoading } = useApprovalOperations();
@@ -380,7 +384,9 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                         )
                     ),
                     ydetailsevent(
-                        yboutique:yboutiqueidfk(*)
+                        *,
+                        yboutique:yboutiqueidfk(*),
+                        ydesign:ydesignidfk(*)
                     )
                 `
                 )
@@ -409,6 +415,37 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
         enabled: isOpen,
     });
 
+    // Extract designer and boutique IDs from product data
+    const designerId = product?.ydesignidfk || null;
+    const boutiqueId = product?.ydetailsevent?.[0]?.yboutiqueidfk || null;
+
+    console.log('Product designer/boutique extraction:', {
+        productDesignerId: product?.ydesignidfk,
+        productYdetailsevent: product?.ydetailsevent,
+        extractedDesignerId: designerId,
+        extractedBoutiqueId: boutiqueId
+    });
+
+    // Fetch available events for the designer and boutique
+    const { data: designerEvents } = useDesignerEvents(designerId, {
+        onlyWithRegistrations: true,
+        onlyActiveEvents: true,
+        enabled: !!designerId && isOpen
+    });
+
+    const { data: boutiqueEvents } = useBoutiqueEvents(boutiqueId, {
+        onlyWithRegistrations: true,
+        onlyActiveEvents: true,
+        enabled: !!boutiqueId && isOpen
+    });
+
+    // Event validation for selected event
+    const { data: eventValidation } = useEventValidation(
+        formData.selectedEventId || null,
+        designerId,
+        boutiqueId
+    );
+
     // Fetch info actions
     const { data: infoActions } = useQuery({
         queryKey: ["info-actions"],
@@ -433,6 +470,7 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
             setFormData({
                 categoryId: product.xcategprodidfk || 0,
                 infoactionId: product.yinfospotactionsidfk || undefined,
+                selectedEventId: undefined,
                 variants:
                     product.yvarprod?.map((variant: any) => ({
                         yvarprodid: variant.yvarprodid,
@@ -446,8 +484,6 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
             });
         }
     }, [product, currencies]);
-
-    // (removed unused handleSubmit)
 
     const updateFormData = (field: keyof ApprovalFormData, value: any) => {
         setFormData((prev) => ({ ...prev, [field]: value }));
@@ -644,10 +680,78 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
         return null;
     };
 
-    // Check if product can be approved (at least one variant must be approved)
+    // Check if product can be approved (at least one variant must be approved + event validation if event selected)
     const canApproveProduct = () => {
         if (!product?.yvarprod) return false;
-        return product.yvarprod.some((v: any) => v.yvarprodstatut === 'approved');
+        
+        // At least one variant must be approved
+        const hasApprovedVariants = product.yvarprod.some((v: any) => v.yvarprodstatut === 'approved');
+        if (!hasApprovedVariants) return false;
+        
+        // Check if there are available events for this designer/boutique combination
+        const availableEvents = [
+            ...(designerEvents?.data || [])
+                .filter(event => event.registrationCount && event.registrationCount > 0),
+            ...(boutiqueEvents?.data || [])
+                .filter(event =>
+                    event.registrationCount &&
+                    event.registrationCount > 0 &&
+                    !(designerEvents?.data || []).some(de => de.yeventid === event.yeventid)
+                )
+        ];
+        
+        const hasAvailableEvents = availableEvents.length > 0;
+        
+        // If there are available events, an event must be selected
+        if (hasAvailableEvents && !formData.selectedEventId) {
+            return false;
+        }
+        
+        // If an event is selected, it must be valid
+        if (formData.selectedEventId) {
+            return eventValidation?.isValid === true;
+        }
+        
+        // If no events are available, product can be approved without event selection
+        return true;
+    };
+
+    // Get approval button tooltip text
+    const getApprovalButtonTooltip = () => {
+        if (!product?.yvarprod) return "No variants available";
+        
+        const hasApprovedVariants = product.yvarprod.some((v: any) => v.yvarprodstatut === 'approved');
+        if (!hasApprovedVariants) return "At least one variant must be approved first";
+        
+        // Check if there are available events for this designer/boutique combination
+        const availableEvents = [
+            ...(designerEvents?.data || [])
+                .filter(event => event.registrationCount && event.registrationCount > 0),
+            ...(boutiqueEvents?.data || [])
+                .filter(event =>
+                    event.registrationCount &&
+                    event.registrationCount > 0 &&
+                    !(designerEvents?.data || []).some(de => de.yeventid === event.yeventid)
+                )
+        ];
+        
+        const hasAvailableEvents = availableEvents.length > 0;
+        
+        // If there are available events but none is selected, require event selection
+        if (hasAvailableEvents && !formData.selectedEventId) {
+            return "An event must be selected for approval";
+        }
+        
+        // If no events are available, show appropriate message
+        if (!hasAvailableEvents) {
+            return "No active events available for this designer/boutique combination";
+        }
+        
+        if (formData.selectedEventId && eventValidation && !eventValidation.isValid) {
+            return eventValidation.message || "Selected event is not valid for approval";
+        }
+        
+        return formData.selectedEventId ? "Approve product for selected event" : "Approve product";
     };
 
     // Prepare options
@@ -782,18 +886,113 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                                 className="bg-gray-700 border-gray-600"
                                             />
                                         </div>
-                                        <div>
-                                            <Label className="text-gray-300">Store</Label>
-                                            <Input
-                                                value={
-                                                    product.ydetailsevent?.[0]?.yboutique?.yboutiqueintitule ||
-                                                    "Unknown Store"
-                                                }
-                                                disabled
-                                                readOnly
-                                                className="bg-gray-700 border-gray-600 text-gray-300"
-                                            />
-                                        </div>
+
+                                        {/* Event Selection Section */}
+                                        {(designerId || boutiqueId) && (
+                                            <div className="space-y-4 border-t border-gray-600 pt-4">
+                                                <div className="flex items-center gap-2">
+                                                    <Calendar className="h-4 w-4 text-gray-400" />
+                                                    <Label className="text-gray-300 font-medium">Event Selection</Label>
+                                                </div>
+                                                
+                                                <div>
+                                                    {(() => {
+                                                        // Check if there are available events
+                                                        const availableEvents = [
+                                                            ...(designerEvents?.data || [])
+                                                                .filter(event => event.registrationCount && event.registrationCount > 0),
+                                                            ...(boutiqueEvents?.data || [])
+                                                                .filter(event =>
+                                                                    event.registrationCount &&
+                                                                    event.registrationCount > 0 &&
+                                                                    !(designerEvents?.data || []).some(de => de.yeventid === event.yeventid)
+                                                                )
+                                                        ];
+                                                        const hasAvailableEvents = availableEvents.length > 0;
+                                                        
+                                                        return (
+                                                            <>
+                                                                <div className="flex items-center gap-2">
+                                                                    <Label className="text-gray-300 text-sm">
+                                                                        Available Events
+                                                                        {hasAvailableEvents && (
+                                                                            <span className="text-red-400 ml-1">*</span>
+                                                                        )}
+                                                                    </Label>
+                                                                    {hasAvailableEvents && (
+                                                                        <Badge variant="secondary" className="bg-blue-500/20 text-blue-300 border-blue-500/30 text-xs">
+                                                                            Required
+                                                                        </Badge>
+                                                                    )}
+                                                                </div>
+                                                                <SuperSelect
+                                                                    value={formData.selectedEventId || "none"}
+                                                                    onValueChange={(value) =>
+                                                                        updateFormData(
+                                                                            "selectedEventId",
+                                                                            value === "none" ? undefined : (value as number)
+                                                                        )
+                                                                    }
+                                                                    options={[
+                                                                        {
+                                                                            value: "none",
+                                                                            label: hasAvailableEvents ? "Select an event (required)" : "No event selected"
+                                                                        },
+                                                                        ...(designerEvents?.data || [])
+                                                                            .filter(event => event.registrationCount && event.registrationCount > 0)
+                                                                            .map(event => ({
+                                                                                value: event.yeventid,
+                                                                                label: `${event.yeventintitule} (${event.registrationCount} registrations, ${event.assignmentCount} assignments)`
+                                                                            })) || [],
+                                                                        ...(boutiqueEvents?.data || [])
+                                                                            .filter(event =>
+                                                                                event.registrationCount &&
+                                                                                event.registrationCount > 0 &&
+                                                                                !(designerEvents?.data || []).some(de => de.yeventid === event.yeventid)
+                                                                            )
+                                                                            .map(event => ({
+                                                                                value: event.yeventid,
+                                                                                label: `${event.yeventintitule} (${event.registrationCount} registrations, ${event.assignmentCount} assignments)`
+                                                                            })) || []
+                                                                    ]}
+                                                                    placeholder={hasAvailableEvents ? "Select an event (required)" : "Select an event"}
+                                                                    className={`bg-gray-700 border-gray-600 ${hasAvailableEvents && !formData.selectedEventId ? 'border-red-500/50' : ''}`}
+                                                                />
+                                                                {hasAvailableEvents && !formData.selectedEventId && (
+                                                                    <div className="flex items-center gap-2 text-xs text-red-400 mt-1">
+                                                                        <AlertTriangle className="h-3 w-3" />
+                                                                        <span>Event selection is required for product approval</span>
+                                                                    </div>
+                                                                )}
+                                                            </>
+                                                        );
+                                                    })()}
+                                                </div>
+
+                                                {/* Event Validation Display */}
+                                                {formData.selectedEventId && eventValidation && (
+                                                    <div className="space-y-2">
+                                                        <div className="flex items-center gap-2">
+                                                            {eventValidation.isValid ? (
+                                                                <CheckCircle className="h-4 w-4 text-green-400" />
+                                                            ) : (
+                                                                <AlertTriangle className="h-4 w-4 text-red-400" />
+                                                            )}
+                                                            <span className={`text-sm ${eventValidation.isValid ? 'text-green-400' : 'text-red-400'}`}>
+                                                                {eventValidation.message}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {/* No events available message */}
+                                                {(!designerEvents?.data?.length && !boutiqueEvents?.data?.length) && (
+                                                    <div className="text-sm text-gray-400 bg-gray-800/30 rounded-lg p-3">
+                                                        No active events with registrations found for this designer/boutique combination.
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
                                     </CardContent>
                                 </Card>
                             </div>
@@ -887,7 +1086,7 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                 ? "bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white"
                                 : "bg-gray-600 text-gray-400 cursor-not-allowed"
                         }`}
-                        title={!canApproveProduct() ? "At least one variant must be approved first" : "Approve product"}
+                        title={getApprovalButtonTooltip()}
                     >
                         {isLoading || variantLoading ? (
                             <div className="flex items-center gap-2">
@@ -897,7 +1096,10 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                         ) : (
                             <>
                                 <CheckCircle className="h-4 w-4 mr-2" />
-                                {canApproveProduct() ? "Approve Product" : "Need Approved Variants"}
+                                {canApproveProduct()
+                                    ? (formData.selectedEventId ? "Approve for Event" : "Approve Product")
+                                    : "Cannot Approve"
+                                }
                             </>
                         )}
                     </Button>

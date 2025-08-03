@@ -1,25 +1,40 @@
 "use client";
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Store, Package, BarChart3, TrendingUp, ShoppingBag } from "lucide-react";
+import { Store, Package, BarChart3, TrendingUp, ShoppingBag, Loader2, AlertCircle } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/hooks/useAuth";
+import { useDashboardStats } from "./_hooks/use-dashboard-stats";
 
 export default function DashboardContent() {
     const { t } = useLanguage();
     const { data: user } = useAuth();
+    const { totalStores, totalProducts, pendingApprovals, totalVisitors, isLoading, error } = useDashboardStats();
 
     const userMetadata = user?.app_metadata as { roles?: string[]; assigned_stores?: number[] };
     const roles = userMetadata?.roles || [];
     const isAdmin = roles.includes("admin");
-    const assignedStores = userMetadata?.assigned_stores || [];
 
-    // Mock data - in real implementation, this would come from API
-    const dashboardStats = {
-        totalStores: isAdmin ? 12 : assignedStores.length,
-        totalProducts: isAdmin ? 1247 : 89,
-        pendingApprovals: isAdmin ? 23 : 0,
-        monthlyGrowth: 12.5,
+    // Loading skeleton component
+    const LoadingSkeleton = () => (
+        <div className="flex items-center justify-center">
+            <Loader2 className="h-6 w-6 animate-spin text-morpheus-gold-light" />
+        </div>
+    );
+
+    // Error display component
+    const ErrorDisplay = () => (
+        <div className="flex items-center justify-center text-red-400">
+            <AlertCircle className="h-5 w-5 mr-2" />
+            <span className="text-sm">Error loading data</span>
+        </div>
+    );
+
+    // Content display component that handles loading/error states
+    const StatValue = ({ value, isLoading, error }: { value: number | string; isLoading: boolean; error: Error | null }) => {
+        if (isLoading) return <LoadingSkeleton />;
+        if (error) return <ErrorDisplay />;
+        return <div className="text-2xl font-bold text-white">{value}</div>;
     };
 
     return (
@@ -34,7 +49,7 @@ export default function DashboardContent() {
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-white">{dashboardStats.totalStores}</div>
+                        <StatValue value={totalStores} isLoading={isLoading} error={error} />
                     </CardContent>
                 </Card>
 
@@ -46,7 +61,7 @@ export default function DashboardContent() {
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-white">{dashboardStats.totalProducts}</div>
+                        <StatValue value={totalProducts} isLoading={isLoading} error={error} />
                     </CardContent>
                 </Card>
 
@@ -54,12 +69,12 @@ export default function DashboardContent() {
                     <Card className="bg-gradient-to-br from-morpheus-blue-dark/40 to-morpheus-blue-light/40 border-slate-700/50 shadow-xl">
                         <CardHeader className="pb-3">
                             <CardTitle className="flex items-center justify-between text-white">
-                                <span className="text-sm font-medium">{t("admin.pendingApprovals")}</span>
+                                <span className="text-sm font-medium">{t("admin.productsPendingApproval")}</span>
                                 <ShoppingBag className="h-5 w-5 text-orange-400" />
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold text-white">{dashboardStats.pendingApprovals}</div>
+                            <StatValue value={pendingApprovals} isLoading={isLoading} error={error} />
                         </CardContent>
                     </Card>
                 )}
@@ -67,12 +82,16 @@ export default function DashboardContent() {
                 <Card className="bg-gradient-to-br from-morpheus-blue-dark/40 to-morpheus-blue-light/40 border-slate-700/50 shadow-xl">
                     <CardHeader className="pb-3">
                         <CardTitle className="flex items-center justify-between text-white">
-                            <span className="text-sm font-medium">{t("admin.monthlyGrowth")}</span>
+                            <span className="text-sm font-medium">{t("admin.totalVisitors")}</span>
                             <TrendingUp className="h-5 w-5 text-green-400" />
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-white">+{dashboardStats.monthlyGrowth}%</div>
+                        <StatValue
+                            value={totalVisitors}
+                            isLoading={isLoading}
+                            error={error}
+                        />
                     </CardContent>
                 </Card>
             </div>
