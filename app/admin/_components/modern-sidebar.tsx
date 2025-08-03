@@ -138,6 +138,7 @@ export function ModernSidebar({ isOpen, isCollapsed, onToggle, onCollapse, userR
                     variant="outline"
                     size="sm"
                     onClick={onToggle}
+                    data-testid="mobile-menu-toggle"
                     className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-[#695029] hover:to-[#d4c066] text-white border-morpheus-gold-light shadow-2xl"
                 >
                     {isOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
@@ -211,6 +212,7 @@ export function ModernSidebar({ isOpen, isCollapsed, onToggle, onCollapse, userR
                                     {/* Dropdown trigger */}
                                     <Button
                                         variant="ghost"
+                                        data-testid={`nav-${item.id}`}
                                         className={`w-full rounded-none h-12 ${
                                             isCollapsed ? "justify-center" : "justify-start"
                                         } transition-all duration-200 ${
@@ -264,6 +266,7 @@ export function ModernSidebar({ isOpen, isCollapsed, onToggle, onCollapse, userR
                                                     <Button
                                                         key={childKey}
                                                         variant="ghost"
+                                                        data-testid={`nav-${child.id}`}
                                                         className={`w-full rounded-none h-10 justify-start pl-8 pr-4 transition-all duration-200 ${
                                                             isChildActive
                                                                 ? "bg-gradient-to-r from-morpheus-gold-dark/20 to-morpheus-gold-light/20 text-morpheus-gold-light border border-morpheus-gold-light/30"
@@ -271,7 +274,7 @@ export function ModernSidebar({ isOpen, isCollapsed, onToggle, onCollapse, userR
                                                         }`}
                                                         asChild
                                                     >
-                                                        <Link href={child.href} className="flex items-center w-full overflow-hidden">
+                                                        <Link href={child.href} data-testid={`nav-link-${child.id}`} className="flex items-center w-full overflow-hidden">
                                                             <ChildIcon
                                                                 className={`h-4 w-4 mr-3 flex-shrink-0 ${
                                                                     isChildActive ? "text-morpheus-gold-light" : ""
@@ -314,6 +317,7 @@ export function ModernSidebar({ isOpen, isCollapsed, onToggle, onCollapse, userR
                             <Button
                                 key={key}
                                 variant="ghost"
+                                data-testid={`nav-${item.id}`}
                                 className={`w-full rounded-none h-12 ${
                                     isCollapsed ? "justify-center" : "justify-start"
                                 } transition-all duration-200 ${
@@ -324,7 +328,7 @@ export function ModernSidebar({ isOpen, isCollapsed, onToggle, onCollapse, userR
                                 title={isCollapsed ? item.label : undefined}
                                 asChild
                             >
-                                <Link key={item.id} href={item.href}>
+                                <Link key={item.id} href={item.href} data-testid={`nav-link-${item.id}`}>
                                     <Icon
                                         className={`h-5 w-5 ${isCollapsed ? "" : "mr-3"} ${
                                             isActive ? "text-morpheus-gold-light" : ""

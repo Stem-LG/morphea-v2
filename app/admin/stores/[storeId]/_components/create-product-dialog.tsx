@@ -447,6 +447,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                             </Label>
                                             <Input
                                                 id="productName"
+                                                data-testid="product-name-input"
                                                 value={productName}
                                                 onChange={(e) => setProductName(e.target.value)}
                                                 placeholder="Enter product name"
@@ -465,6 +466,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                             </Label>
                                             <Input
                                                 id="shortDescription"
+                                                data-testid="product-short-description-input"
                                                 value={shortDescription}
                                                 onChange={(e) => setShortDescription(e.target.value)}
                                                 placeholder="Brief description for tooltips"
@@ -479,6 +481,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                             </Label>
                                             <Textarea
                                                 id="fullDescription"
+                                                data-testid="product-full-description-input"
                                                 value={fullDescription}
                                                 onChange={(e) => setFullDescription(e.target.value)}
                                                 placeholder="Detailed product description"
@@ -1018,6 +1021,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                     </Button>
                     <Button
                         onClick={handleSubmit}
+                        data-testid="submit-product-btn"
                         disabled={
                             createProductMutation.isPending ||
                             updateProductMutation.isPending ||
