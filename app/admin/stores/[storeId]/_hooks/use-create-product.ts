@@ -67,23 +67,7 @@ export function useCreateProduct() {
                     throw new Error(`Failed to create product: ${productError.message}`);
                 }
 
-                // Step 2: Create ydetailsevent link (product -> store -> designer)
-                const { error: detailsEventError } = await supabase
-                    .schema("morpheus")
-                    .from("ydetailsevent")
-                    .insert({
-                        yprodidfk: product.yprodid,
-                        yboutiqueidfk: productData.storeId,
-                        ydesignidfk: productData.designerId,
-                        ymallidfk: null, // Leave empty as requested
-                        yeventidfk: null, // Leave empty as requested
-                    });
-
-                if (detailsEventError) {
-                    throw new Error(`Failed to link product to store: ${detailsEventError.message}`);
-                }
-
-                // Step 3: Create variants
+                // Step 2: Create variants
                 const createdVariants = [];
                 for (const variant of productData.variants) {
                     // Get color and size codes for variant code generation
