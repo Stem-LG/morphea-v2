@@ -27,37 +27,43 @@ export function useYDetailsEventOperations() {
     // Check if designer and boutique are registered for the event
     const checkRegistration = useMutation({
         mutationFn: async ({ eventId, designerId, boutiqueId }: CheckRegistrationParams): Promise<{ designerRegistered: boolean; boutiqueRegistered: boolean }> => {
-            // Check if designer is registered (has a record with yprodidfk = NULL)
-            const { data: designerRegistration, error: designerError } = await supabase
+            console.log('checkRegistration debug:', { eventId, designerId, boutiqueId });
+
+            // Get all event details for this event
+            const { data: eventDetails, error: eventError } = await supabase
                 .schema('morpheus')
                 .from('ydetailsevent')
-                .select('ydetailseventid')
-                .eq('yeventidfk', eventId)
-                .eq('ydesignidfk', designerId)
-                .is('yprodidfk', null)
-                .limit(1);
+                .select('*')
+                .eq('yeventidfk', eventId);
 
-            if (designerError) {
-                throw new Error(`Failed to check designer registration: ${designerError.message}`);
+            if (eventError) {
+                throw new Error(`Failed to fetch event details: ${eventError.message}`);
             }
 
-            // Check if boutique is registered (has a record with yprodidfk = NULL)
-            const { data: boutiqueRegistration, error: boutiqueError } = await supabase
-                .schema('morpheus')
-                .from('ydetailsevent')
-                .select('ydetailseventid')
-                .eq('yeventidfk', eventId)
-                .eq('yboutiqueidfk', boutiqueId)
-                .is('yprodidfk', null)
-                .limit(1);
+            console.log('All event details:', eventDetails);
 
-            if (boutiqueError) {
-                throw new Error(`Failed to check boutique registration: ${boutiqueError.message}`);
-            }
+            // Filter for registration records only (yprodidfk IS NULL)
+            const registrationRecords = eventDetails?.filter(detail => detail.yprodidfk === null) || [];
+            console.log('Registration records:', registrationRecords);
+
+            // Check designer registration
+            const designerRegistered = designerId ?
+                registrationRecords.some(detail => detail.ydesignidfk === designerId) : false;
+
+            // Check boutique registration
+            const boutiqueRegistered = boutiqueId ?
+                registrationRecords.some(detail => detail.yboutiqueidfk === boutiqueId) : false;
+
+            console.log('Registration check results:', {
+                designerRegistered,
+                boutiqueRegistered,
+                designerRecords: registrationRecords.filter(d => d.ydesignidfk === designerId),
+                boutiqueRecords: registrationRecords.filter(d => d.yboutiqueidfk === boutiqueId)
+            });
 
             return {
-                designerRegistered: (designerRegistration && designerRegistration.length > 0),
-                boutiqueRegistered: (boutiqueRegistration && boutiqueRegistration.length > 0)
+                designerRegistered,
+                boutiqueRegistered
             };
         },
         onError: (error: Error) => {
@@ -145,25 +151,18 @@ export function useYDetailsEventOperations() {
         mutationFn: async (params: CheckRegistrationParams & { productId: number; mallId?: number }) => {
             const { eventId, designerId, boutiqueId, productId, mallId } = params;
 
+            console.log('assignProductToEvent debug:', {
+                eventId,
+                designerId,
+                boutiqueId,
+                productId,
+                mallId
+            });
+
             // Step 1: Validate event dates
             await validateEventDates.mutateAsync(eventId);
 
-            // Step 2: Check if designer and boutique are registered
-            const registrationStatus = await checkRegistration.mutateAsync({
-                eventId,
-                designerId,
-                boutiqueId
-            });
-
-            if (!registrationStatus.designerRegistered) {
-                throw new Error('Designer is not registered for this event');
-            }
-
-            if (!registrationStatus.boutiqueRegistered) {
-                throw new Error('Boutique is not registered for this event');
-            }
-
-            // Step 3: Check if product is already assigned to this event
+            // Step 2: Check if product is already assigned to this event
             const { data: existingAssignment } = await supabase
                 .schema('morpheus')
                 .from('ydetailsevent')
@@ -176,14 +175,31 @@ export function useYDetailsEventOperations() {
                 throw new Error('Product is already assigned to this event');
             }
 
-            // Step 4: Create new assignment record
-            return await createProductAssignment.mutateAsync({
-                eventId,
-                designerId,
-                boutiqueId,
-                mallId,
-                productId
-            });
+            // Step 3: Create single product assignment record
+            console.log('Creating product assignment record...');
+            const currentTime = new Date().toISOString();
+            
+            const { data, error } = await supabase
+                .schema('morpheus')
+                .from('ydetailsevent')
+                .insert({
+                    yeventidfk: eventId,
+                    ydesignidfk: designerId,
+                    yboutiqueidfk: boutiqueId,
+                    ymallidfk: mallId || null,
+                    yprodidfk: productId, // Product assignment record
+                    sysdate: currentTime,
+                    sysaction: 'insert'
+                })
+                .select()
+                .single();
+
+            if (error) {
+                throw new Error(`Failed to create product assignment: ${error.message}`);
+            }
+
+            console.log('Product assignment created successfully:', data);
+            return data;
         },
         onSuccess: (data) => {
             // Additional success handling if needed

@@ -100,15 +100,27 @@ export function useApprovalOperations() {
                     throw new Error('Product must have associated event details for event-based approval');
                 }
 
-                if (!eventDetails.ydesignidfk || !eventDetails.yboutiqueidfk) {
+                console.log('Product details for event assignment:', {
+                    productId,
+                    productDesignerId: productDetails.ydesignidfk,
+                    eventDetails,
+                    extractedDesignerId: eventDetails?.ydesignidfk,
+                    extractedBoutiqueId: eventDetails?.yboutiqueidfk
+                });
+
+                // Use the product's designer ID, not the event details designer ID
+                const designerId = productDetails.ydesignidfk || eventDetails?.ydesignidfk;
+                const boutiqueId = eventDetails?.yboutiqueidfk;
+
+                if (!designerId || !boutiqueId) {
                     throw new Error('Product must have both designer and boutique information for event assignment');
                 }
 
                 // Assign product to the selected event
                 await assignProductToEvent.mutateAsync({
                     eventId: approvalData.selectedEventId,
-                    designerId: eventDetails.ydesignidfk,
-                    boutiqueId: eventDetails.yboutiqueidfk,
+                    designerId: designerId,
+                    boutiqueId: boutiqueId,
                     mallId: eventDetails.ymallidfk || undefined,
                     productId: productId
                 });

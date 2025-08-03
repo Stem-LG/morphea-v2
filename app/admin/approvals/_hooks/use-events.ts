@@ -115,16 +115,6 @@ export function useEvents({
           .gte("yeventdatefin", currentDate);
       }
 
-      // Apply designer filter if provided
-      if (designerId !== null) {
-        query = query.eq("ydetailsevent.ydesignidfk", designerId);
-      }
-
-      // Apply boutique filter if provided
-      if (boutiqueId !== null) {
-        query = query.eq("ydetailsevent.yboutiqueidfk", boutiqueId);
-      }
-
       // Apply pagination
       query = query.range(from, to);
 
@@ -137,7 +127,7 @@ export function useEvents({
         throw new Error(error.message);
       }
 
-      // Transform the data to include registration and assignment information
+      // Transform the data and apply client-side filtering
       let transformedData: EventWithDetails[] = (data || []).map(event => {
         const eventWithDetails = event as EventWithDetails;
         
@@ -158,12 +148,54 @@ export function useEvents({
         };
       });
 
-      // Apply registration filter if requested
-      if (onlyWithRegistrations) {
-        transformedData = transformedData.filter(event =>
-          (event.registrationCount || 0) > 0
-        );
-      }
+      // Apply client-side filtering based on business rules
+      transformedData = transformedData.filter(event => {
+        // If no specific filters, include all events
+        if (!designerId && !boutiqueId && !onlyWithRegistrations) {
+          return true;
+        }
+
+        // Check if designer has registration records for this event
+        const hasDesignerRegistration = designerId !== null ?
+          event.ydetailsevent?.some(detail =>
+            detail.ydesignidfk === designerId && detail.yprodidfk === null
+          ) : true;
+        
+        // Check if boutique has registration records for this event  
+        const hasBoutiqueRegistration = boutiqueId !== null ?
+          event.ydetailsevent?.some(detail =>
+            detail.yboutiqueidfk === boutiqueId && detail.yprodidfk === null
+          ) : true;
+        
+        // If only registration filter is applied (no designer/boutique filter)
+        const hasRegistrations = onlyWithRegistrations && !designerId && !boutiqueId ?
+          event.ydetailsevent?.some(detail => detail.yprodidfk === null) : true;
+        
+        const shouldInclude = hasDesignerRegistration && hasBoutiqueRegistration && hasRegistrations;
+        
+        // Debug logging for troubleshooting
+        console.log(`Event ${event.yeventid} (${event.yeventintitule}) filtering:`, {
+          designerId,
+          boutiqueId,
+          onlyWithRegistrations,
+          hasDesignerRegistration,
+          hasBoutiqueRegistration,
+          hasRegistrations,
+          shouldInclude,
+          registrationRecords: event.ydetailsevent?.filter(d => d.yprodidfk === null).map(d => ({
+            ydesignidfk: d.ydesignidfk,
+            yboutiqueidfk: d.yboutiqueidfk,
+            yprodidfk: d.yprodidfk
+          })),
+          assignmentRecords: event.ydetailsevent?.filter(d => d.yprodidfk !== null).map(d => ({
+            ydesignidfk: d.ydesignidfk,
+            yboutiqueidfk: d.yboutiqueidfk,
+            yprodidfk: d.yprodidfk
+          }))
+        });
+        
+        return shouldInclude;
+      });
 
       const totalPages = Math.ceil((count || 0) / perPage);
 

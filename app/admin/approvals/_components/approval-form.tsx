@@ -18,7 +18,7 @@ import { useQuery } from "@tanstack/react-query";
 import Product3DViewer from "@/components/product-3d-viewer";
 import { useProduct3DMedia } from "../_hooks/use-product-3d-media";
 import { useDesignerEvents, useBoutiqueEvents } from "../_hooks/use-events";
-import { useEventValidation, useProductEventEligibility } from "../_hooks/use-event-validation";
+import { useEventValidation } from "../_hooks/use-event-validation";
 
 // Separate component to handle the hook properly
 interface VariantApprovalCardProps {
@@ -416,8 +416,15 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
     });
 
     // Extract designer and boutique IDs from product data
-    const designerId = product?.ydetailsevent?.[0]?.ydesignidfk || null;
+    const designerId = product?.ydesignidfk || null;
     const boutiqueId = product?.ydetailsevent?.[0]?.yboutiqueidfk || null;
+
+    console.log('Product designer/boutique extraction:', {
+        productDesignerId: product?.ydesignidfk,
+        productYdetailsevent: product?.ydetailsevent,
+        extractedDesignerId: designerId,
+        extractedBoutiqueId: boutiqueId
+    });
 
     // Fetch available events for the designer and boutique
     const { data: designerEvents } = useDesignerEvents(designerId, {
@@ -433,19 +440,11 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
     });
 
     // Event validation for selected event
-    const { data: eventValidation } = useEventValidation({
-        eventId: formData.selectedEventId || 0,
+    const { data: eventValidation } = useEventValidation(
+        formData.selectedEventId || null,
         designerId,
         boutiqueId
-    });
-
-    // Product event eligibility check
-    const { data: eventEligibility } = useProductEventEligibility({
-        eventId: formData.selectedEventId || 0,
-        productId,
-        designerId,
-        boutiqueId
-    });
+    );
 
     // Fetch info actions
     const { data: infoActions } = useQuery({
@@ -485,8 +484,6 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
             });
         }
     }, [product, currencies]);
-
-    // (removed unused handleSubmit)
 
     const updateFormData = (field: keyof ApprovalFormData, value: any) => {
         setFormData((prev) => ({ ...prev, [field]: value }));
@@ -712,7 +709,7 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
         
         // If an event is selected, it must be valid
         if (formData.selectedEventId) {
-            return eventEligibility?.canApprove === true;
+            return eventValidation?.isValid === true;
         }
         
         // If no events are available, product can be approved without event selection
@@ -750,14 +747,8 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
             return "No active events available for this designer/boutique combination";
         }
         
-        if (formData.selectedEventId && eventEligibility && !eventEligibility.canApprove) {
-            if (eventEligibility.productAlreadyInEvent) {
-                return "Product is already assigned to this event";
-            }
-            if (eventValidation && eventValidation.errors.length > 0) {
-                return eventValidation.errors[0];
-            }
-            return "Selected event is not valid for approval";
+        if (formData.selectedEventId && eventValidation && !eventValidation.isValid) {
+            return eventValidation.message || "Selected event is not valid for approval";
         }
         
         return formData.selectedEventId ? "Approve product for selected event" : "Approve product";
@@ -895,18 +886,6 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                                 className="bg-gray-700 border-gray-600"
                                             />
                                         </div>
-                                        <div>
-                                            <Label className="text-gray-300">Store</Label>
-                                            <Input
-                                                value={
-                                                    product.ydetailsevent?.[0]?.yboutique?.yboutiqueintitule ||
-                                                    "Unknown Store"
-                                                }
-                                                disabled
-                                                readOnly
-                                                className="bg-gray-700 border-gray-600 text-gray-300"
-                                            />
-                                        </div>
 
                                         {/* Event Selection Section */}
                                         {(designerId || boutiqueId) && (
@@ -1000,47 +979,9 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                                                 <AlertTriangle className="h-4 w-4 text-red-400" />
                                                             )}
                                                             <span className={`text-sm ${eventValidation.isValid ? 'text-green-400' : 'text-red-400'}`}>
-                                                                {eventValidation.isValid ? 'Event is valid for approval' : 'Event validation failed'}
+                                                                {eventValidation.message}
                                                             </span>
                                                         </div>
-
-                                                        {/* Show validation errors */}
-                                                        {eventValidation.errors.length > 0 && (
-                                                            <div className="space-y-1">
-                                                                {eventValidation.errors.map((error, index) => (
-                                                                    <div key={index} className="flex items-center gap-2 text-xs text-red-400">
-                                                                        <X className="h-3 w-3" />
-                                                                        <span>{error}</span>
-                                                                    </div>
-                                                                ))}
-                                                            </div>
-                                                        )}
-
-                                                        {/* Show validation warnings */}
-                                                        {eventValidation.warnings.length > 0 && (
-                                                            <div className="space-y-1">
-                                                                {eventValidation.warnings.map((warning, index) => (
-                                                                    <div key={index} className="flex items-center gap-2 text-xs text-yellow-400">
-                                                                        <AlertTriangle className="h-3 w-3" />
-                                                                        <span>{warning}</span>
-                                                                    </div>
-                                                                ))}
-                                                            </div>
-                                                        )}
-
-                                                        {/* Event details */}
-                                                        {eventValidation.isValid && (
-                                                            <div className="bg-gray-800/30 rounded-lg p-3 space-y-2">
-                                                                <div className="flex items-center gap-2 text-xs text-gray-400">
-                                                                    <Users className="h-3 w-3" />
-                                                                    <span>Designer Registered: {eventValidation.isDesignerRegistered ? '✅' : '❌'}</span>
-                                                                </div>
-                                                                <div className="flex items-center gap-2 text-xs text-gray-400">
-                                                                    <Users className="h-3 w-3" />
-                                                                    <span>Boutique Registered: {eventValidation.isBoutiqueRegistered ? '✅' : '❌'}</span>
-                                                                </div>
-                                                            </div>
-                                                        )}
                                                     </div>
                                                 )}
 
