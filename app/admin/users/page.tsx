@@ -501,7 +501,7 @@ export default function UsersManagementPage() {
         } finally {
             setIsLoadingUsers(false);
         }
-    }, [currentPage, itemsPerPage, emailFilter, roleFilter, fetchUsers, fetchStores]);
+    }, [currentPage, itemsPerPage, emailFilter, roleFilter]);
 
     // Handle store assignment
     const handleAssignStores = async (email: string, storeIds: number[], designerData?: DesignerFormData) => {
