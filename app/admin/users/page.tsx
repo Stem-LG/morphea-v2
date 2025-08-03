@@ -39,7 +39,6 @@ function StoreAssignmentModal({ user, stores, isOpen, onClose, onAssign, loading
     const handleNext = () => {
         if (currentStep === 1) {
             // Check if this is a first-time assignment requiring designer form
-            // Only show designer form if user doesn't have a designer profile AND is getting stores for the first time
             const isFirstTimeAssignment =
                 !hasDesigner && selectedStoreIds.length > 0 && (user?.assigned_stores || []).length === 0;
 
@@ -411,44 +410,6 @@ function StoreAssignmentModal({ user, stores, isOpen, onClose, onAssign, loading
     );
 }
 
-// Component to handle store button logic with designer profile check
-function UserStoreButton({
-    user,
-    onOpenStoreModal,
-    onOpenDesignerModal
-}: {
-    user: UserRole;
-    onOpenStoreModal: (user: UserRole) => void;
-    onOpenDesignerModal: (user: UserRole) => void;
-}) {
-    const { t } = useLanguage();
-    const { hasDesigner } = useHasDesigner(user.id);
-
-    // If user has a designer profile, show designer button instead
-    if (hasDesigner) {
-        return (
-            <button
-                onClick={() => onOpenDesignerModal(user)}
-                className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300 transition-colors"
-            >
-                {t("admin.users.viewDesigner")}
-            </button>
-        );
-    }
-
-    // Otherwise show regular store management button
-    return (
-        <button
-            onClick={() => onOpenStoreModal(user)}
-            className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
-        >
-            {user.store_details && user.store_details.length > 0
-                ? t("admin.users.manageStores")
-                : t("admin.users.assignStores")}
-        </button>
-    );
-}
-
 export default function UsersManagementPage() {
     const { t } = useLanguage();
     const [users, setUsers] = useState<UserRole[]>([]);
@@ -501,7 +462,7 @@ export default function UsersManagementPage() {
         } finally {
             setIsLoadingUsers(false);
         }
-    }, [currentPage, itemsPerPage, emailFilter, roleFilter, fetchUsers, fetchStores]);
+    }, [currentPage, itemsPerPage, emailFilter, roleFilter]);
 
     // Handle store assignment
     const handleAssignStores = async (email: string, storeIds: number[], designerData?: DesignerFormData) => {
@@ -726,9 +687,16 @@ export default function UsersManagementPage() {
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     <div className="flex space-x-2">
-                                        {/* Store Assignment - Only for users who are not admin, not store_admin, and don't have designer profile */}
-                                        {!user.roles.includes("admin") && !user.roles.includes("store_admin") && (
-                                            <UserStoreButton user={user} onOpenStoreModal={openStoreModal} onOpenDesignerModal={openDesignerModal} />
+                                        {/* Store Assignment - Only for users with valid roles (admin/store_admin) */}
+                                        {!user.roles.includes("admin") && (
+                                            <button
+                                                onClick={() => openStoreModal(user)}
+                                                className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
+                                            >
+                                                {user.store_details && user.store_details.length > 0
+                                                    ? t("admin.users.manageStores")
+                                                    : t("admin.users.assignStores")}
+                                            </button>
                                         )}
 
                                         {/* Designer Details - For store admins */}
@@ -740,6 +708,8 @@ export default function UsersManagementPage() {
                                                 {t("admin.users.viewDesigner")}
                                             </button>
                                         )}
+
+                            
                                     </div>
                                 </td>
                             </tr>
@@ -893,8 +863,6 @@ export default function UsersManagementPage() {
                     setSelectedDesignerUser(null);
                 }}
                 canEdit={canEditDesigner()}
-                user={selectedDesignerUser || undefined}
-                onUserUpdate={loadData}
             />
         </div>
     );
