@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SuperSelect } from "@/components/super-select";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { CheckCircle, AlertTriangle, Package, Box, Image as ImageIcon, Loader2, X, RotateCcw, Calendar, Users } from "lucide-react";
+import { CheckCircle, AlertTriangle, Package, Box, Image as ImageIcon, Loader2, X, RotateCcw, Calendar } from "lucide-react";
 import { useApprovalOperations } from "../_hooks/use-approval-operations";
 import { useVariantApprovalOperations } from "../_hooks/use-variant-approval-operations";
 import { useCategories } from "../../stores/[storeId]/_hooks/use-categories";
