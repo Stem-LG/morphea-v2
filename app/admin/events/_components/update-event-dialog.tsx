@@ -7,11 +7,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Calendar, Upload, X, Plus } from "lucide-react";
+import { Calendar, Upload, X, Plus, MapPin, Store, Users } from "lucide-react";
 import { useUpdateEvent } from "../_hooks/use-update-event";
+import { useEventDetails } from "../_hooks/use-event-details";
 import { useQueryClient } from "@tanstack/react-query";
 import { useLanguage } from "@/hooks/useLanguage";
 import { toast } from "sonner";
+import { MallMultiSelect } from "./mall-multi-select";
+import { BoutiqueMultiSelect } from "./boutique-multi-select";
+import { DesignerAssignment } from "./designer-assignment";
 
 interface MediaItem {
     ymediaid: number;
@@ -28,6 +32,11 @@ interface EventData {
     yeventmedia?: Array<{
         ymedia: MediaItem;
     }>;
+}
+
+interface DesignerAssignment {
+    boutiqueId: number;
+    designerId: number | null;
 }
 
 interface UpdateEventDialogProps {
@@ -47,10 +56,14 @@ export function UpdateEventDialog({ children, event }: UpdateEventDialogProps) {
     const [newFiles, setNewFiles] = useState<File[]>([]);
     const [newImagePreviews, setNewImagePreviews] = useState<string[]>([]);
     const [imagesToRemove, setImagesToRemove] = useState<number[]>([]);
+    const [selectedMallIds, setSelectedMallIds] = useState<number[]>([]);
+    const [selectedBoutiqueIds, setSelectedBoutiqueIds] = useState<number[]>([]);
+    const [designerAssignments, setDesignerAssignments] = useState<DesignerAssignment[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const queryClient = useQueryClient();
     const updateEventMutation = useUpdateEvent();
+    const { data: eventDetails, isLoading: isLoadingDetails } = useEventDetails(event?.yeventid);
     const { t } = useLanguage();
 
     // Initialize form data when event changes or dialog opens
@@ -71,6 +84,15 @@ export function UpdateEventDialog({ children, event }: UpdateEventDialogProps) {
             setNewImagePreviews([]);
         }
     }, [event, isOpen]);
+
+    // Initialize mall/boutique/designer data when event details are loaded
+    useEffect(() => {
+        if (eventDetails && isOpen) {
+            setSelectedMallIds(eventDetails.selectedMallIds);
+            setSelectedBoutiqueIds(eventDetails.selectedBoutiqueIds);
+            setDesignerAssignments(eventDetails.designerAssignments);
+        }
+    }, [eventDetails, isOpen]);
 
     const handleInputChange = (field: string, value: string) => {
         setFormData(prev => ({
@@ -121,6 +143,19 @@ export function UpdateEventDialog({ children, event }: UpdateEventDialogProps) {
         if (new Date(formData.startDate) >= new Date(formData.endDate)) {
             return t('admin.events.validation.endDateAfterStart');
         }
+        if (selectedMallIds.length === 0) return 'Please select at least one mall';
+        if (selectedBoutiqueIds.length === 0) return 'Please select at least one boutique';
+        
+        // Check if all boutiques have designers assigned
+        const unassignedBoutiques = selectedBoutiqueIds.filter(boutiqueId => 
+            !designerAssignments.some(assignment => 
+                assignment.boutiqueId === boutiqueId && assignment.designerId !== null
+            )
+        );
+        if (unassignedBoutiques.length > 0) {
+            return 'Please assign designers to all selected boutiques';
+        }
+        
         return null;
     };
 
@@ -136,7 +171,7 @@ export function UpdateEventDialog({ children, event }: UpdateEventDialogProps) {
         setIsSubmitting(true);
 
         try {
-            // Update the event
+            // Update the event with all the new data
             await updateEventMutation.mutateAsync({
                 eventId: event.yeventid,
                 code: formData.code.trim() || undefined,
@@ -144,11 +179,15 @@ export function UpdateEventDialog({ children, event }: UpdateEventDialogProps) {
                 startDate: formData.startDate,
                 endDate: formData.endDate,
                 imagesToAdd: newFiles.length > 0 ? newFiles : undefined,
-                imagesToRemove: imagesToRemove.length > 0 ? imagesToRemove : undefined
+                imagesToRemove: imagesToRemove.length > 0 ? imagesToRemove : undefined,
+                selectedMallIds,
+                selectedBoutiqueIds,
+                designerAssignments
             });
 
             // Invalidate and refetch events
             await queryClient.invalidateQueries({ queryKey: ["events"] });
+            await queryClient.invalidateQueries({ queryKey: ["event-details", event.yeventid] });
 
             // Close dialog
             setIsOpen(false);
@@ -178,6 +217,27 @@ export function UpdateEventDialog({ children, event }: UpdateEventDialogProps) {
             const images = event.yeventmedia?.map(em => em.ymedia) || [];
             setExistingImages(images);
         }
+        if (eventDetails) {
+            setSelectedMallIds(eventDetails.selectedMallIds);
+            setSelectedBoutiqueIds(eventDetails.selectedBoutiqueIds);
+            setDesignerAssignments(eventDetails.designerAssignments);
+        }
+    };
+
+    const handleMallSelectionChange = (mallIds: number[]) => {
+        setSelectedMallIds(mallIds);
+        // Clear boutique selections when malls change
+        setSelectedBoutiqueIds([]);
+        setDesignerAssignments([]);
+    };
+
+    const handleBoutiqueSelectionChange = (boutiqueIds: number[]) => {
+        setSelectedBoutiqueIds(boutiqueIds);
+        // Remove designer assignments for boutiques that are no longer selected
+        const validAssignments = designerAssignments.filter(assignment =>
+            boutiqueIds.includes(assignment.boutiqueId)
+        );
+        setDesignerAssignments(validAssignments);
     };
 
     const handleDialogChange = (open: boolean) => {
@@ -191,10 +251,32 @@ export function UpdateEventDialog({ children, event }: UpdateEventDialogProps) {
         return existingImages.filter(img => !imagesToRemove.includes(img.ymediaid));
     };
 
+    if (isLoadingDetails) {
+        return (
+            <Dialog open={isOpen} onOpenChange={handleDialogChange}>
+                <DialogTrigger asChild>{children}</DialogTrigger>
+                <DialogContent className="bg-gradient-to-br from-morpheus-blue-dark to-morpheus-blue-light max-w-7xl max-h-[95vh] overflow-hidden">
+                    <DialogHeader>
+                        <DialogTitle className="text-white flex items-center gap-2">
+                            <Calendar className="h-5 w-5 text-morpheus-gold-light" />
+                            {t('admin.events.updateEventTitle')}
+                        </DialogTitle>
+                    </DialogHeader>
+                    <div className="flex items-center justify-center py-20">
+                        <div className="text-center text-gray-400">
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-morpheus-gold-light mx-auto mb-4"></div>
+                            <p>Loading event details...</p>
+                        </div>
+                    </div>
+                </DialogContent>
+            </Dialog>
+        );
+    }
+
     return (
         <Dialog open={isOpen} onOpenChange={handleDialogChange}>
             <DialogTrigger asChild>{children}</DialogTrigger>
-            <DialogContent className="bg-gradient-to-br from-morpheus-blue-dark to-morpheus-blue-light max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogContent className="bg-gradient-to-br from-morpheus-blue-dark to-morpheus-blue-light max-w-7xl max-h-[95vh] overflow-hidden">
                 <DialogHeader>
                     <DialogTitle className="text-white flex items-center gap-2">
                         <Calendar className="h-5 w-5 text-morpheus-gold-light" />
@@ -202,254 +284,304 @@ export function UpdateEventDialog({ children, event }: UpdateEventDialogProps) {
                     </DialogTitle>
                 </DialogHeader>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    {/* Basic Event Information */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label className="text-gray-300">{t('admin.events.eventCode')}</Label>
-                            <Input
-                                value={formData.code}
-                                onChange={(e) => handleInputChange("code", e.target.value)}
-                                placeholder={t('admin.events.eventCodePlaceholder')}
-                                className="bg-gray-800/50 border-gray-600 text-white placeholder-gray-400"
-                                disabled={isSubmitting}
-                            />
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label className="text-gray-300">{t('admin.events.eventName')}</Label>
-                            <Input
-                                value={formData.name}
-                                onChange={(e) => handleInputChange("name", e.target.value)}
-                                placeholder={t('admin.events.eventNamePlaceholder')}
-                                className="bg-gray-800/50 border-gray-600 text-white placeholder-gray-400"
-                                disabled={isSubmitting}
-                            />
-                        </div>
-                    </div>
-
-                    {/* Date Range */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label className="text-gray-300">{t('admin.events.startDate')}</Label>
-                            <Input
-                                type="datetime-local"
-                                value={formData.startDate}
-                                onChange={(e) => handleInputChange("startDate", e.target.value)}
-                                className="bg-gray-800/50 border-gray-600 text-white"
-                                disabled={isSubmitting}
-                            />
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label className="text-gray-300">{t('admin.events.endDate')}</Label>
-                            <Input
-                                type="datetime-local"
-                                value={formData.endDate}
-                                onChange={(e) => handleInputChange("endDate", e.target.value)}
-                                className="bg-gray-800/50 border-gray-600 text-white"
-                                disabled={isSubmitting}
-                            />
-                        </div>
-                    </div>
-
-                    {/* Image Management Section */}
-                    <div className="space-y-4">
-                        <Label className="text-gray-300">{t('admin.events.eventImages')}</Label>
-
-                        {/* Existing Images */}
-                        {existingImages.length > 0 && (
-                            <div className="space-y-3">
-                                <div className="flex items-center justify-between">
-                                    <Label className="text-gray-300 text-sm">
-                                        {t('admin.events.currentImages')} ({getVisibleExistingImages().length})
-                                    </Label>
-                                    {imagesToRemove.length > 0 && (
-                                        <Button
-                                            type="button"
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={() => setImagesToRemove([])}
-                                            className="text-blue-400 hover:text-blue-300 hover:bg-blue-900/20"
-                                            disabled={isSubmitting}
-                                        >
-                                            {t('admin.events.restoreAll')}
-                                        </Button>
-                                    )}
-                                </div>
-                                <ScrollArea className="h-40">
-                                    <div className="grid grid-cols-1 gap-3 pr-4">
-                                    {existingImages.map((image) => {
-                                        const isMarkedForRemoval = imagesToRemove.includes(image.ymediaid);
-                                        return (
-                                            <Card
-                                                key={image.ymediaid}
-                                                className={`border-gray-600 transition-all ${
-                                                    isMarkedForRemoval
-                                                        ? "bg-red-900/20 border-red-500/30 opacity-50"
-                                                        : "bg-gray-800/30"
-                                                }`}
-                                            >
-                                                <CardContent className="p-3">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-700 flex-shrink-0">
-                                                            <img
-                                                                src={image.ymediaurl}
-                                                                alt={image.ymediaintitule}
-                                                                className="w-full h-full object-cover"
-                                                            />
-                                                        </div>
-                                                        <div className="flex-1 min-w-0">
-                                                            <p className="text-white font-medium truncate">
-                                                                {image.ymediaintitule}
-                                                            </p>
-                                                            <p className="text-sm text-gray-400">
-                                                                {isMarkedForRemoval
-                                                                    ? t('admin.events.markedForRemoval')
-                                                                    : t('admin.events.currentImage')}
-                                                            </p>
-                                                        </div>
-                                                        <Button
-                                                            type="button"
-                                                            variant="ghost"
-                                                            size="sm"
-                                                            onClick={() =>
-                                                                isMarkedForRemoval
-                                                                    ? restoreExistingImage(image.ymediaid)
-                                                                    : removeExistingImage(image.ymediaid)
-                                                            }
-                                                            className={`flex-shrink-0 ${
-                                                                isMarkedForRemoval
-                                                                    ? "text-blue-400 hover:text-blue-300 hover:bg-blue-900/20"
-                                                                    : "text-red-400 hover:text-red-300 hover:bg-red-900/20"
-                                                            }`}
-                                                            disabled={isSubmitting}
-                                                        >
-                                                            {isMarkedForRemoval ? (
-                                                                <Plus className="h-4 w-4" />
-                                                            ) : (
-                                                                <X className="h-4 w-4" />
-                                                            )}
-                                                        </Button>
-                                                    </div>
-                                                </CardContent>
-                                            </Card>
-                                        );
-                                    })}
-                                    </div>
-                                </ScrollArea>
-                            </div>
-                        )}
-
-                        {/* Add New Images */}
-                        <div className="space-y-3">
-                            <div className="flex items-center justify-between">
-                                <Label className="text-gray-300 text-sm">{t('admin.events.addNewImages')}</Label>
-                                {newFiles.length > 0 && (
-                                    <Button
-                                        type="button"
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={clearAllNewFiles}
-                                        className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
-                                        disabled={isSubmitting}
-                                    >
-                                        {t('admin.events.clearAll')}
-                                    </Button>
-                                )}
-                            </div>
-
-                            {/* Upload Area */}
-                            <Card className="bg-gray-800/30 border-gray-600 border-dashed">
-                                <CardContent className="flex flex-col items-center justify-center py-6">
-                                    <Upload className="h-10 w-10 text-gray-400 mb-3" />
-                                    <div className="text-center">
-                                        <Label
-                                            htmlFor="new-image-upload"
-                                            className="text-morpheus-gold-light hover:text-morpheus-gold-dark cursor-pointer"
-                                        >
-                                            {t('admin.events.clickToAddMore')}
-                                        </Label>
-                                        <p className="text-sm text-gray-400 mt-1">
-                                            {t('admin.events.fileSupport')}
-                                        </p>
-                                    </div>
+                <form onSubmit={handleSubmit} className="flex gap-6 h-[calc(95vh-120px)]">
+                    {/* Left Column - Basic Event Information */}
+                    <div className="flex-1 space-y-6 overflow-y-auto pr-2">
+                        {/* Basic Event Information */}
+                        <div className="space-y-4">
+                            <div className="grid grid-cols-1 gap-4">
+                                <div className="space-y-2">
+                                    <Label className="text-gray-300">{t('admin.events.eventCode')}</Label>
                                     <Input
-                                        id="new-image-upload"
-                                        type="file"
-                                        accept="image/*"
-                                        multiple
-                                        onChange={handleNewFileSelect}
-                                        className="hidden"
+                                        value={formData.code}
+                                        onChange={(e) => handleInputChange("code", e.target.value)}
+                                        placeholder={t('admin.events.eventCodePlaceholder')}
+                                        className="bg-gray-800/50 border-gray-600 text-white placeholder-gray-400"
                                         disabled={isSubmitting}
                                     />
-                                </CardContent>
-                            </Card>
+                                </div>
 
-                            {/* New Image Previews */}
-                            {newFiles.length > 0 && (
+                                <div className="space-y-2">
+                                    <Label className="text-gray-300">{t('admin.events.eventName')}</Label>
+                                    <Input
+                                        value={formData.name}
+                                        onChange={(e) => handleInputChange("name", e.target.value)}
+                                        placeholder={t('admin.events.eventNamePlaceholder')}
+                                        className="bg-gray-800/50 border-gray-600 text-white placeholder-gray-400"
+                                        disabled={isSubmitting}
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Date Range */}
+                            <div className="grid grid-cols-1 gap-4">
+                                <div className="space-y-2">
+                                    <Label className="text-gray-300">{t('admin.events.startDate')}</Label>
+                                    <Input
+                                        type="datetime-local"
+                                        value={formData.startDate}
+                                        onChange={(e) => handleInputChange("startDate", e.target.value)}
+                                        className="bg-gray-800/50 border-gray-600 text-white"
+                                        disabled={isSubmitting}
+                                    />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label className="text-gray-300">{t('admin.events.endDate')}</Label>
+                                    <Input
+                                        type="datetime-local"
+                                        value={formData.endDate}
+                                        onChange={(e) => handleInputChange("endDate", e.target.value)}
+                                        className="bg-gray-800/50 border-gray-600 text-white"
+                                        disabled={isSubmitting}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Image Management Section */}
+                        <div className="space-y-4">
+                            <Label className="text-gray-300">{t('admin.events.eventImages')}</Label>
+
+                            {/* Existing Images */}
+                            {existingImages.length > 0 && (
                                 <div className="space-y-3">
-                                    <Label className="text-gray-300 text-sm">{t('admin.events.newImages')} ({newFiles.length})</Label>
-                                    <ScrollArea className="h-40">
-                                        <div className="grid grid-cols-1 gap-3 pr-4">
-                                        {newFiles.map((file, index) => (
-                                            <Card key={index} className="bg-green-900/20 border-green-500/30">
-                                                <CardContent className="p-3">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-700 flex-shrink-0">
-                                                            <img
-                                                                src={newImagePreviews[index]}
-                                                                alt={`New image ${index + 1}`}
-                                                                className="w-full h-full object-cover"
-                                                            />
+                                    <div className="flex items-center justify-between">
+                                        <Label className="text-gray-300 text-sm">
+                                            {t('admin.events.currentImages')} ({getVisibleExistingImages().length})
+                                        </Label>
+                                        {imagesToRemove.length > 0 && (
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => setImagesToRemove([])}
+                                                className="text-blue-400 hover:text-blue-300 hover:bg-blue-900/20"
+                                                disabled={isSubmitting}
+                                            >
+                                                {t('admin.events.restoreAll')}
+                                            </Button>
+                                        )}
+                                    </div>
+                                    <ScrollArea className="h-32">
+                                        <div className="grid grid-cols-1 gap-2 pr-2">
+                                        {existingImages.map((image) => {
+                                            const isMarkedForRemoval = imagesToRemove.includes(image.ymediaid);
+                                            return (
+                                                <Card
+                                                    key={image.ymediaid}
+                                                    className={`border-gray-600 transition-all ${
+                                                        isMarkedForRemoval
+                                                            ? "bg-red-900/20 border-red-500/30 opacity-50"
+                                                            : "bg-gray-800/30"
+                                                    }`}
+                                                >
+                                                    <CardContent className="p-2">
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="w-12 h-12 rounded overflow-hidden bg-gray-700 flex-shrink-0">
+                                                                <img
+                                                                    src={image.ymediaurl}
+                                                                    alt={image.ymediaintitule}
+                                                                    className="w-full h-full object-cover"
+                                                                />
+                                                            </div>
+                                                            <div className="flex-1 min-w-0">
+                                                                <p className="text-white text-sm font-medium truncate">
+                                                                    {image.ymediaintitule}
+                                                                </p>
+                                                                <p className="text-xs text-gray-400">
+                                                                    {isMarkedForRemoval
+                                                                        ? t('admin.events.markedForRemoval')
+                                                                        : t('admin.events.currentImage')}
+                                                                </p>
+                                                            </div>
+                                                            <Button
+                                                                type="button"
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                onClick={() =>
+                                                                    isMarkedForRemoval
+                                                                        ? restoreExistingImage(image.ymediaid)
+                                                                        : removeExistingImage(image.ymediaid)
+                                                                }
+                                                                className={`flex-shrink-0 h-8 w-8 p-0 ${
+                                                                    isMarkedForRemoval
+                                                                        ? "text-blue-400 hover:text-blue-300 hover:bg-blue-900/20"
+                                                                        : "text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                                                                }`}
+                                                                disabled={isSubmitting}
+                                                            >
+                                                                {isMarkedForRemoval ? (
+                                                                    <Plus className="h-3 w-3" />
+                                                                ) : (
+                                                                    <X className="h-3 w-3" />
+                                                                )}
+                                                            </Button>
                                                         </div>
-                                                        <div className="flex-1 min-w-0">
-                                                            <p className="text-white font-medium truncate">
-                                                                {file.name}
-                                                            </p>
-                                                            <p className="text-sm text-gray-400">
-                                                                {(file.size / 1024 / 1024).toFixed(2)} MB • {t('admin.events.newImage')}
-                                                            </p>
-                                                        </div>
-                                                        <Button
-                                                            type="button"
-                                                            variant="ghost"
-                                                            size="sm"
-                                                            onClick={() => removeNewFile(index)}
-                                                            className="text-red-400 hover:text-red-300 hover:bg-red-900/20 flex-shrink-0"
-                                                            disabled={isSubmitting}
-                                                        >
-                                                            <X className="h-4 w-4" />
-                                                        </Button>
-                                                    </div>
-                                                </CardContent>
-                                            </Card>
-                                        ))}
+                                                    </CardContent>
+                                                </Card>
+                                            );
+                                        })}
                                         </div>
                                     </ScrollArea>
                                 </div>
                             )}
+
+                            {/* Add New Images */}
+                            <div className="space-y-3">
+                                <div className="flex items-center justify-between">
+                                    <Label className="text-gray-300 text-sm">{t('admin.events.addNewImages')}</Label>
+                                    {newFiles.length > 0 && (
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={clearAllNewFiles}
+                                            className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                                            disabled={isSubmitting}
+                                        >
+                                            {t('admin.events.clearAll')}
+                                        </Button>
+                                    )}
+                                </div>
+
+                                {/* Upload Area */}
+                                <Card className="bg-gray-800/30 border-gray-600 border-dashed">
+                                    <CardContent className="flex flex-col items-center justify-center py-4">
+                                        <Upload className="h-6 w-6 text-gray-400 mb-2" />
+                                        <div className="text-center">
+                                            <Label
+                                                htmlFor="new-image-upload"
+                                                className="text-morpheus-gold-light hover:text-morpheus-gold-dark cursor-pointer text-sm"
+                                            >
+                                                {t('admin.events.clickToAddMore')}
+                                            </Label>
+                                            <p className="text-xs text-gray-400 mt-1">
+                                                {t('admin.events.fileSupport')}
+                                            </p>
+                                        </div>
+                                        <Input
+                                            id="new-image-upload"
+                                            type="file"
+                                            accept="image/*"
+                                            multiple
+                                            onChange={handleNewFileSelect}
+                                            className="hidden"
+                                            disabled={isSubmitting}
+                                        />
+                                    </CardContent>
+                                </Card>
+
+                                {/* New Image Previews */}
+                                {newFiles.length > 0 && (
+                                    <div className="space-y-2">
+                                        <Label className="text-gray-300 text-sm">{t('admin.events.newImages')} ({newFiles.length})</Label>
+                                        <ScrollArea className="h-32">
+                                            <div className="grid grid-cols-1 gap-2 pr-2">
+                                            {newFiles.map((file, index) => (
+                                                <Card key={index} className="bg-green-900/20 border-green-500/30">
+                                                    <CardContent className="p-2">
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="w-12 h-12 rounded overflow-hidden bg-gray-700 flex-shrink-0">
+                                                                <img
+                                                                    src={newImagePreviews[index]}
+                                                                    alt={`New image ${index + 1}`}
+                                                                    className="w-full h-full object-cover"
+                                                                />
+                                                            </div>
+                                                            <div className="flex-1 min-w-0">
+                                                                <p className="text-white text-sm font-medium truncate">
+                                                                    {file.name}
+                                                                </p>
+                                                                <p className="text-xs text-gray-400">
+                                                                    {(file.size / 1024 / 1024).toFixed(2)} MB • {t('admin.events.newImage')}
+                                                                </p>
+                                                            </div>
+                                                            <Button
+                                                                type="button"
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                onClick={() => removeNewFile(index)}
+                                                                className="text-red-400 hover:text-red-300 hover:bg-red-900/20 flex-shrink-0 h-8 w-8 p-0"
+                                                                disabled={isSubmitting}
+                                                            >
+                                                                <X className="h-3 w-3" />
+                                                            </Button>
+                                                        </div>
+                                                    </CardContent>
+                                                </Card>
+                                            ))}
+                                            </div>
+                                        </ScrollArea>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Form Actions */}
+                        <div className="flex gap-3 pt-4 sticky bottom-0 bg-gradient-to-br from-morpheus-blue-dark to-morpheus-blue-light">
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => setIsOpen(false)}
+                                disabled={isSubmitting}
+                                className="flex-1 border-gray-600 text-gray-300 hover:bg-gray-800/50"
+                            >
+                                {t('common.cancel')}
+                            </Button>
+                            <Button
+                                type="submit"
+                                disabled={isSubmitting}
+                                className="flex-1 bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-morpheus-gold-dark hover:to-morpheus-gold-light text-white font-semibold transition-all duration-300 hover:scale-105"
+                            >
+                                {isSubmitting ? t('admin.events.updating') : t('admin.events.updateEvent')}
+                            </Button>
                         </div>
                     </div>
 
-                    {/* Form Actions */}
-                    <div className="flex gap-3 pt-4">
-                        <Button
-                            type="button"
-                            variant="outline"
-                            onClick={() => setIsOpen(false)}
-                            disabled={isSubmitting}
-                            className="flex-1 border-gray-600 text-gray-300 hover:bg-gray-800/50"
-                        >
-                            {t('common.cancel')}
-                        </Button>
-                        <Button
-                            type="submit"
-                            disabled={isSubmitting}
-                            className="flex-1 bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-morpheus-gold-dark hover:to-morpheus-gold-light text-white font-semibold transition-all duration-300 hover:scale-105"
-                        >
-                            {isSubmitting ? t('admin.events.updating') : t('admin.events.updateEvent')}
-                        </Button>
+                    {/* Right Column - Mall, Boutique & Designer Selection */}
+                    <div className="flex-1 space-y-6 overflow-y-auto pl-2">
+                        {/* Mall Selection */}
+                        <div className="space-y-3">
+                            <Label className="text-white flex items-center gap-2">
+                                <MapPin className="h-4 w-4 text-morpheus-gold-light" />
+                                {t('admin.events.malls.selectMalls')}
+                            </Label>
+                            <MallMultiSelect
+                                selectedMallIds={selectedMallIds}
+                                onSelectionChange={handleMallSelectionChange}
+                                disabled={isSubmitting}
+                            />
+                        </div>
+
+                        {/* Boutique Selection */}
+                        <div className="space-y-3">
+                            <Label className="text-white flex items-center gap-2">
+                                <Store className="h-4 w-4 text-morpheus-gold-light" />
+                                {t('admin.events.boutiques.selectBoutiques')}
+                            </Label>
+                            <BoutiqueMultiSelect
+                                selectedMallIds={selectedMallIds}
+                                selectedBoutiqueIds={selectedBoutiqueIds}
+                                onSelectionChange={handleBoutiqueSelectionChange}
+                                disabled={isSubmitting}
+                            />
+                        </div>
+
+                        {/* Designer Assignment */}
+                        <div className="space-y-3">
+                            <Label className="text-white flex items-center gap-2">
+                                <Users className="h-4 w-4 text-morpheus-gold-light" />
+                                {t('admin.events.designers.assignDesigners')}
+                            </Label>
+                            <DesignerAssignment
+                                selectedMallIds={selectedMallIds}
+                                selectedBoutiqueIds={selectedBoutiqueIds}
+                                designerAssignments={designerAssignments}
+                                onAssignmentChange={setDesignerAssignments}
+                                disabled={isSubmitting}
+                            />
+                        </div>
                     </div>
                 </form>
             </DialogContent>

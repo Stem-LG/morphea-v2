@@ -5,6 +5,11 @@ import { useMutation } from "@tanstack/react-query";
 import { uploadFile } from "@/app/_hooks/use-upload-file";
 import { useEvents } from "./use-events";
 
+interface DesignerAssignment {
+    boutiqueId: number;
+    designerId: number | null;
+}
+
 interface useUpdateEventProps {
     eventId: number;
     code?: string;
@@ -13,6 +18,9 @@ interface useUpdateEventProps {
     endDate?: string;
     imagesToAdd?: File[];
     imagesToRemove?: number[]; // ymedia IDs to remove
+    selectedMallIds: number[];
+    selectedBoutiqueIds: number[];
+    designerAssignments: DesignerAssignment[];
 }
 
 export function useUpdateEvent() {
@@ -21,17 +29,26 @@ export function useUpdateEvent() {
 
     return useMutation({
         mutationFn: async (updateData: useUpdateEventProps) => {
-            const { eventId, imagesToAdd, imagesToRemove, ...eventFields } = updateData;
+            const {
+                eventId,
+                imagesToAdd,
+                imagesToRemove,
+                selectedMallIds,
+                selectedBoutiqueIds,
+                designerAssignments,
+                ...eventFields
+            } = updateData;
 
             try {
                 // Step 1: Update event basic information if provided
-                if (Object.keys(eventFields).length > 0) {
+                const basicFields = { code: eventFields.code, name: eventFields.name, startDate: eventFields.startDate, endDate: eventFields.endDate };
+                if (Object.values(basicFields).some(val => val !== undefined)) {
                     const updateFields: any = {};
 
-                    if (eventFields.code !== undefined) updateFields.yeventcode = eventFields.code;
-                    if (eventFields.name !== undefined) updateFields.yeventintitule = eventFields.name;
-                    if (eventFields.startDate !== undefined) updateFields.yeventdatedeb = eventFields.startDate;
-                    if (eventFields.endDate !== undefined) updateFields.yeventdatefin = eventFields.endDate;
+                    if (basicFields.code !== undefined) updateFields.yeventcode = basicFields.code;
+                    if (basicFields.name !== undefined) updateFields.yeventintitule = basicFields.name;
+                    if (basicFields.startDate !== undefined) updateFields.yeventdatedeb = basicFields.startDate;
+                    if (basicFields.endDate !== undefined) updateFields.yeventdatefin = basicFields.endDate;
 
                     const { error: eventError } = await supabase
                         .schema("morpheus")
@@ -112,9 +129,80 @@ export function useUpdateEvent() {
                     }
                 }
 
+                // Step 4: Update mall/boutique/designer relationships
+                // First, remove all existing ydetailsevent records for this event
+                const { error: removeDetailsError } = await supabase
+                    .schema("morpheus")
+                    .from("ydetailsevent")
+                    .delete()
+                    .eq("yeventidfk", eventId);
+
+                if (removeDetailsError) {
+                    throw new Error(`Failed to remove existing event details: ${removeDetailsError.message}`);
+                }
+
+                // Step 5: Create new ydetailsevent records for each mall
+                const mallDetailRecords = selectedMallIds.map((mallId) => ({
+                    yeventidfk: eventId,
+                    ymallidfk: mallId,
+                }));
+
+                if (mallDetailRecords.length > 0) {
+                    const { error: mallDetailsError } = await supabase
+                        .schema("morpheus")
+                        .from("ydetailsevent")
+                        .insert(mallDetailRecords);
+
+                    if (mallDetailsError) {
+                        throw new Error(`Failed to create mall event details: ${mallDetailsError.message}`);
+                    }
+                }
+
+                // Step 6: Create ydetailsevent records for each boutique with their assigned designers
+                if (designerAssignments.length > 0) {
+                    // Fetch boutique data to get mall mappings
+                    const { data: boutiquesData, error: boutiquesError } = await supabase
+                        .schema("morpheus")
+                        .from("yboutique")
+                        .select("yboutiqueid, ymallidfk")
+                        .in("yboutiqueid", selectedBoutiqueIds);
+
+                    if (boutiquesError) {
+                        throw new Error(`Failed to fetch boutique data: ${boutiquesError.message}`);
+                    }
+
+                    const boutiqueDetailRecords = designerAssignments
+                        .filter(assignment => assignment.designerId !== null)
+                        .map((assignment) => {
+                            // Find the mall ID for this boutique
+                            const boutique = boutiquesData?.find(b => b.yboutiqueid === assignment.boutiqueId);
+                            if (!boutique) {
+                                throw new Error(`Boutique with ID ${assignment.boutiqueId} not found`);
+                            }
+                            
+                            return {
+                                yeventidfk: eventId,
+                                ymallidfk: boutique.ymallidfk,
+                                yboutiqueidfk: assignment.boutiqueId,
+                                ydesignidfk: assignment.designerId,
+                            };
+                        });
+
+                    if (boutiqueDetailRecords.length > 0) {
+                        const { error: boutiqueDetailsError } = await supabase
+                            .schema("morpheus")
+                            .from("ydetailsevent")
+                            .insert(boutiqueDetailRecords);
+
+                        if (boutiqueDetailsError) {
+                            throw new Error(`Failed to create boutique event details: ${boutiqueDetailsError.message}`);
+                        }
+                    }
+                }
+
                 return {
                     eventId,
-                    updatedFields: eventFields,
+                    updatedFields: basicFields,
                     addedMediaIds: newMediaIds,
                     removedMediaIds: imagesToRemove || [],
                 };

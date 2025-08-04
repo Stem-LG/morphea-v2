@@ -175,6 +175,41 @@ export const frTranslations = {
         "startDateRequired": "La date de début est requise",
         "endDateRequired": "La date de fin est requise",
         "endDateAfterStart": "La date de fin doit être après la date de début"
+      },
+      "malls": {
+        "selectMalls": "Sélectionner les Centres Commerciaux",
+        "mallsOptional": "Centres Commerciaux (Optionnel)",
+        "searchMalls": "Rechercher des centres commerciaux...",
+        "noMallsFound": "Aucun centre commercial trouvé",
+        "noMallsAvailable": "Aucun centre commercial disponible",
+        "mallsSelected": "centres commerciaux sélectionnés",
+        "selectAll": "Tout Sélectionner",
+        "clearAll": "Tout Effacer",
+        "loadingMalls": "Chargement des centres commerciaux..."
+      },
+      "boutiques": {
+        "selectBoutiques": "Sélectionner les Boutiques",
+        "boutiquesOptional": "Boutiques (Optionnel)",
+        "searchBoutiques": "Rechercher des boutiques...",
+        "noBoutiquesFound": "Aucune boutique trouvée",
+        "noBoutiquesAvailable": "Aucune boutique disponible",
+        "boutiquesSelected": "boutiques sélectionnées",
+        "selectAll": "Tout Sélectionner",
+        "clearAll": "Tout Effacer",
+        "loadingBoutiques": "Chargement des boutiques...",
+        "selectMallsFirst": "Veuillez d'abord sélectionner des centres commerciaux pour voir les boutiques disponibles"
+      },
+      "designers": {
+        "assignDesigners": "Assigner des Designers",
+        "designersOptional": "Designers (Optionnel)",
+        "searchDesigners": "Rechercher des designers...",
+        "noDesignersFound": "Aucun designer trouvé",
+        "noDesignersAvailable": "Aucun designer disponible",
+        "designersAssigned": "designers assignés",
+        "selectDesigner": "Sélectionner un Designer",
+        "chooseDesigner": "Choisir un designer...",
+        "loadingDesigners": "Chargement des designers...",
+        "selectBoutiquesFirst": "Veuillez d'abord sélectionner des boutiques pour assigner des designers"
       }
     },
     "analytics": "Analytiques",

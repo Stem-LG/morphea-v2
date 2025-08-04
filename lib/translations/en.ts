@@ -176,6 +176,41 @@ export const enTranslations = {
         "startDateRequired": "Start date is required",
         "endDateRequired": "End date is required",
         "endDateAfterStart": "End date must be after start date"
+      },
+      "malls": {
+        "selectMalls": "Select Malls",
+        "mallsOptional": "Malls (Optional)",
+        "searchMalls": "Search malls...",
+        "noMallsFound": "No malls found",
+        "noMallsAvailable": "No malls available",
+        "mallsSelected": "malls selected",
+        "selectAll": "Select All",
+        "clearAll": "Clear All",
+        "loadingMalls": "Loading malls..."
+      },
+      "boutiques": {
+        "selectBoutiques": "Select Boutiques",
+        "boutiquesOptional": "Boutiques (Optional)",
+        "searchBoutiques": "Search boutiques...",
+        "noBoutiquesFound": "No boutiques found",
+        "noBoutiquesAvailable": "No boutiques available",
+        "boutiquesSelected": "boutiques selected",
+        "selectAll": "Select All",
+        "clearAll": "Clear All",
+        "loadingBoutiques": "Loading boutiques...",
+        "selectMallsFirst": "Please select malls first to see available boutiques"
+      },
+      "designers": {
+        "assignDesigners": "Assign Designers",
+        "designersOptional": "Designers (Optional)",
+        "searchDesigners": "Search designers...",
+        "noDesignersFound": "No designers found",
+        "noDesignersAvailable": "No designers available",
+        "designersAssigned": "designers assigned",
+        "selectDesigner": "Select Designer",
+        "chooseDesigner": "Choose a designer...",
+        "loadingDesigners": "Loading designers...",
+        "selectBoutiquesFirst": "Please select boutiques first to assign designers"
       }
     },
     "analytics": "Analytics",
