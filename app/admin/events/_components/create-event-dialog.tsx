@@ -7,22 +7,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Calendar, Upload, X, MapPin, Store, Users } from "lucide-react";
+import { Calendar, Upload, X, MapPin, Store } from "lucide-react";
 import { useCreateEvent } from "../_hooks/use-create-event";
 import { useQueryClient } from "@tanstack/react-query";
 import { useLanguage } from "@/hooks/useLanguage";
 import { toast } from "sonner";
 import { MallMultiSelect } from "./mall-multi-select";
 import { BoutiqueMultiSelect } from "./boutique-multi-select";
-import { DesignerAssignment } from "./designer-assignment";
 
 interface CreateEventDialogProps {
     children: React.ReactNode;
-}
-
-interface DesignerAssignment {
-    boutiqueId: number;
-    designerId: number | null;
 }
 
 export function CreateEventDialog({ children }: CreateEventDialogProps) {
@@ -37,7 +31,6 @@ export function CreateEventDialog({ children }: CreateEventDialogProps) {
     const [imagePreviews, setImagePreviews] = useState<string[]>([]);
     const [selectedMallIds, setSelectedMallIds] = useState<number[]>([]);
     const [selectedBoutiqueIds, setSelectedBoutiqueIds] = useState<number[]>([]);
-    const [designerAssignments, setDesignerAssignments] = useState<DesignerAssignment[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const queryClient = useQueryClient();
@@ -88,16 +81,6 @@ export function CreateEventDialog({ children }: CreateEventDialogProps) {
         if (selectedMallIds.length === 0) return 'Please select at least one mall';
         if (selectedBoutiqueIds.length === 0) return 'Please select at least one boutique';
         
-        // Check if all boutiques have designers assigned
-        const unassignedBoutiques = selectedBoutiqueIds.filter(boutiqueId =>
-            !designerAssignments.some(assignment =>
-                assignment.boutiqueId === boutiqueId && assignment.designerId !== null
-            )
-        );
-        if (unassignedBoutiques.length > 0) {
-            return 'Please assign designers to all selected boutiques';
-        }
-        
         return null;
     };
 
@@ -121,8 +104,7 @@ export function CreateEventDialog({ children }: CreateEventDialogProps) {
                 endDate: formData.endDate,
                 imageFiles: selectedFiles.length > 0 ? selectedFiles : undefined,
                 selectedMallIds,
-                selectedBoutiqueIds,
-                designerAssignments
+                selectedBoutiqueIds
             });
 
             // Invalidate and refetch events
@@ -154,28 +136,16 @@ export function CreateEventDialog({ children }: CreateEventDialogProps) {
         removeAllFiles();
         setSelectedMallIds([]);
         setSelectedBoutiqueIds([]);
-        setDesignerAssignments([]);
     };
 
     const handleMallSelectionChange = (mallIds: number[]) => {
         setSelectedMallIds(mallIds);
         // Clear boutique selections when malls change
-        const validBoutiqueIds = selectedBoutiqueIds.filter(boutiqueId => {
-            // This would need to be checked against the actual boutiques data
-            // For now, we'll clear all selections when malls change
-            return false;
-        });
         setSelectedBoutiqueIds([]);
-        setDesignerAssignments([]);
     };
 
     const handleBoutiqueSelectionChange = (boutiqueIds: number[]) => {
         setSelectedBoutiqueIds(boutiqueIds);
-        // Remove designer assignments for boutiques that are no longer selected
-        const validAssignments = designerAssignments.filter(assignment =>
-            boutiqueIds.includes(assignment.boutiqueId)
-        );
-        setDesignerAssignments(validAssignments);
     };
 
     const handleDialogChange = (open: boolean) => {
@@ -362,7 +332,7 @@ export function CreateEventDialog({ children }: CreateEventDialogProps) {
                         </div>
                     </div>
 
-                    {/* Right Column - Mall, Boutique & Designer Selection */}
+                    {/* Right Column - Mall & Boutique Selection */}
                     <div className="flex-1 space-y-6 overflow-y-auto pl-2">
                         {/* Mall Selection */}
                         <div className="space-y-3">
@@ -387,21 +357,6 @@ export function CreateEventDialog({ children }: CreateEventDialogProps) {
                                 selectedMallIds={selectedMallIds}
                                 selectedBoutiqueIds={selectedBoutiqueIds}
                                 onSelectionChange={handleBoutiqueSelectionChange}
-                                disabled={isSubmitting}
-                            />
-                        </div>
-
-                        {/* Designer Assignment */}
-                        <div className="space-y-3">
-                            <Label className="text-white flex items-center gap-2">
-                                <Users className="h-4 w-4 text-morpheus-gold-light" />
-                                {t('admin.events.designers.assignDesigners')}
-                            </Label>
-                            <DesignerAssignment
-                                selectedMallIds={selectedMallIds}
-                                selectedBoutiqueIds={selectedBoutiqueIds}
-                                designerAssignments={designerAssignments}
-                                onAssignmentChange={setDesignerAssignments}
                                 disabled={isSubmitting}
                             />
                         </div>

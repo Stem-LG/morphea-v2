@@ -62,6 +62,13 @@ export function ModernSidebar({ isOpen, isCollapsed, onToggle, onCollapse, userR
                 roles: ["admin", "store_admin"],
             },
             {
+                id: "designer-assignments",
+                label: "Designer Assignments",
+                icon: Users,
+                href: "/admin/designer-assignments",
+                roles: ["admin", "store_admin"],
+            },
+            {
                 id: "boutiques",
                 label: "Boutiques",
                 icon: Store,

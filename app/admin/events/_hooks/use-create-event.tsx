@@ -5,11 +5,6 @@ import { useMutation } from "@tanstack/react-query";
 import { uploadFile } from "@/app/_hooks/use-upload-file";
 import { useEvents } from "./use-events";
 
-interface DesignerAssignment {
-    boutiqueId: number;
-    designerId: number | null;
-}
-
 interface useCreateEventProps {
     code?: string;
     name: string;
@@ -18,7 +13,6 @@ interface useCreateEventProps {
     imageFiles?: File[];
     selectedMallIds: number[];
     selectedBoutiqueIds: number[];
-    designerAssignments: DesignerAssignment[];
 }
 
 export function useCreateEvent() {
@@ -114,8 +108,8 @@ export function useCreateEvent() {
                     throw new Error(`Failed to create mall event details: ${mallDetailsError.message}`);
                 }
 
-                // Step 5: Get boutique data to map boutiques to their malls, then create ydetailsevent records
-                if (event.designerAssignments.length > 0) {
+                // Step 5: Create ydetailsevent records for boutiques (without designer assignments)
+                if (event.selectedBoutiqueIds.length > 0) {
                     // Fetch boutique data to get mall mappings
                     const { data: boutiquesData, error: boutiquesError } = await supabase
                         .schema("morpheus")
@@ -127,22 +121,20 @@ export function useCreateEvent() {
                         throw new Error(`Failed to fetch boutique data: ${boutiquesError.message}`);
                     }
 
-                    const boutiqueDetailRecords = event.designerAssignments
-                        .filter(assignment => assignment.designerId !== null)
-                        .map((assignment) => {
-                            // Find the mall ID for this boutique
-                            const boutique = boutiquesData?.find(b => b.yboutiqueid === assignment.boutiqueId);
-                            if (!boutique) {
-                                throw new Error(`Boutique with ID ${assignment.boutiqueId} not found`);
-                            }
-                            
-                            return {
-                                yeventidfk: eventId,
-                                ymallidfk: boutique.ymallidfk,
-                                yboutiqueidfk: assignment.boutiqueId,
-                                ydesignidfk: assignment.designerId,
-                            };
-                        });
+                    const boutiqueDetailRecords = event.selectedBoutiqueIds.map((boutiqueId) => {
+                        // Find the mall ID for this boutique
+                        const boutique = boutiquesData?.find(b => b.yboutiqueid === boutiqueId);
+                        if (!boutique) {
+                            throw new Error(`Boutique with ID ${boutiqueId} not found`);
+                        }
+                        
+                        return {
+                            yeventidfk: eventId,
+                            ymallidfk: boutique.ymallidfk,
+                            yboutiqueidfk: boutiqueId,
+                            ydesignidfk: null, // No designer assignment during event creation
+                        };
+                    });
 
                     if (boutiqueDetailRecords.length > 0) {
                         const { error: boutiqueDetailsError } = await supabase

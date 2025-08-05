@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Calendar, Upload, X, Plus, MapPin, Store, Users } from "lucide-react";
+import { Calendar, Upload, X, Plus, MapPin, Store } from "lucide-react";
 import { useUpdateEvent } from "../_hooks/use-update-event";
 import { useEventDetails } from "../_hooks/use-event-details";
 import { useQueryClient } from "@tanstack/react-query";
@@ -15,7 +15,6 @@ import { useLanguage } from "@/hooks/useLanguage";
 import { toast } from "sonner";
 import { MallMultiSelect } from "./mall-multi-select";
 import { BoutiqueMultiSelect } from "./boutique-multi-select";
-import { DesignerAssignment } from "./designer-assignment";
 
 interface MediaItem {
     ymediaid: number;
@@ -34,10 +33,6 @@ interface EventData {
     }>;
 }
 
-interface DesignerAssignment {
-    boutiqueId: number;
-    designerId: number | null;
-}
 
 interface UpdateEventDialogProps {
     children: React.ReactNode;
@@ -58,7 +53,6 @@ export function UpdateEventDialog({ children, event }: UpdateEventDialogProps) {
     const [imagesToRemove, setImagesToRemove] = useState<number[]>([]);
     const [selectedMallIds, setSelectedMallIds] = useState<number[]>([]);
     const [selectedBoutiqueIds, setSelectedBoutiqueIds] = useState<number[]>([]);
-    const [designerAssignments, setDesignerAssignments] = useState<DesignerAssignment[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const queryClient = useQueryClient();
@@ -85,12 +79,11 @@ export function UpdateEventDialog({ children, event }: UpdateEventDialogProps) {
         }
     }, [event, isOpen]);
 
-    // Initialize mall/boutique/designer data when event details are loaded
+    // Initialize mall/boutique data when event details are loaded
     useEffect(() => {
         if (eventDetails && isOpen) {
             setSelectedMallIds(eventDetails.selectedMallIds);
             setSelectedBoutiqueIds(eventDetails.selectedBoutiqueIds);
-            setDesignerAssignments(eventDetails.designerAssignments);
         }
     }, [eventDetails, isOpen]);
 
@@ -146,16 +139,6 @@ export function UpdateEventDialog({ children, event }: UpdateEventDialogProps) {
         if (selectedMallIds.length === 0) return 'Please select at least one mall';
         if (selectedBoutiqueIds.length === 0) return 'Please select at least one boutique';
         
-        // Check if all boutiques have designers assigned
-        const unassignedBoutiques = selectedBoutiqueIds.filter(boutiqueId => 
-            !designerAssignments.some(assignment => 
-                assignment.boutiqueId === boutiqueId && assignment.designerId !== null
-            )
-        );
-        if (unassignedBoutiques.length > 0) {
-            return 'Please assign designers to all selected boutiques';
-        }
-        
         return null;
     };
 
@@ -181,8 +164,7 @@ export function UpdateEventDialog({ children, event }: UpdateEventDialogProps) {
                 imagesToAdd: newFiles.length > 0 ? newFiles : undefined,
                 imagesToRemove: imagesToRemove.length > 0 ? imagesToRemove : undefined,
                 selectedMallIds,
-                selectedBoutiqueIds,
-                designerAssignments
+                selectedBoutiqueIds
             });
 
             // Invalidate and refetch events
@@ -220,7 +202,6 @@ export function UpdateEventDialog({ children, event }: UpdateEventDialogProps) {
         if (eventDetails) {
             setSelectedMallIds(eventDetails.selectedMallIds);
             setSelectedBoutiqueIds(eventDetails.selectedBoutiqueIds);
-            setDesignerAssignments(eventDetails.designerAssignments);
         }
     };
 
@@ -228,16 +209,10 @@ export function UpdateEventDialog({ children, event }: UpdateEventDialogProps) {
         setSelectedMallIds(mallIds);
         // Clear boutique selections when malls change
         setSelectedBoutiqueIds([]);
-        setDesignerAssignments([]);
     };
 
     const handleBoutiqueSelectionChange = (boutiqueIds: number[]) => {
         setSelectedBoutiqueIds(boutiqueIds);
-        // Remove designer assignments for boutiques that are no longer selected
-        const validAssignments = designerAssignments.filter(assignment =>
-            boutiqueIds.includes(assignment.boutiqueId)
-        );
-        setDesignerAssignments(validAssignments);
     };
 
     const handleDialogChange = (open: boolean) => {
@@ -539,7 +514,7 @@ export function UpdateEventDialog({ children, event }: UpdateEventDialogProps) {
                         </div>
                     </div>
 
-                    {/* Right Column - Mall, Boutique & Designer Selection */}
+                    {/* Right Column - Mall & Boutique Selection */}
                     <div className="flex-1 space-y-6 overflow-y-auto pl-2">
                         {/* Mall Selection */}
                         <div className="space-y-3">
@@ -564,21 +539,6 @@ export function UpdateEventDialog({ children, event }: UpdateEventDialogProps) {
                                 selectedMallIds={selectedMallIds}
                                 selectedBoutiqueIds={selectedBoutiqueIds}
                                 onSelectionChange={handleBoutiqueSelectionChange}
-                                disabled={isSubmitting}
-                            />
-                        </div>
-
-                        {/* Designer Assignment */}
-                        <div className="space-y-3">
-                            <Label className="text-white flex items-center gap-2">
-                                <Users className="h-4 w-4 text-morpheus-gold-light" />
-                                {t('admin.events.designers.assignDesigners')}
-                            </Label>
-                            <DesignerAssignment
-                                selectedMallIds={selectedMallIds}
-                                selectedBoutiqueIds={selectedBoutiqueIds}
-                                designerAssignments={designerAssignments}
-                                onAssignmentChange={setDesignerAssignments}
                                 disabled={isSubmitting}
                             />
                         </div>

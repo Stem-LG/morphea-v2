@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Check, ChevronDown, X } from "lucide-react";
+import { ChevronDown, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -23,25 +23,23 @@ export function BoutiqueMultiSelect({
     selectedMallIds,
     selectedBoutiqueIds,
     onSelectionChange,
-    disabled
+    disabled,
 }: BoutiqueMultiSelectProps) {
     const [isOpen, setIsOpen] = useState(false);
     const { data: boutiques = [], isLoading } = useBoutiques(selectedMallIds);
     const { t } = useLanguage();
 
-    const selectedBoutiques = boutiques.filter(boutique => 
-        selectedBoutiqueIds.includes(boutique.yboutiqueid)
-    );
+    const selectedBoutiques = boutiques.filter((boutique) => selectedBoutiqueIds.includes(boutique.yboutiqueid));
 
     const handleBoutiqueToggle = (boutiqueId: number) => {
         const newSelection = selectedBoutiqueIds.includes(boutiqueId)
-            ? selectedBoutiqueIds.filter(id => id !== boutiqueId)
+            ? selectedBoutiqueIds.filter((id) => id !== boutiqueId)
             : [...selectedBoutiqueIds, boutiqueId];
         onSelectionChange(newSelection);
     };
 
     const handleRemoveBoutique = (boutiqueId: number) => {
-        onSelectionChange(selectedBoutiqueIds.filter(id => id !== boutiqueId));
+        onSelectionChange(selectedBoutiqueIds.filter((id) => id !== boutiqueId));
     };
 
     const clearAll = () => {
@@ -50,7 +48,7 @@ export function BoutiqueMultiSelect({
 
     // Group boutiques by mall
     const boutiquesByMall = boutiques.reduce((acc, boutique) => {
-        const mallName = boutique.ymall?.ymallintitule || 'Unknown Mall';
+        const mallName = boutique.ymall?.ymallintitule || "Unknown Mall";
         if (!acc[mallName]) {
             acc[mallName] = [];
         }
@@ -73,11 +71,10 @@ export function BoutiqueMultiSelect({
                     >
                         <span className="truncate">
                             {selectedMallIds.length === 0
-                                ? t('admin.events.boutiques.selectMallsFirst')
+                                ? t("admin.events.boutiques.selectMallsFirst")
                                 : selectedBoutiques.length === 0
-                                ? t('admin.events.boutiques.searchBoutiques')
-                                : `${selectedBoutiques.length} ${t('admin.events.boutiques.boutiquesSelected')}`
-                            }
+                                ? t("admin.events.boutiques.searchBoutiques")
+                                : `${selectedBoutiques.length} ${t("admin.events.boutiques.boutiquesSelected")}`}
                         </span>
                         <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>
@@ -86,7 +83,9 @@ export function BoutiqueMultiSelect({
                     <Card className="border-0 bg-transparent">
                         <CardContent className="p-0">
                             <div className="flex items-center justify-between p-3 border-b border-gray-600">
-                                <Label className="text-sm font-medium text-gray-300">{t('admin.events.boutiques.selectBoutiques')}</Label>
+                                <Label className="text-sm font-medium text-gray-300">
+                                    {t("admin.events.boutiques.selectBoutiques")}
+                                </Label>
                                 {selectedBoutiqueIds.length > 0 && (
                                     <Button
                                         variant="ghost"
@@ -94,20 +93,21 @@ export function BoutiqueMultiSelect({
                                         onClick={clearAll}
                                         className="h-auto p-1 text-xs text-red-400 hover:text-red-300"
                                     >
-                                        {t('admin.events.boutiques.clearAll')}
+                                        {t("admin.events.boutiques.clearAll")}
                                     </Button>
                                 )}
                             </div>
                             <ScrollArea className="h-60">
                                 <div className="p-2 space-y-3">
                                     {isLoading ? (
-                                        <div className="text-center py-4 text-gray-400">{t('admin.events.boutiques.loadingBoutiques')}</div>
+                                        <div className="text-center py-4 text-gray-400">
+                                            {t("admin.events.boutiques.loadingBoutiques")}
+                                        </div>
                                     ) : boutiques.length === 0 ? (
                                         <div className="text-center py-4 text-gray-400">
                                             {selectedMallIds.length === 0
-                                                ? t('admin.events.boutiques.selectMallsFirst')
-                                                : t('admin.events.boutiques.noBoutiquesFound')
-                                            }
+                                                ? t("admin.events.boutiques.selectMallsFirst")
+                                                : t("admin.events.boutiques.noBoutiquesFound")}
                                         </div>
                                     ) : (
                                         Object.entries(boutiquesByMall).map(([mallName, mallBoutiques]) => (
@@ -124,15 +124,20 @@ export function BoutiqueMultiSelect({
                                                         >
                                                             <Checkbox
                                                                 id={`boutique-${boutique.yboutiqueid}`}
-                                                                checked={selectedBoutiqueIds.includes(boutique.yboutiqueid)}
-                                                                onChange={() => handleBoutiqueToggle(boutique.yboutiqueid)}
+                                                                checked={selectedBoutiqueIds.includes(
+                                                                    boutique.yboutiqueid
+                                                                )}
+                                                                onChange={() =>
+                                                                    handleBoutiqueToggle(boutique.yboutiqueid)
+                                                                }
                                                             />
                                                             <div className="flex-1 min-w-0">
                                                                 <Label
                                                                     htmlFor={`boutique-${boutique.yboutiqueid}`}
                                                                     className="text-sm font-medium text-white cursor-pointer"
                                                                 >
-                                                                    {boutique.yboutiqueintitule || `Boutique ${boutique.yboutiquecode}`}
+                                                                    {boutique.yboutiqueintitule ||
+                                                                        `Boutique ${boutique.yboutiquecode}`}
                                                                 </Label>
                                                                 <p className="text-xs text-gray-400 truncate">
                                                                     {boutique.yboutiqueadressemall}

@@ -32,7 +32,7 @@ export default function UsersPage() {
   
   const { data, isLoading } = useUsers({
     page,
-    limit: 10,
+    limit: 8,
     search: search || undefined,
     role: roleFilter || undefined
   })
