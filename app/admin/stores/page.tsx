@@ -24,6 +24,7 @@ export default function StoresManagement() {
     const { data: user } = useAuth();
 
     const isAdmin = user?.app_metadata?.roles?.includes("admin");
+    const isStoreAdmin = user?.app_metadata?.roles?.includes("store_admin");
 
     const { data: stores, isLoading, isError, error } = useStores();
     const createStoreMutation = useCreateStore();
@@ -177,6 +178,8 @@ export default function StoresManagement() {
                                     <p className="text-gray-400 mb-6">
                                         {isAdmin
                                             ? t("admin.noStoresDescription")
+                                            : isStoreAdmin
+                                            ? "No stores are assigned to you for the current active events."
                                             : t("admin.noAssignedStoresDescription")}
                                     </p>
                                     {isAdmin && (
