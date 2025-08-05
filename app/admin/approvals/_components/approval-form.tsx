@@ -680,13 +680,16 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
         return null;
     };
 
-    // Check if product can be approved (at least one variant must be approved + event validation if event selected)
+    // Check if product can be approved (at least one variant must be approved + event validation if event selected + info action required)
     const canApproveProduct = () => {
         if (!product?.yvarprod) return false;
         
         // At least one variant must be approved
         const hasApprovedVariants = product.yvarprod.some((v: any) => v.yvarprodstatut === 'approved');
         if (!hasApprovedVariants) return false;
+        
+        // Info action is required
+        if (!formData.infoactionId) return false;
         
         // NEW LOGIC: Use the same filtering logic as the dropdown
         const getValidEventsForDesignerBoutique = (events: any[]) => {
@@ -726,7 +729,11 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
             return eventValidation?.isValid === true;
         }
         
-        // If no events are available, product can be approved without event selection
+        // If no events are available, product cannot be approved
+        if (!hasAvailableEvents) {
+            return false;
+        }
+        
         return true;
     };
 
@@ -736,6 +743,9 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
         
         const hasApprovedVariants = product.yvarprod.some((v: any) => v.yvarprodstatut === 'approved');
         if (!hasApprovedVariants) return "At least one variant must be approved first";
+        
+        // Info action is required
+        if (!formData.infoactionId) return "Info action must be selected";
         
         // NEW LOGIC: Use the same filtering logic as the dropdown
         const getValidEventsForDesignerBoutique = (events: any[]) => {
@@ -765,14 +775,14 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
         const availableEvents = [...validDesignerEvents, ...validBoutiqueEvents];
         const hasAvailableEvents = availableEvents.length > 0;
         
+        // If no events are available, product cannot be approved
+        if (!hasAvailableEvents) {
+            return "No events available - product cannot be approved without an event";
+        }
+        
         // If there are available events but none is selected, require event selection
         if (hasAvailableEvents && !formData.selectedEventId) {
             return "An event must be selected for approval";
-        }
-        
-        // If no events are available, show appropriate message
-        if (!hasAvailableEvents) {
-            return "No events with matching registration found for this designer/boutique combination";
         }
         
         if (formData.selectedEventId && eventValidation && !eventValidation.isValid) {
@@ -900,7 +910,7 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                             />
                                         </div>
                                         <div>
-                                            <Label className="text-gray-300">Info Action</Label>
+                                            <Label className="text-gray-300">Info Action *</Label>
                                             <SuperSelect
                                                 value={formData.infoactionId || "none"}
                                                 onValueChange={(value) =>
@@ -909,10 +919,16 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                                         value === "none" ? undefined : (value as number)
                                                     )
                                                 }
-                                                options={[{ value: "none", label: "No action" }, ...infoActionOptions]}
-                                                placeholder="Select info action"
-                                                className="bg-gray-700 border-gray-600"
+                                                options={[{ value: "none", label: "Select info action (required)" }, ...infoActionOptions]}
+                                                placeholder="Select info action (required)"
+                                                className={`bg-gray-700 border-gray-600 ${!formData.infoactionId ? 'border-red-500/50' : ''}`}
                                             />
+                                            {!formData.infoactionId && (
+                                                <div className="flex items-center gap-2 text-xs text-red-400 mt-1">
+                                                    <AlertTriangle className="h-3 w-3" />
+                                                    <span>Info action selection is required for product approval</span>
+                                                </div>
+                                            )}
                                         </div>
 
                                         {/* Event Selection Section */}
