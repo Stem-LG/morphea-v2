@@ -1,16 +1,22 @@
 "use client";
-import { useState } from "react";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/hooks/useAuth";
-import { Plus, Store } from "lucide-react";
-import { useStores } from "./_hooks/use-stores";
+import { Plus, Store, Calendar, Building2 } from "lucide-react";
+import { useQueryStates, parseAsInteger } from "nuqs";
+import { useEvents, getFirstActiveEvent } from "./_hooks/use-events";
+import { useMalls } from "./_hooks/use-malls";
+import { useFilteredStores } from "./_hooks/use-filtered-stores";
 import { useCreateStore, useUpdateStore, useDeleteStore } from "./_hooks/use-store-mutations";
 import { StoreCardSkeleton } from "./_components/store_card_skeleton";
 import { StoreCard } from "./_components/store_card";
 import { StoreDialog } from "./_components/store-dialog";
 import { DeleteConfirmationDialog } from "./_components/delete-confirmation-dialog";
+import { useState } from "react";
 
 interface Store {
     yboutiqueid: number;
@@ -26,7 +32,44 @@ export default function StoresManagement() {
     const isAdmin = user?.app_metadata?.roles?.includes("admin");
     const isStoreAdmin = user?.app_metadata?.roles?.includes("store_admin");
 
-    const { data: stores, isLoading, isError, error } = useStores();
+    // URL state for filters using nuqs
+    const [{ eventId: selectedEventId, mallId: selectedMallId }, setFilters] = useQueryStates({
+        eventId: parseAsInteger,
+        mallId: parseAsInteger
+    });
+
+    // Fetch data
+    const { data: events, isLoading: eventsLoading } = useEvents();
+    const { data: malls, isLoading: mallsLoading } = useMalls();
+    
+    // Get user role for the filtered stores hook
+    const userRole = isAdmin ? "admin" : isStoreAdmin ? "store_admin" : "other";
+    
+    const { data: stores, isLoading, isError, error } = useFilteredStores({
+        eventId: selectedEventId,
+        mallId: selectedMallId,
+        userRole,
+        userId: user?.id
+    });
+
+    // Set default event on load
+    useEffect(() => {
+        if (events && events.length > 0 && !selectedEventId) {
+            if (isStoreAdmin) {
+                // For store admins, default to first active event
+                const activeEvent = getFirstActiveEvent(events);
+                if (activeEvent) {
+                    setFilters({ eventId: activeEvent.yeventid });
+                }
+            } else if (isAdmin) {
+                // For admins, optionally set to first active event or leave unselected
+                const activeEvent = getFirstActiveEvent(events);
+                if (activeEvent) {
+                    setFilters({ eventId: activeEvent.yeventid });
+                }
+            }
+        }
+    }, [events, selectedEventId, isStoreAdmin, isAdmin, setFilters]);
     const createStoreMutation = useCreateStore();
     const updateStoreMutation = useUpdateStore();
     const deleteStoreMutation = useDeleteStore();
@@ -121,6 +164,84 @@ export default function StoresManagement() {
                 )}
             </div>
 
+            {/* Filters */}
+            <Card className="bg-gradient-to-br from-gray-900/50 to-gray-800/30 border-gray-700/50 backdrop-blur-sm">
+                <CardContent className="p-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* Event Selector */}
+                        <div className="space-y-2">
+                            <Label className="text-white flex items-center gap-2">
+                                <Calendar className="h-4 w-4 text-morpheus-gold-light" />
+                                {t("admin.selectEvent")} {isStoreAdmin && "*"}
+                            </Label>
+                            <Select
+                                value={selectedEventId?.toString() || "all"}
+                                onValueChange={(value) => setFilters({ eventId: value === "all" ? null : parseInt(value) })}
+                                disabled={eventsLoading}
+                            >
+                                <SelectTrigger className="bg-gray-800/50 border-gray-600 text-white focus:border-morpheus-gold-light">
+                                    <SelectValue
+                                        placeholder={eventsLoading ? t("admin.loadingEvents") : t("admin.selectEvent")}
+                                    />
+                                </SelectTrigger>
+                                <SelectContent className="bg-gray-800 border-gray-600">
+                                    {isAdmin && (
+                                        <SelectItem value="all" className="text-white hover:bg-gray-700 focus:bg-gray-700">
+                                            {t("admin.allEvents")}
+                                        </SelectItem>
+                                    )}
+                                    {events?.map((event) => (
+                                        <SelectItem
+                                            key={event.yeventid}
+                                            value={event.yeventid.toString()}
+                                            className="text-white hover:bg-gray-700 focus:bg-gray-700"
+                                        >
+                                            {event.yeventintitule}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            {isStoreAdmin && !selectedEventId && (
+                                <p className="text-yellow-400 text-sm">{t("admin.eventRequiredForDesigners")}</p>
+                            )}
+                        </div>
+
+                        {/* Mall Selector */}
+                        <div className="space-y-2">
+                            <Label className="text-white flex items-center gap-2">
+                                <Building2 className="h-4 w-4 text-morpheus-gold-light" />
+                                {t("admin.selectMall")}
+                            </Label>
+                            <Select
+                                value={selectedMallId?.toString() || "all"}
+                                onValueChange={(value) => setFilters({ mallId: value === "all" ? null : parseInt(value) })}
+                                disabled={mallsLoading}
+                            >
+                                <SelectTrigger className="bg-gray-800/50 border-gray-600 text-white focus:border-morpheus-gold-light">
+                                    <SelectValue
+                                        placeholder={mallsLoading ? t("admin.loadingMalls") : t("admin.allMalls")}
+                                    />
+                                </SelectTrigger>
+                                <SelectContent className="bg-gray-800 border-gray-600">
+                                    <SelectItem value="all" className="text-white hover:bg-gray-700 focus:bg-gray-700">
+                                        {t("admin.allMalls")}
+                                    </SelectItem>
+                                    {malls?.map((mall) => (
+                                        <SelectItem
+                                            key={mall.ymallid}
+                                            value={mall.ymallid.toString()}
+                                            className="text-white hover:bg-gray-700 focus:bg-gray-700"
+                                        >
+                                            {mall.ymallintitule}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+
             {/* Content */}
             <div className="space-y-6">
                 {/* Loading State */}
@@ -179,7 +300,9 @@ export default function StoresManagement() {
                                         {isAdmin
                                             ? t("admin.noStoresDescription")
                                             : isStoreAdmin
-                                            ? "No stores are assigned to you for the current active events."
+                                            ? selectedEventId
+                                                ? "No stores are assigned to you for the selected event and mall."
+                                                : "Please select an event to view your assigned stores."
                                             : t("admin.noAssignedStoresDescription")}
                                     </p>
                                     {isAdmin && (

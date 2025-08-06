@@ -2,8 +2,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/hooks/useAuth";
-import { MapPin, Settings, Store, Edit, Trash2 } from "lucide-react";
+import { MapPin, Settings, Store, Edit, Trash2, User } from "lucide-react";
 import Link from "next/link";
+import { useQueryStates, parseAsInteger } from "nuqs";
 
 interface StoreCardProps {
     store: any;
@@ -17,6 +18,22 @@ export function StoreCard({ store, onEdit, onDelete }: StoreCardProps) {
     const { data: user } = useAuth();
 
     const isAdmin = user?.app_metadata?.roles?.includes("admin");
+    
+    // Get current URL state to pass to store page
+    const [{ eventId, mallId }] = useQueryStates({
+        eventId: parseAsInteger,
+        mallId: parseAsInteger
+    });
+    
+    // Build URL with current filters
+    const storeUrl = `/admin/stores/${store.yboutiqueid}${
+        eventId || mallId
+            ? `?${new URLSearchParams({
+                ...(eventId && { eventId: eventId.toString() }),
+                ...(mallId && { mallId: mallId.toString() })
+            }).toString()}`
+            : ''
+    }`;
 
     const handleEdit = (e: React.MouseEvent) => {
         e.preventDefault();
@@ -67,9 +84,22 @@ export function StoreCard({ store, onEdit, onDelete }: StoreCardProps) {
                     <MapPin className="h-4 w-4 text-morpheus-gold-light" />
                     <span className="text-sm">{store.yboutiqueadressemall || t("admin.noAddress")}</span>
                 </div>
+                
+                {/* Show designer info for admins when available */}
+                {isAdmin && store.designer_name && (
+                    <div className="flex items-center gap-2 text-gray-300">
+                        <User className="h-4 w-4 text-blue-400" />
+                        <div className="text-sm">
+                            <span className="font-medium text-blue-300">{store.designer_name}</span>
+                            {store.designer_contact && (
+                                <div className="text-xs text-gray-400">{store.designer_contact}</div>
+                            )}
+                        </div>
+                    </div>
+                )}
             </CardContent>
             <CardFooter>
-                <Link href={`/admin/stores/${store.yboutiqueid}`} className="w-full">
+                <Link href={storeUrl} className="w-full">
                     <Button
                         className="w-full bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-morpheus-gold-dark hover:to-morpheus-gold-light text-white font-semibold transition-all duration-300 hover:scale-105"
                         size="sm"

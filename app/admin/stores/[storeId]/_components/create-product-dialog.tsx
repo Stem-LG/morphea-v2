@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
+import { useQueryState } from "nuqs";
+import { useAuth } from "@/hooks/useAuth";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,6 +26,9 @@ import {
     FileText,
     Info,
     Loader2,
+    CheckCircle,
+    XCircle,
+    Clock,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -48,6 +53,7 @@ interface ProductVariant {
     videos: (File | { ymediaid: number; ymediaurl: string; ymediaintitule: string })[];
     models3d: (File | { yobjet3did: number; yobjet3durl: string })[];
     isDeleted?: boolean; // Mark for deletion
+    status?: 'approved' | 'not_approved' | 'rejected'; // Variant status
 }
 
 interface CreateProductDialogProps {
@@ -59,6 +65,17 @@ interface CreateProductDialogProps {
 export function CreateProductDialog({ isOpen, onClose, productId }: CreateProductDialogProps) {
     const params = useParams();
     const storeId = parseInt(params.storeId as string);
+    const { data: user } = useAuth();
+    
+    const isAdmin = user?.app_metadata?.roles?.includes("admin");
+    const isStoreAdmin = user?.app_metadata?.roles?.includes("store_admin");
+    
+    // Get event context from URL parameters
+    const [selectedEventId] = useQueryState("eventId", {
+        defaultValue: null,
+        parse: (value) => value ? parseInt(value) : null,
+        serialize: (value) => value?.toString() || ""
+    });
 
     // Form state
     const [productCode, setProductCode] = useState("");
@@ -141,6 +158,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                 images: variant.images || [],
                 videos: variant.videos || [],
                 models3d: variant.models3d || [],
+                status: variant.yvarprodstatut || 'not_approved',
             }));
 
             setVariants(
@@ -155,6 +173,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                               images: [],
                               videos: [],
                               models3d: [],
+                              status: 'not_approved',
                           },
                       ]
             );
@@ -174,6 +193,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                     images: [],
                     videos: [],
                     models3d: [],
+                    status: 'not_approved',
                 },
             ]);
         }
@@ -208,6 +228,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
             images: [],
             videos: [],
             models3d: [],
+            status: 'not_approved',
         };
         setVariants([...variants, newVariant]);
     };
@@ -286,6 +307,51 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
         }
     };
 
+    // Helper function to check if variant can be edited
+    const canEditVariant = (variant: ProductVariant) => {
+        if (isAdmin) {
+            // Admin can edit everything except rejected variants
+            return variant.status !== 'rejected';
+        }
+        
+        if (isStoreAdmin) {
+            // Store admin can only edit pending/not_approved variants
+            return variant.status === 'not_approved' || !variant.status;
+        }
+        
+        return false;
+    };
+
+    // Helper function to get variant status display
+    const getVariantStatusDisplay = (variant: ProductVariant) => {
+        const status = variant.status || 'not_approved';
+        const statusConfig = {
+            approved: {
+                icon: CheckCircle,
+                color: "text-green-400",
+                bgColor: "bg-green-500/20",
+                borderColor: "border-green-500/30",
+                label: "Approved"
+            },
+            rejected: {
+                icon: XCircle,
+                color: "text-red-400",
+                bgColor: "bg-red-500/20",
+                borderColor: "border-red-500/30",
+                label: "Rejected"
+            },
+            not_approved: {
+                icon: Clock,
+                color: "text-yellow-400",
+                bgColor: "bg-yellow-500/20",
+                borderColor: "border-yellow-500/30",
+                label: "Pending"
+            }
+        };
+        
+        return statusConfig[status as keyof typeof statusConfig] || statusConfig.not_approved;
+    };
+
     const handleSubmit = async () => {
         if (!productName || !shortDescription || !fullDescription) {
             toast.error("Please fill in all required product fields");
@@ -294,6 +360,11 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
 
         if (!designer) {
             toast.error("Designer information not found");
+            return;
+        }
+
+        if (!selectedEventId) {
+            toast.error("Event context is required. Please navigate from the stores page with an event selected.");
             return;
         }
 
@@ -335,6 +406,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                 // Create new product
                 await createProductMutation.mutateAsync({
                     storeId,
+                    eventId: selectedEventId,
                     designerId: designer.ydesignid,
                     categoryId,
                     productCode: productCode || undefined,
@@ -680,14 +752,35 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                         </div>
                                     </CardHeader>
                                     <CardContent className="space-y-4">
-                                        {variants.map((variant, index) => (
-                                            <Card key={variant.id} className="bg-gray-700/30 border-gray-600/50">
+                                        {variants.map((variant, index) => {
+                                            const canEdit = canEditVariant(variant);
+                                            const statusDisplay = getVariantStatusDisplay(variant);
+                                            const StatusIcon = statusDisplay.icon;
+                                            
+                                            return (
+                                            <Card key={variant.id} className={`bg-gray-700/30 border-gray-600/50 ${!canEdit ? 'opacity-75' : ''}`}>
                                                 <CardHeader className="pb-3">
                                                     <div className="flex items-center justify-between">
-                                                        <CardTitle className="text-base text-white">
-                                                            Variant {index + 1}
-                                                        </CardTitle>
-                                                        {variants.length > 1 && (
+                                                        <div className="flex items-center gap-3">
+                                                            <CardTitle className="text-base text-white">
+                                                                Variant {index + 1}
+                                                            </CardTitle>
+                                                            {variant.yvarprodid && (
+                                                                <Badge
+                                                                    variant="secondary"
+                                                                    className={`${statusDisplay.bgColor} ${statusDisplay.color} ${statusDisplay.borderColor} flex items-center gap-1 text-xs`}
+                                                                >
+                                                                    <StatusIcon className="h-3 w-3" />
+                                                                    {statusDisplay.label}
+                                                                </Badge>
+                                                            )}
+                                                            {!canEdit && variant.yvarprodid && (
+                                                                <Badge variant="secondary" className="bg-gray-500/20 text-gray-400 border-gray-500/30 text-xs">
+                                                                    Read Only
+                                                                </Badge>
+                                                            )}
+                                                        </div>
+                                                        {variants.length > 1 && canEdit && (
                                                             <Button
                                                                 onClick={() => handleRemoveVariant(variant.id)}
                                                                 size="sm"
@@ -716,6 +809,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                                 }
                                                                 placeholder="Enter variant name"
                                                                 className="mt-1 bg-gray-600/50 border-gray-500 text-white"
+                                                                disabled={!canEdit}
                                                             />
                                                         </div>
                                                         <div>
@@ -736,6 +830,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                                 }
                                                                 placeholder="Auto-generated if empty"
                                                                 className="mt-1 bg-gray-600/50 border-gray-500 text-white"
+                                                                disabled={!canEdit}
                                                             />
                                                         </div>
                                                     </div>
@@ -759,17 +854,19 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                                     }
                                                                     options={colorOptions}
                                                                     placeholder="Select color"
-                                                                    disabled={colorsLoading}
+                                                                    disabled={colorsLoading || !canEdit}
                                                                     className="flex-1"
                                                                 />
-                                                                <Button
-                                                                    onClick={() => setShowColorForm(!showColorForm)}
-                                                                    size="sm"
-                                                                    variant="outline"
-                                                                    className="border-gray-600 text-gray-300 hover:bg-gray-700"
-                                                                >
-                                                                    <Plus className="h-3 w-3" />
-                                                                </Button>
+                                                                {canEdit && (
+                                                                    <Button
+                                                                        onClick={() => setShowColorForm(!showColorForm)}
+                                                                        size="sm"
+                                                                        variant="outline"
+                                                                        className="border-gray-600 text-gray-300 hover:bg-gray-700"
+                                                                    >
+                                                                        <Plus className="h-3 w-3" />
+                                                                    </Button>
+                                                                )}
                                                             </div>
                                                         </div>
 
@@ -787,24 +884,27 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                                     }
                                                                     options={sizeOptions}
                                                                     placeholder="Select size"
-                                                                    disabled={sizesLoading}
+                                                                    disabled={sizesLoading || !canEdit}
                                                                     className="flex-1"
                                                                 />
-                                                                <Button
-                                                                    onClick={() => setShowSizeForm(!showSizeForm)}
-                                                                    size="sm"
-                                                                    variant="outline"
-                                                                    className="border-gray-600 text-gray-300 hover:bg-gray-700"
-                                                                >
-                                                                    <Plus className="h-3 w-3" />
-                                                                </Button>
+                                                                {canEdit && (
+                                                                    <Button
+                                                                        onClick={() => setShowSizeForm(!showSizeForm)}
+                                                                        size="sm"
+                                                                        variant="outline"
+                                                                        className="border-gray-600 text-gray-300 hover:bg-gray-700"
+                                                                    >
+                                                                        <Plus className="h-3 w-3" />
+                                                                    </Button>
+                                                                )}
                                                             </div>
                                                         </div>
                                                     </div>
 
                                                     {/* Media Upload */}
-                                                    <div className="space-y-3">
-                                                        <Label className="text-gray-300">Media Files</Label>
+                                                    {canEdit && (
+                                                        <div className="space-y-3">
+                                                            <Label className="text-gray-300">Media Files</Label>
 
                                                         {/* Images */}
                                                         <div>
@@ -995,10 +1095,87 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                                 ))}
                                                             </div>
                                                         </div>
-                                                    </div>
+                                                        </div>
+                                                    )}
+                                                    
+                                                    {/* Read-only media display for non-editable variants */}
+                                                    {!canEdit && variant.yvarprodid && (
+                                                        <div className="space-y-3">
+                                                            <Label className="text-gray-300">Media Files (Read Only)</Label>
+                                                            
+                                                            {/* Display existing images */}
+                                                            {variant.images.length > 0 && (
+                                                                <div>
+                                                                    <div className="flex items-center gap-2 mb-2">
+                                                                        <Image className="h-4 w-4 text-blue-400" />
+                                                                        <span className="text-sm text-gray-300">Images</span>
+                                                                    </div>
+                                                                    <div className="flex flex-wrap gap-2">
+                                                                        {variant.images.map((file, fileIndex) => (
+                                                                            <Badge
+                                                                                key={fileIndex}
+                                                                                variant="secondary"
+                                                                                className="bg-blue-500/20 text-blue-300 border-blue-500/30"
+                                                                            >
+                                                                                {file instanceof File
+                                                                                    ? file.name
+                                                                                    : file.ymediaintitule}
+                                                                            </Badge>
+                                                                        ))}
+                                                                    </div>
+                                                                </div>
+                                                            )}
+                                                            
+                                                            {/* Display existing videos */}
+                                                            {variant.videos.length > 0 && (
+                                                                <div>
+                                                                    <div className="flex items-center gap-2 mb-2">
+                                                                        <Video className="h-4 w-4 text-green-400" />
+                                                                        <span className="text-sm text-gray-300">Videos</span>
+                                                                    </div>
+                                                                    <div className="flex flex-wrap gap-2">
+                                                                        {variant.videos.map((file, fileIndex) => (
+                                                                            <Badge
+                                                                                key={fileIndex}
+                                                                                variant="secondary"
+                                                                                className="bg-green-500/20 text-green-300 border-green-500/30"
+                                                                            >
+                                                                                {file instanceof File
+                                                                                    ? file.name
+                                                                                    : file.ymediaintitule}
+                                                                            </Badge>
+                                                                        ))}
+                                                                    </div>
+                                                                </div>
+                                                            )}
+                                                            
+                                                            {/* Display existing 3D models */}
+                                                            {variant.models3d.length > 0 && (
+                                                                <div>
+                                                                    <div className="flex items-center gap-2 mb-2">
+                                                                        <Box className="h-4 w-4 text-purple-400" />
+                                                                        <span className="text-sm text-gray-300">3D Models</span>
+                                                                    </div>
+                                                                    <div className="flex flex-wrap gap-2">
+                                                                        {variant.models3d.map((file, fileIndex) => (
+                                                                            <Badge
+                                                                                key={fileIndex}
+                                                                                variant="secondary"
+                                                                                className="bg-purple-500/20 text-purple-300 border-purple-500/30"
+                                                                            >
+                                                                                {file instanceof File
+                                                                                    ? file.name
+                                                                                    : `3D Model ${fileIndex + 1}`}
+                                                                            </Badge>
+                                                                        ))}
+                                                                    </div>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    )}
                                                 </CardContent>
                                             </Card>
-                                        ))}
+                                        )})}
                                     </CardContent>
                                 </Card>
                             </div>

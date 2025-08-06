@@ -37,11 +37,7 @@ export function ModernSidebar({ isOpen, isCollapsed, onToggle, onCollapse, userR
 
     // Toggle dropdown state
     const toggleDropdown = (itemId: string) => {
-        setOpenDropdowns(prev =>
-            prev.includes(itemId)
-                ? prev.filter(id => id !== itemId)
-                : [...prev, itemId]
-        );
+        setOpenDropdowns((prev) => (prev.includes(itemId) ? prev.filter((id) => id !== itemId) : [...prev, itemId]));
     };
 
     // Define menu items based on user role
@@ -66,7 +62,7 @@ export function ModernSidebar({ isOpen, isCollapsed, onToggle, onCollapse, userR
                 label: "Designer Assignments",
                 icon: Users,
                 href: "/admin/designer-assignments",
-                roles: ["admin", "store_admin"],
+                roles: ["admin"],
             },
             {
                 id: "boutiques",
@@ -235,7 +231,11 @@ export function ModernSidebar({ isOpen, isCollapsed, onToggle, onCollapse, userR
                                         />
                                         {!isCollapsed && (
                                             <>
-                                                <span className={`flex-1 text-left ${hasActiveChild ? "text-morpheus-gold-light font-medium" : ""}`}>
+                                                <span
+                                                    className={`flex-1 text-left ${
+                                                        hasActiveChild ? "text-morpheus-gold-light font-medium" : ""
+                                                    }`}
+                                                >
                                                     {item.label}
                                                 </span>
                                                 {isDropdownOpen ? (
@@ -252,7 +252,7 @@ export function ModernSidebar({ isOpen, isCollapsed, onToggle, onCollapse, userR
                                         <div className="border-l border-slate-600/50 ml-4">
                                             {item.children.map((child: any, childKey: number) => {
                                                 const ChildIcon = child.icon;
-                                                
+
                                                 // More precise active state logic for children
                                                 const isChildActive = (() => {
                                                     if (child.href === "/admin") {
@@ -278,13 +278,22 @@ export function ModernSidebar({ isOpen, isCollapsed, onToggle, onCollapse, userR
                                                         }`}
                                                         asChild
                                                     >
-                                                        <Link href={child.href} className="flex items-center w-full overflow-hidden">
+                                                        <Link
+                                                            href={child.href}
+                                                            className="flex items-center w-full overflow-hidden"
+                                                        >
                                                             <ChildIcon
                                                                 className={`h-4 w-4 mr-3 flex-shrink-0 ${
                                                                     isChildActive ? "text-morpheus-gold-light" : ""
                                                                 }`}
                                                             />
-                                                            <span className={`truncate ${isChildActive ? "text-morpheus-gold-light font-medium" : ""}`}>
+                                                            <span
+                                                                className={`truncate ${
+                                                                    isChildActive
+                                                                        ? "text-morpheus-gold-light font-medium"
+                                                                        : ""
+                                                                }`}
+                                                            >
                                                                 {child.label}
                                                             </span>
                                                         </Link>
