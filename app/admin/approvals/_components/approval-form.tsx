@@ -14,7 +14,6 @@ import {
     X,
     AlertTriangle,
     Package,
-    Box,
     Image as ImageIcon,
     Loader2,
     Calendar,
@@ -183,7 +182,7 @@ function VariantCard({ variant, onApprove, onReject, isLoading }: VariantCardPro
                     <div className="space-y-1">
                         <div className="text-xs text-blue-400 font-medium">Images ({images.length})</div>
                         <div className="grid gap-2">
-                            {images.map((image, index) => (
+                            {images.map((image) => (
                                 <div
                                     key={image.ymediaid}
                                     className="aspect-video bg-gray-800 rounded-lg overflow-hidden"
@@ -215,7 +214,7 @@ function VariantCard({ variant, onApprove, onReject, isLoading }: VariantCardPro
                     <div className="space-y-1">
                         <div className="text-xs text-green-400 font-medium">Videos ({videos.length})</div>
                         <div className="grid gap-2">
-                            {videos.map((video, index) => (
+                            {videos.map((video) => (
                                 <div
                                     key={video.ymediaid}
                                     className="aspect-video bg-gray-800 rounded-lg overflow-hidden"

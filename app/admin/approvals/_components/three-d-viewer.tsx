@@ -1,9 +1,8 @@
 "use client";
 
-import { useState, useMemo, useEffect, Suspense } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, useGLTF, Html } from "@react-three/drei";
-import { Loader2 } from "lucide-react";
 import * as THREE from "three";
 
 interface Model3DViewerProps {
