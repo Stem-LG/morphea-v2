@@ -322,6 +322,25 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
         return false;
     };
 
+    // Helper function to check if product info can be edited
+    const canEditProductInfo = () => {
+        if (!isEditMode || !productDetails?.product) return true; // Allow editing for new products
+        
+        const productStatus = productDetails.product.yprodstatut;
+        
+        if (isAdmin) {
+            // Admin can edit everything except rejected products
+            return productStatus !== 'rejected';
+        }
+        
+        if (isStoreAdmin) {
+            // Store admin can only edit pending products, but can add variants to approved products
+            return productStatus === 'not_approved';
+        }
+        
+        return false;
+    };
+
     // Helper function to get variant status display
     const getVariantStatusDisplay = (variant: ProductVariant) => {
         const status = variant.status || 'not_approved';
@@ -368,9 +387,10 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
             return;
         }
 
-        // Validate variants
+        // Validate variants - only validate editable variants
         for (const variant of variants) {
-            if (!variant.name || !variant.colorId || !variant.sizeId) {
+            const canEdit = canEditVariant(variant);
+            if (canEdit && (!variant.name || !variant.colorId || !variant.sizeId)) {
                 toast.error("Please complete all variant information");
                 return;
             }
@@ -485,6 +505,15 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent className="space-y-4">
+                                        {!canEditProductInfo() && isEditMode && (
+                                            <div className="mb-4 p-3 bg-yellow-900/20 border border-yellow-700/50 rounded-lg">
+                                                <div className="flex items-center gap-2 text-yellow-300 text-sm">
+                                                    <Info className="h-4 w-4" />
+                                                    Product information is read-only for approved products. You can still add new variants.
+                                                </div>
+                                            </div>
+                                        )}
+                                        
                                         <div className="grid grid-cols-2 gap-4">
                                             <div>
                                                 <Label htmlFor="category" className="text-gray-300">
@@ -495,7 +524,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                     onValueChange={(value) => setCategoryId(value as number)}
                                                     options={categoryOptions}
                                                     placeholder="Select category"
-                                                    disabled={categoriesLoading}
+                                                    disabled={categoriesLoading || !canEditProductInfo()}
                                                     className="mt-1"
                                                 />
                                             </div>
@@ -509,6 +538,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                     onChange={(e) => setProductCode(e.target.value)}
                                                     placeholder="Auto-generated if empty"
                                                     className="mt-1 bg-gray-700/50 border-gray-600 text-white"
+                                                    disabled={!canEditProductInfo()}
                                                 />
                                             </div>
                                         </div>
@@ -524,6 +554,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                 placeholder="Enter product name"
                                                 className="mt-1 bg-gray-700/50 border-gray-600 text-white"
                                                 required
+                                                disabled={!canEditProductInfo()}
                                             />
                                         </div>
 
@@ -542,6 +573,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                 placeholder="Brief description for tooltips"
                                                 className="mt-1 bg-gray-700/50 border-gray-600 text-white"
                                                 required
+                                                disabled={!canEditProductInfo()}
                                             />
                                         </div>
 
@@ -556,6 +588,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                 placeholder="Detailed product description"
                                                 className="mt-1 bg-gray-700/50 border-gray-600 text-white min-h-[100px]"
                                                 required
+                                                disabled={!canEditProductInfo()}
                                             />
                                         </div>
                                     </CardContent>
