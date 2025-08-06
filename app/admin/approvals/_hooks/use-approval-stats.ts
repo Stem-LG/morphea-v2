@@ -16,12 +16,12 @@ export function useApprovalStats() {
                 .select("*", { count: "exact", head: true })
                 .eq("yprodstatut", "not_approved");
 
-            // Get products needing revision
-            const { count: needsRevision } = await supabase
+            // Get rejected products
+            const { count: rejected } = await supabase
                 .schema("morpheus")
                 .from("yprod")
                 .select("*", { count: "exact", head: true })
-                .eq("yprodstatut", "needs_revision");
+                .eq("yprodstatut", "rejected");
 
             // Get approved products with non-approved variants
             const { data: approvedProducts } = await supabase
@@ -38,9 +38,9 @@ export function useApprovalStats() {
 
             return {
                 pending: pending || 0,
-                needsRevision: needsRevision || 0,
+                rejected: rejected || 0,
                 variantApprovals,
-                total: (pending || 0) + (needsRevision || 0) + variantApprovals
+                total: (pending || 0) + (rejected || 0) + variantApprovals
             };
         },
         staleTime: 5 * 60 * 1000, // 5 minutes

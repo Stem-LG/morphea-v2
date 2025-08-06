@@ -32,8 +32,8 @@ export function ApprovalCard({
         const variants = product.yvarprod || [];
         const pendingVariants = variants.filter((v: any) => v.yvarprodstatut === 'not_approved').length;
         const approvedVariants = variants.filter((v: any) => v.yvarprodstatut === 'approved').length;
-        const revisionVariants = variants.filter((v: any) => v.yvarprodstatut === 'needs_revision').length;
-        const deniedVariants = variants.filter((v: any) => v.yvarprodstatut === 'denied').length;
+        const revisionVariants = variants.filter((v: any) => v.yvarprodstatut === 'rejected').length;
+        const rejectedVariants = variants.filter((v: any) => v.yvarprodstatut === 'rejected').length;
 
         if (product.yprodstatut === 'not_approved') {
             return {
@@ -52,7 +52,7 @@ export function ApprovalCard({
                 ),
                 color: 'border-yellow-500/30'
             };
-        } else if (product.yprodstatut === 'needs_revision') {
+        } else if (product.yprodstatut === 'rejected') {
             return {
                 badge: (
                     <div className="flex flex-col items-end gap-1">
@@ -88,9 +88,9 @@ export function ApprovalCard({
                                     {revisionVariants} revision
                                 </Badge>
                             )}
-                            {deniedVariants > 0 && (
+                            {rejectedVariants > 0 && (
                                 <Badge variant="secondary" className="bg-red-500/20 text-red-300 border-red-500/30 text-xs">
-                                    {deniedVariants} denied
+                                    {rejectedVariants} rejected
                                 </Badge>
                             )}
                             {approvedVariants > 0 && (
@@ -182,8 +182,8 @@ export function ApprovalCard({
     const variantCounts = {
         pending: variants.filter((v: any) => v.yvarprodstatut === 'not_approved').length,
         approved: variants.filter((v: any) => v.yvarprodstatut === 'approved').length,
-        revision: variants.filter((v: any) => v.yvarprodstatut === 'needs_revision').length,
-        denied: variants.filter((v: any) => v.yvarprodstatut === 'denied').length,
+        revision: variants.filter((v: any) => v.yvarprodstatut === 'rejected').length,
+        rejected: variants.filter((v: any) => v.yvarprodstatut === 'rejected').length,
     };
 
     return (
@@ -241,9 +241,9 @@ export function ApprovalCard({
                                     {variantCounts.revision} revision
                                 </Badge>
                             )}
-                            {variantCounts.denied > 0 && (
+                            {variantCounts.rejected > 0 && (
                                 <Badge variant="secondary" className="bg-red-500/20 text-red-300 border-red-500/30 text-xs">
-                                    {variantCounts.denied} denied
+                                    {variantCounts.rejected} rejected
                                 </Badge>
                             )}
                             {variantCounts.approved > 0 && (

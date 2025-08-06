@@ -154,7 +154,7 @@ export function useApprovalOperations() {
                 .schema('morpheus')
                 .from('yprod')
                 .update({
-                    yprodstatut: 'needs_revision',
+                    yprodstatut: 'rejected',
                     sysdate: currentTime,
                     sysaction: 'update'
                 })
@@ -273,7 +273,7 @@ export function useApprovalOperations() {
                 .schema('morpheus')
                 .from('yprod')
                 .update({
-                    yprodstatut: 'denied',
+                    yprodstatut: 'rejected',
                     sysdate: currentTime,
                     sysaction: 'update'
                 })

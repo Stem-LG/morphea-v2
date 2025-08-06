@@ -63,11 +63,11 @@ export function useApprovals({
                 // Products that are approved but have non-approved variants
                 query = query.eq("yprodstatut", "approved");
                 // Note: We'll filter variants in the transformation step
-            } else if (approvalType === "needs_revision") {
-                query = query.eq("yprodstatut", "needs_revision");
+            } else if (approvalType === "rejected") {
+                query = query.eq("yprodstatut", "rejected");
             } else if (approvalType === "all") {
                 // All products that need some form of approval
-                query = query.in("yprodstatut", ["not_approved", "needs_revision", "approved"]);
+                query = query.in("yprodstatut", ["not_approved", "rejected", "approved"]);
             }
 
             // Apply category filter if provided
@@ -122,7 +122,7 @@ export function useApprovals({
                 // For "all", include products that need approval OR have variants needing approval
                 transformedData = transformedData.filter(product =>
                     product.yprodstatut === "not_approved" ||
-                    product.yprodstatut === "needs_revision" ||
+                    product.yprodstatut === "rejected" ||
                     (product.yprodstatut === "approved" && product.yvarprod?.some((variant: any) => variant.yvarprodstatut === "not_approved"))
                 );
             }

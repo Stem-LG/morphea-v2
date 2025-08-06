@@ -82,7 +82,7 @@ export default function ApprovalsPage() {
         { value: "all", label: "All Products" },
         { value: "not_approved", label: "New Products" },
         { value: "variant_approval", label: "Variant Approvals" },
-        { value: "needs_revision", label: "Needs Revision" }
+        { value: "rejected", label: "Rejected" }
     ];
 
     const categoryOptions = categories?.map(cat => ({
@@ -164,8 +164,7 @@ export default function ApprovalsPage() {
         const variants = product.yvarprod || [];
         const pendingVariants = variants.filter(v => v.yvarprodstatut === 'not_approved').length;
         const approvedVariants = variants.filter(v => v.yvarprodstatut === 'approved').length;
-        const revisionVariants = variants.filter(v => v.yvarprodstatut === 'needs_revision').length;
-        const deniedVariants = variants.filter(v => v.yvarprodstatut === 'denied').length;
+        const rejectedVariants = variants.filter(v => v.yvarprodstatut === 'rejected').length;
 
         if (product.yprodstatut === 'not_approved') {
             return (
@@ -181,12 +180,12 @@ export default function ApprovalsPage() {
                     )}
                 </div>
             );
-        } else if (product.yprodstatut === 'needs_revision') {
+        } else if (product.yprodstatut === 'rejected') {
             return (
                 <div className="flex items-center gap-2">
-                    <Badge variant="secondary" className="bg-orange-500/20 text-orange-300 border-orange-500/30">
+                    <Badge variant="secondary" className="bg-red-500/20 text-red-300 border-red-500/30">
                         <AlertTriangle className="h-3 w-3 mr-1" />
-                        Needs Revision
+                        Rejected
                     </Badge>
                     {variants.length > 0 && (
                         <Badge variant="secondary" className="bg-gray-500/20 text-gray-300 border-gray-500/30 text-xs">
@@ -195,7 +194,7 @@ export default function ApprovalsPage() {
                     )}
                 </div>
             );
-        } else if (pendingVariants > 0 || revisionVariants > 0) {
+        } else if (pendingVariants > 0 || rejectedVariants > 0) {
             return (
                 <div className="flex items-center gap-2">
                     <Badge variant="secondary" className="bg-blue-500/20 text-blue-300 border-blue-500/30">
@@ -374,11 +373,11 @@ export default function ApprovalsPage() {
                     <Card className="bg-gradient-to-br from-gray-900/50 to-gray-800/30 border-gray-700/50 backdrop-blur-sm">
                         <CardContent className="p-4">
                             <div className="flex items-center gap-2 mb-2">
-                                <AlertTriangle className="h-5 w-5 text-orange-400" />
-                                <span className="text-sm font-medium text-gray-300">Needs Revision</span>
+                                <AlertTriangle className="h-5 w-5 text-red-400" />
+                                <span className="text-sm font-medium text-gray-300">Rejected</span>
                             </div>
                             <div className="text-2xl font-bold text-white">
-                                {stats.needsRevision || 0}
+                                {stats.rejected || 0}
                             </div>
                         </CardContent>
                     </Card>
