@@ -20,7 +20,8 @@ import {
     ArrowLeft,
     CheckCircle,
     XCircle,
-    Clock
+    Clock,
+    AlertTriangle
 } from "lucide-react";
 import { ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
@@ -29,6 +30,7 @@ import { useStore } from "./_hooks/use-store";
 import { useProducts } from "./_hooks/use-products";
 import { useCategories } from "./_hooks/use-categories";
 import { CreateProductDialog } from "./_components/create-product-dialog";
+import { ProductViewDialog } from "./_components/product-view-dialog";
 
 // Let Supabase infer the types automatically
 type Product = any;
@@ -55,6 +57,8 @@ export default function StoreDetails() {
     // Dialog state
     const [isCreateProductDialogOpen, setIsCreateProductDialogOpen] = useState(false);
     const [editingProductId, setEditingProductId] = useState<number | null>(null);
+    const [isProductViewDialogOpen, setIsProductViewDialogOpen] = useState(false);
+    const [viewingProductId, setViewingProductId] = useState<number | null>(null);
     
     const perPage = 10;
     const currentPage = page;
@@ -156,20 +160,41 @@ export default function StoreDetails() {
     };
 
     const handleViewProduct = (product: Product) => {
-        console.log("View product:", product);
-        // TODO: Implement view product functionality
+        setViewingProductId(product.yprodid);
+        setIsProductViewDialogOpen(true);
+    };
+
+    const handleCloseViewDialog = () => {
+        setIsProductViewDialogOpen(false);
+        setViewingProductId(null);
     };
 
     // Helper function to get product status
     const getProductStatus = (product: Product) => {
-        // Check if product has any variants and their statuses
+        // If product itself is not approved, return product status
+        if (product.yprodstatut === 'rejected') return 'rejected';
+        if (product.yprodstatut === 'not_approved') return 'pending';
+        
+        // If product is approved, check variant statuses
         if (product.yvarprod && product.yvarprod.length > 0) {
             const statuses = product.yvarprod.map((variant: any) => variant.yvarprodstatut);
-            if (statuses.includes('rejected')) return 'rejected';
-            if (statuses.includes('approved')) return 'approved';
-            return 'pending';
+            const hasRejected = statuses.includes('rejected');
+            const hasPending = statuses.includes('not_approved');
+            const hasApproved = statuses.includes('approved');
+            
+            // If there are rejected variants, show as rejected
+            if (hasRejected) return 'rejected';
+            
+            // If there are pending variants (even with approved product), show as mixed
+            if (hasPending && hasApproved) return 'mixed';
+            if (hasPending) return 'pending';
+            
+            // All variants are approved
+            if (hasApproved) return 'approved';
         }
-        return product.yprodstatut || 'pending';
+        
+        // Fallback to product status
+        return product.yprodstatut === 'approved' ? 'approved' : 'pending';
     };
 
     // Helper function to check if product can be edited
@@ -181,8 +206,8 @@ export default function StoreDetails() {
         
         if (isStoreAdmin) {
             const status = getProductStatus(product);
-            // Store admin can only edit pending products
-            return status === 'pending';
+            // Store admin can only edit pending products, but can add variants to approved products
+            return status === 'pending' || status === 'approved';
         }
         
         return false;
@@ -267,11 +292,48 @@ export default function StoreDetails() {
                         bgColor: "bg-yellow-500/20",
                         borderColor: "border-yellow-500/30",
                         label: "Pending"
+                    },
+                    mixed: {
+                        icon: AlertTriangle,
+                        color: "text-blue-400",
+                        bgColor: "bg-blue-500/20",
+                        borderColor: "border-blue-500/30",
+                        label: "Mixed Status"
                     }
                 };
                 
                 const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.pending;
                 const Icon = config.icon;
+                
+                // For mixed status, show additional variant info
+                if (status === 'mixed' && product.yvarprod) {
+                    const pendingCount = product.yvarprod.filter((v: any) => v.yvarprodstatut === 'not_approved').length;
+                    const approvedCount = product.yvarprod.filter((v: any) => v.yvarprodstatut === 'approved').length;
+                    
+                    return (
+                        <div className="flex items-center gap-2">
+                            <Badge
+                                variant="secondary"
+                                className={`${config.bgColor} ${config.color} ${config.borderColor} flex items-center gap-1 w-fit`}
+                            >
+                                <Icon className="h-3 w-3" />
+                                {config.label}
+                            </Badge>
+                            <div className="flex gap-1">
+                                {approvedCount > 0 && (
+                                    <Badge variant="secondary" className="bg-green-500/20 text-green-300 border-green-500/30 text-xs">
+                                        {approvedCount} approved
+                                    </Badge>
+                                )}
+                                {pendingCount > 0 && (
+                                    <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30 text-xs">
+                                        {pendingCount} pending
+                                    </Badge>
+                                )}
+                            </div>
+                        </div>
+                    );
+                }
                 
                 return (
                     <Badge
@@ -515,6 +577,13 @@ export default function StoreDetails() {
                 isOpen={isCreateProductDialogOpen}
                 onClose={handleCloseDialog}
                 productId={editingProductId || undefined}
+            />
+
+            {/* Product View Dialog */}
+            <ProductViewDialog
+                isOpen={isProductViewDialogOpen}
+                onClose={handleCloseViewDialog}
+                productId={viewingProductId || undefined}
             />
         </div>
     );

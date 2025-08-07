@@ -9,7 +9,19 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CheckCircle, X, AlertTriangle, Package, Box, Image as ImageIcon, Loader2, Calendar, Store, User, MapPin, Settings } from "lucide-react";
+import {
+    CheckCircle,
+    X,
+    AlertTriangle,
+    Package,
+    Image as ImageIcon,
+    Loader2,
+    Calendar,
+    Store,
+    User,
+    MapPin,
+    Settings,
+} from "lucide-react";
 import { useApprovalOperations } from "../_hooks/use-approval-operations";
 import { useVariantApprovalOperations } from "../_hooks/use-variant-approval-operations";
 import { useCategories } from "../../stores/[storeId]/_hooks/use-categories";
@@ -27,14 +39,14 @@ interface VariantCardProps {
 
 function VariantCard({ variant, onApprove, onReject, isLoading }: VariantCardProps) {
     const [showPromotionForm, setShowPromotionForm] = useState(false);
-    const [promotionPrice, setPromotionPrice] = useState(variant.yvarprodprixpromotion || '');
-    const [promotionStartDate, setPromotionStartDate] = useState(variant.yvarprodpromotiondatedeb || '');
-    const [promotionEndDate, setPromotionEndDate] = useState(variant.yvarprodpromotiondatefin || '');
-    const [catalogPrice, setCatalogPrice] = useState(variant.yvarprodprixcatalogue || '');
+    const [promotionPrice, setPromotionPrice] = useState(variant.yvarprodprixpromotion || "");
+    const [promotionStartDate, setPromotionStartDate] = useState(variant.yvarprodpromotiondatedeb || "");
+    const [promotionEndDate, setPromotionEndDate] = useState(variant.yvarprodpromotiondatefin || "");
+    const [catalogPrice, setCatalogPrice] = useState(variant.yvarprodprixcatalogue || "");
     const [selectedCurrencyId, setSelectedCurrencyId] = useState(variant.xdeviseidfk || 1);
-    
+
     const supabase = createClient();
-    
+
     // Fetch currencies
     const { data: currencies } = useQuery({
         queryKey: ["currencies"],
@@ -44,7 +56,7 @@ function VariantCard({ variant, onApprove, onReject, isLoading }: VariantCardPro
                 .from("xdevise")
                 .select("*")
                 .order("xdevisecodealpha");
-            
+
             if (error) throw new Error(error.message);
             return data;
         },
@@ -52,59 +64,60 @@ function VariantCard({ variant, onApprove, onReject, isLoading }: VariantCardPro
     // Extract media data directly from the variant object (already loaded in main query)
     const models3d = variant.yobjet3d?.map((obj: any) => obj.yobjet3durl) || [];
     const allMedia = variant.yvarprodmedia?.map((media: any) => media.ymedia).filter(Boolean) || [];
-    
+
     // Debug media data
     console.log("Debug media for variant", variant.yvarprodid, {
         allMedia,
         rawMedia: variant.yvarprodmedia,
-        models3d
+        models3d,
     });
-    
+
     // First, separate videos explicitly
     const videos = allMedia.filter((media: any) => {
-        const isVideo = media.ymediaboolvideo === true ||
+        const isVideo =
+            media.ymediaboolvideo === true ||
             media.ymediaboolvideo === "1" ||
             media.ymediaboolvideocapsule === true ||
             media.ymediaboolvideocapsule === "1";
-            
+
         console.log("Media check for video:", media.ymediaid, {
             ymediaboolvideo: media.ymediaboolvideo,
             ymediaboolvideocapsule: media.ymediaboolvideocapsule,
-            isVideo
+            isVideo,
         });
-        
+
         return isVideo;
     });
-    
+
     // Then, treat everything else as images (including explicit image flags and fallback)
     const images = allMedia.filter((media: any) => {
         // First check if it's explicitly a video
-        const isVideo = media.ymediaboolvideo === true ||
+        const isVideo =
+            media.ymediaboolvideo === true ||
             media.ymediaboolvideo === "1" ||
             media.ymediaboolvideocapsule === true ||
             media.ymediaboolvideocapsule === "1";
-            
+
         // If not a video, treat as image
         const isImage = !isVideo;
-        
+
         console.log("Media check for image:", media.ymediaid, {
             ymediaboolphotoprod: media.ymediaboolphotoprod,
             ymediaboolphotoevent: media.ymediaboolphotoevent,
             ymediaboolphotoeditoriale: media.ymediaboolphotoeditoriale,
             ymediaboolvideo: media.ymediaboolvideo,
             isVideo,
-            isImage
+            isImage,
         });
-        
+
         return isImage;
     });
-    
+
     console.log("Final media counts:", {
         models3d: models3d.length,
         images: images.length,
-        videos: videos.length
+        videos: videos.length,
     });
-    
 
     const getStatusBadge = () => {
         switch (variant.yvarprodstatut) {
@@ -136,7 +149,7 @@ function VariantCard({ variant, onApprove, onReject, isLoading }: VariantCardPro
 
     const renderMediaPreview = () => {
         const hasAnyMedia = models3d.length > 0 || images.length > 0 || videos.length > 0;
-        
+
         if (!hasAnyMedia) {
             return (
                 <div className="aspect-video bg-gray-800 rounded-lg flex items-center justify-center">
@@ -169,15 +182,18 @@ function VariantCard({ variant, onApprove, onReject, isLoading }: VariantCardPro
                     <div className="space-y-1">
                         <div className="text-xs text-blue-400 font-medium">Images ({images.length})</div>
                         <div className="grid gap-2">
-                            {images.map((image, index) => (
-                                <div key={image.ymediaid} className="aspect-video bg-gray-800 rounded-lg overflow-hidden">
+                            {images.map((image) => (
+                                <div
+                                    key={image.ymediaid}
+                                    className="aspect-video bg-gray-800 rounded-lg overflow-hidden"
+                                >
                                     <img
                                         src={image.ymediaurl}
                                         alt={image.ymediaintitule}
                                         className="w-full h-full object-cover"
                                         onError={(e) => {
                                             const target = e.target as HTMLImageElement;
-                                            target.style.display = 'none';
+                                            target.style.display = "none";
                                             target.parentElement!.innerHTML = `
                                                 <div class="w-full h-full flex items-center justify-center">
                                                     <svg class="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -198,8 +214,11 @@ function VariantCard({ variant, onApprove, onReject, isLoading }: VariantCardPro
                     <div className="space-y-1">
                         <div className="text-xs text-green-400 font-medium">Videos ({videos.length})</div>
                         <div className="grid gap-2">
-                            {videos.map((video, index) => (
-                                <div key={video.ymediaid} className="aspect-video bg-gray-800 rounded-lg overflow-hidden">
+                            {videos.map((video) => (
+                                <div
+                                    key={video.ymediaid}
+                                    className="aspect-video bg-gray-800 rounded-lg overflow-hidden"
+                                >
                                     <video
                                         src={video.ymediaurl}
                                         className="w-full h-full object-cover"
@@ -220,9 +239,7 @@ function VariantCard({ variant, onApprove, onReject, isLoading }: VariantCardPro
             <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
                     <div className="flex-1">
-                        <CardTitle className="text-white text-sm font-medium">
-                            {variant.yvarprodintitule}
-                        </CardTitle>
+                        <CardTitle className="text-white text-sm font-medium">{variant.yvarprodintitule}</CardTitle>
                         <div className="flex items-center gap-2 mt-1 text-xs text-gray-400">
                             <span>{variant.xcouleur?.xcouleurintitule}</span>
                             <span>•</span>
@@ -232,7 +249,7 @@ function VariantCard({ variant, onApprove, onReject, isLoading }: VariantCardPro
                     {getStatusBadge()}
                 </div>
             </CardHeader>
-            
+
             <CardContent className="space-y-3">
                 {/* Media Preview */}
                 {renderMediaPreview()}
@@ -242,7 +259,9 @@ function VariantCard({ variant, onApprove, onReject, isLoading }: VariantCardPro
                     <div className="flex justify-between">
                         <span className="text-gray-400">Price:</span>
                         <span className="text-white">
-                            {variant.yvarprodprixcatalogue ? `${variant.yvarprodprixcatalogue} ${variant.xdevise?.xdevisecodealpha || ''}` : 'Not set'}
+                            {variant.yvarprodprixcatalogue
+                                ? `${variant.yvarprodprixcatalogue} ${variant.xdevise?.xdevisecodealpha || ""}`
+                                : "Not set"}
                         </span>
                     </div>
                     <div className="flex justify-between">
@@ -253,7 +272,7 @@ function VariantCard({ variant, onApprove, onReject, isLoading }: VariantCardPro
                         <div className="flex justify-between">
                             <span className="text-gray-400">Promo:</span>
                             <span className="text-green-400">
-                                {variant.yvarprodprixpromotion} {variant.xdevise?.xdevisecodealpha || ''}
+                                {variant.yvarprodprixpromotion} {variant.xdevise?.xdevisecodealpha || ""}
                             </span>
                         </div>
                     )}
@@ -263,17 +282,26 @@ function VariantCard({ variant, onApprove, onReject, isLoading }: VariantCardPro
                 {(models3d?.length > 0 || images?.length > 0 || videos?.length > 0) && (
                     <div className="flex gap-1 flex-wrap">
                         {models3d?.length > 0 && (
-                            <Badge variant="secondary" className="bg-purple-500/20 text-purple-300 border-purple-500/30 text-xs">
+                            <Badge
+                                variant="secondary"
+                                className="bg-purple-500/20 text-purple-300 border-purple-500/30 text-xs"
+                            >
                                 {models3d.length} 3D
                             </Badge>
                         )}
                         {images?.length > 0 && (
-                            <Badge variant="secondary" className="bg-blue-500/20 text-blue-300 border-blue-500/30 text-xs">
+                            <Badge
+                                variant="secondary"
+                                className="bg-blue-500/20 text-blue-300 border-blue-500/30 text-xs"
+                            >
                                 {images.length} img
                             </Badge>
                         )}
                         {videos?.length > 0 && (
-                            <Badge variant="secondary" className="bg-green-500/20 text-green-300 border-green-500/30 text-xs">
+                            <Badge
+                                variant="secondary"
+                                className="bg-green-500/20 text-green-300 border-green-500/30 text-xs"
+                            >
                                 {videos.length} vid
                             </Badge>
                         )}
@@ -377,13 +405,15 @@ function VariantCard({ variant, onApprove, onReject, isLoading }: VariantCardPro
                             <Button
                                 size="sm"
                                 onClick={() => {
-                                    const approvalData = showPromotionForm ? {
-                                        catalogPrice: catalogPrice ? parseFloat(catalogPrice) : null,
-                                        currencyId: selectedCurrencyId,
-                                        promotionPrice: promotionPrice ? parseFloat(promotionPrice) : null,
-                                        promotionStartDate: promotionStartDate || null,
-                                        promotionEndDate: promotionEndDate || null,
-                                    } : null;
+                                    const approvalData = showPromotionForm
+                                        ? {
+                                              catalogPrice: catalogPrice ? parseFloat(catalogPrice) : null,
+                                              currencyId: selectedCurrencyId,
+                                              promotionPrice: promotionPrice ? parseFloat(promotionPrice) : null,
+                                              promotionStartDate: promotionStartDate || null,
+                                              promotionEndDate: promotionEndDate || null,
+                                          }
+                                        : null;
                                     onApprove(approvalData);
                                 }}
                                 disabled={isLoading || (showPromotionForm && !catalogPrice)}
@@ -432,11 +462,11 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
         approveVariant,
         denyVariant,
         bulkApproveVariants,
-        isLoading: variantLoading
+        isLoading: variantLoading,
     } = useVariantApprovalOperations();
     const { data: categories } = useCategories();
     const supabase = createClient();
-    
+
     // State for category selection
     const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
 
@@ -481,8 +511,8 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
     });
 
     // Get category name
-    const category = categories?.find(cat => cat.xcategprodid === product?.xcategprodidfk);
-    
+    const category = categories?.find((cat) => cat.xcategprodid === product?.xcategprodidfk);
+
     // Get event details
     const eventDetail = product?.ydetailsevent?.[0];
     const store = eventDetail?.yboutique;
@@ -491,9 +521,9 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
     const event = eventDetail?.yevent;
 
     // Get pending variants count
-    const pendingVariants = product?.yvarprod?.filter((v: any) => v.yvarprodstatut === 'not_approved') || [];
-    const approvedVariants = product?.yvarprod?.filter((v: any) => v.yvarprodstatut === 'approved') || [];
-    const rejectedVariants = product?.yvarprod?.filter((v: any) => v.yvarprodstatut === 'rejected') || [];
+    const pendingVariants = product?.yvarprod?.filter((v: any) => v.yvarprodstatut === "not_approved") || [];
+    const approvedVariants = product?.yvarprod?.filter((v: any) => v.yvarprodstatut === "approved") || [];
+    const rejectedVariants = product?.yvarprod?.filter((v: any) => v.yvarprodstatut === "rejected") || [];
 
     const handleApproveProduct = async () => {
         if (!productId || !product) return;
@@ -508,7 +538,7 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
             });
             onClose();
         } catch (error: any) {
-            console.error('Product approval error:', error);
+            console.error("Product approval error:", error);
         }
     };
 
@@ -519,7 +549,7 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
             await denyProduct.mutateAsync(productId);
             onClose();
         } catch (error: any) {
-            console.error('Product rejection error:', error);
+            console.error("Product rejection error:", error);
         }
     };
 
@@ -537,10 +567,10 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                     yvarprodpromotiondatefin: approvalData?.promotionEndDate || variant.yvarprodpromotiondatefin,
                     yvarprodnbrjourlivraison: variant.yvarprodnbrjourlivraison || 1,
                     currencyId: approvalData?.currencyId || variant.xdeviseidfk || 1,
-                }
+                },
             });
         } catch (error: any) {
-            console.error('Variant approval error:', error);
+            console.error("Variant approval error:", error);
         }
     };
 
@@ -548,7 +578,7 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
         try {
             await denyVariant.mutateAsync(variantId);
         } catch (error: any) {
-            console.error('Variant rejection error:', error);
+            console.error("Variant rejection error:", error);
         }
     };
 
@@ -564,13 +594,13 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                 yvarprodpromotiondatefin: variant.yvarprodpromotiondatefin,
                 yvarprodnbrjourlivraison: variant.yvarprodnbrjourlivraison || 1,
                 currencyId: variant.xdeviseidfk || 1,
-            }
+            },
         }));
 
         try {
             await bulkApproveVariants.mutateAsync({ variantApprovals });
         } catch (error: any) {
-            console.error('Bulk approval error:', error);
+            console.error("Bulk approval error:", error);
         }
     };
 
@@ -605,6 +635,7 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
     if (productLoading) {
         return (
             <Dialog open={isOpen} onOpenChange={onClose}>
+                <DialogTitle className="text-lg text-white">Loading Product Approval...</DialogTitle>
                 <DialogContent className="max-w-6xl max-h-[90vh] bg-gray-900 border-gray-700">
                     <div className="flex items-center justify-center py-12">
                         <Loader2 className="h-8 w-8 animate-spin text-blue-400" />
@@ -657,13 +688,19 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                         </div>
                                         <div>
                                             <Label className="text-gray-300 text-sm">Category</Label>
-                                            <div className="text-white">{category?.xcategprodintitule || "Unknown"}</div>
+                                            <div className="text-white">
+                                                {category?.xcategprodintitule || "Unknown"}
+                                            </div>
                                             {product.yprodstatut === "not_approved" && (
                                                 <div className="mt-2">
-                                                    <Label className="text-gray-300 text-xs">Change Category (Optional)</Label>
+                                                    <Label className="text-gray-300 text-xs">
+                                                        Change Category (Optional)
+                                                    </Label>
                                                     <Select
                                                         value={selectedCategoryId?.toString() || ""}
-                                                        onValueChange={(value) => setSelectedCategoryId(value ? parseInt(value) : null)}
+                                                        onValueChange={(value) =>
+                                                            setSelectedCategoryId(value ? parseInt(value) : null)
+                                                        }
                                                     >
                                                         <SelectTrigger className="h-8 text-xs bg-gray-800 border-gray-600 text-white">
                                                             <SelectValue placeholder="Select new category" />
@@ -712,7 +749,9 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                                 <User className="h-4 w-4 text-gray-400" />
                                                 <div>
                                                     <Label className="text-gray-300 text-sm">Designer</Label>
-                                                    <div className="text-white">{designer.ydesignnom} ({designer.ydesignmarque})</div>
+                                                    <div className="text-white">
+                                                        {designer.ydesignnom} ({designer.ydesignmarque})
+                                                    </div>
                                                 </div>
                                             </div>
                                         )}
@@ -721,7 +760,9 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                                 <Store className="h-4 w-4 text-gray-400" />
                                                 <div>
                                                     <Label className="text-gray-300 text-sm">Store</Label>
-                                                    <div className="text-white">{store.yboutiqueintitule || store.yboutiquecode}</div>
+                                                    <div className="text-white">
+                                                        {store.yboutiqueintitule || store.yboutiquecode}
+                                                    </div>
                                                 </div>
                                             </div>
                                         )}
@@ -757,15 +798,21 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                     <CardContent>
                                         <div className="grid grid-cols-3 gap-4 text-center">
                                             <div>
-                                                <div className="text-2xl font-bold text-yellow-400">{pendingVariants.length}</div>
+                                                <div className="text-2xl font-bold text-yellow-400">
+                                                    {pendingVariants.length}
+                                                </div>
                                                 <div className="text-xs text-gray-400">Pending</div>
                                             </div>
                                             <div>
-                                                <div className="text-2xl font-bold text-green-400">{approvedVariants.length}</div>
+                                                <div className="text-2xl font-bold text-green-400">
+                                                    {approvedVariants.length}
+                                                </div>
                                                 <div className="text-xs text-gray-400">Approved</div>
                                             </div>
                                             <div>
-                                                <div className="text-2xl font-bold text-red-400">{rejectedVariants.length}</div>
+                                                <div className="text-2xl font-bold text-red-400">
+                                                    {rejectedVariants.length}
+                                                </div>
                                                 <div className="text-xs text-gray-400">Rejected</div>
                                             </div>
                                         </div>
@@ -794,14 +841,16 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                     </Button>
                                 )}
                             </div>
-                            
+
                             <ScrollArea className="h-[calc(95vh-300px)] overflow-y-auto">
                                 <div className="space-y-4 pr-4">
                                     {product.yvarprod?.map((variant: any) => (
                                         <VariantCard
                                             key={variant.yvarprodid}
                                             variant={variant}
-                                            onApprove={(promotionData) => handleApproveVariant(variant.yvarprodid, promotionData)}
+                                            onApprove={(promotionData) =>
+                                                handleApproveVariant(variant.yvarprodid, promotionData)
+                                            }
                                             onReject={() => handleRejectVariant(variant.yvarprodid)}
                                             isLoading={variantLoading}
                                         />

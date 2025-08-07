@@ -207,14 +207,9 @@ export default function ApprovalsPage() {
                                 {pendingVariants} pending
                             </Badge>
                         )}
-                        {revisionVariants > 0 && (
-                            <Badge variant="secondary" className="bg-orange-500/20 text-orange-300 border-orange-500/30 text-xs">
-                                {revisionVariants} revision
-                            </Badge>
-                        )}
-                        {deniedVariants > 0 && (
+                        {rejectedVariants > 0 && (
                             <Badge variant="secondary" className="bg-red-500/20 text-red-300 border-red-500/30 text-xs">
-                                {deniedVariants} denied
+                                {rejectedVariants} rejected
                             </Badge>
                         )}
                         {approvedVariants > 0 && (
