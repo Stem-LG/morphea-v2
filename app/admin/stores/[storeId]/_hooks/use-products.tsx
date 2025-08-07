@@ -10,6 +10,7 @@ interface SortConfig {
 
 interface useProductsProps {
     storeId: number;
+    eventId?: number | null;
     page?: number;
     perPage?: number;
     categoryFilter?: number | null;
@@ -17,21 +18,42 @@ interface useProductsProps {
     sorting?: SortConfig | null;
 }
 
-export function useProducts({ storeId, page = 1, perPage = 10, categoryFilter = null, search = "", sorting = null }: useProductsProps) {
+export function useProducts({ storeId, eventId = null, page = 1, perPage = 10, categoryFilter = null, search = "", sorting = null }: useProductsProps) {
     const supabase = createClient();
 
     return useQuery({
-        queryKey: ["products", storeId, page, perPage, categoryFilter, search, sorting],
+        queryKey: ["products", storeId, eventId, page, perPage, categoryFilter, search, sorting],
         queryFn: async () => {
             const from = (page - 1) * perPage;
             const to = from + perPage - 1;
 
-            // Build the query - join with ydetailsevent to filter by store
+            // Build the query - join with ydetailsevent to filter by store and event
             let query = supabase
                 .schema("morpheus")
                 .from("yprod")
-                .select("*, ydetailsevent!inner(yboutiqueidfk)", { count: "exact" })
+                .select(`
+                    *,
+                    ydetailsevent!inner(
+                        yboutiqueidfk,
+                        yeventidfk,
+                        ymallidfk,
+                        ydesignidfk
+                    ),
+                    yvarprod(
+                        yvarprodid,
+                        yvarprodintitule,
+                        yvarprodstatut,
+                        yvarprodprixcatalogue,
+                        xcouleur:xcouleuridfk(xcouleurintitule),
+                        xtaille:xtailleidfk(xtailleintitule)
+                    )
+                `, { count: "exact" })
                 .eq("ydetailsevent.yboutiqueidfk", storeId);
+
+            // Filter by event if provided
+            if (eventId) {
+                query = query.eq("ydetailsevent.yeventidfk", eventId);
+            }
 
             // Apply category filter if provided
             if (categoryFilter !== null) {

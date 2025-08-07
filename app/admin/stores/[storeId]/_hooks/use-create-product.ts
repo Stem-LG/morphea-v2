@@ -7,6 +7,7 @@ import { useCreateMedia } from "@/app/_hooks/use-create-media";
 import { useCreate3dModel } from "@/app/_hooks/use-create-3dmodel";
 import { useProducts } from "./use-products";
 import { useParams } from "next/navigation";
+import { useQueryState } from "nuqs";
 
 interface ProductVariant {
     name: string;
@@ -20,6 +21,7 @@ interface ProductVariant {
 
 interface CreateProductParams {
     storeId: number;
+    eventId: number | null;
     designerId: number;
     categoryId?: number;
     productCode?: string;
@@ -33,18 +35,33 @@ export function useCreateProduct() {
     const params = useParams<{ storeId: string }>();
     const storeId = parseInt(params.storeId || "0", 10);
 
+    // Get event context from URL parameters to pass to useProducts
+    const [eventId] = useQueryState("eventId", {
+        defaultValue: null,
+        parse: (value) => value ? parseInt(value) : null,
+        serialize: (value) => value?.toString() || ""
+    });
 
     const supabase = createClient();
     const uploadFile = useUploadFile();
     const createMedia = useCreateMedia();
     const create3dModel = useCreate3dModel();
 
-
-    const { refetch: refetchProducts } = useProducts({ storeId });
+    // Pass the event context to useProducts for proper refetching
+    const { refetch: refetchProducts } = useProducts({
+        storeId,
+        eventId,
+        page: 1,
+        perPage: 10
+    });
 
     return useMutation({
         mutationFn: async (productData: CreateProductParams) => {
             try {
+                if (!productData.eventId) {
+                    throw new Error("Event ID is required for product creation");
+                }
+
                 // Generate product code if not provided
                 const productCode = productData.productCode || Date.now().toString();
 
@@ -65,6 +82,34 @@ export function useCreateProduct() {
 
                 if (productError) {
                     throw new Error(`Failed to create product: ${productError.message}`);
+                }
+
+                // Step 1.5: Create entry in ydetailsevent to link product to event and store
+                // First, get the mall ID from the store
+                const { data: storeData, error: storeError } = await supabase
+                    .schema("morpheus")
+                    .from("yboutique")
+                    .select("ymallidfk")
+                    .eq("yboutiqueid", productData.storeId)
+                    .single();
+
+                if (storeError) {
+                    throw new Error(`Failed to get store mall info: ${storeError.message}`);
+                }
+
+                const { error: detailsEventError } = await supabase
+                    .schema("morpheus")
+                    .from("ydetailsevent")
+                    .insert({
+                        yprodidfk: product.yprodid,
+                        yeventidfk: productData.eventId,
+                        yboutiqueidfk: productData.storeId,
+                        ymallidfk: storeData.ymallidfk,
+                        ydesignidfk: productData.designerId,
+                    });
+
+                if (detailsEventError) {
+                    throw new Error(`Failed to link product to event: ${detailsEventError.message}`);
                 }
 
                 // Step 2: Create variants

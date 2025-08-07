@@ -11,6 +11,8 @@ interface useCreateEventProps {
     startDate: string;
     endDate: string;
     imageFiles?: File[];
+    selectedMallIds: number[];
+    selectedBoutiqueIds: number[];
 }
 
 export function useCreateEvent() {
@@ -72,10 +74,12 @@ export function useCreateEvent() {
                     throw new Error(`Failed to create event: ${eventError.message}`);
                 }
 
+                const eventId = eventData.yeventid;
+
                 // Step 3: Create yeventmedia junction records
-                if (mediaIds.length > 0 && eventData?.yeventid) {
+                if (mediaIds.length > 0 && eventId) {
                     const junctionRecords = mediaIds.map((mediaId) => ({
-                        yeventidfk: eventData.yeventid,
+                        yeventidfk: eventId,
                         ymediaidfk: mediaId,
                     }));
 
@@ -86,6 +90,61 @@ export function useCreateEvent() {
 
                     if (junctionError) {
                         throw new Error(`Failed to create media associations: ${junctionError.message}`);
+                    }
+                }
+
+                // Step 4: Create ydetailsevent records for each mall
+                const mallDetailRecords = event.selectedMallIds.map((mallId) => ({
+                    yeventidfk: eventId,
+                    ymallidfk: mallId,
+                }));
+
+                const { error: mallDetailsError } = await supabase
+                    .schema("morpheus")
+                    .from("ydetailsevent")
+                    .insert(mallDetailRecords);
+
+                if (mallDetailsError) {
+                    throw new Error(`Failed to create mall event details: ${mallDetailsError.message}`);
+                }
+
+                // Step 5: Create ydetailsevent records for boutiques (without designer assignments)
+                if (event.selectedBoutiqueIds.length > 0) {
+                    // Fetch boutique data to get mall mappings
+                    const { data: boutiquesData, error: boutiquesError } = await supabase
+                        .schema("morpheus")
+                        .from("yboutique")
+                        .select("yboutiqueid, ymallidfk")
+                        .in("yboutiqueid", event.selectedBoutiqueIds);
+
+                    if (boutiquesError) {
+                        throw new Error(`Failed to fetch boutique data: ${boutiquesError.message}`);
+                    }
+
+                    const boutiqueDetailRecords = event.selectedBoutiqueIds.map((boutiqueId) => {
+                        // Find the mall ID for this boutique
+                        const boutique = boutiquesData?.find(b => b.yboutiqueid === boutiqueId);
+                        if (!boutique) {
+                            throw new Error(`Boutique with ID ${boutiqueId} not found`);
+                        }
+                        
+                        return {
+                            yeventidfk: eventId,
+                            ymallidfk: boutique.ymallidfk,
+                            yboutiqueidfk: boutiqueId,
+                            ydesignidfk: null, // No designer assignment during event creation
+                        };
+                    });
+
+                    if (boutiqueDetailRecords.length > 0) {
+                        const { error: boutiqueDetailsError } = await supabase
+                            .schema("morpheus")
+                            .from("ydetailsevent")
+                            .insert(boutiqueDetailRecords);
+
+                        if (boutiqueDetailsError) {
+                            throw new Error(`Failed to create boutique event details: ${boutiqueDetailsError.message}`);
+                        }
                     }
                 }
 

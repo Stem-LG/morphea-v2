@@ -1583,7 +1583,7 @@ export type Database = {
           yprodid: number
           yprodinfobulle: string
           yprodintitule: string
-          yprodstatut: string
+          yprodstatut: Database["morpheus"]["Enums"]["product_status"]
         }
         Insert: {
           sysaction?: string | null
@@ -1598,7 +1598,7 @@ export type Database = {
           yprodid?: number
           yprodinfobulle: string
           yprodintitule: string
-          yprodstatut?: string
+          yprodstatut?: Database["morpheus"]["Enums"]["product_status"]
         }
         Update: {
           sysaction?: string | null
@@ -1613,7 +1613,7 @@ export type Database = {
           yprodid?: number
           yprodinfobulle?: string
           yprodintitule?: string
-          yprodstatut?: string
+          yprodstatut?: Database["morpheus"]["Enums"]["product_status"]
         }
         Relationships: [
           {
@@ -1751,7 +1751,7 @@ export type Database = {
           yvarprodprixpromotion: number | null
           yvarprodpromotiondatedeb: string | null
           yvarprodpromotiondatefin: string | null
-          yvarprodstatut: string
+          yvarprodstatut: Database["morpheus"]["Enums"]["product_status"]
         }
         Insert: {
           sysaction?: string | null
@@ -1771,7 +1771,7 @@ export type Database = {
           yvarprodprixpromotion?: number | null
           yvarprodpromotiondatedeb?: string | null
           yvarprodpromotiondatefin?: string | null
-          yvarprodstatut?: string
+          yvarprodstatut?: Database["morpheus"]["Enums"]["product_status"]
         }
         Update: {
           sysaction?: string | null
@@ -1791,7 +1791,7 @@ export type Database = {
           yvarprodprixpromotion?: number | null
           yvarprodpromotiondatedeb?: string | null
           yvarprodpromotiondatefin?: string | null
-          yvarprodstatut?: string
+          yvarprodstatut?: Database["morpheus"]["Enums"]["product_status"]
         }
         Relationships: [
           {
@@ -2108,7 +2108,7 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      product_status: "approved" | "not_approved" | "rejected"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2268,7 +2268,9 @@ export const Constants = {
     },
   },
   morpheus: {
-    Enums: {},
+    Enums: {
+      product_status: ["approved", "not_approved", "rejected"],
+    },
   },
   public: {
     Enums: {},

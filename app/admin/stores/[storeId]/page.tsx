@@ -17,10 +17,14 @@ import {
     Edit,
     Trash2,
     Eye,
-    ArrowLeft
+    ArrowLeft,
+    CheckCircle,
+    XCircle,
+    Clock
 } from "lucide-react";
 import { ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
+import { useAuth } from "@/hooks/useAuth";
 import { useStore } from "./_hooks/use-store";
 import { useProducts } from "./_hooks/use-products";
 import { useCategories } from "./_hooks/use-categories";
@@ -32,14 +36,20 @@ type Product = any;
 export default function StoreDetails() {
     const params = useParams();
     const storeId = parseInt(params.storeId as string);
+    const { data: user } = useAuth();
     
-    // State for pagination, filters, and sorting using nuqs
-    const [{ page, category, search, sortBy, sortOrder }, setFilters] = useQueryStates({
+    const isAdmin = user?.app_metadata?.roles?.includes("admin");
+    const isStoreAdmin = user?.app_metadata?.roles?.includes("store_admin");
+    
+    // State for pagination, filters, sorting, and event context using nuqs
+    const [{ page, category, search, sortBy, sortOrder, eventId, mallId }, setFilters] = useQueryStates({
         page: parseAsInteger.withDefault(1),
         category: parseAsInteger,
         search: parseAsString.withDefault(""),
         sortBy: parseAsString,
-        sortOrder: parseAsString
+        sortOrder: parseAsString,
+        eventId: parseAsInteger,
+        mallId: parseAsInteger
     });
     
     // Dialog state
@@ -66,6 +76,7 @@ export default function StoreDetails() {
     const { data: storeData, isLoading: storeLoading, error: storeError } = useStore({ storeId });
     const { data: productsData, isLoading: productsLoading } = useProducts({
         storeId,
+        eventId,
         page: currentPage,
         perPage,
         categoryFilter,
@@ -149,6 +160,49 @@ export default function StoreDetails() {
         // TODO: Implement view product functionality
     };
 
+    // Helper function to get product status
+    const getProductStatus = (product: Product) => {
+        // Check if product has any variants and their statuses
+        if (product.yvarprod && product.yvarprod.length > 0) {
+            const statuses = product.yvarprod.map((variant: any) => variant.yvarprodstatut);
+            if (statuses.includes('rejected')) return 'rejected';
+            if (statuses.includes('approved')) return 'approved';
+            return 'pending';
+        }
+        return product.yprodstatut || 'pending';
+    };
+
+    // Helper function to check if product can be edited
+    const canEditProduct = (product: Product) => {
+        if (isAdmin) {
+            // Admin can edit everything except rejected products
+            return getProductStatus(product) !== 'rejected';
+        }
+        
+        if (isStoreAdmin) {
+            const status = getProductStatus(product);
+            // Store admin can only edit pending products
+            return status === 'pending';
+        }
+        
+        return false;
+    };
+
+    // Helper function to check if product can be deleted
+    const canDeleteProduct = (product: Product) => {
+        if (isAdmin) {
+            // Admin can delete non-rejected products
+            return getProductStatus(product) !== 'rejected';
+        }
+        
+        if (isStoreAdmin) {
+            // Store admin can only delete pending products
+            return getProductStatus(product) === 'pending';
+        }
+        
+        return false;
+    };
+
     // Define table columns
     const columns: ColumnDef<Product>[] = [
         {
@@ -186,6 +240,51 @@ export default function StoreDetails() {
             },
         },
         {
+            id: "status",
+            header: "Status",
+            cell: ({ row }) => {
+                const product = row.original;
+                const status = getProductStatus(product);
+                
+                const statusConfig = {
+                    approved: {
+                        icon: CheckCircle,
+                        color: "text-green-400",
+                        bgColor: "bg-green-500/20",
+                        borderColor: "border-green-500/30",
+                        label: "Approved"
+                    },
+                    rejected: {
+                        icon: XCircle,
+                        color: "text-red-400",
+                        bgColor: "bg-red-500/20",
+                        borderColor: "border-red-500/30",
+                        label: "Rejected"
+                    },
+                    pending: {
+                        icon: Clock,
+                        color: "text-yellow-400",
+                        bgColor: "bg-yellow-500/20",
+                        borderColor: "border-yellow-500/30",
+                        label: "Pending"
+                    }
+                };
+                
+                const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.pending;
+                const Icon = config.icon;
+                
+                return (
+                    <Badge
+                        variant="secondary"
+                        className={`${config.bgColor} ${config.color} ${config.borderColor} flex items-center gap-1 w-fit`}
+                    >
+                        <Icon className="h-3 w-3" />
+                        {config.label}
+                    </Badge>
+                );
+            },
+        },
+        {
             id: "actions",
             header: "Actions",
             cell: ({ row }) => {
@@ -205,8 +304,13 @@ export default function StoreDetails() {
                             size="sm"
                             variant="ghost"
                             onClick={() => handleEditProduct(product)}
-                            className="h-8 w-8 p-0 text-gray-400 hover:text-white hover:bg-gray-800/50"
-                            title="Edit Product"
+                            disabled={!canEditProduct(product)}
+                            className={`h-8 w-8 p-0 ${
+                                canEditProduct(product)
+                                    ? "text-gray-400 hover:text-white hover:bg-gray-800/50"
+                                    : "text-gray-600 cursor-not-allowed"
+                            }`}
+                            title={canEditProduct(product) ? "Edit Product" : "Cannot edit this product"}
                         >
                             <Edit className="h-3 w-3" />
                         </Button>
@@ -214,8 +318,13 @@ export default function StoreDetails() {
                             size="sm"
                             variant="ghost"
                             onClick={() => handleDeleteProduct(product)}
-                            className="h-8 w-8 p-0 text-gray-400 hover:text-red-400 hover:bg-red-900/50"
-                            title="Delete Product"
+                            disabled={!canDeleteProduct(product)}
+                            className={`h-8 w-8 p-0 ${
+                                canDeleteProduct(product)
+                                    ? "text-gray-400 hover:text-red-400 hover:bg-red-900/50"
+                                    : "text-gray-600 cursor-not-allowed"
+                            }`}
+                            title={canDeleteProduct(product) ? "Delete Product" : "Cannot delete this product"}
                         >
                             <Trash2 className="h-3 w-3" />
                         </Button>
@@ -251,7 +360,14 @@ export default function StoreDetails() {
                         <p className="text-gray-400 mb-4">
                             {"The store you're looking for doesn't exist or you don't have access to it."}
                         </p>
-                        <Link href="/admin/stores">
+                        <Link href={`/admin/stores${
+                            eventId || mallId
+                                ? `?${new URLSearchParams({
+                                    ...(eventId && { eventId: eventId.toString() }),
+                                    ...(mallId && { mallId: mallId.toString() })
+                                }).toString()}`
+                                : ''
+                        }`}>
                             <Button variant="outline" className="border-red-700/50 text-red-400 hover:bg-red-900/30">
                                 <ArrowLeft className="h-4 w-4 mr-2" />
                                 Back to Stores
@@ -267,9 +383,16 @@ export default function StoreDetails() {
         <div className="p-6 space-y-6">
             {/* Header with Back Button */}
             <div className="flex items-center gap-4 mb-6">
-                <Link href="/admin/stores">
-                    <Button 
-                        variant="outline" 
+                <Link href={`/admin/stores${
+                    eventId || mallId
+                        ? `?${new URLSearchParams({
+                            ...(eventId && { eventId: eventId.toString() }),
+                            ...(mallId && { mallId: mallId.toString() })
+                        }).toString()}`
+                        : ''
+                }`}>
+                    <Button
+                        variant="outline"
                         size="sm"
                         className="border-gray-600 text-gray-300 hover:bg-gray-800/50 hover:text-white"
                     >
@@ -357,7 +480,9 @@ export default function StoreDetails() {
                         actions={
                             <Button
                                 onClick={handleCreateProduct}
-                                className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-morpheus-gold-dark hover:to-morpheus-gold-light text-white font-semibold transition-all duration-300 hover:scale-105"
+                                disabled={!eventId}
+                                className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-morpheus-gold-dark hover:to-morpheus-gold-light text-white font-semibold transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                                title={eventId ? "Add Product" : "Please select an event from the stores page to add products"}
                             >
                                 <Plus className="h-4 w-4 mr-2" />
                                 Add Product
