@@ -99,6 +99,8 @@ export const enTranslations = {
     "getStarted": "Get Started",
     "login": "Login",
     "exploreAsGuest": "Explore as Guest",
+    "enterMall": "Enter Mall",
+    "myProfile": "My Profile",
     "immersiveExperience": "Immersive Experience",
     "virtualTours": "Virtual Tour",
     "premiumQuality": "Premium Quality",
