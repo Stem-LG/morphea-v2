@@ -87,14 +87,63 @@ export function useDesignerAssignment() {
 
             return { eventId, mallId, boutiqueId, designerId };
         },
-        onSuccess: () => {
-            // Invalidate relevant queries
-            queryClient.invalidateQueries({ queryKey: ["event-mall-boutiques"] });
-            queryClient.invalidateQueries({ queryKey: ["designers-paginated"] });
-            toast.success("Designer assigned successfully");
+        onMutate: async ({ eventId, mallId, boutiqueId, designerId }) => {
+            // Cancel any outgoing refetches
+            await queryClient.cancelQueries({ queryKey: ["event-mall-boutiques", eventId, mallId] });
+            
+            // Snapshot the previous value
+            const previousData = queryClient.getQueryData(["event-mall-boutiques", eventId, mallId]);
+            
+            // Optimistically update the cache
+            queryClient.setQueryData(["event-mall-boutiques", eventId, mallId], (old: any) => {
+                if (!old) return old;
+                
+                const updatedAssignments = [...(old.assignments || [])];
+                const existingIndex = updatedAssignments.findIndex(a => a.yboutiqueidfk === boutiqueId);
+                
+                if (existingIndex >= 0) {
+                    // Update existing assignment
+                    updatedAssignments[existingIndex] = {
+                        ...updatedAssignments[existingIndex],
+                        ydesignidfk: designerId
+                    };
+                } else {
+                    // Add new assignment
+                    updatedAssignments.push({
+                        ydetailseventid: Date.now(), // Temporary ID
+                        yboutiqueidfk: boutiqueId,
+                        ydesignidfk: designerId,
+                        hasProducts: false
+                    });
+                }
+                
+                return {
+                    ...old,
+                    assignments: updatedAssignments
+                };
+            });
+            
+            return { previousData };
         },
-        onError: (error: Error) => {
-            toast.error(error.message || "Failed to assign designer");
+        onError: (err, variables, context) => {
+            // Rollback on error
+            if (context?.previousData) {
+                queryClient.setQueryData(
+                    ["event-mall-boutiques", variables.eventId, variables.mallId],
+                    context.previousData
+                );
+            }
+            toast.error(err.message || "Failed to assign designer");
+        },
+        onSuccess: ({ eventId, mallId }) => {
+            // Invalidate specific queries with exact parameters
+            queryClient.invalidateQueries({
+                queryKey: ["event-mall-boutiques", eventId, mallId]
+            });
+            queryClient.invalidateQueries({
+                queryKey: ["designers-paginated", eventId, mallId]
+            });
+            toast.success("Designer assigned successfully");
         }
     });
 
@@ -136,14 +185,48 @@ export function useDesignerAssignment() {
 
             return { eventId, mallId, boutiqueId };
         },
-        onSuccess: () => {
-            // Invalidate relevant queries
-            queryClient.invalidateQueries({ queryKey: ["event-mall-boutiques"] });
-            queryClient.invalidateQueries({ queryKey: ["designers-paginated"] });
-            toast.success("Designer unassigned successfully");
+        onMutate: async ({ eventId, mallId, boutiqueId }) => {
+            // Cancel any outgoing refetches
+            await queryClient.cancelQueries({ queryKey: ["event-mall-boutiques", eventId, mallId] });
+            
+            // Snapshot the previous value
+            const previousData = queryClient.getQueryData(["event-mall-boutiques", eventId, mallId]);
+            
+            // Optimistically update the cache
+            queryClient.setQueryData(["event-mall-boutiques", eventId, mallId], (old: any) => {
+                if (!old) return old;
+                
+                const updatedAssignments = (old.assignments || []).filter(
+                    (a: any) => a.yboutiqueidfk !== boutiqueId
+                );
+                
+                return {
+                    ...old,
+                    assignments: updatedAssignments
+                };
+            });
+            
+            return { previousData };
         },
-        onError: (error: Error) => {
-            toast.error(error.message || "Failed to unassign designer");
+        onError: (err, variables, context) => {
+            // Rollback on error
+            if (context?.previousData) {
+                queryClient.setQueryData(
+                    ["event-mall-boutiques", variables.eventId, variables.mallId],
+                    context.previousData
+                );
+            }
+            toast.error(err.message || "Failed to unassign designer");
+        },
+        onSuccess: ({ eventId, mallId }) => {
+            // Invalidate specific queries with exact parameters
+            queryClient.invalidateQueries({
+                queryKey: ["event-mall-boutiques", eventId, mallId]
+            });
+            queryClient.invalidateQueries({
+                queryKey: ["designers-paginated", eventId, mallId]
+            });
+            toast.success("Designer unassigned successfully");
         }
     });
 

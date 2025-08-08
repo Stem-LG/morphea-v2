@@ -138,66 +138,127 @@ export function BoutiqueGrid({ eventId, mallId, boutiques, assignments, isLoadin
                             </div>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                            {hasDesigner && assignment?.ydesign ? (
-                                <div className="space-y-3">
-                                    <div className="flex items-center gap-2">
-                                        <Badge className="bg-green-500/20 text-green-300 border-green-500/30">
-                                            <User className="h-3 w-3 mr-1" />
-                                            Assigned
-                                        </Badge>
-                                        {isLocked && (
-                                            <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30">
-                                                <Lock className="h-3 w-3 mr-1" />
-                                                Locked
+                            {hasDesigner ? (
+                                assignment?.ydesign ? (
+                                    // Case 1: Full designer info available
+                                    <div className="space-y-3">
+                                        <div className="flex items-center gap-2">
+                                            <Badge className="bg-green-500/20 text-green-300 border-green-500/30">
+                                                <User className="h-3 w-3 mr-1" />
+                                                Assigned
                                             </Badge>
-                                        )}
-                                    </div>
-                                    
-                                    <div className="bg-gray-700/30 rounded-lg p-3 space-y-2">
-                                        <div className="font-medium text-white">
-                                            {assignment.ydesign.ydesignnom}
+                                            {isLocked && (
+                                                <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30">
+                                                    <Lock className="h-3 w-3 mr-1" />
+                                                    Locked
+                                                </Badge>
+                                            )}
                                         </div>
-                                        <div className="text-sm text-gray-400">
-                                            {assignment.ydesign.ydesignmarque} • {assignment.ydesign.ydesignspecialite}
-                                        </div>
-                                        <div className="flex items-center gap-1 text-xs text-gray-500">
-                                            <Mail className="h-3 w-3" />
-                                            {assignment.ydesign.ydesigncontactemail}
-                                        </div>
-                                    </div>
-
-                                    <div className="flex gap-2">
-                                        {!isLocked && (
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={() => handleUnassignDesigner(boutique.yboutiqueid)}
-                                                disabled={isUnassigning && unassigningBoutiqueId === boutique.yboutiqueid}
-                                                className="flex-1 border-red-600/50 text-red-400 hover:bg-red-900/30"
-                                            >
-                                                <UserMinus className="h-4 w-4 mr-2" />
-                                                {isUnassigning && unassigningBoutiqueId === boutique.yboutiqueid 
-                                                    ? "Unassigning..." 
-                                                    : "Unassign"
-                                                }
-                                            </Button>
-                                        )}
                                         
-                                        {isLocked ? (
-                                            <DesignerInfoDialog
-                                                designer={assignment.ydesign}
-                                                boutiqueName={boutique.yboutiqueintitule || boutique.yboutiquecode}
-                                                isLocked={isLocked}
-                                            >
+                                        <div className="bg-gray-700/30 rounded-lg p-3 space-y-2">
+                                            <div className="font-medium text-white">
+                                                {assignment.ydesign.ydesignnom}
+                                            </div>
+                                            <div className="text-sm text-gray-400">
+                                                {assignment.ydesign.ydesignmarque} • {assignment.ydesign.ydesignspecialite}
+                                            </div>
+                                            <div className="flex items-center gap-1 text-xs text-gray-500">
+                                                <Mail className="h-3 w-3" />
+                                                {assignment.ydesign.ydesigncontactemail}
+                                            </div>
+                                        </div>
+
+                                        <div className="flex gap-2">
+                                            {!isLocked && (
                                                 <Button
+                                                    variant="outline"
                                                     size="sm"
-                                                    className="flex-1 bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-morpheus-gold-dark hover:to-morpheus-gold-light text-white"
+                                                    onClick={() => handleUnassignDesigner(boutique.yboutiqueid)}
+                                                    disabled={isUnassigning && unassigningBoutiqueId === boutique.yboutiqueid}
+                                                    className="flex-1 border-red-600/50 text-red-400 hover:bg-red-900/30"
                                                 >
-                                                    <User className="h-4 w-4 mr-2" />
-                                                    View Designer
+                                                    <UserMinus className="h-4 w-4 mr-2" />
+                                                    {isUnassigning && unassigningBoutiqueId === boutique.yboutiqueid
+                                                        ? "Unassigning..."
+                                                        : "Unassign"
+                                                    }
                                                 </Button>
-                                            </DesignerInfoDialog>
-                                        ) : (
+                                            )}
+                                            
+                                            {isLocked ? (
+                                                <DesignerInfoDialog
+                                                    designer={assignment.ydesign}
+                                                    boutiqueName={boutique.yboutiqueintitule || boutique.yboutiquecode}
+                                                    isLocked={isLocked}
+                                                >
+                                                    <Button
+                                                        size="sm"
+                                                        className="flex-1 bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-morpheus-gold-dark hover:to-morpheus-gold-light text-white"
+                                                    >
+                                                        <User className="h-4 w-4 mr-2" />
+                                                        View Designer
+                                                    </Button>
+                                                </DesignerInfoDialog>
+                                            ) : (
+                                                <DesignerSelectionDialog
+                                                    eventId={eventId}
+                                                    mallId={mallId}
+                                                    boutiqueId={boutique.yboutiqueid}
+                                                    boutiqueName={boutique.yboutiqueintitule || boutique.yboutiquecode}
+                                                >
+                                                    <Button
+                                                        size="sm"
+                                                        className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-morpheus-gold-dark hover:to-morpheus-gold-light text-white"
+                                                    >
+                                                        <User className="h-4 w-4 mr-2" />
+                                                        Change Designer
+                                                    </Button>
+                                                </DesignerSelectionDialog>
+                                            )}
+                                        </div>
+                                    </div>
+                                ) : (
+                                    // Case 2: Designer assigned but details not loaded (join failed)
+                                    <div className="space-y-3">
+                                        <div className="flex items-center gap-2">
+                                            <Badge className="bg-orange-500/20 text-orange-300 border-orange-500/30">
+                                                <User className="h-3 w-3 mr-1" />
+                                                Designer Assigned
+                                            </Badge>
+                                            {isLocked && (
+                                                <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30">
+                                                    <Lock className="h-3 w-3 mr-1" />
+                                                    Locked
+                                                </Badge>
+                                            )}
+                                        </div>
+                                        
+                                        <div className="bg-gray-700/30 rounded-lg p-3 space-y-2">
+                                            <div className="font-medium text-white">
+                                                Designer ID: {assignment?.ydesignidfk}
+                                            </div>
+                                            <div className="text-sm text-gray-400">
+                                                Designer details could not be loaded
+                                            </div>
+                                        </div>
+
+                                        <div className="flex gap-2">
+                                            {!isLocked && (
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={() => handleUnassignDesigner(boutique.yboutiqueid)}
+                                                    disabled={isUnassigning && unassigningBoutiqueId === boutique.yboutiqueid}
+                                                    className="flex-1 border-red-600/50 text-red-400 hover:bg-red-900/30"
+                                                >
+                                                    <UserMinus className="h-4 w-4 mr-2" />
+                                                    {isUnassigning && unassigningBoutiqueId === boutique.yboutiqueid
+                                                        ? "Unassigning..."
+                                                        : "Unassign"
+                                                    }
+                                                </Button>
+                                            )}
+                                            
                                             <DesignerSelectionDialog
                                                 eventId={eventId}
                                                 mallId={mallId}
@@ -206,16 +267,17 @@ export function BoutiqueGrid({ eventId, mallId, boutiques, assignments, isLoadin
                                             >
                                                 <Button
                                                     size="sm"
-                                                    className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-morpheus-gold-dark hover:to-morpheus-gold-light text-white"
+                                                    className="flex-1 bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-morpheus-gold-dark hover:to-morpheus-gold-light text-white"
                                                 >
                                                     <User className="h-4 w-4 mr-2" />
-                                                    Change Designer
+                                                    {isLocked ? "View Assignment" : "Change Designer"}
                                                 </Button>
                                             </DesignerSelectionDialog>
-                                        )}
+                                        </div>
                                     </div>
-                                </div>
+                                )
                             ) : (
+                                // Case 3: No designer assigned
                                 <div className="space-y-3">
                                     <Badge className="bg-gray-500/20 text-gray-400 border-gray-500/30">
                                         <UserPlus className="h-3 w-3 mr-1" />

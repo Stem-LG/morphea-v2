@@ -21,15 +21,18 @@ export default function ProductsListModal({ isOpen, onClose, onProductDetailsCha
 
     const productsList = useMemo(() => {
         return productsData?.map((product) => {
-            // Get the first variant for pricing and media
-            const firstVariant = product.yvarprod?.[0];
+            // Filter to get only approved variants
+            const approvedVariants = product.yvarprod?.filter((variant) => variant.yvarprodstatut === "approved") || [];
+            
+            // Get the first approved variant for pricing and media
+            const firstVariant = approvedVariants[0];
 
-            // Get the first picture media from the first variant
+            // Get the first picture media from the first approved variant
             const firstPicture = firstVariant?.yvarprodmedia?.find(
                 (media) => media.ymedia && !media.ymedia.ymediaboolvideo
             )?.ymedia;
 
-            // Get product pricing info from first variant
+            // Get product pricing info from first approved variant
             const pricing = firstVariant
                 ? {
                       catalogPrice: firstVariant.yvarprodprixcatalogue,
