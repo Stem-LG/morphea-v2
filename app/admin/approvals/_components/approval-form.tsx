@@ -469,6 +469,24 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
 
     // State for category selection
     const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
+    
+    // State for infoaction selection
+    const [selectedInfoactionId, setSelectedInfoactionId] = useState<number | null>(null);
+
+    // Fetch available infoactions
+    const { data: infoactions } = useQuery({
+        queryKey: ["infoactions"],
+        queryFn: async () => {
+            const { data, error } = await supabase
+                .schema("morpheus")
+                .from("yinfospotactions")
+                .select("*")
+                .order("yinfospotactionstitle");
+
+            if (error) throw new Error(error.message);
+            return data;
+        },
+    });
 
     // Fetch product details
     const { data: product, isLoading: productLoading } = useQuery({
@@ -528,12 +546,18 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
     const handleApproveProduct = async () => {
         if (!productId || !product) return;
 
+        // Require manual infoaction selection for products that are not approved
+        if (product.yprodstatut === "not_approved" && !selectedInfoactionId) {
+            console.error("Infoaction selection is required for product approval");
+            return;
+        }
+
         try {
             await approveProduct.mutateAsync({
                 productId,
                 approvalData: {
                     categoryId: selectedCategoryId || product.xcategprodidfk,
-                    infoactionId: product.yinfospotactionsidfk,
+                    infoactionId: selectedInfoactionId, // Only use manually selected infoaction
                 },
             });
             onClose();
@@ -667,7 +691,7 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                 <div className="flex h-[calc(95vh-180px)]">
                     {/* Left Panel - Product Information */}
                     <div className="w-1/2 border-r border-gray-700">
-                        <ScrollArea className="h-full">
+                        <ScrollArea className="h-full [&>[data-radix-scroll-area-viewport]]:pr-3">
                             <div className="p-6 space-y-6">
                                 {/* Basic Product Info */}
                                 <Card className="bg-gray-800/50 border-gray-700">
@@ -717,6 +741,38 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                                             ))}
                                                         </SelectContent>
                                                     </Select>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div>
+                                            <Label className="text-gray-300 text-sm">Infoaction *</Label>
+                                            {product.yprodstatut === "not_approved" ? (
+                                                <div className="mt-2">
+                                                    <Select
+                                                        value={selectedInfoactionId?.toString() || ""}
+                                                        onValueChange={(value) =>
+                                                            setSelectedInfoactionId(value ? parseInt(value) : null)
+                                                        }
+                                                    >
+                                                        <SelectTrigger className="h-8 text-xs bg-gray-800 border-gray-600 text-white">
+                                                            <SelectValue placeholder="Select an infoaction *" />
+                                                        </SelectTrigger>
+                                                        <SelectContent className="bg-gray-800 border-gray-600">
+                                                            {infoactions?.map((infoaction) => (
+                                                                <SelectItem
+                                                                    key={infoaction.yinfospotactionsid}
+                                                                    value={infoaction.yinfospotactionsid.toString()}
+                                                                    className="text-white hover:bg-gray-700"
+                                                                >
+                                                                    {infoaction.yinfospotactionstitle}
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                </div>
+                                            ) : (
+                                                <div className="text-white">
+                                                    {infoactions?.find(ia => ia.yinfospotactionsid === product.yinfospotactionsidfk)?.yinfospotactionstitle || "Not set"}
                                                 </div>
                                             )}
                                         </div>
@@ -823,9 +879,9 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                     </div>
 
                     {/* Right Panel - Variant Cards */}
-                    <div className="w-1/2">
-                        <div className="p-6">
-                            <div className="flex items-center justify-between mb-4">
+                    <div className="w-1/2 flex flex-col">
+                        <div className="p-6 pb-4 flex-shrink-0">
+                            <div className="flex items-center justify-between">
                                 <h3 className="text-lg font-semibold text-white">
                                     Product Variants ({product.yvarprod?.length || 0})
                                 </h3>
@@ -841,9 +897,11 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                     </Button>
                                 )}
                             </div>
+                        </div>
 
-                            <ScrollArea className="h-[calc(95vh-300px)] overflow-y-auto">
-                                <div className="space-y-4 pr-4">
+                        <div className="flex-1 px-6 pb-6 min-h-0">
+                            <ScrollArea className="h-full [&>[data-radix-scroll-area-viewport]]:pr-3">
+                                <div className="space-y-4">
                                     {product.yvarprod?.map((variant: any) => (
                                         <VariantCard
                                             key={variant.yvarprodid}
@@ -884,7 +942,7 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                     <Button
                         type="button"
                         onClick={handleApproveProduct}
-                        disabled={isLoading || variantLoading}
+                        disabled={isLoading || variantLoading || (product?.yprodstatut === "not_approved" && !selectedInfoactionId)}
                         className="bg-green-600 hover:bg-green-700 text-white"
                     >
                         {isLoading || variantLoading ? (
