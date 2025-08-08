@@ -78,7 +78,7 @@ export function useEventMallBoutiques(eventId: number | null, mallId: number | n
             });
 
             // For each boutique, select the most relevant assignment
-            const relevantAssignments = Array.from(assignmentsByBoutique.entries()).map(([boutiqueId, boutiqueAssignments]) => {
+            const relevantAssignments = Array.from(assignmentsByBoutique.entries()).map(([, boutiqueAssignments]) => {
                 // Sort assignments by priority:
                 // 1. Has product (yprodidfk not null) - highest priority (locked assignment)
                 // 2. Has designer (ydesignidfk not null)

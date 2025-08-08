@@ -330,7 +330,7 @@ export function ProductDetailsPage({ productData, onClose }: ProductDetailsPageP
         if (!selectedVariant) return;
 
         addToCartMutation.mutate({
-            yvarprodidfk: selectedVariant.yvarprodid,
+            ydetailseventidfk: selectedVariant.yvarprodid, // TODO: This should be event detail ID, not variant ID
             ypanierqte: quantity,
         });
     };
