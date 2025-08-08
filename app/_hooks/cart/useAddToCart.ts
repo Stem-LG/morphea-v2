@@ -6,7 +6,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 interface AddToCartParams {
-  yvarprodidfk: number;
+  ydetailseventidfk: number;
   ypanierqte: number;
 }
 
@@ -16,7 +16,7 @@ export function useAddToCart() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ yvarprodidfk, ypanierqte }: AddToCartParams) => {
+    mutationFn: async ({ ydetailseventidfk, ypanierqte }: AddToCartParams) => {
       if (!userData) {
         throw new Error("User not authenticated");
       }
@@ -27,7 +27,7 @@ export function useAddToCart() {
         .from("ypanier")
         .select("*")
         .eq("yuseridfk", userData.id)
-        .eq("yvarprodidfk", yvarprodidfk)
+        .eq("ydetailseventidfk", ydetailseventidfk)
         .single();
 
       if (checkError && checkError.code !== "PGRST116") {
@@ -61,7 +61,7 @@ export function useAddToCart() {
           .insert({
             ypanierid: uniqueId,
             yuseridfk: userData.id,
-            yvarprodidfk,
+            ydetailseventidfk,
             ypanierqte,
             sysaction: "INSERT",
             sysuser: userData.id,

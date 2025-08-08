@@ -41,7 +41,9 @@ export function CartDialog({ isOpen, onClose }: CartDialogProps) {
 
     const calculateTotal = () => {
         return cartItems.reduce((total, item) => {
-            const price = item.yvarprod?.yvarprodprixpromotion || item.yvarprod?.yvarprodprixcatalogue || 0;
+            // Get the first variant from the product (you might want to store which variant was selected)
+            const variant = (item.ydetailsevent?.yprod as any)?.yvarprod?.[0];
+            const price = variant?.yvarprodprixpromotion || variant?.yvarprodprixcatalogue || 0;
             return total + price * item.ypanierqte;
         }, 0);
     };
@@ -90,10 +92,10 @@ export function CartDialog({ isOpen, onClose }: CartDialogProps) {
                                 >
                                     {/* Product Image */}
                                     <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                                        {(item.yvarprod as any)?.yvarprodmedia?.[0]?.ymedia?.ymediaurl ? (
+                                        {(item.ydetailsevent?.yprod as any)?.yvarprodmedia?.[0]?.ymedia?.ymediaurl ? (
                                             <Image
-                                                src={(item.yvarprod as any).yvarprodmedia[0].ymedia.ymediaurl}
-                                                alt={item.yvarprod?.yvarprodintitule || "Product"}
+                                                src={(item.ydetailsevent.yprod as any).yvarprodmedia[0].ymedia.ymediaurl}
+                                                alt={item.ydetailsevent?.yprod?.yprodintitule || "Product"}
                                                 width={64}
                                                 height={64}
                                                 className="w-full h-full object-cover"
@@ -108,20 +110,20 @@ export function CartDialog({ isOpen, onClose }: CartDialogProps) {
                                     {/* Product Details */}
                                     <div className="flex-1 min-w-0">
                                         <h4 className="font-medium text-white truncate">
-                                            {item.yvarprod?.yvarprodintitule || "Unknown Product"}
+                                            {item.ydetailsevent?.yprod?.yprodintitule || "Unknown Product"}
                                         </h4>
                                         <div className="flex items-center gap-2 text-sm text-gray-300">
-                                            {item.yvarprod?.xcouleur && (
+                                            {(item.ydetailsevent?.yprod as any)?.yvarprod?.[0]?.xcouleur && (
                                                 <span className="flex items-center gap-1">
                                                     <div
                                                         className="w-3 h-3 rounded-full border"
-                                                        style={{ backgroundColor: item.yvarprod.xcouleur.xcouleurhexa }}
+                                                        style={{ backgroundColor: (item.ydetailsevent.yprod as any).yvarprod[0].xcouleur.xcouleurhexa }}
                                                     />
-                                                    {item.yvarprod.xcouleur.xcouleurintitule}
+                                                    {(item.ydetailsevent.yprod as any).yvarprod[0].xcouleur.xcouleurintitule}
                                                 </span>
                                             )}
-                                            {item.yvarprod?.xtaille && (
-                                                <span>• {item.yvarprod.xtaille.xtailleintitule}</span>
+                                            {(item.ydetailsevent?.yprod as any)?.yvarprod?.[0]?.xtaille && (
+                                                <span>• {(item.ydetailsevent.yprod as any).yvarprod[0].xtaille.xtailleintitule}</span>
                                             )}
                                         </div>
                                         <div className="flex items-center justify-between mt-2">
@@ -129,15 +131,15 @@ export function CartDialog({ isOpen, onClose }: CartDialogProps) {
                                                 <span className="font-semibold text-morpheus-gold-dark">
                                                     $
                                                     {(
-                                                        item.yvarprod?.yvarprodprixpromotion ||
-                                                        item.yvarprod?.yvarprodprixcatalogue ||
+                                                        (item.ydetailsevent?.yprod as any)?.yvarprod?.[0]?.yvarprodprixpromotion ||
+                                                        (item.ydetailsevent?.yprod as any)?.yvarprod?.[0]?.yvarprodprixcatalogue ||
                                                         0
                                                     ).toFixed(2)}
                                                 </span>
-                                                {item.yvarprod?.yvarprodprixpromotion &&
-                                                    item.yvarprod?.yvarprodprixcatalogue && (
+                                                {(item.ydetailsevent?.yprod as any)?.yvarprod?.[0]?.yvarprodprixpromotion &&
+                                                    (item.ydetailsevent?.yprod as any)?.yvarprod?.[0]?.yvarprodprixcatalogue && (
                                                         <span className="text-sm text-gray-300 line-through">
-                                                            ${item.yvarprod.yvarprodprixcatalogue.toFixed(2)}
+                                                            ${(item.ydetailsevent.yprod as any).yvarprod[0].yvarprodprixcatalogue.toFixed(2)}
                                                         </span>
                                                     )}
                                             </div>

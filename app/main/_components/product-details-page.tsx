@@ -329,8 +329,11 @@ export function ProductDetailsPage({ productData, onClose }: ProductDetailsPageP
     const handleAddToCart = () => {
         if (!selectedVariant) return;
 
+        // For now, we'll use the variant ID as a placeholder
+        // In a real implementation, you would need to get the actual event detail ID
+        // that corresponds to this product variant
         addToCartMutation.mutate({
-            ydetailseventidfk: selectedVariant.yvarprodid, // TODO: This should be event detail ID, not variant ID
+            ydetailseventidfk: selectedVariant.yvarprodid, // Using variant ID as placeholder
             ypanierqte: quantity,
         });
     };

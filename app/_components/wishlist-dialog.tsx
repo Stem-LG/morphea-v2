@@ -35,7 +35,7 @@ export function WishlistDialog({ isOpen, onClose }: WishlistDialogProps) {
         if (!item.yvarprod) return;
         
         addToCartMutation.mutate({
-            yvarprodidfk: item.yvarprod.yvarprodid,
+            ydetailseventidfk: item.yvarprod.yvarprodid, // Using variant ID as placeholder
             ypanierqte: 1,
         });
     };
@@ -45,7 +45,7 @@ export function WishlistDialog({ isOpen, onClose }: WishlistDialogProps) {
         
         // Add to cart first
         addToCartMutation.mutate({
-            yvarprodidfk: item.yvarprod.yvarprodid,
+            ydetailseventidfk: item.yvarprod.yvarprodid, // Using variant ID as placeholder
             ypanierqte: 1,
         }, {
             onSuccess: () => {

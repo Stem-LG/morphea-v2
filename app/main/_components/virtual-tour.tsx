@@ -270,7 +270,7 @@ export default function VirtualTour({
                 animationIntervalRef.current = null;
             }
         };
-    }, [pressedKeys, isTransitioning, tourData.scenes, currentScene, findClosestSceneInDirection]);
+    }, [pressedKeys, isTransitioning, tourData.scenes, currentScene, findClosestSceneInDirection, normalizeAngle]);
 
     // Add keyboard event listeners
     useEffect(() => {
@@ -606,7 +606,7 @@ export default function VirtualTour({
                 handleInfoSpotAction(marker.data.action, marker.data.title || "", marker.data.text || "");
             }
         },
-        [isTransitioning, handleInfoSpotAction]
+        [isTransitioning, handleInfoSpotAction, currentScene]
     );
 
     if (isLoading) {

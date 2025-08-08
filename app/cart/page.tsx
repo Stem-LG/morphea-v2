@@ -14,7 +14,8 @@ export default function CartPage() {
 
     const totalItems = cart.reduce((sum, item) => sum + item.ypanierqte, 0);
     const totalPrice = cart.reduce((sum, item) => {
-        const price = item.yvarprod?.yvarprodprixpromotion || item.yvarprod?.yvarprodprixcatalogue || 0;
+        const variant = (item.ydetailsevent?.yprod as any)?.yvarprod?.[0];
+        const price = variant?.yvarprodprixpromotion || variant?.yvarprodprixcatalogue || 0;
         return sum + price * item.ypanierqte;
     }, 0);
 
@@ -94,7 +95,7 @@ export default function CartPage() {
                                             {false ? (
                                                 <img
                                                     src=""
-                                                    alt={item.yvarprod?.yprod?.yprodintitule || "Product"}
+                                                    alt={item.ydetailsevent?.yprod?.yprodintitule || "Product"}
                                                     className="w-full h-full object-cover"
                                                 />
                                             ) : (
@@ -117,35 +118,35 @@ export default function CartPage() {
                                         {/* Product Details */}
                                         <div className="flex-1">
                                             <h3 className="text-white font-semibold text-lg mb-1">
-                                                {item.yvarprod?.yvarprodintitule || t("cart.unknownProduct")}
+                                                {item.ydetailsevent?.yprod?.yprodintitule || t("cart.unknownProduct")}
                                             </h3>
                                             <div className="flex items-center gap-4">
                                                 <span className="text-morpheus-gold-light font-semibold">
                                                     $
                                                     {(
-                                                        item.yvarprod?.yvarprodprixpromotion ||
-                                                        item.yvarprod?.yvarprodprixcatalogue ||
+                                                        (item.ydetailsevent?.yprod as any)?.yvarprod?.[0]?.yvarprodprixpromotion ||
+                                                        (item.ydetailsevent?.yprod as any)?.yvarprod?.[0]?.yvarprodprixcatalogue ||
                                                         0
                                                     ).toFixed(2)}
                                                 </span>
-                                                {item.yvarprod?.yvarprodprixpromotion && item.yvarprod?.yvarprodprixcatalogue && (
+                                                {(item.ydetailsevent?.yprod as any)?.yvarprod?.[0]?.yvarprodprixpromotion && (item.ydetailsevent?.yprod as any)?.yvarprod?.[0]?.yvarprodprixcatalogue && (
                                                     <span className="text-gray-300 text-sm line-through">
-                                                        ${item.yvarprod.yvarprodprixcatalogue.toFixed(2)}
+                                                        ${(item.ydetailsevent.yprod as any).yvarprod[0].yvarprodprixcatalogue.toFixed(2)}
                                                     </span>
                                                 )}
                                             </div>
                                             <div className="flex items-center gap-2 text-sm text-gray-300 mt-1">
-                                                {item.yvarprod?.xcouleur && (
+                                                {(item.ydetailsevent?.yprod as any)?.yvarprod?.[0]?.xcouleur && (
                                                     <span className="flex items-center gap-1">
                                                         <div
                                                             className="w-3 h-3 rounded-full border"
-                                                            style={{ backgroundColor: item.yvarprod.xcouleur.xcouleurhexa }}
+                                                            style={{ backgroundColor: (item.ydetailsevent.yprod as any).yvarprod[0].xcouleur.xcouleurhexa }}
                                                         />
-                                                        {item.yvarprod.xcouleur.xcouleurintitule}
+                                                        {(item.ydetailsevent.yprod as any).yvarprod[0].xcouleur.xcouleurintitule}
                                                     </span>
                                                 )}
-                                                {item.yvarprod?.xtaille && (
-                                                    <span>• {item.yvarprod.xtaille.xtailleintitule}</span>
+                                                {(item.ydetailsevent?.yprod as any)?.yvarprod?.[0]?.xtaille && (
+                                                    <span>• {(item.ydetailsevent.yprod as any).yvarprod[0].xtaille.xtailleintitule}</span>
                                                 )}
                                             </div>
                                         </div>
@@ -209,8 +210,8 @@ export default function CartPage() {
                                             <span className="text-morpheus-gold-light font-semibold">
                                                 $
                                                 {(
-                                                    (item.yvarprod?.yvarprodprixpromotion ||
-                                                        item.yvarprod?.yvarprodprixcatalogue ||
+                                                    ((item.ydetailsevent?.yprod as any)?.yvarprod?.[0]?.yvarprodprixpromotion ||
+                                                        (item.ydetailsevent?.yprod as any)?.yvarprod?.[0]?.yvarprodprixcatalogue ||
                                                         0) * item.ypanierqte
                                                 ).toFixed(2)}
                                             </span>

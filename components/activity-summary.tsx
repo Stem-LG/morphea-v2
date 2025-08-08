@@ -155,7 +155,7 @@ export function ActivitySummary({}: ActivitySummaryProps) {
                                 <div key={item.ypanierid} className="flex items-center gap-2 text-xs">
                                     <div className="w-2 h-2 bg-morpheus-gold-light rounded-full flex-shrink-0"></div>
                                     <span className="text-gray-300 truncate">
-                                        {item.yvarprod?.yvarprodintitule || t("activity.unknownProduct")}
+                                        {item.ydetailsevent?.yprod?.yprodintitule || t("activity.unknownProduct")}
                                         {item.ypanierqte > 1 && (
                                             <span className="text-morpheus-gold-light ml-1">(×{item.ypanierqte})</span>
                                         )}
@@ -247,7 +247,7 @@ export function ActivitySummary({}: ActivitySummaryProps) {
                                     <p className="text-white">
                                         {t("activity.added")}{" "}
                                         <span className="text-morpheus-gold-light font-medium">
-                                            {item.yvarprod?.yvarprodintitule || t("activity.unknownProduct")}
+                                            {item.ydetailsevent?.yprod?.yprodintitule || t("activity.unknownProduct")}
                                         </span>{" "}
                                         {t("activity.addedToCart")}
                                         {item.ypanierqte > 1 && (

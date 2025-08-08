@@ -20,10 +20,8 @@ export function useCart() {
         .from("ypanier")
         .select(`
           *,
-          yvarprod:yvarprodidfk (
+          ydetailsevent:ydetailseventidfk (
             *,
-            xcouleur:xcouleuridfk (*),
-            xtaille:xtailleidfk (*),
             yprod:yprodidfk (
               *,
               ydesign:ydesignidfk (*)
@@ -36,21 +34,42 @@ export function useCart() {
       if (data && data.length > 0) {
         const enrichedData = await Promise.all(
           data.map(async (item) => {
-            if (item.yvarprod) {
-              const { data: mediaData } = await supabase
+            if (item.ydetailsevent?.yprod) {
+              // Get variants for this product
+              const { data: variants } = await supabase
                 .schema("morpheus")
-                .from("yvarprodmedia")
+                .from("yvarprod")
                 .select(`
-                  ymedia:ymediaidfk (*)
+                  *,
+                  xcouleur:xcouleuridfk (*),
+                  xtaille:xtailleidfk (*)
                 `)
-                .eq("yvarprodidfk", item.yvarprod.yvarprodid)
-                .limit(1);
+                .eq("yprodidfk", item.ydetailsevent.yprod.yprodid);
+
+              // Get media for the first variant (or you could get media for all variants)
+              let mediaData = [];
+              if (variants && variants.length > 0) {
+                const { data: media } = await supabase
+                  .schema("morpheus")
+                  .from("yvarprodmedia")
+                  .select(`
+                    ymedia:ymediaidfk (*)
+                  `)
+                  .eq("yvarprodidfk", variants[0].yvarprodid)
+                  .limit(1);
+                
+                mediaData = media || [];
+              }
               
               return {
                 ...item,
-                yvarprod: {
-                  ...item.yvarprod,
-                  yvarprodmedia: mediaData || []
+                ydetailsevent: {
+                  ...item.ydetailsevent,
+                  yprod: {
+                    ...item.ydetailsevent.yprod,
+                    yvarprod: variants || [],
+                    yvarprodmedia: mediaData
+                  }
                 }
               };
             }

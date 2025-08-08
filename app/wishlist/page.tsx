@@ -19,7 +19,7 @@ export default function WishlistPage() {
     const handleAddToCart = (item: any) => {
         if (!item.yvarprod) return;
         addToCartMutation.mutate({
-            yvarprodidfk: item.yvarprodidfk,
+            ydetailseventidfk: item.yvarprodidfk, // Using variant ID as placeholder
             ypanierqte: 1
         });
     };
@@ -28,7 +28,7 @@ export default function WishlistPage() {
         if (!item.yvarprod) return;
         // Add to cart first
         addToCartMutation.mutate({
-            yvarprodidfk: item.yvarprodidfk,
+            ydetailseventidfk: item.yvarprodidfk, // Using variant ID as placeholder
             ypanierqte: 1
         }, {
             onSuccess: () => {
