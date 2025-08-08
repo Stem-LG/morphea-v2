@@ -28,6 +28,7 @@ interface CreateProductParams {
     productName: string;
     shortDescription: string;
     fullDescription: string;
+    infospotactionId?: number;
     variants: ProductVariant[];
 }
 
@@ -106,6 +107,7 @@ export function useCreateProduct() {
                         yboutiqueidfk: productData.storeId,
                         ymallidfk: storeData.ymallidfk,
                         ydesignidfk: productData.designerId,
+                        yinfospotactionId: productData.infospotactionId?.toString() || null,
                     });
 
                 if (detailsEventError) {

@@ -1,42 +1,49 @@
 import { createClient } from "@/lib/client";
-import { useQuery } from "@tanstack/react-query"
-
+import { useQuery } from "@tanstack/react-query";
+import { useCurrentEvent } from "./useCurrentEvent";
 
 export function useSceneProducts(infospotActionId: string | null) {
-
-
-    const supabase = createClient()
+    const supabase = createClient();
+    const { data: currentEvent } = useCurrentEvent();
 
     return useQuery({
-        queryKey: ['sceneProducts', infospotActionId],
+        queryKey: ['sceneProducts', infospotActionId, currentEvent?.yeventid],
         queryFn: async () => {
             if (!infospotActionId) {
                 console.log("No infospotActionId provided to useSceneProducts");
                 return [];
             }
+
+            if (!currentEvent) {
+                console.log("No current event found, cannot fetch products");
+                return [];
+            }
             
-            console.log("Fetching products for infospotActionId:", infospotActionId);
+            console.log("Fetching products for infospotActionId:", infospotActionId, "and eventId:", currentEvent.yeventid);
             
-            // Fetch products that are linked to this infospot action
+            // Query products through ydetailsevent table with proper relationships
             const { data, error } = await supabase
                 .schema("morpheus")
-                .from("yprod")
+                .from("ydetailsevent")
                 .select(`
                     *,
-                    yvarprod (
+                    yprod!yprodidfk (
                         *,
-                        xcouleur(*),
-                        xtaille(*),
-                        xdevise(*),
-                        yvarprodmedia (
-                            ymedia (*)
-                        ),
-                        yobjet3d (*)
-                    ),
-                    yinfospotactions!yinfospotactionsidfk (*)
+                        yvarprod (
+                            *,
+                            xcouleur(*),
+                            xtaille(*),
+                            xdevise(*),
+                            yvarprodmedia (
+                                ymedia (*)
+                            ),
+                            yobjet3d (*)
+                        )
+                    )
                 `)
-                .eq("yinfospotactionsidfk", parseInt(infospotActionId))
-                .eq("yprodstatut", "approved"); // Only fetch approved products
+                .eq("yinfospotactionId", infospotActionId)
+                .eq("yeventidfk", currentEvent.yeventid)
+                .not("yprodidfk", "is", null); // Ensure we have a product
 
             if (error) {
                 console.error("Error fetching products for infospot action:", {
@@ -44,16 +51,24 @@ export function useSceneProducts(infospotActionId: string | null) {
                     details: error.details,
                     hint: error.hint,
                     code: error.code,
-                    infospotActionId: infospotActionId
+                    infospotActionId: infospotActionId,
+                    eventId: currentEvent.yeventid
                 });
                 return [];
             }
 
-            console.log("Fetched products for infospot action", infospotActionId, ":", data);
+            // Filter for approved products only and transform the data
+            const approvedProducts = data
+                ?.filter(detailEvent =>
+                    detailEvent.yprod &&
+                    detailEvent.yprod.yprodstatut === "approved"
+                )
+                .map(detailEvent => detailEvent.yprod) || [];
 
-            return data || [];
+            console.log("Fetched approved products for infospot action", infospotActionId, "in event", currentEvent.yeventid, ":", approvedProducts);
+
+            return approvedProducts;
         },
-        enabled: !!infospotActionId // Only run query if infospotActionId is provided
-    })
-
+        enabled: !!infospotActionId && !!currentEvent // Only run query if both infospotActionId and currentEvent are available
+    });
 }

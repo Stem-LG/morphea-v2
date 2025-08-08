@@ -1050,6 +1050,7 @@ export type Database = {
           ydesignidfk: number | null
           ydetailseventid: number
           yeventidfk: number
+          yinfospotactionId: number | null
           ymallidfk: number
           yprodidfk: number | null
         }
@@ -1062,6 +1063,7 @@ export type Database = {
           ydesignidfk?: number | null
           ydetailseventid?: number
           yeventidfk: number
+          yinfospotactionId?: number | null
           ymallidfk: number
           yprodidfk?: number | null
         }
@@ -1074,6 +1076,7 @@ export type Database = {
           ydesignidfk?: number | null
           ydetailseventid?: number
           yeventidfk?: number
+          yinfospotactionId?: number | null
           ymallidfk?: number
           yprodidfk?: number | null
         }
@@ -1098,6 +1101,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "yevent"
             referencedColumns: ["yeventid"]
+          },
+          {
+            foreignKeyName: "ydetailsevent_yinfospotactionId_fkey"
+            columns: ["yinfospotactionId"]
+            isOneToOne: false
+            referencedRelation: "yinfospotactions"
+            referencedColumns: ["yinfospotactionsid"]
           },
           {
             foreignKeyName: "ydetailsevent_ymallidfk_fkey"
@@ -1534,38 +1544,38 @@ export type Database = {
           sysadresseip: string | null
           sysdate: string | null
           sysuser: string | null
+          ydetailseventidfk: number
           ypanierid: number
           ypanierqte: number
           yuseridfk: string
-          yvarprodidfk: number
         }
         Insert: {
           sysaction?: string | null
           sysadresseip?: string | null
           sysdate?: string | null
           sysuser?: string | null
+          ydetailseventidfk: number
           ypanierid: number
           ypanierqte: number
           yuseridfk: string
-          yvarprodidfk: number
         }
         Update: {
           sysaction?: string | null
           sysadresseip?: string | null
           sysdate?: string | null
           sysuser?: string | null
+          ydetailseventidfk?: number
           ypanierid?: number
           ypanierqte?: number
           yuseridfk?: string
-          yvarprodidfk?: number
         }
         Relationships: [
           {
-            foreignKeyName: "ypanier_yvarprodidfk_fkey"
-            columns: ["yvarprodidfk"]
+            foreignKeyName: "ypanier_ydetailseventidfk_fkey"
+            columns: ["ydetailseventidfk"]
             isOneToOne: false
-            referencedRelation: "yvarprod"
-            referencedColumns: ["yvarprodid"]
+            referencedRelation: "ydetailsevent"
+            referencedColumns: ["ydetailseventid"]
           },
         ]
       }

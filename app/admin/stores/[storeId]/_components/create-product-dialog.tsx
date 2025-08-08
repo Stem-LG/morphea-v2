@@ -41,6 +41,8 @@ import { useDesigner } from "../_hooks/use-designer";
 import { useCreateProduct } from "../_hooks/use-create-product";
 import { useUpdateProduct } from "../_hooks/use-update-product";
 import { useProductDetails } from "../_hooks/use-product-details";
+import { useInfospotactions } from "../_hooks/use-infospotactions";
+import { useCurrencies } from "../_hooks/use-currencies";
 
 interface ProductVariant {
     id: string;
@@ -54,6 +56,12 @@ interface ProductVariant {
     models3d: (File | { yobjet3did: number; yobjet3durl: string })[];
     isDeleted?: boolean; // Mark for deletion
     status?: 'approved' | 'not_approved' | 'rejected'; // Variant status
+    // Pricing fields (admin only)
+    catalogPrice?: number;
+    promotionPrice?: number | null;
+    promotionStartDate?: string | null;
+    promotionEndDate?: string | null;
+    currencyId?: number | null;
 }
 
 interface CreateProductDialogProps {
@@ -83,6 +91,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
     const [shortDescription, setShortDescription] = useState("");
     const [fullDescription, setFullDescription] = useState("");
     const [categoryId, setCategoryId] = useState<number | null>(null);
+    const [selectedInfospotactionId, setSelectedInfospotactionId] = useState<number | null>(null);
     const [variants, setVariants] = useState<ProductVariant[]>([
         {
             id: "1",
@@ -121,6 +130,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
     const { data: categories, isLoading: categoriesLoading } = useCategories();
     const { data: colors, isLoading: colorsLoading } = useColors();
     const { data: sizes, isLoading: sizesLoading } = useSizes();
+    const { data: currencies, isLoading: currenciesLoading } = useCurrencies();
     const { data: designer, isLoading: designerLoading } = useDesigner();
     const {
         data: productDetails,
@@ -128,7 +138,14 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
         isError: productDetailsError,
     } = useProductDetails({
         productId: productId!,
+        eventId: selectedEventId || undefined,
         enabled: isEditMode,
+    });
+    
+    // Get store ID for infospotactions (admin only)
+    const { data: infospotactions } = useInfospotactions({
+        boutiqueId: storeId,
+        enabled: isAdmin && !!storeId
     });
     const createColorMutation = useCreateColor();
     const createSizeMutation = useCreateSize();
@@ -138,7 +155,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
     // Effect to populate form when editing
     useEffect(() => {
         if (isEditMode && productDetails && productDetails.product) {
-            const { product, variants: productVariants } = productDetails;
+            const { product, variants: productVariants, infospotactionId } = productDetails;
 
             // Populate product fields
             setProductCode(product.yprodcode || "");
@@ -146,6 +163,8 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
             setShortDescription(product.yprodinfobulle || "");
             setFullDescription(product.yproddetailstech || "");
             setCategoryId(product.xcategprodidfk || null);
+            // Set the current infospotaction from ydetailsevent
+            setSelectedInfospotactionId(infospotactionId || null);
 
             // Populate variants
             const formattedVariants: ProductVariant[] = productVariants.map((variant, index) => ({
@@ -159,6 +178,12 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                 videos: variant.videos || [],
                 models3d: variant.models3d || [],
                 status: variant.yvarprodstatut || 'not_approved',
+                // Populate pricing data
+                catalogPrice: variant.yvarprodprixcatalogue || 0,
+                promotionPrice: variant.yvarprodprixpromotion || null,
+                promotionStartDate: variant.yvarprodpromotiondatedeb || null,
+                promotionEndDate: variant.yvarprodpromotiondatefin || null,
+                currencyId: variant.xdeviseidfk || null,
             }));
 
             setVariants(
@@ -184,6 +209,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
             setShortDescription("");
             setFullDescription("");
             setCategoryId(null);
+            setSelectedInfospotactionId(null);
             setVariants([
                 {
                     id: "1",
@@ -194,6 +220,11 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                     videos: [],
                     models3d: [],
                     status: 'not_approved',
+                    catalogPrice: 0,
+                    promotionPrice: null,
+                    promotionStartDate: null,
+                    promotionEndDate: null,
+                    currencyId: null,
                 },
             ]);
         }
@@ -218,6 +249,12 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
             label: size.xtailleintitule,
         })) || [];
 
+    const currencyOptions =
+        currencies?.map((currency) => ({
+            value: currency.xdeviseid,
+            label: `${currency.xdeviseintitule} (${currency.xdevisecodealpha})`,
+        })) || [];
+
     // Handlers
     const handleAddVariant = () => {
         const newVariant: ProductVariant = {
@@ -229,6 +266,11 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
             videos: [],
             models3d: [],
             status: 'not_approved',
+            catalogPrice: 0,
+            promotionPrice: null,
+            promotionStartDate: null,
+            promotionEndDate: null,
+            currencyId: null,
         };
         setVariants([...variants, newVariant]);
     };
@@ -408,6 +450,8 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                     productName,
                     shortDescription,
                     fullDescription,
+                    infospotactionId: selectedInfospotactionId || undefined,
+                    eventId: selectedEventId || undefined,
                     variants: variants.map((v) => ({
                         id: v.id,
                         yvarprodid: v.yvarprodid,
@@ -419,6 +463,12 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                         videos: v.videos,
                         models3d: v.models3d,
                         isDeleted: v.isDeleted,
+                        // Include pricing data
+                        catalogPrice: v.catalogPrice,
+                        promotionPrice: v.promotionPrice,
+                        promotionStartDate: v.promotionStartDate,
+                        promotionEndDate: v.promotionEndDate,
+                        currencyId: v.currencyId,
                     })),
                 });
                 toast.success("Product updated successfully!");
@@ -433,6 +483,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                     productName,
                     shortDescription,
                     fullDescription,
+                    infospotactionId: selectedInfospotactionId || undefined,
                     variants: variants.map((v) => ({
                         name: v.name,
                         code: v.code,
@@ -591,6 +642,26 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                 disabled={!canEditProductInfo()}
                                             />
                                         </div>
+                                        
+                                        {/* Infospotaction Selection (Admin Only) */}
+                                        {isAdmin && (
+                                            <div>
+                                                <Label className="text-gray-300">Product Placement</Label>
+                                                <div className="text-gray-400 text-xs mb-1">
+                                                    Choose where this product should be placed in the store
+                                                </div>
+                                                <SuperSelect
+                                                    value={selectedInfospotactionId}
+                                                    onValueChange={(value) => setSelectedInfospotactionId(value as number)}
+                                                    options={infospotactions?.map(action => ({
+                                                        value: action.yinfospotactionsid,
+                                                        label: `${action.yinfospotactionstitle} - ${action.yinfospotactionsdescription}`
+                                                    })) || []}
+                                                    placeholder="Select product placement (optional)"
+                                                    className="mt-1"
+                                                />
+                                            </div>
+                                        )}
                                     </CardContent>
                                 </Card>
 
@@ -933,6 +1004,109 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                             </div>
                                                         </div>
                                                     </div>
+
+                                                    {/* Pricing Section (Admin Only) */}
+                                                    {isAdmin && canEdit && (
+                                                        <div className="space-y-4 border-t border-gray-600/30 pt-4">
+                                                            <Label className="text-gray-300 flex items-center gap-2">
+                                                                <svg className="h-4 w-4 text-morpheus-gold-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                                                                </svg>
+                                                                Pricing & Promotion
+                                                            </Label>
+                                                            
+                                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                                {/* Currency Selection */}
+                                                                <div>
+                                                                    <Label className="text-gray-300 text-sm">Currency</Label>
+                                                                    <SuperSelect
+                                                                        value={variant.currencyId}
+                                                                        onValueChange={(value) =>
+                                                                            handleVariantChange(variant.id, "currencyId", value)
+                                                                        }
+                                                                        options={currencyOptions}
+                                                                        placeholder="Select currency"
+                                                                        disabled={currenciesLoading}
+                                                                        className="mt-1"
+                                                                    />
+                                                                </div>
+
+                                                                {/* Catalog Price */}
+                                                                <div>
+                                                                    <Label className="text-gray-300 text-sm">Catalog Price</Label>
+                                                                    <Input
+                                                                        type="number"
+                                                                        min="0"
+                                                                        step="0.01"
+                                                                        value={variant.catalogPrice || ""}
+                                                                        onChange={(e) =>
+                                                                            handleVariantChange(
+                                                                                variant.id,
+                                                                                "catalogPrice",
+                                                                                parseFloat(e.target.value) || 0
+                                                                            )
+                                                                        }
+                                                                        placeholder="0.00"
+                                                                        className="mt-1 bg-gray-600/50 border-gray-500 text-white"
+                                                                    />
+                                                                </div>
+
+                                                                {/* Promotion Price */}
+                                                                <div>
+                                                                    <Label className="text-gray-300 text-sm">Promotion Price (Optional)</Label>
+                                                                    <Input
+                                                                        type="number"
+                                                                        min="0"
+                                                                        step="0.01"
+                                                                        value={variant.promotionPrice || ""}
+                                                                        onChange={(e) =>
+                                                                            handleVariantChange(
+                                                                                variant.id,
+                                                                                "promotionPrice",
+                                                                                e.target.value ? parseFloat(e.target.value) : null
+                                                                            )
+                                                                        }
+                                                                        placeholder="0.00"
+                                                                        className="mt-1 bg-gray-600/50 border-gray-500 text-white"
+                                                                    />
+                                                                </div>
+
+                                                                {/* Promotion Start Date */}
+                                                                <div>
+                                                                    <Label className="text-gray-300 text-sm">Promotion Start Date</Label>
+                                                                    <Input
+                                                                        type="date"
+                                                                        value={variant.promotionStartDate || ""}
+                                                                        onChange={(e) =>
+                                                                            handleVariantChange(
+                                                                                variant.id,
+                                                                                "promotionStartDate",
+                                                                                e.target.value || null
+                                                                            )
+                                                                        }
+                                                                        className="mt-1 bg-gray-600/50 border-gray-500 text-white"
+                                                                    />
+                                                                </div>
+
+                                                                {/* Promotion End Date */}
+                                                                <div className="sm:col-span-2">
+                                                                    <Label className="text-gray-300 text-sm">Promotion End Date</Label>
+                                                                    <Input
+                                                                        type="date"
+                                                                        value={variant.promotionEndDate || ""}
+                                                                        onChange={(e) =>
+                                                                            handleVariantChange(
+                                                                                variant.id,
+                                                                                "promotionEndDate",
+                                                                                e.target.value || null
+                                                                            )
+                                                                        }
+                                                                        className="mt-1 bg-gray-600/50 border-gray-500 text-white"
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    )}
 
                                                     {/* Media Upload */}
                                                     {canEdit && (

@@ -5,14 +5,15 @@ import { useQuery } from "@tanstack/react-query";
 
 interface UseProductDetailsProps {
     productId: number;
+    eventId?: number;
     enabled?: boolean;
 }
 
-export function useProductDetails({ productId, enabled = true }: UseProductDetailsProps) {
+export function useProductDetails({ productId, eventId, enabled = true }: UseProductDetailsProps) {
     const supabase = createClient();
 
     return useQuery({
-        queryKey: ["product-details", productId],
+        queryKey: ["product-details", productId, eventId],
         queryFn: async () => {
             // Fetch product details
             const { data: product, error: productError } = await supabase
@@ -24,6 +25,24 @@ export function useProductDetails({ productId, enabled = true }: UseProductDetai
 
             if (productError) {
                 throw new Error(`Failed to fetch product: ${productError.message}`);
+            }
+
+            // Fetch infospotaction assignment from ydetailsevent if eventId is provided
+            let infospotactionId = null;
+            if (eventId) {
+                const { data: detailsEvent, error: detailsEventError } = await supabase
+                    .schema("morpheus")
+                    .from("ydetailsevent")
+                    .select("yinfospotactionId")
+                    .eq("yprodidfk", productId)
+                    .eq("yeventidfk", eventId)
+                    .single();
+
+                if (detailsEventError) {
+                    console.warn(`Failed to fetch infospotaction for product ${productId} in event ${eventId}:`, detailsEventError);
+                } else {
+                    infospotactionId = detailsEvent?.yinfospotactionId ? parseInt(detailsEvent.yinfospotactionId) : null;
+                }
             }
 
             // Fetch product variants with color and size information
@@ -92,7 +111,8 @@ export function useProductDetails({ productId, enabled = true }: UseProductDetai
 
             return {
                 product,
-                variants: variantsWithMedia
+                variants: variantsWithMedia,
+                infospotactionId
             };
         },
         enabled,

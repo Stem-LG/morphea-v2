@@ -17,6 +17,12 @@ interface ProductVariant {
     videos: (File | { ymediaid: number; ymediaurl: string; ymediaintitule: string })[];
     models3d: (File | { yobjet3did: number; yobjet3durl: string })[];
     isDeleted?: boolean; // Mark for deletion
+    // Pricing fields
+    catalogPrice?: number;
+    promotionPrice?: number | null;
+    promotionStartDate?: string | null;
+    promotionEndDate?: string | null;
+    currencyId?: number | null;
 }
 
 interface UpdateProductParams {
@@ -29,6 +35,8 @@ interface UpdateProductParams {
     shortDescription: string;
     fullDescription: string;
     variants: ProductVariant[];
+    infospotactionId?: number;
+    eventId?: number;
 }
 
 export function useUpdateProduct() {
@@ -59,6 +67,22 @@ export function useUpdateProduct() {
 
                 if (productError) {
                     throw new Error(`Failed to update product: ${productError.message}`);
+                }
+
+                // Step 1.5: Update infospotaction in ydetailsevent if provided
+                if (productData.infospotactionId !== undefined && productData.eventId) {
+                    const { error: detailsEventError } = await supabase
+                        .schema("morpheus")
+                        .from("ydetailsevent")
+                        .update({
+                            yinfospotactionId: productData.infospotactionId.toString(),
+                        })
+                        .eq("yprodidfk", productData.productId)
+                        .eq("yeventidfk", productData.eventId);
+
+                    if (detailsEventError) {
+                        console.warn(`Failed to update infospotaction: ${detailsEventError.message}`);
+                    }
                 }
 
                 // Step 2: Handle variants
@@ -122,19 +146,35 @@ export function useUpdateProduct() {
         // Generate variant code
         const variantCode = variant.code || `${Date.now()}-${color?.xcouleurcode || 'C'}-${size?.xtaillecode || 'S'}`;
 
+        const insertData: any = {
+            yvarprodcode: variantCode,
+            yvarprodintitule: variant.name,
+            yvarprodgenre: size?.xtaillecode || 'S',
+            xcouleuridfk: variant.colorId,
+            xtailleidfk: variant.sizeId,
+            yprodidfk: productId,
+            yvarprodnbrjourlivraison: 7,
+            yvarprodprixcatalogue: variant.catalogPrice || 0,
+        };
+
+        // Add pricing data if provided
+        if (variant.promotionPrice !== undefined) {
+            insertData.yvarprodprixpromotion = variant.promotionPrice;
+        }
+        if (variant.promotionStartDate !== undefined) {
+            insertData.yvarprodpromotiondatedeb = variant.promotionStartDate;
+        }
+        if (variant.promotionEndDate !== undefined) {
+            insertData.yvarprodpromotiondatefin = variant.promotionEndDate;
+        }
+        if (variant.currencyId !== undefined) {
+            insertData.xdeviseidfk = variant.currencyId;
+        }
+
         const { data: createdVariant, error: variantError } = await supabase
             .schema("morpheus")
             .from("yvarprod")
-            .insert({
-                yvarprodcode: variantCode,
-                yvarprodintitule: variant.name,
-                yvarprodgenre: size?.xtaillecode || 'S',
-                xcouleuridfk: variant.colorId,
-                xtailleidfk: variant.sizeId,
-                yprodidfk: productId,
-                yvarprodnbrjourlivraison: 7,
-                yvarprodprixcatalogue: 0,
-            })
+            .insert(insertData)
             .select("*")
             .single();
 
@@ -146,15 +186,34 @@ export function useUpdateProduct() {
     }
 
     async function updateVariant(variant: ProductVariant) {
+        const updateData: any = {
+            yvarprodintitule: variant.name,
+            yvarprodcode: variant.code,
+            xcouleuridfk: variant.colorId,
+            xtailleidfk: variant.sizeId,
+        };
+
+        // Add pricing data if provided
+        if (variant.catalogPrice !== undefined) {
+            updateData.yvarprodprixcatalogue = variant.catalogPrice;
+        }
+        if (variant.promotionPrice !== undefined) {
+            updateData.yvarprodprixpromotion = variant.promotionPrice;
+        }
+        if (variant.promotionStartDate !== undefined) {
+            updateData.yvarprodpromotiondatedeb = variant.promotionStartDate;
+        }
+        if (variant.promotionEndDate !== undefined) {
+            updateData.yvarprodpromotiondatefin = variant.promotionEndDate;
+        }
+        if (variant.currencyId !== undefined) {
+            updateData.xdeviseidfk = variant.currencyId;
+        }
+
         const { data: updatedVariant, error: variantError } = await supabase
             .schema("morpheus")
             .from("yvarprod")
-            .update({
-                yvarprodintitule: variant.name,
-                yvarprodcode: variant.code,
-                xcouleuridfk: variant.colorId,
-                xtailleidfk: variant.sizeId,
-            })
+            .update(updateData)
             .eq("yvarprodid", variant.yvarprodid!)
             .select("*")
             .single();

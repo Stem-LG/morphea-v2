@@ -25,9 +25,11 @@ import {
 import { useApprovalOperations } from "../_hooks/use-approval-operations";
 import { useVariantApprovalOperations } from "../_hooks/use-variant-approval-operations";
 import { useCategories } from "../../stores/[storeId]/_hooks/use-categories";
+import { useInfospotactions } from "../_hooks/use-infospotactions";
 import { createClient } from "@/lib/client";
 import { useQuery } from "@tanstack/react-query";
 import { Model3DViewer } from "./three-d-viewer";
+import { useAuth } from "@/hooks/useAuth";
 
 // Variant Card Component
 interface VariantCardProps {
@@ -457,6 +459,9 @@ interface ApprovalFormProps {
 }
 
 export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) {
+    const { data: user } = useAuth();
+    const isAdmin = user?.app_metadata?.roles?.includes("admin");
+    
     const { approveProduct, denyProduct, isLoading } = useApprovalOperations();
     const {
         approveVariant,
@@ -467,8 +472,9 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
     const { data: categories } = useCategories();
     const supabase = createClient();
 
-    // State for category selection
+    // State for category and infospotaction selection
     const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
+    const [selectedInfospotactionId, setSelectedInfospotactionId] = useState<number | null>(null);
 
     // Fetch product details
     const { data: product, isLoading: productLoading } = useQuery({
@@ -520,6 +526,15 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
     const mall = eventDetail?.ymall;
     const event = eventDetail?.yevent;
 
+    // Get boutique ID for infospotactions
+    const boutiqueId = store?.yboutiqueid;
+    
+    // Fetch infospotactions for the current boutique (admin only)
+    const { data: infospotactions } = useInfospotactions({
+        boutiqueId,
+        enabled: isAdmin && !!boutiqueId && isOpen
+    });
+
     // Get pending variants count
     const pendingVariants = product?.yvarprod?.filter((v: any) => v.yvarprodstatut === "not_approved") || [];
     const approvedVariants = product?.yvarprod?.filter((v: any) => v.yvarprodstatut === "approved") || [];
@@ -533,7 +548,7 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                 productId,
                 approvalData: {
                     categoryId: selectedCategoryId || product.xcategprodidfk,
-                    infoactionId: product.yinfospotactionsidfk,
+                    infoactionId: selectedInfospotactionId,
                 },
             });
             onClose();
@@ -720,6 +735,41 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                                 </div>
                                             )}
                                         </div>
+                                        
+                                        {/* Infospotaction Selection (Admin Only) */}
+                                        {isAdmin && product.yprodstatut === "not_approved" && (
+                                            <div>
+                                                <Label className="text-gray-300 text-sm">Product Placement</Label>
+                                                <div className="text-gray-400 text-xs mb-2">
+                                                    Choose where this product should be placed in the store
+                                                </div>
+                                                <Select
+                                                    value={selectedInfospotactionId?.toString() || ""}
+                                                    onValueChange={(value) =>
+                                                        setSelectedInfospotactionId(value ? parseInt(value) : null)
+                                                    }
+                                                >
+                                                    <SelectTrigger className="h-8 text-xs bg-gray-800 border-gray-600 text-white">
+                                                        <SelectValue placeholder="Select product placement" />
+                                                    </SelectTrigger>
+                                                    <SelectContent className="bg-gray-800 border-gray-600">
+                                                        {infospotactions?.map((action) => (
+                                                            <SelectItem
+                                                                key={action.yinfospotactionsid}
+                                                                value={action.yinfospotactionsid.toString()}
+                                                                className="text-white hover:bg-gray-700"
+                                                            >
+                                                                <div className="flex flex-col">
+                                                                    <span className="font-medium">{action.yinfospotactionstitle}</span>
+                                                                    <span className="text-xs text-gray-400">{action.yinfospotactionsdescription}</span>
+                                                                </div>
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+                                        )}
+                                        
                                         <div>
                                             <Label className="text-gray-300 text-sm">Technical Details</Label>
                                             <div className="text-gray-300 text-sm bg-gray-800 p-3 rounded border border-gray-600">

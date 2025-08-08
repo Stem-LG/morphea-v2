@@ -30,14 +30,13 @@ export function useApprovalOperations() {
         mutationFn: async ({ productId, approvalData }: { productId: number; approvalData: ApprovalData }) => {
             const currentTime = new Date().toISOString();
             
-            // Update product status, category, and infoaction
+            // Update product status and category
             const { data: updatedProduct, error: updateError } = await supabase
                 .schema('morpheus')
                 .from('yprod')
                 .update({
                     yprodstatut: 'approved',
                     xcategprodidfk: approvalData.categoryId,
-                    yinfospotactionsidfk: approvalData.infoactionId,
                     sysdate: currentTime,
                     sysaction: 'update'
                 })
@@ -47,6 +46,23 @@ export function useApprovalOperations() {
 
             if (updateError) {
                 throw new Error(updateError.message || 'Failed to update product status');
+            }
+
+            // Update infospotaction in ydetailsevent if provided
+            if (approvalData.infoactionId) {
+                const { error: detailsError } = await supabase
+                    .schema('morpheus')
+                    .from('ydetailsevent')
+                    .update({
+                        yinfospotactionId: approvalData.infoactionId.toString(),
+                        sysdate: currentTime,
+                        sysaction: 'update'
+                    })
+                    .eq('yprodidfk', productId);
+
+                if (detailsError) {
+                    throw new Error(detailsError.message || 'Failed to update product placement');
+                }
             }
 
             // Update variants with pricing, delivery information, and currency
