@@ -48,7 +48,7 @@ export function AccessDenied() {
                         <Link href="/auth/login">
                             <Button 
                                 variant="outline" 
-                                className="w-full border-slate-600 text-gray-300 hover:bg-slate-700/50 hover:text-white"
+                                className="w-full border-slate-600 text-gray-300 hover:bg-slate-700/50 hover:text-white mt-3"
                             >
                                 {t('admin.loginDifferentAccount')}
                             </Button>
