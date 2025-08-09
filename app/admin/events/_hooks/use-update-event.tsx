@@ -33,6 +33,42 @@ export function useUpdateEvent() {
             } = updateData;
 
             try {
+               // If updating dates, validate them
+               if (eventFields.startDate || eventFields.endDate) {
+                   const now = new Date();
+                   const start = eventFields.startDate ? new Date(eventFields.startDate) : undefined;
+                   const end = eventFields.endDate ? new Date(eventFields.endDate) : undefined;
+
+                   if (start && start < now) {
+                       throw new Error("Event start date cannot be in the past");
+                   }
+                   if (end && end < now) {
+                       throw new Error("Event end date cannot be in the past");
+                   }
+                   if (start && end && end < start) {
+                       throw new Error("Event end date cannot be before start date");
+                   }
+
+                   // Fetch existing events excluding current
+                   const { data: existingEvents, error: existingEventsError } = await supabase
+                       .schema("morpheus")
+                       .from("yevent")
+                       .select("yeventid, yeventdatedeb, yeventdatefin")
+                       .neq("yeventid", eventId);
+                   if (existingEventsError) {
+                       throw new Error(`Failed to fetch existing events: ${existingEventsError.message}`);
+                   }
+                   const checkStart = start || new Date();
+                   const checkEnd = end || start || new Date();
+                   for (const ev of existingEvents || []) {
+                       const evStart = new Date(ev.yeventdatedeb);
+                       const evEnd = new Date(ev.yeventdatefin);
+                       const overlap = (checkStart <= evEnd && checkEnd >= evStart);
+                       if (overlap) {
+                           throw new Error("Updated event dates overlap with an existing event");
+                       }
+                   }
+               }
                 // Step 1: Update event basic information if provided
                 const basicFields = { code: eventFields.code, name: eventFields.name, startDate: eventFields.startDate, endDate: eventFields.endDate };
                 if (Object.values(basicFields).some(val => val !== undefined)) {

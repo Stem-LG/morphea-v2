@@ -9,6 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Calendar, Upload, X, MapPin, Store } from "lucide-react";
 import { useCreateEvent } from "../_hooks/use-create-event";
+import { useEvents } from "../_hooks/use-events";
 import { useQueryClient } from "@tanstack/react-query";
 import { useLanguage } from "@/hooks/useLanguage";
 import { toast } from "sonner";
@@ -32,10 +33,33 @@ export function CreateEventDialog({ children }: CreateEventDialogProps) {
     const [selectedMallIds, setSelectedMallIds] = useState<number[]>([]);
     const [selectedBoutiqueIds, setSelectedBoutiqueIds] = useState<number[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [dateOverlapWarning, setDateOverlapWarning] = useState<string | null>(null);
 
     const queryClient = useQueryClient();
     const createEventMutation = useCreateEvent();
+    const { data: existingEvents } = useEvents();
     const { t } = useLanguage();
+
+    const checkDateOverlap = (startDate: string, endDate: string) => {
+        if (!startDate || !endDate || !existingEvents) {
+            setDateOverlapWarning(null);
+            return;
+        }
+
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+
+        for (const event of existingEvents) {
+            const eventStart = new Date(event.yeventdatedeb);
+            const eventEnd = new Date(event.yeventdatefin);
+            
+            if (start <= eventEnd && end >= eventStart) {
+                setDateOverlapWarning(`Dates overlap with event: ${event.yeventintitule}`);
+                return;
+            }
+        }
+        setDateOverlapWarning(null);
+    };
 
     const handleInputChange = (field: string, value: string) => {
         setFormData(prev => ({
@@ -202,7 +226,19 @@ export function CreateEventDialog({ children }: CreateEventDialogProps) {
                                     <Input
                                         type="datetime-local"
                                         value={formData.startDate}
-                                        onChange={(e) => handleInputChange("startDate", e.target.value)}
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            handleInputChange("startDate", value);
+                                            const startDateTime = new Date(value);
+                                            const endDateTime = new Date(formData.endDate);
+                                            if (formData.endDate && startDateTime >= endDateTime) {
+                                                // If same day but end time earlier or equal, adjust to +1 hour
+                                                const adjusted = new Date(startDateTime.getTime() + 60 * 60 * 1000);
+                                                handleInputChange("endDate", adjusted.toISOString().slice(0,16));
+                                            }
+                                            checkDateOverlap(value, formData.endDate);
+                                        }}
+                                        max={formData.endDate || undefined}
                                         className="bg-gray-800/50 border-gray-600 text-white"
                                         disabled={isSubmitting}
                                     />
@@ -213,12 +249,24 @@ export function CreateEventDialog({ children }: CreateEventDialogProps) {
                                     <Input
                                         type="datetime-local"
                                         value={formData.endDate}
-                                        onChange={(e) => handleInputChange("endDate", e.target.value)}
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            handleInputChange("endDate", value);
+                                            checkDateOverlap(formData.startDate, value);
+                                        }}
+                                        min={formData.startDate || undefined}
                                         className="bg-gray-800/50 border-gray-600 text-white"
                                         disabled={isSubmitting}
                                     />
                                 </div>
                             </div>
+                            
+                            {/* Date Overlap Warning */}
+                            {dateOverlapWarning && (
+                                <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-3">
+                                    <p className="text-red-400 text-sm font-medium">⚠️ {dateOverlapWarning}</p>
+                                </div>
+                            )}
                         </div>
 
                         {/* Image Upload Section */}

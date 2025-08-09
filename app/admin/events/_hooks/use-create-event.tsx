@@ -24,6 +24,33 @@ export function useCreateEvent() {
             const code = event.code || Date.now().toString();
 
             try {
+               // Validation: Date should not be in the past
+               const now = new Date();
+               const start = new Date(event.startDate);
+               const end = new Date(event.endDate);
+               if (start < now || end < now) {
+                   throw new Error("Event dates cannot be in the past");
+               }
+               if (end < start) {
+                   throw new Error("Event end date cannot be before start date");
+               }
+
+               // Validation: Dates should not overlap with existing events
+               const { data: existingEvents, error: existingEventsError } = await supabase
+                   .schema("morpheus")
+                   .from("yevent")
+                   .select("yeventid, yeventdatedeb, yeventdatefin");
+               if (existingEventsError) {
+                   throw new Error(`Failed to fetch existing events: ${existingEventsError.message}`);
+               }
+               for (const ev of existingEvents || []) {
+                   const evStart = new Date(ev.yeventdatedeb);
+                   const evEnd = new Date(ev.yeventdatefin);
+                   const overlap = (start <= evEnd && end >= evStart);
+                   if (overlap) {
+                       throw new Error("Event dates overlap with an existing event");
+                   }
+               }
                 // Step 1: Upload files and create ymedia records
                 const mediaIds: number[] = [];
 

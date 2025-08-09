@@ -3,9 +3,7 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Textarea } from "@/components/ui/textarea";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import {
     Plus,
@@ -14,36 +12,19 @@ import {
     Tag,
     Search,
     Package,
-    X,
-    Save,
     AlertTriangle
 } from "lucide-react";
 import {
-    useCreateCategory,
-    useUpdateCategory,
     useDeleteCategory,
     useCategoriesWithStats
 } from "@/hooks/useCategories";
-
-interface CategoryFormData {
-    xcategprodintitule: string;
-    xcategprodcode: string;
-    xcategprodinfobulle: string;
-}
+import { CreateCategoryDialog } from "./create-category-dialog";
+import { UpdateCategoryDialog } from "./update-category-dialog";
 
 export function CategoryManagement() {
     const [searchTerm, setSearchTerm] = useState("");
-    const [showForm, setShowForm] = useState(false);
-    const [editingCategory, setEditingCategory] = useState<number | null>(null);
-    const [formData, setFormData] = useState<CategoryFormData>({
-        xcategprodintitule: "",
-        xcategprodcode: "",
-        xcategprodinfobulle: ""
-    });
 
     const { data: categories, isLoading } = useCategoriesWithStats();
-    const createCategoryMutation = useCreateCategory();
-    const updateCategoryMutation = useUpdateCategory();
     const deleteCategoryMutation = useDeleteCategory();
 
     // Filter categories based on search term
@@ -53,43 +34,6 @@ export function CategoryManagement() {
         category.xcategprodinfobulle?.toLowerCase().includes(searchTerm.toLowerCase())
     ) || [];
 
-    const resetForm = () => {
-        setFormData({
-            xcategprodintitule: "",
-            xcategprodcode: "",
-            xcategprodinfobulle: ""
-        });
-        setEditingCategory(null);
-        setShowForm(false);
-    };
-
-    const handleEdit = (category: any) => {
-        setFormData({
-            xcategprodintitule: category.xcategprodintitule || "",
-            xcategprodcode: category.xcategprodcode || "",
-            xcategprodinfobulle: category.xcategprodinfobulle || ""
-        });
-        setEditingCategory(category.xcategprodid);
-        setShowForm(true);
-    };
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        
-        try {
-            if (editingCategory) {
-                await updateCategoryMutation.mutateAsync({
-                    categoryId: editingCategory,
-                    updates: formData
-                });
-            } else {
-                await createCategoryMutation.mutateAsync(formData);
-            }
-            resetForm();
-        } catch (error) {
-            console.error('Failed to save category:', error);
-        }
-    };
 
     const handleDelete = async (categoryId: number) => {
         if (confirm('Are you sure you want to delete this category? This action cannot be undone.')) {
@@ -103,11 +47,6 @@ export function CategoryManagement() {
         }
     };
 
-    const validateForm = () => {
-        return formData.xcategprodintitule.trim() !== "" &&
-               formData.xcategprodcode.trim() !== "" &&
-               formData.xcategprodinfobulle.trim() !== "";
-    };
 
     const getProductCount = (category: any) => {
         return category.yprod?.[0]?.count || 0;
@@ -138,13 +77,12 @@ export function CategoryManagement() {
                         Manage global product categories for the platform
                     </p>
                 </div>
-                <Button
-                    onClick={() => setShowForm(true)}
-                    className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-morpheus-gold-light hover:to-morpheus-gold-dark text-white shadow-lg"
-                >
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Category
-                </Button>
+                <CreateCategoryDialog>
+                    <Button className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-morpheus-gold-light hover:to-morpheus-gold-dark text-white shadow-lg">
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Category
+                    </Button>
+                </CreateCategoryDialog>
             </div>
 
             {/* Stats */}
@@ -205,75 +143,6 @@ export function CategoryManagement() {
                 />
             </div>
 
-            {/* Category Form */}
-            {showForm && (
-                <Card className="bg-gradient-to-br from-morpheus-blue-dark/40 to-morpheus-blue-light/40 border-slate-700/50">
-                    <CardHeader>
-                        <CardTitle className="text-white flex items-center gap-2">
-                            <Tag className="h-5 w-5 text-morpheus-gold-light" />
-                            {editingCategory ? 'Edit Category' : 'Add New Category'}
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <form onSubmit={handleSubmit} className="space-y-4">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <Label className="text-gray-300">Category Name *</Label>
-                                    <Input
-                                        value={formData.xcategprodintitule}
-                                        onChange={(e) => setFormData(prev => ({ ...prev, xcategprodintitule: e.target.value }))}
-                                        className="bg-morpheus-blue-dark/30 border-slate-600 text-white"
-                                        placeholder="e.g., Electronics"
-                                        required
-                                    />
-                                </div>
-                                <div>
-                                    <Label className="text-gray-300">Category Code *</Label>
-                                    <Input
-                                        value={formData.xcategprodcode}
-                                        onChange={(e) => setFormData(prev => ({ ...prev, xcategprodcode: e.target.value.toUpperCase() }))}
-                                        className="bg-morpheus-blue-dark/30 border-slate-600 text-white"
-                                        placeholder="e.g., ELEC"
-                                        required
-                                    />
-                                </div>
-                            </div>
-                            
-                            <div>
-                                <Label className="text-gray-300">Description *</Label>
-                                <Textarea
-                                    value={formData.xcategprodinfobulle}
-                                    onChange={(e) => setFormData(prev => ({ ...prev, xcategprodinfobulle: e.target.value }))}
-                                    className="bg-morpheus-blue-dark/30 border-slate-600 text-white"
-                                    placeholder="Describe this category..."
-                                    rows={3}
-                                    required
-                                />
-                            </div>
-
-                            <div className="flex gap-3 pt-4">
-                                <Button
-                                    type="submit"
-                                    disabled={!validateForm() || createCategoryMutation.isPending || updateCategoryMutation.isPending}
-                                    className="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white"
-                                >
-                                    <Save className="h-4 w-4 mr-2" />
-                                    {editingCategory ? 'Update' : 'Create'} Category
-                                </Button>
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    onClick={resetForm}
-                                    className="border-slate-600 text-gray-300 hover:bg-slate-700/50"
-                                >
-                                    <X className="h-4 w-4 mr-2" />
-                                    Cancel
-                                </Button>
-                            </div>
-                        </form>
-                    </CardContent>
-                </Card>
-            )}
 
             {/* Categories List */}
             {filteredCategories.length === 0 ? (
@@ -337,15 +206,16 @@ export function CategoryManagement() {
                                     </div>
 
                                     <div className="flex gap-2 pt-2">
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() => handleEdit(category)}
-                                            className="flex-1 border-slate-600 text-white hover:bg-slate-700/50"
-                                        >
-                                            <Edit className="h-4 w-4 mr-1" />
-                                            Edit
-                                        </Button>
+                                        <UpdateCategoryDialog category={category}>
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                className="flex-1 border-slate-600 text-white hover:bg-slate-700/50"
+                                            >
+                                                <Edit className="h-4 w-4 mr-1" />
+                                                Edit
+                                            </Button>
+                                        </UpdateCategoryDialog>
                                         <Tooltip>
                                             <TooltipTrigger asChild>
                                                 <span className={isInUse ? "cursor-not-allowed" : ""}>
