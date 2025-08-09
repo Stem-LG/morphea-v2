@@ -158,6 +158,8 @@ export const frTranslations = {
       "retry": "Réessayer",
       "viewDetails": "Voir les Détails",
       "editEvent": "Modifier l'Événement",
+      "designerAssignments": "Assignations de Designers",
+      "errorLoadingDetails": "Erreur lors du chargement des détails de l'événement",
       "deleteEventConfirm": "Êtes-vous sûr de vouloir supprimer cet événement ?",
       "deleteEventWarning": "Cette action ne peut pas être annulée. L'événement et toutes ses données associées seront définitivement supprimés.",
       "eventCreatedSuccess": "Événement créé avec succès !",
@@ -179,6 +181,7 @@ export const frTranslations = {
         "endDateAfterStart": "La date de fin doit être après la date de début"
       },
       "malls": {
+        "title": "Centres Commerciaux",
         "selectMalls": "Sélectionner les Centres Commerciaux",
         "mallsOptional": "Centres Commerciaux (Optionnel)",
         "searchMalls": "Rechercher des centres commerciaux...",
@@ -190,6 +193,7 @@ export const frTranslations = {
         "loadingMalls": "Chargement des centres commerciaux..."
       },
       "boutiques": {
+        "title": "Boutiques",
         "selectBoutiques": "Sélectionner les Boutiques",
         "boutiquesOptional": "Boutiques (Optionnel)",
         "searchBoutiques": "Rechercher des boutiques...",

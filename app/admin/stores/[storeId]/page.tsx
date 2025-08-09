@@ -206,8 +206,9 @@ export default function StoreDetails() {
         
         if (isStoreAdmin) {
             const status = getProductStatus(product);
-            // Store admin can only edit pending products, but can add variants to approved products
-            return status === 'pending' || status === 'approved';
+            // Store admin can edit pending products, approved products (to add variants),
+            // and mixed status products (to edit unapproved variants)
+            return status === 'pending' || status === 'approved' || status === 'mixed';
         }
         
         return false;
@@ -540,15 +541,17 @@ export default function StoreDetails() {
                             onSortingChange: handleSortingChange
                         }}
                         actions={
-                            <Button
-                                onClick={handleCreateProduct}
-                                disabled={!eventId}
-                                className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-morpheus-gold-dark hover:to-morpheus-gold-light text-white font-semibold transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-                                title={eventId ? "Add Product" : "Please select an event from the stores page to add products"}
-                            >
-                                <Plus className="h-4 w-4 mr-2" />
-                                Add Product
-                            </Button>
+                            isStoreAdmin && !isAdmin ? (
+                                <Button
+                                    onClick={handleCreateProduct}
+                                    disabled={!eventId}
+                                    className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-morpheus-gold-dark hover:to-morpheus-gold-light text-white font-semibold transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    title={eventId ? "Add Product" : "Please select an event from the stores page to add products"}
+                                >
+                                    <Plus className="h-4 w-4 mr-2" />
+                                    Add Product
+                                </Button>
+                            ) : null
                         }
                         filters={
                             <SuperSelect

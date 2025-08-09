@@ -7,6 +7,7 @@ import { useLanguage } from "@/hooks/useLanguage";
 import { Calendar, Edit, Trash2, CalendarDays, Eye } from "lucide-react";
 import { UpdateEventDialog } from "./update-event-dialog";
 import { DeleteEventDialog } from "./delete-event-dialog";
+import { ViewEventDetailsDialog } from "./view-event-details-dialog";
 import { Badge } from "@/components/ui/badge";
 import { useDeleteEvent } from "../_hooks/use-delete-event";
 import { useState } from "react";
@@ -144,14 +145,15 @@ export function EventCard({ event }) {
                 </div>
             </CardContent>
             <CardFooter>
-                <Button
-                    className="w-full bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-morpheus-gold-dark hover:to-morpheus-gold-light text-white font-semibold transition-all duration-300 hover:scale-105"
-                    size="sm"
-                    onClick={() => console.log("View event details:", event)}
-                >
-                    <Eye className="h-4 w-4 mr-2" />
-                    {t('admin.events.viewDetails')}
-                </Button>
+                <ViewEventDetailsDialog event={event}>
+                    <Button
+                        className="w-full bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-morpheus-gold-dark hover:to-morpheus-gold-light text-white font-semibold transition-all duration-300 hover:scale-105"
+                        size="sm"
+                    >
+                        <Eye className="h-4 w-4 mr-2" />
+                        {t('admin.events.viewDetails')}
+                    </Button>
+                </ViewEventDetailsDialog>
             </CardFooter>
             
             <DeleteEventDialog

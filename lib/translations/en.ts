@@ -159,6 +159,8 @@ export const enTranslations = {
       "retry": "Retry",
       "viewDetails": "View Details",
       "editEvent": "Edit Event",
+      "designerAssignments": "Designer Assignments",
+      "errorLoadingDetails": "Error loading event details",
       "deleteEventConfirm": "Are you sure you want to delete this event?",
       "deleteEventWarning": "This action cannot be undone. The event and all its associated data will be permanently removed.",
       "eventCreatedSuccess": "Event created successfully!",
@@ -180,6 +182,7 @@ export const enTranslations = {
         "endDateAfterStart": "End date must be after start date"
       },
       "malls": {
+        "title": "Malls",
         "selectMalls": "Select Malls",
         "mallsOptional": "Malls (Optional)",
         "searchMalls": "Search malls...",
@@ -191,6 +194,7 @@ export const enTranslations = {
         "loadingMalls": "Loading malls..."
       },
       "boutiques": {
+        "title": "Boutiques",
         "selectBoutiques": "Select Boutiques",
         "boutiquesOptional": "Boutiques (Optional)",
         "searchBoutiques": "Search boutiques...",

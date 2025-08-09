@@ -37,9 +37,11 @@ interface VariantCardProps {
     onApprove: (promotionData?: any) => void;
     onReject: () => void;
     isLoading: boolean;
+    eventStartDate?: string;
+    eventEndDate?: string;
 }
 
-function VariantCard({ variant, onApprove, onReject, isLoading }: VariantCardProps) {
+function VariantCard({ variant, onApprove, onReject, isLoading, eventStartDate, eventEndDate }: VariantCardProps) {
     const [showPromotionForm, setShowPromotionForm] = useState(false);
     const [promotionPrice, setPromotionPrice] = useState(variant.yvarprodprixpromotion || "");
     const [promotionStartDate, setPromotionStartDate] = useState(variant.yvarprodpromotiondatedeb || "");
@@ -48,6 +50,54 @@ function VariantCard({ variant, onApprove, onReject, isLoading }: VariantCardPro
     const [selectedCurrencyId, setSelectedCurrencyId] = useState(variant.xdeviseidfk || 1);
 
     const supabase = createClient();
+
+    // Validation functions
+    const validatePromotionDates = () => {
+        if (!promotionPrice || parseFloat(promotionPrice) <= 0) {
+            return { isValid: true, error: null }; // No promotion, no validation needed
+        }
+
+        if (!promotionStartDate || !promotionEndDate) {
+            return {
+                isValid: false,
+                error: "Both start and end dates are required when setting a promotion price"
+            };
+        }
+
+        const startDate = new Date(promotionStartDate);
+        const endDate = new Date(promotionEndDate);
+
+        if (endDate <= startDate) {
+            return {
+                isValid: false,
+                error: "End date must be after start date"
+            };
+        }
+
+        // Validate against event dates if available
+        if (eventStartDate && eventEndDate) {
+            const eventStart = new Date(eventStartDate);
+            const eventEnd = new Date(eventEndDate);
+
+            if (startDate < eventStart || startDate > eventEnd) {
+                return {
+                    isValid: false,
+                    error: "Promotion start date must be within the event period"
+                };
+            }
+
+            if (endDate < eventStart || endDate > eventEnd) {
+                return {
+                    isValid: false,
+                    error: "Promotion end date must be within the event period"
+                };
+            }
+        }
+
+        return { isValid: true, error: null };
+    };
+
+    const promotionValidation = validatePromotionDates();
 
     // Fetch currencies
     const { data: currencies } = useQuery({
@@ -271,12 +321,24 @@ function VariantCard({ variant, onApprove, onReject, isLoading }: VariantCardPro
                         <span className="text-white">{variant.yvarprodnbrjourlivraison || 0} days</span>
                     </div>
                     {variant.yvarprodprixpromotion && (
-                        <div className="flex justify-between">
-                            <span className="text-gray-400">Promo:</span>
-                            <span className="text-green-400">
-                                {variant.yvarprodprixpromotion} {variant.xdevise?.xdevisecodealpha || ""}
-                            </span>
-                        </div>
+                        <>
+                            <div className="flex justify-between">
+                                <span className="text-gray-400">Promo:</span>
+                                <span className="text-green-400">
+                                    {variant.yvarprodprixpromotion} {variant.xdevise?.xdevisecodealpha || ""}
+                                </span>
+                            </div>
+                            {(variant.yvarprodpromotiondatedeb || variant.yvarprodpromotiondatefin) && (
+                                <div className="flex justify-between">
+                                    <span className="text-gray-400">Promo Period:</span>
+                                    <span className="text-green-400 text-xs">
+                                        {variant.yvarprodpromotiondatedeb && new Date(variant.yvarprodpromotiondatedeb).toLocaleDateString()}
+                                        {variant.yvarprodpromotiondatedeb && variant.yvarprodpromotiondatefin && " - "}
+                                        {variant.yvarprodpromotiondatefin && new Date(variant.yvarprodpromotiondatefin).toLocaleDateString()}
+                                    </span>
+                                </div>
+                            )}
+                        </>
                     )}
                 </div>
 
@@ -373,6 +435,8 @@ function VariantCard({ variant, onApprove, onReject, isLoading }: VariantCardPro
                                         value={promotionStartDate}
                                         onChange={(e) => setPromotionStartDate(e.target.value)}
                                         className="h-8 text-xs bg-gray-800 border-gray-600 text-white"
+                                        min={eventStartDate ? eventStartDate.replace(' ', 'T') : undefined}
+                                        max={eventEndDate ? eventEndDate.replace(' ', 'T') : undefined}
                                     />
                                 </div>
                                 <div>
@@ -382,6 +446,8 @@ function VariantCard({ variant, onApprove, onReject, isLoading }: VariantCardPro
                                         value={promotionEndDate}
                                         onChange={(e) => setPromotionEndDate(e.target.value)}
                                         className="h-8 text-xs bg-gray-800 border-gray-600 text-white"
+                                        min={promotionStartDate || (eventStartDate ? eventStartDate.replace(' ', 'T') : undefined)}
+                                        max={eventEndDate ? eventEndDate.replace(' ', 'T') : undefined}
                                     />
                                 </div>
                             </div>
@@ -403,6 +469,13 @@ function VariantCard({ variant, onApprove, onReject, isLoading }: VariantCardPro
                                 Set Price & Promotion
                             </Button>
                         )}
+                        {/* Validation Error Display */}
+                        {showPromotionForm && !promotionValidation.isValid && (
+                            <div className="text-xs text-red-400 bg-red-900/20 border border-red-600/30 rounded p-2">
+                                {promotionValidation.error}
+                            </div>
+                        )}
+                        
                         <div className="flex gap-2">
                             <Button
                                 size="sm"
@@ -418,8 +491,12 @@ function VariantCard({ variant, onApprove, onReject, isLoading }: VariantCardPro
                                         : null;
                                     onApprove(approvalData);
                                 }}
-                                disabled={isLoading || (showPromotionForm && !catalogPrice)}
-                                className="flex-1 h-8 bg-green-600 hover:bg-green-700 text-white text-xs"
+                                disabled={
+                                    isLoading ||
+                                    (showPromotionForm && !catalogPrice) ||
+                                    (showPromotionForm && !promotionValidation.isValid)
+                                }
+                                className="flex-1 h-8 bg-green-600 hover:bg-green-700 text-white text-xs disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 <CheckCircle className="h-3 w-3 mr-1" />
                                 Approve
@@ -703,35 +780,31 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                         </div>
                                         <div>
                                             <Label className="text-gray-300 text-sm">Category</Label>
-                                            <div className="text-white">
-                                                {category?.xcategprodintitule || "Unknown"}
-                                            </div>
-                                            {product.yprodstatut === "not_approved" && (
-                                                <div className="mt-2">
-                                                    <Label className="text-gray-300 text-xs">
-                                                        Change Category (Optional)
-                                                    </Label>
-                                                    <Select
-                                                        value={selectedCategoryId?.toString() || ""}
-                                                        onValueChange={(value) =>
-                                                            setSelectedCategoryId(value ? parseInt(value) : null)
-                                                        }
-                                                    >
-                                                        <SelectTrigger className="h-8 text-xs bg-gray-800 border-gray-600 text-white">
-                                                            <SelectValue placeholder="Select new category" />
-                                                        </SelectTrigger>
-                                                        <SelectContent className="bg-gray-800 border-gray-600">
-                                                            {categories?.map((cat) => (
-                                                                <SelectItem
-                                                                    key={cat.xcategprodid}
-                                                                    value={cat.xcategprodid.toString()}
-                                                                    className="text-white hover:bg-gray-700"
-                                                                >
-                                                                    {cat.xcategprodintitule}
-                                                                </SelectItem>
-                                                            ))}
-                                                        </SelectContent>
-                                                    </Select>
+                                            {product.yprodstatut === "not_approved" ? (
+                                                <Select
+                                                    value={selectedCategoryId?.toString() || product.xcategprodidfk?.toString() || ""}
+                                                    onValueChange={(value) =>
+                                                        setSelectedCategoryId(value ? parseInt(value) : null)
+                                                    }
+                                                >
+                                                    <SelectTrigger className="h-8 text-xs bg-gray-800 border-gray-600 text-white">
+                                                        <SelectValue placeholder="Select category" />
+                                                    </SelectTrigger>
+                                                    <SelectContent className="bg-gray-800 border-gray-600">
+                                                        {categories?.map((cat) => (
+                                                            <SelectItem
+                                                                key={cat.xcategprodid}
+                                                                value={cat.xcategprodid.toString()}
+                                                                className="text-white hover:bg-gray-700"
+                                                            >
+                                                                {cat.xcategprodintitule}
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                            ) : (
+                                                <div className="text-white">
+                                                    {category?.xcategprodintitule || "Unknown"}
                                                 </div>
                                             )}
                                         </div>
@@ -740,9 +813,6 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                         {isAdmin && product.yprodstatut === "not_approved" && (
                                             <div>
                                                 <Label className="text-gray-300 text-sm">Product Placement</Label>
-                                                <div className="text-gray-400 text-xs mb-2">
-                                                    Choose where this product should be placed in the store
-                                                </div>
                                                 <Select
                                                     value={selectedInfospotactionId?.toString() || ""}
                                                     onValueChange={(value) =>
@@ -759,10 +829,7 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                                                 value={action.yinfospotactionsid.toString()}
                                                                 className="text-white hover:bg-gray-700"
                                                             >
-                                                                <div className="flex flex-col">
-                                                                    <span className="font-medium">{action.yinfospotactionstitle}</span>
-                                                                    <span className="text-xs text-gray-400">{action.yinfospotactionsdescription}</span>
-                                                                </div>
+                                                                {action.yinfospotactionstitle}
                                                             </SelectItem>
                                                         ))}
                                                     </SelectContent>
@@ -903,6 +970,8 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                             }
                                             onReject={() => handleRejectVariant(variant.yvarprodid)}
                                             isLoading={variantLoading}
+                                            eventStartDate={event?.yeventdatedeb}
+                                            eventEndDate={event?.yeventdatefin}
                                         />
                                     ))}
                                 </div>

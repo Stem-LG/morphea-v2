@@ -120,6 +120,7 @@ export function ProductViewDialog({ isOpen, onClose, productId }: ProductViewDia
     if (productLoading) {
         return (
             <Dialog open={isOpen} onOpenChange={onClose}>
+                <DialogTitle className="text-white flex items-center gap-2">Product Details</DialogTitle>
                 <DialogContent className="max-w-6xl max-h-[90vh] bg-gray-900 border-gray-700">
                     <div className="flex items-center justify-center py-12">
                         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400"></div>
