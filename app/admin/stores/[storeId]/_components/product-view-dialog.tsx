@@ -406,7 +406,7 @@ function VariantViewCard({ variant }: { variant: any }) {
                                 >
                                     <img
                                         src={image.ymediaurl}
-                                        alt={image.ymediaintitule}
+                                        alt={image.ymediaintitule || `Product image ${image.ymediaid}`}
                                         className="w-full h-full object-cover"
                                         onError={(e) => {
                                             const target = e.target as HTMLImageElement;

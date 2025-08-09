@@ -98,6 +98,8 @@ export const frTranslations = {
     "getStarted": "Commencer",
     "login": "Connexion",
     "exploreAsGuest": "Explorer en tant qu'invité",
+    "enterMall": "Entrer dans le Mall",
+    "myProfile": "Mon Profil",
     "immersiveExperience": "Expérience Immersive",
     "virtualTours": "Visite Virtuelle",
     "premiumQuality": "Qualité Premium",

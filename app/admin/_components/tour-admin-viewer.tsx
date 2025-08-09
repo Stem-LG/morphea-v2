@@ -127,6 +127,247 @@ export default function TourAdminViewer({
 
   const loading = scenesLoading || infospotsLoading || scenelinksLoading || storesLoading
 
+  // Add markers for navigation links and info spots
+  const addMarkers = useCallback(() => {
+    if (!viewerInstance || !currentScene) {
+      console.log('Cannot add markers - missing viewer or current scene:', {
+        hasViewer: !!viewerInstance,
+        currentScene: currentScene?.yscenesid
+      })
+      return
+    }
+
+    const markersPluginInstance = viewerInstance.getPlugin(MarkersPlugin) as MarkersPlugin
+    if (!markersPluginInstance) {
+      console.log('Markers plugin not available yet')
+      return
+    }
+
+    console.log('Adding markers for scene:', currentScene.yscenesid, currentScene.yscenesname)
+    
+    // Inline the marker adding logic to avoid circular dependency
+    markersPluginInstance.clearMarkers()
+
+    // Add scene link markers - filter by current scene ID
+    const currentSceneLinks = scenelinks.filter(link => link.yscenesidfkactuelle === currentScene.yscenesid)
+    console.log('Scene links for current scene:', currentSceneLinks.length, currentSceneLinks.map(l => l.yscenelinksname))
+    
+    currentSceneLinks.forEach((link) => {
+      const targetScene = scenes.find(s => s.yscenesid === link.yscenesidfktarget)
+      
+      // Create custom HTML for scene link markers with click handling
+      const markerHtml = `
+        <div
+          style="
+            width: 40px;
+            height: 40px;
+            background-image: url('/explore.svg');
+            background-size: contain;
+            background-repeat: no-repeat;
+            cursor: pointer;
+            position: relative;
+          "
+          data-marker-type="scenelink"
+          data-marker-id="${link.yscenelinksid}"
+          data-target-id="${link.yscenesidfktarget}"
+          onclick="event.stopPropagation(); event.preventDefault(); window.handleSceneLinkClick('${link.yscenelinksid}', '${link.yscenesidfktarget}');"
+        ></div>
+      `
+      
+      markersPluginInstance.addMarker({
+        id: `link-${link.yscenelinksid}`,
+        position: { yaw: link.yscenelinksaxexyaw, pitch: link.yscenelinksaxeypitch },
+        html: markerHtml,
+        anchor: "center center",
+        tooltip: {
+          content: adminModeRef.current === 'edit'
+            ? `Click to edit: ${link.yscenelinksname} → ${targetScene?.yscenesname || 'Unknown Scene'}`
+            : `${link.yscenelinksname} → ${targetScene?.yscenesname || 'Unknown Scene'}`,
+          position: "top center",
+        },
+        data: {
+          type: 'scenelink',
+          id: link.yscenelinksid,
+          targetId: link.yscenesidfktarget,
+        },
+      })
+    })
+
+    // Add infospot markers - filter by current scene ID
+    const currentInfospots = infospots.filter(spot => spot.yscenesidfk === currentScene.yscenesid)
+    console.log('Infospots for current scene:', currentInfospots.length, currentInfospots.map(s => s.yinfospotstitle))
+    
+    currentInfospots.forEach((spot) => {
+      const action = actions.find(a => a.yinfospotactionsid === spot.yinfospotactionidfk)
+      
+      const infospotHtml = `
+        <div
+          style="
+            width: 32px;
+            height: 32px;
+            background: #f59e0b;
+            border: 3px solid white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            animation: pulse 2s infinite;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+          "
+          data-marker-type="infospot"
+          data-marker-id="${spot.yinfospotsid}"
+          onclick="event.stopPropagation(); event.preventDefault(); window.handleInfospotClick('${spot.yinfospotsid}');"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+          </svg>
+        </div>
+        <style>
+          @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+          }
+        </style>
+      `
+      
+      markersPluginInstance.addMarker({
+        id: `infospot-${spot.yinfospotsid}`,
+        position: { yaw: parseFloat(spot.yinfospotsaxexyaw), pitch: parseFloat(spot.yinfospotsaxeypitch) },
+        html: infospotHtml,
+        anchor: "center center",
+        tooltip: {
+          content: adminModeRef.current === 'edit'
+            ? `Click to edit: ${spot.yinfospotstitle}`
+            : spot.yinfospotstitle,
+          position: "top center",
+        },
+        data: {
+          type: 'infospot',
+          id: spot.yinfospotsid,
+          title: spot.yinfospotstitle,
+          text: spot.yinfospotstext,
+          action: action,
+        },
+      })
+    })
+
+    console.log('Finished adding markers. Total markers added:', currentSceneLinks.length + currentInfospots.length)
+  }, [viewerInstance, currentScene, scenelinks, infospots, scenes, actions])
+
+  const handleMarkerClick = useCallback((e: any) => {
+    // Use refs to get current state values to avoid stale closure issues
+    const currentAdminMode = adminModeRef.current
+    const currentIsTransitioning = isTransitioningRef.current
+    const currentIsHandlingEdit = isHandlingEditRef.current
+    const currentForceStopTransitions = forceStopTransitionsRef.current
+    
+    console.log('Marker clicked:', e, 'Admin mode:', currentAdminMode, 'Is transitioning:', currentIsTransitioning, 'Is handling edit:', currentIsHandlingEdit, 'Force stop:', currentForceStopTransitions)
+    if ((currentIsTransitioning && !currentForceStopTransitions) || currentIsHandlingEdit) return
+
+    const marker = e.marker
+    const data = marker.data
+
+    // Stop event propagation immediately
+    if (e.originalEvent) {
+      e.originalEvent.preventDefault()
+      e.originalEvent.stopPropagation()
+      e.originalEvent.stopImmediatePropagation()
+    }
+
+    // In edit mode, always edit
+    if (currentAdminMode === 'edit') {
+      console.log('Edit mode - opening edit form for:', data.type, data.id)
+      setIsHandlingEdit(true)
+      
+      if (data.type === 'scenelink') {
+        const sceneLink = scenelinks.find(link => link.yscenelinksid === data.id)
+        console.log('Found scene link for editing:', sceneLink)
+        if (sceneLink) {
+          setInlineEditingSceneLink(sceneLink)
+          setPreviewMarkerPosition({ yaw: sceneLink.yscenelinksaxexyaw, pitch: sceneLink.yscenelinksaxeypitch })
+          // Reset flag after a delay
+          setTimeout(() => setIsHandlingEdit(false), 100)
+          return // Exit early to prevent any navigation
+        }
+      } else if (data.type === 'infospot') {
+        const infospot = infospots.find(spot => spot.yinfospotsid === data.id)
+        console.log('Found infospot for editing:', infospot)
+        if (infospot) {
+          setInlineEditingInfospot(infospot)
+          setPreviewMarkerPosition({ yaw: parseFloat(infospot.yinfospotsaxexyaw), pitch: parseFloat(infospot.yinfospotsaxeypitch) })
+          // Reset flag after a delay
+          setTimeout(() => setIsHandlingEdit(false), 100)
+          return // Exit early to prevent any navigation
+        }
+      }
+      
+      // Reset flag if no match found
+      setIsHandlingEdit(false)
+    } else {
+      // View mode: Check for ctrl+click for editing, otherwise normal functionality
+      const isEditClick = e.originalEvent?.ctrlKey || e.originalEvent?.button === 2
+      
+      if (isEditClick) {
+        console.log('Ctrl+click in view mode - opening edit form for:', data.type, data.id)
+        setIsHandlingEdit(true)
+        
+        if (data.type === 'scenelink') {
+          const sceneLink = scenelinks.find(link => link.yscenelinksid === data.id)
+          console.log('Found scene link for editing (ctrl+click):', sceneLink)
+          if (sceneLink) {
+            setInlineEditingSceneLink(sceneLink)
+            setPreviewMarkerPosition({ yaw: sceneLink.yscenelinksaxexyaw, pitch: sceneLink.yscenelinksaxeypitch })
+            setTimeout(() => setIsHandlingEdit(false), 100)
+            return
+          }
+        } else if (data.type === 'infospot') {
+          const infospot = infospots.find(spot => spot.yinfospotsid === data.id)
+          console.log('Found infospot for editing (ctrl+click):', infospot)
+          if (infospot) {
+            setInlineEditingInfospot(infospot)
+            setPreviewMarkerPosition({ yaw: parseFloat(infospot.yinfospotsaxexyaw), pitch: parseFloat(infospot.yinfospotsaxeypitch) })
+            setTimeout(() => setIsHandlingEdit(false), 100)
+            return
+          }
+        }
+        
+        setIsHandlingEdit(false)
+      } else {
+        // Normal view mode functionality - only if not handling edit and not in edit mode
+        console.log('Normal click in view mode for:', data.type, data.id)
+        
+        // Double-check current mode to prevent navigation in edit mode
+        const finalAdminMode = adminModeRef.current
+        const finalForceStopTransitions = forceStopTransitionsRef.current
+        if (finalAdminMode === 'edit' || finalForceStopTransitions) {
+          console.log('Navigation blocked - current mode:', finalAdminMode, 'forceStop:', finalForceStopTransitions)
+          return
+        }
+        
+        if (data.type === 'scenelink') {
+          // Navigate to target scene only if we're truly in view mode
+          const targetScene = scenes.find(s => s.yscenesid === data.targetId)
+          if (targetScene) {
+            console.log('Navigating to scene:', targetScene.yscenesname)
+            setIsTransitioning(true)
+            setCurrentScene(targetScene)
+            setTimeout(() => setIsTransitioning(false), 1000)
+          }
+        } else if (data.type === 'infospot') {
+          // Show infospot information in modal
+          const infospot = infospots.find(spot => spot.yinfospotsid === data.id)
+          if (infospot) {
+            setViewingInfospot(infospot)
+          }
+        }
+      }
+    }
+  }, [scenes, scenelinks, infospots])
 
   // Initialize current scene with URL persistence
   useEffect(() => {
@@ -225,7 +466,7 @@ export default function TourAdminViewer({
         }
       }
     }
-  }, [containerElement, currentScene?.yscenesid, loading])
+  }, [containerElement, currentScene?.yscenesid, loading, addMarkers, handleMarkerClick])
 
   // Separate effect for scene transitions (like virtual-tour.tsx)
   useEffect(() => {
@@ -256,7 +497,7 @@ export default function TourAdminViewer({
     }
 
     transitionToScene()
-  }, [currentScene?.yscenesid, viewerInstance, loading])
+  }, [currentScene?.yscenesid, viewerInstance, loading, addMarkers])
 
   // Global handlers setup (separate from viewer initialization)
   useEffect(() => {
@@ -354,7 +595,7 @@ export default function TourAdminViewer({
         addMarkers()
       }, 100)
     }
-  }, [infospots, scenelinks, currentScene?.yscenesid, adminMode, viewerInstance])
+  }, [infospots, scenelinks, currentScene?.yscenesid, adminMode, viewerInstance, addMarkers])
 
   // Update preview marker in real-time when position changes (for editing)
   useEffect(() => {
@@ -512,247 +753,8 @@ export default function TourAdminViewer({
     }
   }, [adminMode, inlineEditingInfospot, inlineEditingSceneLink, inlineAddingInfospot, inlineAddingSceneLink, viewerInstance])
 
-  const addMarkers = useCallback(() => {
-    if (!viewerInstance || !currentScene) {
-      console.log('Cannot add markers - missing viewer or current scene:', {
-        hasViewer: !!viewerInstance,
-        currentScene: currentScene?.yscenesid
-      })
-      return
-    }
-
-    const markersPluginInstance = viewerInstance.getPlugin(MarkersPlugin) as MarkersPlugin
-    if (!markersPluginInstance) {
-      console.log('Markers plugin not available yet')
-      return
-    }
-
-    console.log('Adding markers for scene:', currentScene.yscenesid, currentScene.yscenesname)
-    
-    // Inline the marker adding logic to avoid circular dependency
-    markersPluginInstance.clearMarkers()
-
-    // Add scene link markers - filter by current scene ID
-    const currentSceneLinks = scenelinks.filter(link => link.yscenesidfkactuelle === currentScene.yscenesid)
-    console.log('Scene links for current scene:', currentSceneLinks.length, currentSceneLinks.map(l => l.yscenelinksname))
-    
-    currentSceneLinks.forEach((link) => {
-      const targetScene = scenes.find(s => s.yscenesid === link.yscenesidfktarget)
-      
-      // Create custom HTML for scene link markers with click handling
-      const markerHtml = `
-        <div
-          style="
-            width: 40px;
-            height: 40px;
-            background-image: url('/explore.svg');
-            background-size: contain;
-            background-repeat: no-repeat;
-            cursor: pointer;
-            position: relative;
-          "
-          data-marker-type="scenelink"
-          data-marker-id="${link.yscenelinksid}"
-          data-target-id="${link.yscenesidfktarget}"
-          onclick="event.stopPropagation(); event.preventDefault(); window.handleSceneLinkClick('${link.yscenelinksid}', '${link.yscenesidfktarget}');"
-        ></div>
-      `
-      
-      markersPluginInstance.addMarker({
-        id: `link-${link.yscenelinksid}`,
-        position: { yaw: link.yscenelinksaxexyaw, pitch: link.yscenelinksaxeypitch },
-        html: markerHtml,
-        anchor: "center center",
-        tooltip: {
-          content: adminModeRef.current === 'edit'
-            ? `Click to edit: ${link.yscenelinksname} → ${targetScene?.yscenesname || 'Unknown Scene'}`
-            : `${link.yscenelinksname} → ${targetScene?.yscenesname || 'Unknown Scene'}`,
-          position: "top center",
-        },
-        data: {
-          type: 'scenelink',
-          id: link.yscenelinksid,
-          targetId: link.yscenesidfktarget,
-        },
-      })
-    })
-
-    // Add infospot markers - filter by current scene ID
-    const currentInfospots = infospots.filter(spot => spot.yscenesidfk === currentScene.yscenesid)
-    console.log('Infospots for current scene:', currentInfospots.length, currentInfospots.map(s => s.yinfospotstitle))
-    
-    currentInfospots.forEach((spot) => {
-      const action = actions.find(a => a.yinfospotactionsid === spot.yinfospotactionidfk)
-      
-      const infospotHtml = `
-        <div
-          style="
-            width: 32px;
-            height: 32px;
-            background: #f59e0b;
-            border: 3px solid white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 16px;
-            cursor: pointer;
-            animation: pulse 2s infinite;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-          "
-          data-marker-type="infospot"
-          data-marker-id="${spot.yinfospotsid}"
-          onclick="event.stopPropagation(); event.preventDefault(); window.handleInfospotClick('${spot.yinfospotsid}');"
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
-          </svg>
-        </div>
-        <style>
-          @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-          }
-        </style>
-      `
-      
-      markersPluginInstance.addMarker({
-        id: `infospot-${spot.yinfospotsid}`,
-        position: { yaw: parseFloat(spot.yinfospotsaxexyaw), pitch: parseFloat(spot.yinfospotsaxeypitch) },
-        html: infospotHtml,
-        anchor: "center center",
-        tooltip: {
-          content: adminModeRef.current === 'edit'
-            ? `Click to edit: ${spot.yinfospotstitle}`
-            : spot.yinfospotstitle,
-          position: "top center",
-        },
-        data: {
-          type: 'infospot',
-          id: spot.yinfospotsid,
-          title: spot.yinfospotstitle,
-          text: spot.yinfospotstext,
-          action: action,
-        },
-      })
-    })
-
-    console.log('Finished adding markers. Total markers added:', currentSceneLinks.length + currentInfospots.length)
-  }, [viewerInstance, currentScene, scenelinks, infospots, scenes, actions])
 
 
-  const handleMarkerClick = useCallback((e: any) => {
-    // Use refs to get current state values to avoid stale closure issues
-    const currentAdminMode = adminModeRef.current
-    const currentIsTransitioning = isTransitioningRef.current
-    const currentIsHandlingEdit = isHandlingEditRef.current
-    const currentForceStopTransitions = forceStopTransitionsRef.current
-    
-    console.log('Marker clicked:', e, 'Admin mode:', currentAdminMode, 'Is transitioning:', currentIsTransitioning, 'Is handling edit:', currentIsHandlingEdit, 'Force stop:', currentForceStopTransitions)
-    if ((currentIsTransitioning && !currentForceStopTransitions) || currentIsHandlingEdit) return
-
-    const marker = e.marker
-    const data = marker.data
-
-    // Stop event propagation immediately
-    if (e.originalEvent) {
-      e.originalEvent.preventDefault()
-      e.originalEvent.stopPropagation()
-      e.originalEvent.stopImmediatePropagation()
-    }
-
-    // In edit mode, always edit
-    if (currentAdminMode === 'edit') {
-      console.log('Edit mode - opening edit form for:', data.type, data.id)
-      setIsHandlingEdit(true)
-      
-      if (data.type === 'scenelink') {
-        const sceneLink = scenelinks.find(link => link.yscenelinksid === data.id)
-        console.log('Found scene link for editing:', sceneLink)
-        if (sceneLink) {
-          setInlineEditingSceneLink(sceneLink)
-          setPreviewMarkerPosition({ yaw: sceneLink.yscenelinksaxexyaw, pitch: sceneLink.yscenelinksaxeypitch })
-          // Reset flag after a delay
-          setTimeout(() => setIsHandlingEdit(false), 100)
-          return // Exit early to prevent any navigation
-        }
-      } else if (data.type === 'infospot') {
-        const infospot = infospots.find(spot => spot.yinfospotsid === data.id)
-        console.log('Found infospot for editing:', infospot)
-        if (infospot) {
-          setInlineEditingInfospot(infospot)
-          setPreviewMarkerPosition({ yaw: parseFloat(infospot.yinfospotsaxexyaw), pitch: parseFloat(infospot.yinfospotsaxeypitch) })
-          // Reset flag after a delay
-          setTimeout(() => setIsHandlingEdit(false), 100)
-          return // Exit early to prevent any navigation
-        }
-      }
-      
-      // Reset flag if no match found
-      setIsHandlingEdit(false)
-    } else {
-      // View mode: Check for ctrl+click for editing, otherwise normal functionality
-      const isEditClick = e.originalEvent?.ctrlKey || e.originalEvent?.button === 2
-      
-      if (isEditClick) {
-        console.log('Ctrl+click in view mode - opening edit form for:', data.type, data.id)
-        setIsHandlingEdit(true)
-        
-        if (data.type === 'scenelink') {
-          const sceneLink = scenelinks.find(link => link.yscenelinksid === data.id)
-          console.log('Found scene link for editing (ctrl+click):', sceneLink)
-          if (sceneLink) {
-            setInlineEditingSceneLink(sceneLink)
-            setPreviewMarkerPosition({ yaw: sceneLink.yscenelinksaxexyaw, pitch: sceneLink.yscenelinksaxeypitch })
-            setTimeout(() => setIsHandlingEdit(false), 100)
-            return
-          }
-        } else if (data.type === 'infospot') {
-          const infospot = infospots.find(spot => spot.yinfospotsid === data.id)
-          console.log('Found infospot for editing (ctrl+click):', infospot)
-          if (infospot) {
-            setInlineEditingInfospot(infospot)
-            setPreviewMarkerPosition({ yaw: parseFloat(infospot.yinfospotsaxexyaw), pitch: parseFloat(infospot.yinfospotsaxeypitch) })
-            setTimeout(() => setIsHandlingEdit(false), 100)
-            return
-          }
-        }
-        
-        setIsHandlingEdit(false)
-      } else {
-        // Normal view mode functionality - only if not handling edit and not in edit mode
-        console.log('Normal click in view mode for:', data.type, data.id)
-        
-        // Double-check current mode to prevent navigation in edit mode
-        const finalAdminMode = adminModeRef.current
-        const finalForceStopTransitions = forceStopTransitionsRef.current
-        if (finalAdminMode === 'edit' || finalForceStopTransitions) {
-          console.log('Navigation blocked - current mode:', finalAdminMode, 'forceStop:', finalForceStopTransitions)
-          return
-        }
-        
-        if (data.type === 'scenelink') {
-          // Navigate to target scene only if we're truly in view mode
-          const targetScene = scenes.find(s => s.yscenesid === data.targetId)
-          if (targetScene) {
-            console.log('Navigating to scene:', targetScene.yscenesname)
-            setIsTransitioning(true)
-            setCurrentScene(targetScene)
-            setTimeout(() => setIsTransitioning(false), 1000)
-          }
-        } else if (data.type === 'infospot') {
-          // Show infospot information in modal
-          const infospot = infospots.find(spot => spot.yinfospotsid === data.id)
-          if (infospot) {
-            setViewingInfospot(infospot)
-          }
-        }
-      }
-    }
-  }, [scenes, scenelinks, infospots])
 
   const handleSceneChange = (sceneId: string) => {
     const scene = scenes.find(s => s.yscenesid === parseInt(sceneId))

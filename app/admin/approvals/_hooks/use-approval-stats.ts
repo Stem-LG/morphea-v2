@@ -23,24 +23,24 @@ export function useApprovalStats() {
                 .select("*", { count: "exact", head: true })
                 .eq("yprodstatut", "rejected");
 
-            // Get approved products with non-approved variants
-            const { data: approvedProducts } = await supabase
+            // Get approved products
+            const { count: approved } = await supabase
                 .schema("morpheus")
                 .from("yprod")
-                .select(`
-                    yprodid,
-                    yvarprod!inner(yvarprodstatut)
-                `)
-                .eq("yprodstatut", "approved")
-                .eq("yvarprod.yvarprodstatut", "not_approved");
+                .select("*", { count: "exact", head: true })
+                .eq("yprodstatut", "approved");
 
-            const variantApprovals = approvedProducts?.length || 0;
+            // Get total products count
+            const { count: total } = await supabase
+                .schema("morpheus")
+                .from("yprod")
+                .select("*", { count: "exact", head: true });
 
             return {
                 pending: pending || 0,
                 rejected: rejected || 0,
-                variantApprovals,
-                total: (pending || 0) + (rejected || 0) + variantApprovals
+                approved: approved || 0,
+                total: total || 0
             };
         },
         staleTime: 5 * 60 * 1000, // 5 minutes

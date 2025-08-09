@@ -2,10 +2,15 @@
 
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/hooks/useLanguage';
+import { useAuth } from '@/hooks/useAuth';
 import Link from 'next/link';
 
 export default function LandingPage() {
     const { t } = useLanguage();
+    const { data: user, isLoading } = useAuth();
+    
+    // Check if user is authenticated (not anonymous)
+    const isAuthenticated = user && !user.is_anonymous;
 
     return (
         <div className="relative w-full overflow-hidden" style={{ height: 'calc(100vh - 4rem)' }}>
@@ -43,27 +48,58 @@ export default function LandingPage() {
                             
                             {/* Button layout - mobile responsive, desktop original */}
                             <div className="flex flex-col gap-4 sm:gap-6 w-full">
-                                <Link href="/auth/sign-up" className="w-full">
-                                    <Button className="w-full bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-[#695029] hover:to-[#d4c066] text-white shadow-2xl text-lg sm:text-xl md:text-2xl py-4 md:py-5 transition-all rounded-none font-semibold">
-                                        {t('landing.getStarted')}
-                                    </Button>
-                                </Link>
-                                <Link href="/auth/login" className="w-full">
-                                    <Button
-                                        variant="outline"
-                                        className="w-full border-white/30 bg-white/20 text-white dark:text-white hover:bg-white/30 text-lg sm:text-xl md:text-2xl py-4 md:py-5 transition-all rounded-none font-semibold"
-                                    >
-                                        {t('landing.login')}
-                                    </Button>
-                                </Link>
-                                <Link href="/main" className="w-full">
-                                    <Button
-                                        variant="ghost"
-                                        className="w-full text-white dark:text-white text-lg sm:text-xl md:text-2xl py-4 md:py-5 transition-all hover:bg-white/10 hover:text-white dark:hover:text-white rounded-none font-medium"
-                                    >
-                                        {t('landing.exploreAsGuest')}
-                                    </Button>
-                                </Link>
+                                {!isLoading && (
+                                    <>
+                                        {!isAuthenticated ? (
+                                            // Show auth buttons for non-authenticated users
+                                            <>
+                                                <Link href="/auth/sign-up" className="w-full">
+                                                    <Button className="w-full bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-[#695029] hover:to-[#d4c066] text-white shadow-2xl text-lg sm:text-xl md:text-2xl py-4 md:py-5 transition-all rounded-none font-semibold">
+                                                        {t('landing.getStarted')}
+                                                    </Button>
+                                                </Link>
+                                                <Link href="/auth/login" className="w-full">
+                                                    <Button
+                                                        variant="outline"
+                                                        className="w-full border-white/30 bg-white/20 text-white dark:text-white hover:bg-white/30 text-lg sm:text-xl md:text-2xl py-4 md:py-5 transition-all rounded-none font-semibold"
+                                                    >
+                                                        {t('landing.login')}
+                                                    </Button>
+                                                </Link>
+                                                <Link href="/main" className="w-full">
+                                                    <Button
+                                                        variant="ghost"
+                                                        className="w-full text-white dark:text-white text-lg sm:text-xl md:text-2xl py-4 md:py-5 transition-all hover:bg-white/10 hover:text-white dark:hover:text-white rounded-none font-medium"
+                                                    >
+                                                        {t('landing.exploreAsGuest')}
+                                                    </Button>
+                                                </Link>
+                                            </>
+                                        ) : (
+                                            // Show main app button for authenticated users
+                                            <>
+                                                <Link href="/main" className="w-full">
+                                                    <Button className="w-full bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-[#695029] hover:to-[#d4c066] text-white shadow-2xl text-lg sm:text-xl md:text-2xl py-4 md:py-5 transition-all rounded-none font-semibold">
+                                                        {t('landing.enterMall')}
+                                                    </Button>
+                                                </Link>
+                                                <Link href="/profile" className="w-full">
+                                                    <Button
+                                                        variant="outline"
+                                                        className="w-full border-white/30 bg-white/20 text-white dark:text-white hover:bg-white/30 text-lg sm:text-xl md:text-2xl py-4 md:py-5 transition-all rounded-none font-semibold"
+                                                    >
+                                                        {t('landing.myProfile')}
+                                                    </Button>
+                                                </Link>
+                                            </>
+                                        )}
+                                    </>
+                                )}
+                                {isLoading && (
+                                    <div className="w-full py-4 md:py-5 flex items-center justify-center">
+                                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>

@@ -276,7 +276,7 @@ export function PaginationControl({
         }
 
         return items;
-    }, [currentPage, totalPages]);
+    }, [currentPage, totalPages, maxVisiblePages]);
 
     return (
         <Pagination className="mt-4">

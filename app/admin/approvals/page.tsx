@@ -346,30 +346,8 @@ export default function ApprovalsPage() {
                     <Card className="bg-gradient-to-br from-gray-900/50 to-gray-800/30 border-gray-700/50 backdrop-blur-sm">
                         <CardContent className="p-4">
                             <div className="flex items-center gap-2 mb-2">
-                                <Clock className="h-5 w-5 text-yellow-400" />
-                                <span className="text-sm font-medium text-gray-300">Pending</span>
-                            </div>
-                            <div className="text-2xl font-bold text-white">
-                                {stats.pending || 0}
-                            </div>
-                        </CardContent>
-                    </Card>
-                    <Card className="bg-gradient-to-br from-gray-900/50 to-gray-800/30 border-gray-700/50 backdrop-blur-sm">
-                        <CardContent className="p-4">
-                            <div className="flex items-center gap-2 mb-2">
-                                <Package className="h-5 w-5 text-blue-400" />
-                                <span className="text-sm font-medium text-gray-300">Variant Approvals</span>
-                            </div>
-                            <div className="text-2xl font-bold text-white">
-                                {stats.variantApprovals || 0}
-                            </div>
-                        </CardContent>
-                    </Card>
-                    <Card className="bg-gradient-to-br from-gray-900/50 to-gray-800/30 border-gray-700/50 backdrop-blur-sm">
-                        <CardContent className="p-4">
-                            <div className="flex items-center gap-2 mb-2">
                                 <AlertTriangle className="h-5 w-5 text-red-400" />
-                                <span className="text-sm font-medium text-gray-300">Rejected</span>
+                                <span className="text-sm font-medium text-gray-300">Total Rejected</span>
                             </div>
                             <div className="text-2xl font-bold text-white">
                                 {stats.rejected || 0}
@@ -379,11 +357,33 @@ export default function ApprovalsPage() {
                     <Card className="bg-gradient-to-br from-gray-900/50 to-gray-800/30 border-gray-700/50 backdrop-blur-sm">
                         <CardContent className="p-4">
                             <div className="flex items-center gap-2 mb-2">
-                                <CheckCircle className="h-5 w-5 text-green-400" />
-                                <span className="text-sm font-medium text-gray-300">Total</span>
+                                <Clock className="h-5 w-5 text-yellow-400" />
+                                <span className="text-sm font-medium text-gray-300">Total Pending</span>
                             </div>
                             <div className="text-2xl font-bold text-white">
-                                {approvalsData?.count || 0}
+                                {stats.pending || 0}
+                            </div>
+                        </CardContent>
+                    </Card>
+                    <Card className="bg-gradient-to-br from-gray-900/50 to-gray-800/30 border-gray-700/50 backdrop-blur-sm">
+                        <CardContent className="p-4">
+                            <div className="flex items-center gap-2 mb-2">
+                                <CheckCircle className="h-5 w-5 text-green-400" />
+                                <span className="text-sm font-medium text-gray-300">Total Approved</span>
+                            </div>
+                            <div className="text-2xl font-bold text-white">
+                                {stats.approved || 0}
+                            </div>
+                        </CardContent>
+                    </Card>
+                    <Card className="bg-gradient-to-br from-gray-900/50 to-gray-800/30 border-gray-700/50 backdrop-blur-sm">
+                        <CardContent className="p-4">
+                            <div className="flex items-center gap-2 mb-2">
+                                <Package className="h-5 w-5 text-blue-400" />
+                                <span className="text-sm font-medium text-gray-300">Total Products</span>
+                            </div>
+                            <div className="text-2xl font-bold text-white">
+                                {stats.total || 0}
                             </div>
                         </CardContent>
                     </Card>
