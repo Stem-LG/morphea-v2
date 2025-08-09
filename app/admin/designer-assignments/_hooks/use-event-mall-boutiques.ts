@@ -13,25 +13,40 @@ export function useEventMallBoutiques(eventId: number | null, mallId: number | n
                 return { boutiques: [], assignments: [] };
             }
 
-            // Get boutiques for the mall
+            // Get boutiques for the event and mall with NO designer and NO product
             const { data: boutiques, error: boutiquesError } = await supabase
                 .schema("morpheus")
-                .from("yboutique")
+                .from("ydetailsevent")
                 .select(`
-                    yboutiqueid,
-                    yboutiquecode,
-                    yboutiqueintitule,
-                    yboutiqueadressemall,
-                    ymallidfk
+                    ydetailseventid,
+                    yboutiqueidfk,
+                    yboutique:yboutiqueidfk (
+                        yboutiqueid,
+                        yboutiquecode,
+                        yboutiqueintitule,
+                        yboutiqueadressemall,
+                        ymallidfk
+                    )
                 `)
+                .eq("yeventidfk", eventId)
                 .eq("ymallidfk", mallId)
-                .order("yboutiqueintitule");
+                .not("yboutiqueidfk", "is", null)
+                .is("ydesignidfk", null)
+                .is("yprodidfk", null);
+
+            // Map to just the boutique objects (avoid duplicates if multiple details entries per boutique)
+            const boutiqueMap = new Map();
+            (boutiques || []).forEach((b: any) => {
+                if (b.yboutique && !boutiqueMap.has(b.yboutique.yboutiqueid)) {
+                    boutiqueMap.set(b.yboutique.yboutiqueid, b.yboutique);
+                }
+            });
 
             if (boutiquesError) {
                 throw new Error(`Failed to fetch boutiques: ${boutiquesError.message}`);
             }
 
-            // Get existing designer assignments for this event and mall
+            // Get existing designer assignments for this event and mall (NO product)
             const { data: assignments, error: assignmentsError } = await supabase
                 .schema("morpheus")
                 .from("ydetailsevent")
@@ -39,7 +54,6 @@ export function useEventMallBoutiques(eventId: number | null, mallId: number | n
                     ydetailseventid,
                     yboutiqueidfk,
                     ydesignidfk,
-                    yprodidfk,
                     ydesign:ydesignidfk (
                         ydesignid,
                         ydesignnom,
@@ -59,7 +73,9 @@ export function useEventMallBoutiques(eventId: number | null, mallId: number | n
                 `)
                 .eq("yeventidfk", eventId)
                 .eq("ymallidfk", mallId)
-                .not("yboutiqueidfk", "is", null);
+                .not("yboutiqueidfk", "is", null)
+                .not("ydesignidfk", "is", null)
+                .is("yprodidfk", null);
 
             if (assignmentsError) {
                 throw new Error(`Failed to fetch assignments: ${assignmentsError.message}`);
@@ -93,7 +109,7 @@ export function useEventMallBoutiques(eventId: number | null, mallId: number | n
             );
 
             return {
-                boutiques: boutiques || [],
+                boutiques: Array.from(boutiqueMap.values()) || [],
                 assignments: assignmentsWithProducts || []
             };
         },
