@@ -7,6 +7,7 @@ import { Store, User, UserPlus, UserMinus, Lock, Mail } from "lucide-react";
 import { DesignerSelectionDialog } from "./designer-selection-dialog";
 import { DesignerInfoDialog } from "./designer-info-dialog";
 import { useDesignerAssignment } from "../_hooks/use-designer-assignment";
+import { useLanguage } from "@/hooks/useLanguage";
 import { useState } from "react";
 
 interface Boutique {
@@ -48,6 +49,7 @@ interface BoutiqueGridProps {
 }
 
 export function BoutiqueGrid({ eventId, mallId, boutiques, assignments, isLoading }: BoutiqueGridProps) {
+    const { t } = useLanguage();
     const { unassignDesigner, isUnassigning } = useDesignerAssignment();
     const [unassigningBoutiqueId, setUnassigningBoutiqueId] = useState<number | null>(null);
 
@@ -97,9 +99,9 @@ export function BoutiqueGrid({ eventId, mallId, boutiques, assignments, isLoadin
                 <div className="h-16 w-16 rounded-full bg-gray-800/50 flex items-center justify-center mb-4">
                     <Store className="h-8 w-8 text-gray-400" />
                 </div>
-                <h3 className="text-xl font-semibold text-white mb-2">No Boutiques Found</h3>
+                <h3 className="text-xl font-semibold text-white mb-2">{t('admin.designerAssignments.noBoutiquesFound')}</h3>
                 <p className="text-gray-400">
-                    No boutiques are associated with this mall in the selected event.
+                    {t('admin.designerAssignments.noBoutiquesMessage')}
                 </p>
             </div>
         );
@@ -131,7 +133,7 @@ export function BoutiqueGrid({ eventId, mallId, boutiques, assignments, isLoadin
                                     </p>
                                 </div>
                                 {isLocked && (
-                                    <div title="Assignment locked - products exist">
+                                    <div title={t('admin.designerAssignments.assignmentLocked')}>
                                         <Lock className="h-4 w-4 text-yellow-500" />
                                     </div>
                                 )}
@@ -143,12 +145,12 @@ export function BoutiqueGrid({ eventId, mallId, boutiques, assignments, isLoadin
                                     <div className="flex items-center gap-2">
                                         <Badge className="bg-green-500/20 text-green-300 border-green-500/30">
                                             <User className="h-3 w-3 mr-1" />
-                                            Assigned
+                                            {t('admin.designerAssignments.assigned')}
                                         </Badge>
                                         {isLocked && (
                                             <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30">
                                                 <Lock className="h-3 w-3 mr-1" />
-                                                Locked
+                                                {t('admin.designerAssignments.locked')}
                                             </Badge>
                                         )}
                                     </div>
@@ -177,8 +179,8 @@ export function BoutiqueGrid({ eventId, mallId, boutiques, assignments, isLoadin
                                             >
                                                 <UserMinus className="h-4 w-4 mr-2" />
                                                 {isUnassigning && unassigningBoutiqueId === boutique.yboutiqueid 
-                                                    ? "Unassigning..." 
-                                                    : "Unassign"
+                                                    ? t('admin.designerAssignments.unassigning')
+                                                    : t('admin.designerAssignments.unassign')
                                                 }
                                             </Button>
                                         )}
@@ -194,7 +196,7 @@ export function BoutiqueGrid({ eventId, mallId, boutiques, assignments, isLoadin
                                                     className="flex-1 bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-morpheus-gold-dark hover:to-morpheus-gold-light text-white"
                                                 >
                                                     <User className="h-4 w-4 mr-2" />
-                                                    View Designer
+                                                    {t('admin.designerAssignments.viewDesigner')}
                                                 </Button>
                                             </DesignerInfoDialog>
                                         ) : (
@@ -209,7 +211,7 @@ export function BoutiqueGrid({ eventId, mallId, boutiques, assignments, isLoadin
                                                     className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-morpheus-gold-dark hover:to-morpheus-gold-light text-white"
                                                 >
                                                     <User className="h-4 w-4 mr-2" />
-                                                    Change Designer
+                                                    {t('admin.designerAssignments.changeDesigner')}
                                                 </Button>
                                             </DesignerSelectionDialog>
                                         )}
@@ -219,7 +221,7 @@ export function BoutiqueGrid({ eventId, mallId, boutiques, assignments, isLoadin
                                 <div className="space-y-3">
                                     <Badge className="bg-gray-500/20 text-gray-400 border-gray-500/30">
                                         <UserPlus className="h-3 w-3 mr-1" />
-                                        No Designer Assigned
+                                        {t('admin.designerAssignments.noDesignerAssigned')}
                                     </Badge>
                                     
                                     <DesignerSelectionDialog
@@ -232,7 +234,7 @@ export function BoutiqueGrid({ eventId, mallId, boutiques, assignments, isLoadin
                                             className="w-full bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-morpheus-gold-dark hover:to-morpheus-gold-light text-white"
                                         >
                                             <UserPlus className="h-4 w-4 mr-2" />
-                                            Assign Designer
+                                            {t('admin.designerAssignments.assignDesigner')}
                                         </Button>
                                     </DesignerSelectionDialog>
                                 </div>

@@ -26,6 +26,7 @@ import {
 import { ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
+import { useLanguage } from "@/hooks/useLanguage";
 import { useStore } from "./_hooks/use-store";
 import { useProducts } from "./_hooks/use-products";
 import { useCategories } from "./_hooks/use-categories";
@@ -36,6 +37,7 @@ import { ProductViewDialog } from "./_components/product-view-dialog";
 type Product = any;
 
 export default function StoreDetails() {
+    const { t } = useLanguage();
     const params = useParams();
     const storeId = parseInt(params.storeId as string);
     const { data: user } = useAuth();
@@ -100,7 +102,7 @@ export default function StoreDetails() {
 
     // Add "All Categories" option
     const allCategoryOptions = [
-        { value: "all", label: "All Categories" },
+        { value: "all", label: t('admin.allCategories') },
         ...categoryOptions
     ];
 
@@ -233,7 +235,7 @@ export default function StoreDetails() {
     const columns: ColumnDef<Product>[] = [
         {
             accessorKey: "yprodcode",
-            header: "Product Code",
+            header: t('admin.productCode'),
             enableSorting: true,
             cell: ({ row }) => (
                 <div className="font-mono text-sm">
@@ -243,7 +245,7 @@ export default function StoreDetails() {
         },
         {
             accessorKey: "yprodintitule",
-            header: "Product Name",
+            header: t('admin.productName'),
             enableSorting: true,
             cell: ({ row }) => (
                 <div className="font-medium">
@@ -253,21 +255,21 @@ export default function StoreDetails() {
         },
         {
             accessorKey: "xcategprodidfk",
-            header: "Category",
+            header: t('admin.category'),
             enableSorting: true,
             cell: ({ row }) => {
                 const categoryId = row.getValue("xcategprodidfk") as number;
                 const category = categories?.find(cat => cat.xcategprodid === categoryId);
                 return (
                     <Badge variant="secondary" className="bg-blue-500/20 text-blue-300 border-blue-500/30">
-                        {category?.xcategprodintitule || "Unknown"}
+                        {category?.xcategprodintitule || t('admin.unknown')}
                     </Badge>
                 );
             },
         },
         {
             id: "status",
-            header: "Status",
+            header: t('admin.status'),
             cell: ({ row }) => {
                 const product = row.original;
                 const status = getProductStatus(product);
@@ -278,28 +280,28 @@ export default function StoreDetails() {
                         color: "text-green-400",
                         bgColor: "bg-green-500/20",
                         borderColor: "border-green-500/30",
-                        label: "Approved"
+                        label: t('admin.approved')
                     },
                     rejected: {
                         icon: XCircle,
                         color: "text-red-400",
                         bgColor: "bg-red-500/20",
                         borderColor: "border-red-500/30",
-                        label: "Rejected"
+                        label: t('admin.rejected')
                     },
                     pending: {
                         icon: Clock,
                         color: "text-yellow-400",
                         bgColor: "bg-yellow-500/20",
                         borderColor: "border-yellow-500/30",
-                        label: "Pending"
+                        label: t('admin.pending')
                     },
                     mixed: {
                         icon: AlertTriangle,
                         color: "text-blue-400",
                         bgColor: "bg-blue-500/20",
                         borderColor: "border-blue-500/30",
-                        label: "Mixed Status"
+                        label: t('admin.mixedStatus')
                     }
                 };
                 
@@ -323,12 +325,12 @@ export default function StoreDetails() {
                             <div className="flex gap-1">
                                 {approvedCount > 0 && (
                                     <Badge variant="secondary" className="bg-green-500/20 text-green-300 border-green-500/30 text-xs">
-                                        {approvedCount} approved
+                                        {approvedCount} {t('admin.approved').toLowerCase()}
                                     </Badge>
                                 )}
                                 {pendingCount > 0 && (
                                     <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30 text-xs">
-                                        {pendingCount} pending
+                                        {pendingCount} {t('admin.pending').toLowerCase()}
                                     </Badge>
                                 )}
                             </div>
@@ -349,7 +351,7 @@ export default function StoreDetails() {
         },
         {
             id: "actions",
-            header: "Actions",
+            header: t('admin.actions'),
             cell: ({ row }) => {
                 const product = row.original;
                 return (
@@ -359,7 +361,7 @@ export default function StoreDetails() {
                             variant="ghost"
                             onClick={() => handleViewProduct(product)}
                             className="h-8 w-8 p-0 text-gray-400 hover:text-white hover:bg-gray-800/50"
-                            title="View Product"
+                            title={t('admin.viewProduct')}
                         >
                             <Eye className="h-3 w-3" />
                         </Button>
@@ -373,7 +375,7 @@ export default function StoreDetails() {
                                     ? "text-gray-400 hover:text-white hover:bg-gray-800/50"
                                     : "text-gray-600 cursor-not-allowed"
                             }`}
-                            title={canEditProduct(product) ? "Edit Product" : "Cannot edit this product"}
+                            title={canEditProduct(product) ? t('admin.editProduct') : t('admin.cannotEditProduct')}
                         >
                             <Edit className="h-3 w-3" />
                         </Button>
@@ -387,7 +389,7 @@ export default function StoreDetails() {
                                     ? "text-gray-400 hover:text-red-400 hover:bg-red-900/50"
                                     : "text-gray-600 cursor-not-allowed"
                             }`}
-                            title={canDeleteProduct(product) ? "Delete Product" : "Cannot delete this product"}
+                            title={canDeleteProduct(product) ? t('admin.deleteProduct') : t('admin.cannotDeleteProduct')}
                         >
                             <Trash2 className="h-3 w-3" />
                         </Button>
@@ -419,9 +421,9 @@ export default function StoreDetails() {
                         <div className="h-16 w-16 rounded-full bg-red-900/30 flex items-center justify-center mb-4">
                             <Store className="h-8 w-8 text-red-400" />
                         </div>
-                        <h3 className="text-xl font-semibold text-white mb-2">Store Not Found</h3>
+                        <h3 className="text-xl font-semibold text-white mb-2">{t('admin.storeNotFound')}</h3>
                         <p className="text-gray-400 mb-4">
-                            {"The store you're looking for doesn't exist or you don't have access to it."}
+                            {t('admin.storeNotFoundMessage')}
                         </p>
                         <Link href={`/admin/stores${
                             eventId || mallId
@@ -433,7 +435,7 @@ export default function StoreDetails() {
                         }`}>
                             <Button variant="outline" className="border-red-700/50 text-red-400 hover:bg-red-900/30">
                                 <ArrowLeft className="h-4 w-4 mr-2" />
-                                Back to Stores
+                                {t('admin.backToStores')}
                             </Button>
                         </Link>
                     </CardContent>
@@ -460,12 +462,12 @@ export default function StoreDetails() {
                         className="border-gray-600 text-gray-300 hover:bg-gray-800/50 hover:text-white"
                     >
                         <ArrowLeft className="h-4 w-4 mr-2" />
-                        Back to Stores
+                        {t('admin.backToStores')}
                     </Button>
                 </Link>
                 <div>
-                    <h1 className="text-3xl lg:text-4xl font-bold text-white">Store Details</h1>
-                    <p className="text-lg text-gray-300">Manage products and store information</p>
+                    <h1 className="text-3xl lg:text-4xl font-bold text-white">{t('admin.storeDetails')}</h1>
+                    <p className="text-lg text-gray-300">{t('admin.manageProductsAndStore')}</p>
                 </div>
             </div>
 
@@ -481,7 +483,7 @@ export default function StoreDetails() {
                             <div className="flex items-center gap-2 text-gray-300 mt-2">
                                 <MapPin className="h-4 w-4 text-morpheus-gold-light" />
                                 <span className="text-sm">
-                                    {store.yboutiqueadressemall || "No address specified"}
+                                    {store.yboutiqueadressemall || t('admin.noAddressSpecified')}
                                 </span>
                             </div>
                         </div>
@@ -492,7 +494,7 @@ export default function StoreDetails() {
                         <div className="bg-gray-800/30 rounded-lg p-4">
                             <div className="flex items-center gap-2 mb-2">
                                 <Package className="h-5 w-5 text-morpheus-gold-light" />
-                                <span className="text-sm font-medium text-gray-300">Total Products</span>
+                                <span className="text-sm font-medium text-gray-300">{t('admin.totalProducts')}</span>
                             </div>
                             <div className="text-2xl font-bold text-white">
                                 {productsData?.count || 0}
@@ -501,7 +503,7 @@ export default function StoreDetails() {
                         <div className="bg-gray-800/30 rounded-lg p-4">
                             <div className="flex items-center gap-2 mb-2">
                                 <Store className="h-5 w-5 text-morpheus-gold-light" />
-                                <span className="text-sm font-medium text-gray-300">Store ID</span>
+                                <span className="text-sm font-medium text-gray-300">{t('admin.storeId')}</span>
                             </div>
                             <div className="text-2xl font-bold text-white">
                                 #{store.yboutiqueid}
@@ -510,7 +512,7 @@ export default function StoreDetails() {
                         <div className="bg-gray-800/30 rounded-lg p-4">
                             <div className="flex items-center gap-2 mb-2">
                                 <MapPin className="h-5 w-5 text-morpheus-gold-light" />
-                                <span className="text-sm font-medium text-gray-300">Mall ID</span>
+                                <span className="text-sm font-medium text-gray-300">{t('admin.mallId')}</span>
                             </div>
                             <div className="text-2xl font-bold text-white">
                                 {store.ymallidfk ? `#${store.ymallidfk}` : "N/A"}
@@ -525,7 +527,7 @@ export default function StoreDetails() {
                 <CardHeader>
                     <CardTitle className="text-xl text-white flex items-center gap-2">
                         <Package className="h-5 w-5" />
-                        Products
+                        {t('admin.products')}
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -546,10 +548,10 @@ export default function StoreDetails() {
                                     onClick={handleCreateProduct}
                                     disabled={!eventId}
                                     className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-morpheus-gold-dark hover:to-morpheus-gold-light text-white font-semibold transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-                                    title={eventId ? "Add Product" : "Please select an event from the stores page to add products"}
+                                    title={eventId ? t('admin.addProduct') : t('admin.selectEventToAddProducts')}
                                 >
                                     <Plus className="h-4 w-4 mr-2" />
-                                    Add Product
+                                    {t('admin.addProduct')}
                                 </Button>
                             ) : null
                         }
@@ -558,7 +560,7 @@ export default function StoreDetails() {
                                 value={categoryFilter || "all"}
                                 onValueChange={handleCategoryFilterChange}
                                 options={allCategoryOptions}
-                                placeholder="Filter by category"
+                                placeholder={t('admin.filterByCategory')}
                                 className="w-48"
                                 disabled={categoriesLoading}
                             />

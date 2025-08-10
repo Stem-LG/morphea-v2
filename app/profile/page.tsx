@@ -19,20 +19,21 @@ import Image from "next/image";
 // Orders Tab Component
 function OrdersTab() {
     const { data: orders = [], isLoading } = useUserOrders();
+    const { t } = useLanguage();
     const router = useRouter();
 
     const getStatusBadge = (status: string) => {
         switch (status) {
             case "pending":
-                return <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-300"><Clock className="w-3 h-3 mr-1" />Pending</Badge>;
+                return <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-300"><Clock className="w-3 h-3 mr-1" />{t('orders.status.pending')}</Badge>;
             case "confirmed":
-                return <Badge variant="secondary" className="bg-blue-500/20 text-blue-300"><Package className="w-3 h-3 mr-1" />Confirmed</Badge>;
+                return <Badge variant="secondary" className="bg-blue-500/20 text-blue-300"><Package className="w-3 h-3 mr-1" />{t('orders.status.confirmed')}</Badge>;
             case "shipped":
-                return <Badge variant="secondary" className="bg-green-500/20 text-green-300"><Truck className="w-3 h-3 mr-1" />Shipped</Badge>;
+                return <Badge variant="secondary" className="bg-green-500/20 text-green-300"><Truck className="w-3 h-3 mr-1" />{t('orders.status.shipped')}</Badge>;
             case "delivered":
-                return <Badge variant="secondary" className="bg-emerald-500/20 text-emerald-300"><Check className="w-3 h-3 mr-1" />Delivered</Badge>;
+                return <Badge variant="secondary" className="bg-emerald-500/20 text-emerald-300"><Check className="w-3 h-3 mr-1" />{t('orders.status.delivered')}</Badge>;
             case "cancelled":
-                return <Badge variant="secondary" className="bg-red-500/20 text-red-300"><X className="w-3 h-3 mr-1" />Cancelled</Badge>;
+                return <Badge variant="secondary" className="bg-red-500/20 text-red-300"><X className="w-3 h-3 mr-1" />{t('orders.status.cancelled')}</Badge>;
             default:
                 return <Badge variant="secondary">{status}</Badge>;
         }
@@ -57,23 +58,23 @@ function OrdersTab() {
         <div className="space-y-6">
             <div className="text-center space-y-4">
                 <h2 className="text-2xl font-bold font-parisienne bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light bg-clip-text text-transparent">
-                    My Orders
+                    {t('orders.myOrders')}
                 </h2>
                 <p className="text-gray-300">
-                    Track your order status and history
+                    {t('orders.trackYourOrder')}
                 </p>
             </div>
 
             {orders.length === 0 ? (
                 <div className="text-center py-12 space-y-4">
                     <Package className="w-16 h-16 mx-auto text-morpheus-gold-light/50" />
-                    <h3 className="text-xl font-medium text-white">No orders yet</h3>
-                    <p className="text-gray-300 mb-6">You haven't placed any orders yet. Start shopping to see your orders here.</p>
+                    <h3 className="text-xl font-medium text-white">{t('orders.noOrdersYet')}</h3>
+                    <p className="text-gray-300 mb-6">{t('orders.startShoppingMessage')}</p>
                     <Button
                         onClick={() => router.push("/")}
                         className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-morpheus-gold-light hover:to-morpheus-gold-dark text-white"
                     >
-                        Start Shopping
+                        {t('orders.startShopping')}
                     </Button>
                 </div>
             ) : (
@@ -83,7 +84,7 @@ function OrdersTab() {
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-4">
                                     <h3 className="text-lg font-semibold text-white">
-                                        Order #{orderGroup.zcommandeno}
+                                        {t('orders.orderNumber')}: {orderGroup.zcommandeno}
                                     </h3>
                                     {getStatusBadge(orderGroup.zcommandestatut)}
                                 </div>
@@ -95,7 +96,7 @@ function OrdersTab() {
 
                             {/* Order Items */}
                             <div className="space-y-3">
-                                <h4 className="font-medium text-white">Items</h4>
+                                <h4 className="font-medium text-white">{t('orders.items')}</h4>
                                 {orderGroup.items.slice(0, 3).map((item: any, index: number) => (
                                     <div key={index} className="flex items-center gap-4 p-3 bg-white/5 rounded-lg">
                                         <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
@@ -117,7 +118,7 @@ function OrdersTab() {
                                             <p className="font-medium text-white text-sm">
                                                 {item.yvarprod?.yvarprodintitule || "Unknown Product"}
                                             </p>
-                                            <p className="text-xs text-gray-300">Qty: {item.zcommandequantite}</p>
+                                            <p className="text-xs text-gray-300">{t('orders.quantity')}: {item.zcommandequantite}</p>
                                         </div>
                                         <div className="text-right">
                                             <p className="text-sm text-morpheus-gold-light">
@@ -128,7 +129,7 @@ function OrdersTab() {
                                 ))}
                                 {orderGroup.items.length > 3 && (
                                     <p className="text-sm text-gray-300 text-center">
-                                        +{orderGroup.items.length - 3} more items
+                                        +{orderGroup.items.length - 3} {t('orders.moreItems')}
                                     </p>
                                 )}
                             </div>
@@ -137,7 +138,7 @@ function OrdersTab() {
                                 <div className="flex items-center gap-2">
                                     <DollarSign className="w-5 h-5 text-morpheus-gold-light" />
                                     <span className="text-lg font-semibold text-white">
-                                        Total: ${calculateOrderTotal(orderGroup.items).toFixed(2)}
+                                        {t('orders.total')}: ${calculateOrderTotal(orderGroup.items).toFixed(2)}
                                     </span>
                                 </div>
                                 <Button
@@ -146,7 +147,7 @@ function OrdersTab() {
                                     size="sm"
                                     className="border-morpheus-gold-dark/30 text-white hover:bg-morpheus-gold-dark/20"
                                 >
-                                    View Details
+                                    {t('orders.viewDetails')}
                                 </Button>
                             </div>
                         </div>
@@ -157,7 +158,7 @@ function OrdersTab() {
                             onClick={() => router.push("/my-orders")}
                             className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-morpheus-gold-light hover:to-morpheus-gold-dark text-white"
                         >
-                            View All Orders
+                            {t('orders.viewAllOrders')}
                         </Button>
                     </div>
                 </div>
@@ -383,7 +384,7 @@ export default function ProfilePage() {
                                 className="w-full bg-gradient-to-br from-morpheus-blue-dark/60 to-morpheus-blue-light/40 border border-morpheus-gold-dark/30 text-white p-4 text-lg font-semibold backdrop-blur-sm focus:border-morpheus-gold-light focus:ring-morpheus-gold-light/20 rounded-none"
                             >
                                 <option value="profile" className="bg-morpheus-blue-dark text-white">👤 {t('profile.profile')}</option>
-                                <option value="orders" className="bg-morpheus-blue-dark text-white">📦 Orders</option>
+                                <option value="orders" className="bg-morpheus-blue-dark text-white">📦 {t('profile.orders')}</option>
                                 <option value="security" className="bg-morpheus-blue-dark text-white">🔒 {t('profile.security')}</option>
                             </select>
                         </div>
@@ -425,7 +426,7 @@ export default function ProfilePage() {
                                     <svg className="w-4 h-4 lg:w-5 lg:h-5 inline mr-1 lg:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                                     </svg>
-                                    <span className="hidden sm:inline">Orders</span>
+                                    <span className="hidden sm:inline">{t('profile.orders')}</span>
                                 </button>
                                 <button
                                     onClick={() => {

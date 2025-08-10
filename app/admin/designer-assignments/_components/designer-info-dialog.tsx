@@ -14,6 +14,7 @@ import {
     CredenzaClose,
 } from "@/components/ui/credenza";
 import { User, Mail, Phone, MapPin, Palette, Building, Lock } from "lucide-react";
+import { useLanguage } from "@/hooks/useLanguage";
 
 interface Designer {
     ydesignid: number;
@@ -45,6 +46,7 @@ export function DesignerInfoDialog({
     isLocked,
     children
 }: DesignerInfoDialogProps) {
+    const { t } = useLanguage();
     const [isOpen, setIsOpen] = useState(false);
 
     return (
@@ -56,10 +58,10 @@ export function DesignerInfoDialog({
                 <CredenzaHeader>
                     <CredenzaTitle className="text-white flex items-center gap-2">
                         <User className="h-5 w-5 text-morpheus-gold-light" />
-                        Designer Information
+                        {t('admin.designerAssignments.designerInformation')}
                     </CredenzaTitle>
                     <CredenzaDescription className="text-gray-300">
-                        Designer assigned to {boutiqueName}
+                        {t('admin.designerAssignments.designerAssignedTo')} {boutiqueName}
                     </CredenzaDescription>
                 </CredenzaHeader>
 
@@ -76,7 +78,7 @@ export function DesignerInfoDialog({
                                 {isLocked && (
                                     <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30">
                                         <Lock className="h-3 w-3 mr-1" />
-                                        Assignment Locked
+                                        {t('admin.designerAssignments.assignmentLocked')}
                                     </Badge>
                                 )}
                             </div>
@@ -88,7 +90,7 @@ export function DesignerInfoDialog({
                         <div className="bg-gray-700/30 rounded-lg p-4">
                             <div className="flex items-center gap-2 mb-2">
                                 <Building className="h-4 w-4 text-morpheus-gold-light" />
-                                <span className="text-sm font-medium text-morpheus-gold-light">Brand</span>
+                                <span className="text-sm font-medium text-morpheus-gold-light">{t('admin.designerAssignments.brand')}</span>
                             </div>
                             <p className="text-white font-medium">{designer.ydesignmarque}</p>
                         </div>
@@ -96,7 +98,7 @@ export function DesignerInfoDialog({
                         <div className="bg-gray-700/30 rounded-lg p-4">
                             <div className="flex items-center gap-2 mb-2">
                                 <Palette className="h-4 w-4 text-morpheus-gold-light" />
-                                <span className="text-sm font-medium text-morpheus-gold-light">Specialty</span>
+                                <span className="text-sm font-medium text-morpheus-gold-light">{t('admin.designerAssignments.specialty')}</span>
                             </div>
                             <p className="text-white font-medium">{designer.ydesignspecialite}</p>
                         </div>
@@ -106,7 +108,7 @@ export function DesignerInfoDialog({
                     <div className="bg-gray-700/30 rounded-lg p-4">
                         <div className="flex items-center gap-2 mb-2">
                             <MapPin className="h-4 w-4 text-morpheus-gold-light" />
-                            <span className="text-sm font-medium text-morpheus-gold-light">Location</span>
+                            <span className="text-sm font-medium text-morpheus-gold-light">{t('admin.designerAssignments.location')}</span>
                         </div>
                         <p className="text-white font-medium">{designer.ydesignpays}</p>
                     </div>
@@ -116,7 +118,7 @@ export function DesignerInfoDialog({
                         <div className="bg-gray-700/30 rounded-lg p-4">
                             <div className="flex items-center gap-2 mb-3">
                                 <Palette className="h-4 w-4 text-morpheus-gold-light" />
-                                <span className="text-sm font-medium text-morpheus-gold-light">Designer Colors</span>
+                                <span className="text-sm font-medium text-morpheus-gold-light">{t('admin.designerAssignments.designerColors')}</span>
                             </div>
                             <div className="flex gap-4">
                                 {designer.ydesigncouleur1codehexa && (
@@ -127,7 +129,7 @@ export function DesignerInfoDialog({
                                         />
                                         <div>
                                             <div className="text-white text-sm font-medium">
-                                                {designer.ydesigncouleur1dsg || 'Color 1'}
+                                                {designer.ydesigncouleur1dsg || t('admin.designerAssignments.color1')}
                                             </div>
                                             <div className="text-gray-400 text-xs">
                                                 {designer.ydesigncouleur1codehexa}
@@ -143,7 +145,7 @@ export function DesignerInfoDialog({
                                         />
                                         <div>
                                             <div className="text-white text-sm font-medium">
-                                                {designer.ydesigncouleur2dsg || 'Color 2'}
+                                                {designer.ydesigncouleur2dsg || t('admin.designerAssignments.color2')}
                                             </div>
                                             <div className="text-gray-400 text-xs">
                                                 {designer.ydesigncouleur2codehexa}
@@ -159,7 +161,7 @@ export function DesignerInfoDialog({
                                         />
                                         <div>
                                             <div className="text-white text-sm font-medium">
-                                                {designer.ydesigncouleur3dsg || 'Color 3'}
+                                                {designer.ydesigncouleur3dsg || t('admin.designerAssignments.color3')}
                                             </div>
                                             <div className="text-gray-400 text-xs">
                                                 {designer.ydesigncouleur3codehexa}
@@ -175,7 +177,7 @@ export function DesignerInfoDialog({
                     <div className="bg-gray-700/30 rounded-lg p-4">
                         <div className="flex items-center gap-2 mb-3">
                             <Mail className="h-4 w-4 text-morpheus-gold-light" />
-                            <span className="text-sm font-medium text-morpheus-gold-light">Contact Information</span>
+                            <span className="text-sm font-medium text-morpheus-gold-light">{t('admin.designerAssignments.contactInformation')}</span>
                         </div>
                         <div className="space-y-2">
                             <div className="flex items-center gap-2">
@@ -195,11 +197,10 @@ export function DesignerInfoDialog({
                         <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4">
                             <div className="flex items-center gap-2 mb-2">
                                 <Lock className="h-4 w-4 text-yellow-400" />
-                                <span className="text-sm font-medium text-yellow-400">Assignment Status</span>
+                                <span className="text-sm font-medium text-yellow-400">{t('admin.designerAssignments.assignmentStatus')}</span>
                             </div>
                             <p className="text-yellow-300 text-sm">
-                                This designer assignment is locked because products have been created for this boutique. 
-                                The assignment cannot be changed.
+                                {t('admin.designerAssignments.assignmentLockedMessage')}
                             </p>
                         </div>
                     )}
@@ -208,7 +209,7 @@ export function DesignerInfoDialog({
                 <CredenzaFooter>
                     <CredenzaClose asChild>
                         <Button variant="outline" className="border-gray-600 text-gray-300">
-                            Close
+                            {t('common.close')}
                         </Button>
                     </CredenzaClose>
                 </CredenzaFooter>

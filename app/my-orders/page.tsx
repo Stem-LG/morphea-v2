@@ -18,15 +18,15 @@ export default function MyOrdersPage() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "pending":
-        return <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-300"><Clock className="w-3 h-3 mr-1" />Pending</Badge>;
+        return <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-300"><Clock className="w-3 h-3 mr-1" />{t('orders.status.pending')}</Badge>;
       case "confirmed":
-        return <Badge variant="secondary" className="bg-blue-500/20 text-blue-300"><Package className="w-3 h-3 mr-1" />Confirmed</Badge>;
+        return <Badge variant="secondary" className="bg-blue-500/20 text-blue-300"><Package className="w-3 h-3 mr-1" />{t('orders.status.confirmed')}</Badge>;
       case "shipped":
-        return <Badge variant="secondary" className="bg-green-500/20 text-green-300"><Truck className="w-3 h-3 mr-1" />Shipped</Badge>;
+        return <Badge variant="secondary" className="bg-green-500/20 text-green-300"><Truck className="w-3 h-3 mr-1" />{t('orders.status.shipped')}</Badge>;
       case "delivered":
-        return <Badge variant="secondary" className="bg-emerald-500/20 text-emerald-300"><Check className="w-3 h-3 mr-1" />Delivered</Badge>;
+        return <Badge variant="secondary" className="bg-emerald-500/20 text-emerald-300"><Check className="w-3 h-3 mr-1" />{t('orders.status.delivered')}</Badge>;
       case "cancelled":
-        return <Badge variant="secondary" className="bg-red-500/20 text-red-300"><X className="w-3 h-3 mr-1" />Cancelled</Badge>;
+        return <Badge variant="secondary" className="bg-red-500/20 text-red-300"><X className="w-3 h-3 mr-1" />{t('orders.status.cancelled')}</Badge>;
       default:
         return <Badge variant="secondary">{status}</Badge>;
     }
@@ -35,17 +35,17 @@ export default function MyOrdersPage() {
   const getStatusMessage = (status: string) => {
     switch (status) {
       case "pending":
-        return "Your order is being reviewed and will be processed soon.";
+        return t('orders.messagePending');
       case "confirmed":
-        return "Your order has been confirmed and is being prepared for shipment.";
+        return t('orders.messageConfirmed');
       case "shipped":
-        return "Your order has been shipped and is on its way to you.";
+        return t('orders.messageShipped');
       case "delivered":
-        return "Your order has been delivered successfully.";
+        return t('orders.messageDelivered');
       case "cancelled":
-        return "This order has been cancelled.";
+        return t('orders.messageCancelled');
       default:
-        return "Order status unknown.";
+        return t('orders.messageUnknown');
     }
   };
 
@@ -70,15 +70,15 @@ export default function MyOrdersPage() {
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-white">My Orders</h1>
-            <p className="text-gray-300">Track your order status and history</p>
+            <h1 className="text-3xl font-bold text-white">{t('orders.myOrders')}</h1>
+            <p className="text-gray-300">{t('orders.trackYourOrder')}</p>
           </div>
           <Button
             onClick={() => router.push("/")}
             className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-morpheus-gold-light hover:to-morpheus-gold-dark text-white"
           >
             <Home className="w-4 h-4 mr-2" />
-            Continue Shopping
+            {t('orders.startShopping')}
           </Button>
         </div>
 
@@ -88,13 +88,13 @@ export default function MyOrdersPage() {
             <Card className="bg-white/10 backdrop-blur-md border border-morpheus-gold-dark/20">
               <CardContent className="text-center py-12">
                 <Package className="w-16 h-16 mx-auto text-morpheus-gold-light/50 mb-4" />
-                <h3 className="text-xl font-medium text-white mb-2">No orders yet</h3>
-                <p className="text-gray-300 mb-6">You haven't placed any orders yet. Start shopping to see your orders here.</p>
+                <h3 className="text-xl font-medium text-white mb-2">{t('orders.noOrdersYet')}</h3>
+                <p className="text-gray-300 mb-6">{t('orders.startShoppingMessage')}</p>
                 <Button
                   onClick={() => router.push("/")}
                   className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-morpheus-gold-light hover:to-morpheus-gold-dark text-white"
                 >
-                  Start Shopping
+                  {t('orders.startShopping')}
                 </Button>
               </CardContent>
             </Card>
@@ -105,7 +105,7 @@ export default function MyOrdersPage() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
                       <CardTitle className="text-white">
-                        Order #{orderGroup.zcommandeno}
+                        {t('orders.orderNumber')}: {orderGroup.zcommandeno}
                       </CardTitle>
                       {getStatusBadge(orderGroup.zcommandestatut)}
                     </div>
@@ -124,17 +124,17 @@ export default function MyOrdersPage() {
                     <div className="p-4 bg-white/5 rounded-lg">
                       <div className="flex items-center gap-2 mb-2">
                         <Truck className="w-4 h-4 text-morpheus-gold-light" />
-                        <span className="font-medium text-white">Delivery Information</span>
+                        <span className="font-medium text-white">{t('orders.deliveryInfo')}</span>
                       </div>
                       <p className="text-sm text-gray-300">
-                        Expected delivery: {new Date(orderGroup.zcommandelivraisondate).toLocaleDateString()}
+                        {t('orders.expectedDelivery')}: {new Date(orderGroup.zcommandelivraisondate).toLocaleDateString()}
                       </p>
                     </div>
                   )}
 
                   {/* Order Items */}
                   <div className="space-y-3">
-                    <h4 className="font-medium text-white">Items Ordered</h4>
+                    <h4 className="font-medium text-white">{t('orders.items')}</h4>
                     {orderGroup.items.map((item: any, index: number) => (
                       <div key={index} className="flex items-center gap-4 p-4 bg-white/5 rounded-lg">
                         {/* Product Image */}
@@ -157,7 +157,7 @@ export default function MyOrdersPage() {
                         {/* Product Details */}
                         <div className="flex-1">
                           <h5 className="font-medium text-white">
-                            {item.yvarprod?.yvarprodintitule || "Unknown Product"}
+                            {item.yvarprod?.yvarprodintitule || t('orders.unknownProduct')}
                           </h5>
                           <div className="flex items-center gap-2 text-sm text-gray-300">
                             {item.yvarprod?.xcouleur && (
@@ -177,7 +177,7 @@ export default function MyOrdersPage() {
 
                         {/* Quantity and Price */}
                         <div className="text-right">
-                          <p className="font-medium text-white">Qty: {item.zcommandequantite}</p>
+                          <p className="font-medium text-white">{t('orders.quantity')}: {item.zcommandequantite}</p>
                           <p className="text-sm text-morpheus-gold-light">
                             ${(item.yvarprod?.yvarprodprixpromotion || item.yvarprod?.yvarprodprixcatalogue || 0).toFixed(2)}
                           </p>
@@ -193,13 +193,13 @@ export default function MyOrdersPage() {
                     <div className="flex items-center gap-2">
                       <DollarSign className="w-5 h-5 text-morpheus-gold-light" />
                       <span className="text-lg font-semibold text-white">
-                        Total: ${calculateOrderTotal(orderGroup.items).toFixed(2)}
+                        {t('orders.total')}: ${calculateOrderTotal(orderGroup.items).toFixed(2)}
                       </span>
                     </div>
                     {orderGroup.zcommandestatut === "shipped" && (
                       <Badge variant="secondary" className="bg-blue-500/20 text-blue-300">
                         <Truck className="w-3 h-3 mr-1" />
-                        Track Package
+                        {t('orders.trackPackage')}
                       </Badge>
                     )}
                   </div>

@@ -57,35 +57,35 @@ export default function AdminOrdersPage() {
                 return (
                     <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-300">
                         <Clock className="w-3 h-3 mr-1" />
-                        Pending
+                        {t("orders.status.pending")}
                     </Badge>
                 );
             case "confirmed":
                 return (
                     <Badge variant="secondary" className="bg-blue-500/20 text-blue-300">
                         <Package className="w-3 h-3 mr-1" />
-                        Confirmed
+                        {t("orders.status.confirmed")}
                     </Badge>
                 );
             case "shipped":
                 return (
                     <Badge variant="secondary" className="bg-green-500/20 text-green-300">
                         <Check className="w-3 h-3 mr-1" />
-                        Shipped
+                        {t("orders.status.shipped")}
                     </Badge>
                 );
             case "delivered":
                 return (
                     <Badge variant="secondary" className="bg-emerald-500/20 text-emerald-300">
                         <Check className="w-3 h-3 mr-1" />
-                        Delivered
+                        {t("orders.status.delivered")}
                     </Badge>
                 );
             case "cancelled":
                 return (
                     <Badge variant="secondary" className="bg-red-500/20 text-red-300">
                         <X className="w-3 h-3 mr-1" />
-                        Cancelled
+                        {t("orders.status.cancelled")}
                     </Badge>
                 );
             default:
@@ -113,12 +113,12 @@ export default function AdminOrdersPage() {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold text-white">Order Management</h1>
-                    <p className="text-gray-300">Manage and track all customer orders</p>
+                    <h1 className="text-3xl font-bold text-white">{t("admin.orders.title")}</h1>
+                    <p className="text-gray-300">{t("admin.orders.subtitle")}</p>
                 </div>
                 <div className="flex items-center gap-2 text-white">
                     <Package className="w-5 h-5 text-morpheus-gold-light" />
-                    <span className="font-medium">{orders.length} Total Orders</span>
+                    <span className="font-medium">{orders.length} {t("admin.orders.totalOrders")}</span>
                 </div>
             </div>
 
@@ -128,13 +128,13 @@ export default function AdminOrdersPage() {
                     <div className="flex flex-col md:flex-row gap-4">
                         <div className="flex-1">
                             <Label htmlFor="search" className="text-white">
-                                Search Orders
+                                {t("admin.orders.searchOrders")}
                             </Label>
                             <div className="relative">
                                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                                 <Input
                                     id="search"
-                                    placeholder="Search by order number or customer name..."
+                                    placeholder={t("admin.orders.searchPlaceholder")}
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                     className="pl-10 bg-white/10 border-morpheus-gold-dark/30 text-white placeholder:text-gray-400"
@@ -142,18 +142,18 @@ export default function AdminOrdersPage() {
                             </div>
                         </div>
                         <div className="w-full md:w-48">
-                            <Label className="text-white">Filter by Status</Label>
+                            <Label className="text-white">{t("admin.orders.filterByStatus")}</Label>
                             <Select value={statusFilter} onValueChange={setStatusFilter}>
                                 <SelectTrigger className="bg-white/10 border-morpheus-gold-dark/30 text-white">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="all">All Status</SelectItem>
-                                    <SelectItem value="pending">Pending</SelectItem>
-                                    <SelectItem value="confirmed">Confirmed</SelectItem>
-                                    <SelectItem value="shipped">Shipped</SelectItem>
-                                    <SelectItem value="delivered">Delivered</SelectItem>
-                                    <SelectItem value="cancelled">Cancelled</SelectItem>
+                                    <SelectItem value="all">{t("admin.orders.allStatus")}</SelectItem>
+                                    <SelectItem value="pending">{t("orders.status.pending")}</SelectItem>
+                                    <SelectItem value="confirmed">{t("orders.status.confirmed")}</SelectItem>
+                                    <SelectItem value="shipped">{t("orders.status.shipped")}</SelectItem>
+                                    <SelectItem value="delivered">{t("orders.status.delivered")}</SelectItem>
+                                    <SelectItem value="cancelled">{t("orders.status.cancelled")}</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
@@ -167,8 +167,8 @@ export default function AdminOrdersPage() {
                     <Card className="bg-white/10 backdrop-blur-md border border-morpheus-gold-dark/20">
                         <CardContent className="text-center py-8">
                             <Package className="w-16 h-16 mx-auto text-morpheus-gold-light/50 mb-4" />
-                            <h3 className="text-lg font-medium text-white mb-2">No orders found</h3>
-                            <p className="text-gray-300">No orders match your current filters</p>
+                            <h3 className="text-lg font-medium text-white mb-2">{t("admin.orders.noOrdersFound")}</h3>
+                            <p className="text-gray-300">{t("admin.orders.noOrdersMatchFilters")}</p>
                         </CardContent>
                     </Card>
                 ) : (
@@ -180,7 +180,7 @@ export default function AdminOrdersPage() {
                             <CardHeader>
                                 <div className="flex items-center justify-between pt-4">
                                     <div className="flex items-center gap-4">
-                                        <CardTitle className="text-white">Order #{orderGroup.zcommandeno}</CardTitle>
+                                        <CardTitle className="text-white">{t("admin.orders.orderNumber")} #{orderGroup.zcommandeno}</CardTitle>
                                         {getStatusBadge(orderGroup.zcommandestatut)}
                                     </div>
                                     <div className="flex items-center gap-2 text-sm text-gray-300">
@@ -195,17 +195,17 @@ export default function AdminOrdersPage() {
                                     <User className="w-5 h-5 text-morpheus-gold-light" />
                                     <div>
                                         <p className="font-medium text-white">
-                                            {orderGroup.yvisiteur?.yvisiteurnom || "Unknown Customer"}
+                                            {orderGroup.yvisiteur?.yvisiteurnom || t("admin.orders.unknownCustomer")}
                                         </p>
                                         <p className="text-sm text-gray-300">
-                                            {orderGroup.yvisiteur?.yvisiteuremail || "No email"}
+                                            {orderGroup.yvisiteur?.yvisiteuremail || t("admin.orders.noEmail")}
                                         </p>
                                     </div>
                                 </div>
 
                                 {/* Order Items */}
                                 <div className="space-y-2">
-                                    <h4 className="font-medium text-white">Order Items</h4>
+                                    <h4 className="font-medium text-white">{t("admin.orders.orderItems")}</h4>
                                     {orderGroup.items.map((item: any, index: number) => (
                                         <div
                                             key={index}
@@ -213,7 +213,7 @@ export default function AdminOrdersPage() {
                                         >
                                             <div className="flex-1">
                                                 <p className="font-medium text-white">
-                                                    {item.yvarprod?.yvarprodintitule || "Unknown Product"}
+                                                    {item.yvarprod?.yvarprodintitule || t("admin.orders.unknownProduct")}
                                                 </p>
                                                 <div className="flex items-center gap-2 text-sm text-gray-300">
                                                     {item.yvarprod?.xcouleur && (
@@ -234,7 +234,7 @@ export default function AdminOrdersPage() {
                                                 </div>
                                             </div>
                                             <div className="text-right">
-                                                <p className="font-medium text-white">Qty: {item.zcommandequantite}</p>
+                                                <p className="font-medium text-white">{t("admin.orders.quantity")}: {item.zcommandequantite}</p>
                                                 <p className="text-sm text-morpheus-gold-light">
                                                     $
                                                     {(
@@ -255,7 +255,7 @@ export default function AdminOrdersPage() {
                                     <div className="flex items-center gap-2">
                                         <DollarSign className="w-5 h-5 text-morpheus-gold-light" />
                                         <span className="text-lg font-semibold text-white">
-                                            Total: ${calculateOrderTotal(orderGroup.items).toFixed(2)}
+                                            {t("admin.orders.total")}: ${calculateOrderTotal(orderGroup.items).toFixed(2)}
                                         </span>
                                     </div>
                                     <div className="flex gap-2">
@@ -270,7 +270,7 @@ export default function AdminOrdersPage() {
                                                     className="bg-green-600 hover:bg-green-700 text-white"
                                                 >
                                                     <Check className="w-4 h-4 mr-1" />
-                                                    Confirm
+                                                    {t("admin.orders.confirm")}
                                                 </Button>
                                                 <Button
                                                     size="sm"
@@ -281,7 +281,7 @@ export default function AdminOrdersPage() {
                                                     disabled={updateOrderStatusMutation.isPending}
                                                 >
                                                     <X className="w-4 h-4 mr-1" />
-                                                    Cancel
+                                                    {t("admin.orders.cancel")}
                                                 </Button>
                                             </>
                                         )}
@@ -293,7 +293,7 @@ export default function AdminOrdersPage() {
                                                 className="bg-blue-600 hover:bg-blue-700 text-white"
                                             >
                                                 <Package className="w-4 h-4 mr-1" />
-                                                Mark as Shipped
+                                                {t("admin.orders.markAsShipped")}
                                             </Button>
                                         )}
                                         {orderGroup.zcommandestatut === "shipped" && (
@@ -304,7 +304,7 @@ export default function AdminOrdersPage() {
                                                 className="bg-emerald-600 hover:bg-emerald-700 text-white"
                                             >
                                                 <Check className="w-4 h-4 mr-1" />
-                                                Mark as Delivered
+                                                {t("admin.orders.markAsDelivered")}
                                             </Button>
                                         )}
                                     </div>
