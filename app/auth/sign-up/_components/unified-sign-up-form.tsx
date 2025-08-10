@@ -449,7 +449,7 @@ export function UnifiedSignUpForm({
                                             Vos intérêts
                                         </Label>
                                         <p className="text-gray-400 text-xs mt-1">
-                                            Sélectionnez tout ce qui s'applique
+                                            {"Sélectionnez tout ce qui s'applique"}
                                         </p>
                                     </div>
                                     

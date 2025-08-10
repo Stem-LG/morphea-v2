@@ -21,13 +21,11 @@ type PasswordRequirement = {
 
 interface EnhancedSignUpFormProps extends React.ComponentPropsWithoutRef<"div"> {
     visitorFormData?: VisitorFormData;
-    onVisitorDataNeeded?: () => void;
 }
 
 export function EnhancedSignUpForm({ 
     className, 
     visitorFormData, 
-    onVisitorDataNeeded,
     ...props 
 }: EnhancedSignUpFormProps) {
     const [name, setName] = useState("");

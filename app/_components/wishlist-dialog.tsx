@@ -31,15 +31,6 @@ export function WishlistDialog({ isOpen, onClose }: WishlistDialogProps) {
         removeFromWishlistMutation.mutate({ ywishlistid });
     };
 
-    const handleAddToCart = (item: any) => {
-        if (!item.yvarprod) return;
-        
-        addToCartMutation.mutate({
-            yvarprodidfk: item.yvarprod.yvarprodid,
-            ypanierqte: 1,
-        });
-    };
-
     const handleMoveToCart = (item: any) => {
         if (!item.yvarprod) return;
         

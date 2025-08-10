@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useLanguage } from "@/hooks/useLanguage";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -86,9 +85,7 @@ export function VisitorFormSidePanel({ onDataChange, initialData }: VisitorFormS
                         <Users className="w-5 h-5" />
                         Additional Information
                     </CardTitle>
-                    <p className="text-gray-300 text-sm">
-                        Help us know you better
-                    </p>
+                    <p className="text-gray-300 text-sm">Help us know you better</p>
                 </CardHeader>
                 <CardContent className="space-y-6">
                     {/* Contact Information */}
@@ -125,14 +122,10 @@ export function VisitorFormSidePanel({ onDataChange, initialData }: VisitorFormS
                     {/* Visitor Types */}
                     <div className="space-y-4">
                         <div>
-                            <Label className="text-white text-sm font-medium">
-                                Vos intérêts
-                            </Label>
-                            <p className="text-gray-400 text-xs mt-1">
-                                Sélectionnez tout ce qui s'applique
-                            </p>
+                            <Label className="text-white text-sm font-medium">Vos intérêts</Label>
+                            <p className="text-gray-400 text-xs mt-1">{"Sélectionnez tout ce qui s'applique"}</p>
                         </div>
-                        
+
                         <div className="grid grid-cols-1 gap-2 max-h-48 overflow-y-auto">
                             {[
                                 { key: "grandpublic", label: "Grand Public" },
@@ -155,11 +148,7 @@ export function VisitorFormSidePanel({ onDataChange, initialData }: VisitorFormS
                                 >
                                     <input
                                         type="checkbox"
-                                        checked={
-                                            formData.visitorTypes[
-                                                key as keyof VisitorFormData["visitorTypes"]
-                                            ]
-                                        }
+                                        checked={formData.visitorTypes[key as keyof VisitorFormData["visitorTypes"]]}
                                         onChange={(e) =>
                                             handleVisitorTypeChange(
                                                 key as keyof VisitorFormData["visitorTypes"],
@@ -168,9 +157,7 @@ export function VisitorFormSidePanel({ onDataChange, initialData }: VisitorFormS
                                         }
                                         className="w-3 h-3 text-morpheus-gold-light bg-morpheus-blue-dark border-morpheus-gold-dark/30 rounded focus:ring-morpheus-gold-light focus:ring-1"
                                     />
-                                    <span className="text-gray-300 text-xs">
-                                        {label}
-                                    </span>
+                                    <span className="text-gray-300 text-xs">{label}</span>
                                 </label>
                             ))}
                         </div>

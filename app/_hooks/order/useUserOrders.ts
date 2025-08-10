@@ -4,6 +4,35 @@ import { useAuth } from "@/hooks/useAuth";
 import { createClient } from "@/lib/client";
 import { useQuery } from "@tanstack/react-query";
 
+interface YMedia {
+  [key: string]: any;
+}
+
+interface YVarProd {
+  yvarprodid: string;
+  [key: string]: any;
+  yvarprodmedia?: { ymedia: YMedia }[];
+}
+
+interface ZDetailsCommande {
+  zcommandeno: string;
+  zcommandeid: string;
+  zcommandedate: string;
+  zcommandelivraisondate?: string;
+  zcommandestatut: string;
+  [key: string]: any;
+  yvarprod?: YVarProd;
+}
+
+interface GroupedOrder {
+  zcommandeno: string;
+  zcommandeid: string;
+  zcommandedate: string;
+  zcommandelivraisondate?: string;
+  zcommandestatut: string;
+  items: ZDetailsCommande[];
+}
+
 export function useUserOrders() {
   const supabase = createClient();
   const { data: userData, isError } = useAuth();
@@ -73,7 +102,7 @@ export function useUserOrders() {
         );
 
         // Group orders by zcommandeno
-        const groupedOrders = enrichedData.reduce((acc: any, item: any) => {
+        const groupedOrders = enrichedData.reduce<Record<string, GroupedOrder>>((acc, item) => {
           const orderNo = item.zcommandeno;
           if (!acc[orderNo]) {
             acc[orderNo] = {
