@@ -15,6 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { Minus, Plus, Trash2, ShoppingCart } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface CartDialogProps {
     isOpen: boolean;
@@ -23,6 +24,7 @@ interface CartDialogProps {
 
 export function CartDialog({ isOpen, onClose }: CartDialogProps) {
     const { t } = useLanguage();
+    const router = useRouter();
     const { data: cartItems = [], isLoading } = useCart();
     const updateCartMutation = useUpdateCart();
     const deleteFromCartMutation = useDeleteFromCart();
@@ -47,10 +49,9 @@ export function CartDialog({ isOpen, onClose }: CartDialogProps) {
     };
 
     const handleCheckout = () => {
-        // Implementation for checkout
-        console.log("Proceeding to checkout with items:", cartItems);
-        // You would redirect to checkout page here
+        // Navigate to order page
         onClose();
+        router.push("/order");
     };
 
     return (
@@ -205,7 +206,7 @@ export function CartDialog({ isOpen, onClose }: CartDialogProps) {
                                 onClick={handleCheckout}
                                 className="flex-1 bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-morpheus-gold-light hover:to-morpheus-gold-dark text-white"
                             >
-                                {t("cart.checkout") || "Checkout"}
+                                {t("cart.checkout") || "Proceed to Payment"}
                             </Button>
                         </div>
                     </CredenzaFooter>

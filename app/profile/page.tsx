@@ -7,12 +7,164 @@ import { useEffect, useState } from "react";
 import { ProfileInfoDisplay } from "@/components/profile-info-display";
 import { ProfileInfoEdit } from "@/components/profile-info-edit";
 import { PasswordChangeForm } from "@/components/password-change-form";
-import { ActivitySummary } from "@/components/activity-summary";
-import { PreferencesManagement } from "@/components/preferences-management";
 import { AccountDeletionSection } from "@/components/account-deletion-section";
 import { profileService, ProfileUpdateData } from "@/lib/profile-service";
 import { Button } from "@/components/ui/button";
 import { useQueryClient } from "@tanstack/react-query";
+import { useUserOrders } from "@/app/_hooks/order/useUserOrders";
+import { Badge } from "@/components/ui/badge";
+import { Package, Calendar, DollarSign, Clock, Check, X, Truck } from "lucide-react";
+import Image from "next/image";
+
+// Orders Tab Component
+function OrdersTab() {
+    const { data: orders = [], isLoading } = useUserOrders();
+    const router = useRouter();
+
+    const getStatusBadge = (status: string) => {
+        switch (status) {
+            case "pending":
+                return <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-300"><Clock className="w-3 h-3 mr-1" />Pending</Badge>;
+            case "confirmed":
+                return <Badge variant="secondary" className="bg-blue-500/20 text-blue-300"><Package className="w-3 h-3 mr-1" />Confirmed</Badge>;
+            case "shipped":
+                return <Badge variant="secondary" className="bg-green-500/20 text-green-300"><Truck className="w-3 h-3 mr-1" />Shipped</Badge>;
+            case "delivered":
+                return <Badge variant="secondary" className="bg-emerald-500/20 text-emerald-300"><Check className="w-3 h-3 mr-1" />Delivered</Badge>;
+            case "cancelled":
+                return <Badge variant="secondary" className="bg-red-500/20 text-red-300"><X className="w-3 h-3 mr-1" />Cancelled</Badge>;
+            default:
+                return <Badge variant="secondary">{status}</Badge>;
+        }
+    };
+
+    const calculateOrderTotal = (orderItems: any[]) => {
+        return orderItems.reduce((total, item) => {
+            const price = item.yvarprod?.yvarprodprixpromotion || item.yvarprod?.yvarprodprixcatalogue || 0;
+            return total + (price * item.zcommandequantite);
+        }, 0);
+    };
+
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center py-8">
+                <div className="w-8 h-8 border-2 border-morpheus-gold-dark border-t-transparent animate-spin rounded-full"></div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="space-y-6">
+            <div className="text-center space-y-4">
+                <h2 className="text-2xl font-bold font-parisienne bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light bg-clip-text text-transparent">
+                    My Orders
+                </h2>
+                <p className="text-gray-300">
+                    Track your order status and history
+                </p>
+            </div>
+
+            {orders.length === 0 ? (
+                <div className="text-center py-12 space-y-4">
+                    <Package className="w-16 h-16 mx-auto text-morpheus-gold-light/50" />
+                    <h3 className="text-xl font-medium text-white">No orders yet</h3>
+                    <p className="text-gray-300 mb-6">You haven't placed any orders yet. Start shopping to see your orders here.</p>
+                    <Button
+                        onClick={() => router.push("/")}
+                        className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-morpheus-gold-light hover:to-morpheus-gold-dark text-white"
+                    >
+                        Start Shopping
+                    </Button>
+                </div>
+            ) : (
+                <div className="space-y-4">
+                    {orders.map((orderGroup: any) => (
+                        <div key={orderGroup.zcommandeno} className="bg-morpheus-blue-dark/50 border border-morpheus-gold-dark/30 p-6 space-y-4">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-4">
+                                    <h3 className="text-lg font-semibold text-white">
+                                        Order #{orderGroup.zcommandeno}
+                                    </h3>
+                                    {getStatusBadge(orderGroup.zcommandestatut)}
+                                </div>
+                                <div className="flex items-center gap-2 text-sm text-gray-300">
+                                    <Calendar className="w-4 h-4" />
+                                    {new Date(orderGroup.zcommandedate).toLocaleDateString()}
+                                </div>
+                            </div>
+
+                            {/* Order Items */}
+                            <div className="space-y-3">
+                                <h4 className="font-medium text-white">Items</h4>
+                                {orderGroup.items.slice(0, 3).map((item: any, index: number) => (
+                                    <div key={index} className="flex items-center gap-4 p-3 bg-white/5 rounded-lg">
+                                        <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                                            {(item.yvarprod as any)?.yvarprodmedia?.[0]?.ymedia?.ymediaurl ? (
+                                                <Image
+                                                    src={(item.yvarprod as any).yvarprodmedia[0].ymedia.ymediaurl}
+                                                    alt={item.yvarprod?.yvarprodintitule || "Product"}
+                                                    width={48}
+                                                    height={48}
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                                    <Package className="w-4 h-4" />
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="flex-1">
+                                            <p className="font-medium text-white text-sm">
+                                                {item.yvarprod?.yvarprodintitule || "Unknown Product"}
+                                            </p>
+                                            <p className="text-xs text-gray-300">Qty: {item.zcommandequantite}</p>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="text-sm text-morpheus-gold-light">
+                                                ${(item.yvarprod?.yvarprodprixpromotion || item.yvarprod?.yvarprodprixcatalogue || 0).toFixed(2)}
+                                            </p>
+                                        </div>
+                                    </div>
+                                ))}
+                                {orderGroup.items.length > 3 && (
+                                    <p className="text-sm text-gray-300 text-center">
+                                        +{orderGroup.items.length - 3} more items
+                                    </p>
+                                )}
+                            </div>
+
+                            <div className="flex items-center justify-between pt-4 border-t border-morpheus-gold-dark/30">
+                                <div className="flex items-center gap-2">
+                                    <DollarSign className="w-5 h-5 text-morpheus-gold-light" />
+                                    <span className="text-lg font-semibold text-white">
+                                        Total: ${calculateOrderTotal(orderGroup.items).toFixed(2)}
+                                    </span>
+                                </div>
+                                <Button
+                                    onClick={() => router.push("/my-orders")}
+                                    variant="outline"
+                                    size="sm"
+                                    className="border-morpheus-gold-dark/30 text-white hover:bg-morpheus-gold-dark/20"
+                                >
+                                    View Details
+                                </Button>
+                            </div>
+                        </div>
+                    ))}
+                    
+                    <div className="text-center pt-4">
+                        <Button
+                            onClick={() => router.push("/my-orders")}
+                            className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-morpheus-gold-light hover:to-morpheus-gold-dark text-white"
+                        >
+                            View All Orders
+                        </Button>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}
 
 export default function ProfilePage() {
     const { data: currentUser, isLoading, refetch } = useAuth();
@@ -21,7 +173,7 @@ export default function ProfilePage() {
     const queryClient = useQueryClient();
 
     // Component state
-    const [activeTab, setActiveTab] = useState<'profile' | 'activity' | 'security' | 'preferences'>('profile');
+    const [activeTab, setActiveTab] = useState<'profile' | 'orders' | 'security'>('profile');
     const [isEditing, setIsEditing] = useState(false);
     const [isUpdating, setIsUpdating] = useState(false);
     const [showPasswordChange, setShowPasswordChange] = useState(false);
@@ -221,7 +373,7 @@ export default function ProfilePage() {
                             <select
                                 value={activeTab}
                                 onChange={(e) => {
-                                    const newTab = e.target.value as 'profile' | 'activity' | 'security' | 'preferences';
+                                    const newTab = e.target.value as 'profile' | 'orders' | 'security';
                                     setActiveTab(newTab);
                                     setIsEditing(false);
                                     setShowPasswordChange(false);
@@ -231,9 +383,8 @@ export default function ProfilePage() {
                                 className="w-full bg-gradient-to-br from-morpheus-blue-dark/60 to-morpheus-blue-light/40 border border-morpheus-gold-dark/30 text-white p-4 text-lg font-semibold backdrop-blur-sm focus:border-morpheus-gold-light focus:ring-morpheus-gold-light/20 rounded-none"
                             >
                                 <option value="profile" className="bg-morpheus-blue-dark text-white">👤 {t('profile.profile')}</option>
-                                <option value="activity" className="bg-morpheus-blue-dark text-white">📊 {t('profile.activity')}</option>
+                                <option value="orders" className="bg-morpheus-blue-dark text-white">📦 Orders</option>
                                 <option value="security" className="bg-morpheus-blue-dark text-white">🔒 {t('profile.security')}</option>
-                                <option value="preferences" className="bg-morpheus-blue-dark text-white">⚙️ {t('profile.preferences')}</option>
                             </select>
                         </div>
 
@@ -260,21 +411,21 @@ export default function ProfilePage() {
                                 </button>
                                 <button
                                     onClick={() => {
-                                        setActiveTab('activity');
+                                        setActiveTab('orders');
                                         setIsEditing(false);
                                         setShowPasswordChange(false);
                                         setShowAccountDeletion(false);
                                         setMessage(null);
                                     }}
-                                    className={`px-4 lg:px-6 py-3 font-semibold transition-all duration-300 text-sm lg:text-base ${activeTab === 'activity'
+                                    className={`px-4 lg:px-6 py-3 font-semibold transition-all duration-300 text-sm lg:text-base ${activeTab === 'orders'
                                             ? 'bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light text-white shadow-lg'
                                             : 'text-gray-300 hover:text-white hover:bg-morpheus-gold-dark/20'
                                         }`}
                                 >
                                     <svg className="w-4 h-4 lg:w-5 lg:h-5 inline mr-1 lg:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                                     </svg>
-                                    <span className="hidden sm:inline">{t('profile.activity')}</span>
+                                    <span className="hidden sm:inline">Orders</span>
                                 </button>
                                 <button
                                     onClick={() => {
@@ -293,25 +444,6 @@ export default function ProfilePage() {
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                                     </svg>
                                     <span className="hidden sm:inline">{t('profile.security')}</span>
-                                </button>
-                                <button
-                                    onClick={() => {
-                                        setActiveTab('preferences');
-                                        setIsEditing(false);
-                                        setShowPasswordChange(false);
-                                        setShowAccountDeletion(false);
-                                        setMessage(null);
-                                    }}
-                                    className={`px-4 lg:px-6 py-3 font-semibold transition-all duration-300 text-sm lg:text-base ${activeTab === 'preferences'
-                                            ? 'bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light text-white shadow-lg'
-                                            : 'text-gray-300 hover:text-white hover:bg-morpheus-gold-dark/20'
-                                        }`}
-                                >
-                                    <svg className="w-4 h-4 lg:w-5 lg:h-5 inline mr-1 lg:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    </svg>
-                                    <span className="hidden sm:inline">{t('profile.preferences')}</span>
                                 </button>
                             </div>
                         </div>
@@ -352,8 +484,8 @@ export default function ProfilePage() {
                             </>
                         )}
 
-                        {activeTab === 'activity' && (
-                            <ActivitySummary />
+                        {activeTab === 'orders' && (
+                            <OrdersTab />
                         )}
 
                         {activeTab === 'security' && (
@@ -463,13 +595,6 @@ export default function ProfilePage() {
                                     </>
                                 ) : <></>}
                             </>
-                        )}
-
-                        {activeTab === 'preferences' && (
-                            <PreferencesManagement
-                                onSuccess={(message) => setMessage({ type: 'success', text: message })}
-                                onError={(error) => setMessage({ type: 'error', text: error })}
-                            />
                         )}
                     </div>
                 </div>

@@ -85,7 +85,8 @@ export const frTranslations = {
     "welcomeToMorpheusMall": "Bienvenue chez Morpheus Mall. En utilisant nos services, vous acceptez ces conditions générales.",
     "termsContentPlaceholder": "Le contenu des conditions générales sera ajouté ici.",
     "developmentPlaceholder": "Ceci est une page de développement temporaire.",
-    "backToSignUp": "← Retour à l'inscription"
+    "backToSignUp": "← Retour à l'inscription",
+    "backToMorpheusMall": "← Retour à Morpheus Mall"
   },
   "landing": {
     "title": "Bienvenue chez Morpheus Mall",
@@ -810,6 +811,9 @@ export const frTranslations = {
     "title": "Bienvenue chez Morpheus Mall",
     "subtitle": "Aidez-nous à personnaliser votre expérience en partageant quelques informations sur vous.",
     "basicInformation": "Vos informations",
+    "additionalInfo": "Informations supplémentaires",
+    "helpUsKnowYouBetter": "Aidez-nous à mieux vous connaître",
+    "selectAllThatApply": "Sélectionnez tout ce qui s'applique",
     "name": "Nom",
     "nameRequired": "Nom *",
     "email": "Email",

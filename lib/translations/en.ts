@@ -86,7 +86,8 @@ export const enTranslations = {
     "welcomeToMorpheusMall": "Welcome to Morpheus Mall. By using our services, you agree to these terms and conditions.",
     "termsContentPlaceholder": "Terms and conditions content will be added here.",
     "developmentPlaceholder": "This is a placeholder page for development purposes.",
-    "backToSignUp": "← Back to Sign Up"
+    "backToSignUp": "← Back to Sign Up",
+    "backToMorpheusMall": "← Back to Morpheus Mall"
   },
   "landing": {
     "title": "Welcome to Morpheus Mall",
@@ -811,6 +812,9 @@ export const enTranslations = {
     "title": "Welcome to Morpheus Mall",
     "subtitle": "Help us personalize your experience by sharing some information about yourself.",
     "basicInformation": "Your Information",
+    "additionalInfo": "Additional Information",
+    "helpUsKnowYouBetter": "Help us know you better",
+    "selectAllThatApply": "Select all that apply",
     "name": "Name",
     "nameRequired": "Name *",
     "email": "Email",

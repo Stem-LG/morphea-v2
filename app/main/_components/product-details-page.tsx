@@ -149,6 +149,7 @@ type ProductVariant = {
     yvarprodpromotiondatedeb: string | null;
     yvarprodpromotiondatefin: string | null;
     yvarprodnbrjourlivraison: number;
+    yvarprodstatut: string; // Approval status field
     xcouleur: {
         xcouleurid: number;
         xcouleurintitule: string;
@@ -185,14 +186,21 @@ interface ProductDetailsPageProps {
 
 export function ProductDetailsPage({ productData, onClose }: ProductDetailsPageProps) {
     const { t } = useLanguage();
+    
+    // Filter to only show approved variants
+    const approvedVariants = useMemo(() => {
+        if (!productData.yvarprod || productData.yvarprod.length === 0) return [];
+        return productData.yvarprod.filter((variant) => variant.yvarprodstatut === "approved");
+    }, [productData.yvarprod]);
+
     const [selectedMediaIndex, setSelectedMediaIndex] = useState(0);
     const [selectedColorId, setSelectedColorId] = useState<number>(() => {
-        return productData.yvarprod && productData.yvarprod.length > 0
-            ? productData.yvarprod[0].xcouleur.xcouleurid
+        return approvedVariants && approvedVariants.length > 0
+            ? approvedVariants[0].xcouleur.xcouleurid
             : 0;
     });
     const [selectedSizeId, setSelectedSizeId] = useState<number>(() => {
-        return productData.yvarprod && productData.yvarprod.length > 0 ? productData.yvarprod[0].xtaille.xtailleid : 0;
+        return approvedVariants && approvedVariants.length > 0 ? approvedVariants[0].xtaille.xtailleid : 0;
     });
     const [viewMode, setViewMode] = useState<"media" | "3d">("media");
     const [quantity, setQuantity] = useState(1);
@@ -201,26 +209,27 @@ export function ProductDetailsPage({ productData, onClose }: ProductDetailsPageP
     const addToCartMutation = useAddToCart();
     const addToWishlistMutation = useAddToWishlist();
     const removeFromWishlistMutation = useRemoveFromWishlist();
-    // Get all unique colors and sizes from variants
+    
+    // Get all unique colors and sizes from approved variants only
     const availableColors = useMemo(() => {
-        if (!productData.yvarprod || productData.yvarprod.length === 0) return [];
+        if (!approvedVariants || approvedVariants.length === 0) return [];
 
         const colorMap = new Map();
-        productData.yvarprod.forEach((variant) => {
+        approvedVariants.forEach((variant) => {
             const color = variant.xcouleur;
             if (!colorMap.has(color.xcouleurid)) {
                 colorMap.set(color.xcouleurid, color);
             }
         });
         return Array.from(colorMap.values());
-    }, [productData.yvarprod]);
+    }, [approvedVariants]);
 
     const availableSizes = useMemo(() => {
-        if (!productData.yvarprod || productData.yvarprod.length === 0) return [];
+        if (!approvedVariants || approvedVariants.length === 0) return [];
 
         const sizeMap = new Map();
-        // Filter sizes based on selected color
-        const variantsForColor = productData.yvarprod.filter((v) => v.xcouleur.xcouleurid === selectedColorId);
+        // Filter sizes based on selected color from approved variants only
+        const variantsForColor = approvedVariants.filter((v) => v.xcouleur.xcouleurid === selectedColorId);
         variantsForColor.forEach((variant) => {
             const size = variant.xtaille;
             if (!sizeMap.has(size.xtailleid)) {
@@ -228,25 +237,25 @@ export function ProductDetailsPage({ productData, onClose }: ProductDetailsPageP
             }
         });
         return Array.from(sizeMap.values());
-    }, [productData.yvarprod, selectedColorId]);
+    }, [approvedVariants, selectedColorId]);
 
-    // Get current selected variant
+    // Get current selected variant from approved variants only
     const selectedVariant = useMemo(() => {
-        if (!productData.yvarprod || productData.yvarprod.length === 0) return null;
+        if (!approvedVariants || approvedVariants.length === 0) return null;
 
         return (
-            productData.yvarprod.find(
+            approvedVariants.find(
                 (v) => v.xcouleur.xcouleurid === selectedColorId && v.xtaille.xtailleid === selectedSizeId
-            ) || productData.yvarprod[0]
+            ) || approvedVariants[0]
         );
-    }, [productData.yvarprod, selectedColorId, selectedSizeId]);
+    }, [approvedVariants, selectedColorId, selectedSizeId]);
 
     // Check if current variant is in wishlist
     const { data: isInWishlist } = useIsInWishlist(selectedVariant?.yvarprodid || 0);
 
-    // Get all media from all variants for the carousel
+    // Get all media from approved variants only for the carousel
     const allMedia = useMemo(() => {
-        if (!productData.yvarprod || productData.yvarprod.length === 0) return [];
+        if (!approvedVariants || approvedVariants.length === 0) return [];
 
         const mediaSet = new Set();
         const mediaArray: Array<{
@@ -256,7 +265,7 @@ export function ProductDetailsPage({ productData, onClose }: ProductDetailsPageP
             ymediaboolvideo: boolean;
         }> = [];
 
-        productData.yvarprod.forEach((variant) => {
+        approvedVariants.forEach((variant) => {
             if (variant.yvarprodmedia && Array.isArray(variant.yvarprodmedia)) {
                 variant.yvarprodmedia.forEach((mediaWrapper) => {
                     const media = mediaWrapper.ymedia;
@@ -268,7 +277,7 @@ export function ProductDetailsPage({ productData, onClose }: ProductDetailsPageP
             }
         });
         return mediaArray;
-    }, [productData.yvarprod]);
+    }, [approvedVariants]);
 
     // Get 3D model for selected variant
     const selected3DModel = useMemo(() => {
@@ -291,12 +300,12 @@ export function ProductDetailsPage({ productData, onClose }: ProductDetailsPageP
 
     // Handle color selection
     const handleColorChange = (colorId: number) => {
-        if (!productData.yvarprod || productData.yvarprod.length === 0) return;
+        if (!approvedVariants || approvedVariants.length === 0) return;
 
         setSelectedColorId(colorId);
 
-        // Check if current size is available for new color
-        const variantsForColor = productData.yvarprod.filter((v) => v.xcouleur.xcouleurid === colorId);
+        // Check if current size is available for new color from approved variants only
+        const variantsForColor = approvedVariants.filter((v) => v.xcouleur.xcouleurid === colorId);
         const currentSizeAvailable = variantsForColor.some((v) => v.xtaille.xtailleid === selectedSizeId);
 
         if (!currentSizeAvailable && variantsForColor.length > 0) {
@@ -352,8 +361,8 @@ export function ProductDetailsPage({ productData, onClose }: ProductDetailsPageP
         }
     };
 
-    // Early return if no variants
-    if (!productData.yvarprod || productData.yvarprod.length === 0) {
+    // Early return if no approved variants
+    if (!approvedVariants || approvedVariants.length === 0) {
         return (
             <div className="fixed inset-0 z-[70] bg-black/90 backdrop-blur-sm flex items-center justify-center p-4">
                 <div className="bg-gradient-to-br from-morpheus-blue-dark via-morpheus-blue-dark/95 to-morpheus-blue-light/90 backdrop-blur-md shadow-2xl shadow-black/50 rounded-lg p-8 max-w-md w-full text-center">

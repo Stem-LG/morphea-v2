@@ -55,6 +55,31 @@ export function WishlistDialog({ isOpen, onClose }: WishlistDialogProps) {
         });
     };
 
+    const handleMoveAllToCart = async () => {
+        if (wishlistItems.length === 0) return;
+        
+        // Process items sequentially to avoid race conditions
+        for (const item of wishlistItems) {
+            if (!item.yvarprod) continue;
+            
+            try {
+                // Add to cart first
+                await addToCartMutation.mutateAsync({
+                    yvarprodidfk: item.yvarprod.yvarprodid,
+                    ypanierqte: 1,
+                });
+                
+                // Then remove from wishlist
+                await removeFromWishlistMutation.mutateAsync({
+                    ywishlistid: item.ywishlistid
+                });
+            } catch (error) {
+                console.error(`Failed to move item ${item.ywishlistid} to cart:`, error);
+                // Continue with other items even if one fails
+            }
+        }
+    };
+
     return (
         <Credenza open={isOpen} onOpenChange={onClose}>
             <CredenzaContent className="max-w-2xl max-h-[80vh] bg-gradient-to-br from-morpheus-blue-dark via-morpheus-blue-dark/95 to-morpheus-blue-light/90 backdrop-blur-md border border-morpheus-gold-dark/20">
@@ -145,8 +170,8 @@ export function WishlistDialog({ isOpen, onClose }: WishlistDialogProps) {
                                         <Button
                                             variant="outline"
                                             size="sm"
-                                            onClick={() => handleAddToCart(item)}
-                                            disabled={addToCartMutation.isPending}
+                                            onClick={() => handleMoveToCart(item)}
+                                            disabled={addToCartMutation.isPending || removeFromWishlistMutation.isPending}
                                             className="flex items-center gap-1 border-morpheus-gold-dark/30 text-white hover:bg-morpheus-gold-dark/20"
                                         >
                                             <ShoppingCart className="w-3 h-3" />
@@ -178,10 +203,7 @@ export function WishlistDialog({ isOpen, onClose }: WishlistDialogProps) {
                             {t("wishlist.continueShopping") || "Continue Shopping"}
                         </Button>
                         <Button
-                            onClick={() => {
-                                // Move all items to cart
-                                wishlistItems.forEach(item => handleMoveToCart(item));
-                            }}
+                            onClick={() => handleMoveAllToCart()}
                             disabled={addToCartMutation.isPending || removeFromWishlistMutation.isPending}
                             className="flex-1 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white"
                         >

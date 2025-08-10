@@ -19,6 +19,7 @@ import {
     FolderTree,
     Package,
     Store,
+    ShoppingBag,
 } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
 
@@ -70,6 +71,13 @@ export function ModernSidebar({ isOpen, isCollapsed, onToggle, onCollapse, userR
                 icon: Store,
                 href: "/admin/stores",
                 roles: ["admin", "store_admin"],
+            },
+            {
+                id: "orders",
+                label: "Orders",
+                icon: ShoppingBag,
+                href: "/admin/orders",
+                roles: ["admin"],
             },
             {
                 id: "produit",
