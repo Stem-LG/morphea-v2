@@ -1,6 +1,7 @@
 "use client";
 
 import { useLanguage } from "@/hooks/useLanguage";
+import { useCurrency } from "@/hooks/useCurrency";
 import { useWishlist } from "@/app/_hooks/wishlist/useWishlist";
 import { useRemoveFromWishlist } from "@/app/_hooks/wishlist/useRemoveFromWishlist";
 import { useAddToCart } from "@/app/_hooks/cart/useAddToCart";
@@ -26,6 +27,7 @@ export function WishlistDialog({ isOpen, onClose }: WishlistDialogProps) {
     const { data: wishlistItems = [], isLoading } = useWishlist();
     const removeFromWishlistMutation = useRemoveFromWishlist();
     const addToCartMutation = useAddToCart();
+    const { formatPrice, currencies } = useCurrency();
 
     const handleRemoveFromWishlist = (ywishlistid: number) => {
         removeFromWishlistMutation.mutate({ ywishlistid });
@@ -69,6 +71,24 @@ export function WishlistDialog({ isOpen, onClose }: WishlistDialogProps) {
                 // Continue with other items even if one fails
             }
         }
+    };
+
+    // Helper function to get formatted price for an item
+    const getFormattedItemPrice = (item: any) => {
+        if (!item.yvarprod) return '$0.00';
+        
+        const productCurrency = currencies.find(c => c.xdeviseid === item.yvarprod?.xdeviseidfk);
+        const price = item.yvarprod.yvarprodprixpromotion || item.yvarprod.yvarprodprixcatalogue || 0;
+        
+        return formatPrice(price, productCurrency);
+    };
+
+    // Helper function to get formatted original price for an item
+    const getFormattedOriginalPrice = (item: any) => {
+        if (!item.yvarprod?.yvarprodprixpromotion || !item.yvarprod?.yvarprodprixcatalogue) return null;
+        
+        const productCurrency = currencies.find(c => c.xdeviseid === item.yvarprod?.xdeviseidfk);
+        return formatPrice(item.yvarprod.yvarprodprixcatalogue, productCurrency);
     };
 
     return (
@@ -146,11 +166,11 @@ export function WishlistDialog({ isOpen, onClose }: WishlistDialogProps) {
                                         </div>
                                         <div className="flex items-center gap-2 mt-2">
                                             <span className="font-semibold text-morpheus-gold-dark">
-                                                ${(item.yvarprod?.yvarprodprixpromotion || item.yvarprod?.yvarprodprixcatalogue || 0).toFixed(2)}
+                                                {getFormattedItemPrice(item)}
                                             </span>
-                                            {item.yvarprod?.yvarprodprixpromotion && item.yvarprod?.yvarprodprixcatalogue && (
+                                            {getFormattedOriginalPrice(item) && (
                                                 <span className="text-sm text-gray-300 line-through">
-                                                    ${item.yvarprod.yvarprodprixcatalogue.toFixed(2)}
+                                                    {getFormattedOriginalPrice(item)}
                                                 </span>
                                             )}
                                         </div>

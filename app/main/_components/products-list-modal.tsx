@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { ProductDetailsPage } from "./product-details-page";
 import { useSceneProducts } from "../_hooks/useSceneProducts";
+import { useCurrency } from "@/hooks/useCurrency";
 import Image from "next/image";
 
 interface ProductsListModalProps {
@@ -18,6 +19,7 @@ export default function ProductsListModal({ isOpen, onClose, onProductDetailsCha
     const [showProductDetails, setShowProductDetails] = useState(false);
 
     const { data: productsData, isLoading } = useSceneProducts(infospotActionId);
+    const { formatPrice, currencies } = useCurrency();
 
     const productsList = useMemo(() => {
         return productsData?.map((product) => {
@@ -29,12 +31,16 @@ export default function ProductsListModal({ isOpen, onClose, onProductDetailsCha
                 (media) => media.ymedia && !media.ymedia.ymediaboolvideo
             )?.ymedia;
 
-            // Get product pricing info from first variant
+            // Get product pricing info from first variant with currency conversion
             const pricing = firstVariant
                 ? {
                       catalogPrice: firstVariant.yvarprodprixcatalogue,
                       promotionPrice: firstVariant.yvarprodprixpromotion,
-                      currency: firstVariant.xdevise?.xdevisecodealpha || "EUR",
+                      // Find the product's base currency
+                      productCurrency: currencies.find(c => c.xdeviseid === firstVariant.xdeviseidfk),
+                      // Format prices with proper currency conversion
+                      formattedCatalogPrice: formatPrice(firstVariant.yvarprodprixcatalogue, currencies.find(c => c.xdeviseid === firstVariant.xdeviseidfk)),
+                      formattedPromotionPrice: firstVariant.yvarprodprixpromotion ? formatPrice(firstVariant.yvarprodprixpromotion, currencies.find(c => c.xdeviseid === firstVariant.xdeviseidfk)) : null,
                   }
                 : null;
 
@@ -46,7 +52,7 @@ export default function ProductsListModal({ isOpen, onClose, onProductDetailsCha
                 pricing: pricing,
             };
         });
-    }, [productsData]);
+    }, [productsData, currencies, formatPrice]);
 
     if (!isOpen) return null;
     return (
@@ -139,21 +145,18 @@ export default function ProductsListModal({ isOpen, onClose, onProductDetailsCha
                                             {product.pricing && (
                                                 <div className="mb-3 sm:mb-4">
                                                     <div className="flex items-center gap-2 text-sm justify-center sm:justify-start">
-                                                        {product.pricing.promotionPrice ? (
+                                                        {product.pricing.formattedPromotionPrice ? (
                                                             <>
                                                                 <span className="text-morpheus-gold-light font-bold">
-                                                                    {product.pricing.promotionPrice}{" "}
-                                                                    {product.pricing.currency}
+                                                                    {product.pricing.formattedPromotionPrice}
                                                                 </span>
                                                                 <span className="text-gray-400 line-through text-xs">
-                                                                    {product.pricing.catalogPrice}{" "}
-                                                                    {product.pricing.currency}
+                                                                    {product.pricing.formattedCatalogPrice}
                                                                 </span>
                                                             </>
                                                         ) : (
                                                             <span className="text-morpheus-gold-light font-bold">
-                                                                {product.pricing.catalogPrice}{" "}
-                                                                {product.pricing.currency}
+                                                                {product.pricing.formattedCatalogPrice}
                                                             </span>
                                                         )}
                                                     </div>

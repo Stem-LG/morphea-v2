@@ -14,6 +14,8 @@ export const frTranslations = {
     "language": "Langue",
     "english": "Anglais",
     "french": "Français",
+    "currency": "Devise",
+    "selectCurrency": "Sélectionner une devise",
     "loading": "Chargement...",
     "error": "Erreur",
     "cancel": "Annuler",

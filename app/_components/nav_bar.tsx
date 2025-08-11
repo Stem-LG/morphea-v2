@@ -4,6 +4,7 @@ import { LogoutButton } from "@/components/logout-button";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/hooks/useLanguage";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { CurrencySwitcher } from "@/components/currency-switcher";
 import { CartDialog } from "@/app/_components/cart-dialog";
 import { WishlistDialog } from "@/app/_components/wishlist-dialog";
 import { useCart } from "@/app/_hooks/cart/useCart";
@@ -144,6 +145,9 @@ export default function NavBar() {
 
                             {/* Language Switcher */}
                             <LanguageSwitcher />
+
+                            {/* Currency Switcher */}
+                            <CurrencySwitcher />
 
                             {/* Auth Section */}
                             {isLoading ? (
@@ -300,9 +304,10 @@ export default function NavBar() {
                                     </>
                                 )}
 
-                                {/* Mobile Language Switcher */}
-                                <div className="px-4 py-3">
+                                {/* Mobile Language & Currency Switchers */}
+                                <div className="px-4 py-3 space-y-3">
                                     <LanguageSwitcher />
+                                    <CurrencySwitcher />
                                 </div>
 
                                 {/* Mobile Auth Section */}

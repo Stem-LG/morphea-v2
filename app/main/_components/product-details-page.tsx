@@ -6,6 +6,7 @@ import { Canvas } from "@react-three/fiber";
 import { OrbitControls, useGLTF, Html } from "@react-three/drei";
 import { Suspense } from "react";
 import { useLanguage } from "@/hooks/useLanguage";
+import { useCurrency } from "@/hooks/useCurrency";
 import { useAddToCart } from "@/app/_hooks/cart/useAddToCart";
 import { useAddToWishlist } from "@/app/_hooks/wishlist/useAddToWishlist";
 import { useRemoveFromWishlist } from "@/app/_hooks/wishlist/useRemoveFromWishlist";
@@ -150,6 +151,7 @@ type ProductVariant = {
     yvarprodpromotiondatefin: string | null;
     yvarprodnbrjourlivraison: number;
     yvarprodstatut: string; // Approval status field
+    xdeviseidfk: number | null; // Currency foreign key
     xcouleur: {
         xcouleurid: number;
         xcouleurintitule: string;
@@ -186,6 +188,7 @@ interface ProductDetailsPageProps {
 
 export function ProductDetailsPage({ productData, onClose }: ProductDetailsPageProps) {
     const { t } = useLanguage();
+    const { formatPrice, convertPrice, currencies } = useCurrency();
     
     // Filter to only show approved variants
     const approvedVariants = useMemo(() => {
@@ -287,16 +290,30 @@ export function ProductDetailsPage({ productData, onClose }: ProductDetailsPageP
         return selectedVariant.yobjet3d[0];
     }, [selectedVariant]);
 
-    // Calculate pricing
+    // Calculate pricing with currency conversion
     const pricing = useMemo(() => {
-        if (!selectedVariant) return { price: 0, originalPrice: null, hasDiscount: false };
+        if (!selectedVariant) return { price: 0, originalPrice: null, hasDiscount: false, formattedPrice: '', formattedOriginalPrice: null };
 
-        const currentPrice = selectedVariant.yvarprodprixpromotion || selectedVariant.yvarprodprixcatalogue;
-        const originalPrice = selectedVariant.yvarprodprixpromotion ? selectedVariant.yvarprodprixcatalogue : null;
+        // Find the product's base currency
+        const productCurrency = currencies.find(c => c.xdeviseid === selectedVariant.xdeviseidfk);
+        
+        // Get raw prices
+        const rawCurrentPrice = selectedVariant.yvarprodprixpromotion || selectedVariant.yvarprodprixcatalogue;
+        const rawOriginalPrice = selectedVariant.yvarprodprixpromotion ? selectedVariant.yvarprodprixcatalogue : null;
         const hasDiscount = !!selectedVariant.yvarprodprixpromotion;
 
-        return { price: currentPrice, originalPrice, hasDiscount };
-    }, [selectedVariant]);
+        // Format prices with proper currency conversion
+        const formattedPrice = formatPrice(rawCurrentPrice, productCurrency);
+        const formattedOriginalPrice = rawOriginalPrice ? formatPrice(rawOriginalPrice, productCurrency) : null;
+
+        return {
+            price: rawCurrentPrice,
+            originalPrice: rawOriginalPrice,
+            hasDiscount,
+            formattedPrice,
+            formattedOriginalPrice
+        };
+    }, [selectedVariant, currencies, formatPrice]);
 
     // Handle color selection
     const handleColorChange = (colorId: number) => {
@@ -620,11 +637,11 @@ export function ProductDetailsPage({ productData, onClose }: ProductDetailsPageP
                             {/* Price */}
                             <div className="flex items-center gap-3 mb-6">
                                 <span className="text-4xl font-bold bg-gradient-to-r from-morpheus-gold-dark via-morpheus-gold-light to-morpheus-gold-dark bg-clip-text text-transparent">
-                                    ${pricing.price.toFixed(2)}
+                                    {pricing.formattedPrice}
                                 </span>
-                                {pricing.hasDiscount && pricing.originalPrice && (
+                                {pricing.hasDiscount && pricing.formattedOriginalPrice && (
                                     <span className="text-xl text-gray-400 line-through">
-                                        ${pricing.originalPrice.toFixed(2)}
+                                        {pricing.formattedOriginalPrice}
                                     </span>
                                 )}
                             </div>

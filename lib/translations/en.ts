@@ -15,6 +15,8 @@ export const enTranslations = {
     "language": "Language",
     "english": "English",
     "french": "French",
+    "currency": "Currency",
+    "selectCurrency": "Select Currency",
     "loading": "Loading...",
     "error": "Error",
     "cancel": "Cancel",

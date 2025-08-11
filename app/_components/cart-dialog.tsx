@@ -1,6 +1,7 @@
 "use client";
 
 import { useLanguage } from "@/hooks/useLanguage";
+import { useCurrency } from "@/hooks/useCurrency";
 import { useCart } from "@/app/_hooks/cart/useCart";
 import { useUpdateCart } from "@/app/_hooks/cart/useUpdateCart";
 import { useDeleteFromCart } from "@/app/_hooks/cart/useDeleteFromCart";
@@ -28,6 +29,7 @@ export function CartDialog({ isOpen, onClose }: CartDialogProps) {
     const { data: cartItems = [], isLoading } = useCart();
     const updateCartMutation = useUpdateCart();
     const deleteFromCartMutation = useDeleteFromCart();
+    const { formatPrice, currencies, convertPrice } = useCurrency();
 
     const handleQuantityChange = (ypanierid: number, newQuantity: number) => {
         if (newQuantity <= 0) {
@@ -43,9 +45,35 @@ export function CartDialog({ isOpen, onClose }: CartDialogProps) {
 
     const calculateTotal = () => {
         return cartItems.reduce((total, item) => {
-            const price = item.yvarprod?.yvarprodprixpromotion || item.yvarprod?.yvarprodprixcatalogue || 0;
-            return total + price * item.ypanierqte;
+            if (!item.yvarprod) return total;
+            
+            // Find the product's base currency
+            const productCurrency = currencies.find(c => c.xdeviseid === item.yvarprod?.xdeviseidfk);
+            const price = item.yvarprod.yvarprodprixpromotion || item.yvarprod.yvarprodprixcatalogue || 0;
+            
+            // Convert price from product currency to current currency
+            const convertedPrice = convertPrice(price, productCurrency);
+            
+            return total + convertedPrice * item.ypanierqte;
         }, 0);
+    };
+
+    // Helper function to get formatted price for an item
+    const getFormattedItemPrice = (item: any) => {
+        if (!item.yvarprod) return '$0.00';
+        
+        const productCurrency = currencies.find(c => c.xdeviseid === item.yvarprod?.xdeviseidfk);
+        const price = item.yvarprod.yvarprodprixpromotion || item.yvarprod.yvarprodprixcatalogue || 0;
+        
+        return formatPrice(price, productCurrency);
+    };
+
+    // Helper function to get formatted original price for an item
+    const getFormattedOriginalPrice = (item: any) => {
+        if (!item.yvarprod?.yvarprodprixpromotion || !item.yvarprod?.yvarprodprixcatalogue) return null;
+        
+        const productCurrency = currencies.find(c => c.xdeviseid === item.yvarprod?.xdeviseidfk);
+        return formatPrice(item.yvarprod.yvarprodprixcatalogue, productCurrency);
     };
 
     const handleCheckout = () => {
@@ -128,19 +156,13 @@ export function CartDialog({ isOpen, onClose }: CartDialogProps) {
                                         <div className="flex items-center justify-between mt-2">
                                             <div className="flex items-center gap-2">
                                                 <span className="font-semibold text-morpheus-gold-dark">
-                                                    $
-                                                    {(
-                                                        item.yvarprod?.yvarprodprixpromotion ||
-                                                        item.yvarprod?.yvarprodprixcatalogue ||
-                                                        0
-                                                    ).toFixed(2)}
+                                                    {getFormattedItemPrice(item)}
                                                 </span>
-                                                {item.yvarprod?.yvarprodprixpromotion &&
-                                                    item.yvarprod?.yvarprodprixcatalogue && (
-                                                        <span className="text-sm text-gray-300 line-through">
-                                                            ${item.yvarprod.yvarprodprixcatalogue.toFixed(2)}
-                                                        </span>
-                                                    )}
+                                                {getFormattedOriginalPrice(item) && (
+                                                    <span className="text-sm text-gray-300 line-through">
+                                                        {getFormattedOriginalPrice(item)}
+                                                    </span>
+                                                )}
                                             </div>
                                         </div>
                                     </div>
@@ -191,7 +213,7 @@ export function CartDialog({ isOpen, onClose }: CartDialogProps) {
                         <div className="flex flex-1 gap-2 items-center text-lg font-semibold">
                             <span className="text-white">{t("cart.total") || "Total"}</span>
                             <span className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light bg-clip-text text-transparent">
-                                ${calculateTotal().toFixed(2)}
+                                {formatPrice(calculateTotal())}
                             </span>
                         </div>
                         <div className="flex gap-2">

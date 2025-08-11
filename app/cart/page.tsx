@@ -4,6 +4,7 @@ import { useCart } from "@/app/_hooks/cart/useCart";
 import { useUpdateCart } from "@/app/_hooks/cart/useUpdateCart";
 import { useDeleteFromCart } from "@/app/_hooks/cart/useDeleteFromCart";
 import { useLanguage } from "@/hooks/useLanguage";
+import { useCurrency } from "@/hooks/useCurrency";
 import Link from "next/link";
 
 export default function CartPage() {
@@ -11,12 +12,49 @@ export default function CartPage() {
     const updateCartMutation = useUpdateCart();
     const deleteFromCartMutation = useDeleteFromCart();
     const { t } = useLanguage();
+    const { formatPrice, currencies } = useCurrency();
 
     const totalItems = cart.reduce((sum, item) => sum + item.ypanierqte, 0);
+    const { convertPrice } = useCurrency();
     const totalPrice = cart.reduce((sum, item) => {
-        const price = item.yvarprod?.yvarprodprixpromotion || item.yvarprod?.yvarprodprixcatalogue || 0;
-        return sum + price * item.ypanierqte;
+        if (!item.yvarprod) return sum;
+        
+        const productCurrency = currencies.find(c => c.xdeviseid === item.yvarprod?.xdeviseidfk);
+        const price = item.yvarprod.yvarprodprixpromotion || item.yvarprod.yvarprodprixcatalogue || 0;
+        const convertedPrice = convertPrice(price, productCurrency);
+        
+        return sum + convertedPrice * item.ypanierqte;
     }, 0);
+
+    // Helper function to get formatted price for an item
+    const getFormattedItemPrice = (item: any) => {
+        if (!item.yvarprod) return '$0.00';
+        
+        const productCurrency = currencies.find(c => c.xdeviseid === item.yvarprod?.xdeviseidfk);
+        const price = item.yvarprod.yvarprodprixpromotion || item.yvarprod.yvarprodprixcatalogue || 0;
+        
+        return formatPrice(price, productCurrency);
+    };
+
+    // Helper function to get formatted original price for an item
+    const getFormattedOriginalPrice = (item: any) => {
+        if (!item.yvarprod?.yvarprodprixpromotion || !item.yvarprod?.yvarprodprixcatalogue) return null;
+        
+        const productCurrency = currencies.find(c => c.xdeviseid === item.yvarprod?.xdeviseidfk);
+        return formatPrice(item.yvarprod.yvarprodprixcatalogue, productCurrency);
+    };
+
+    // Helper function to get formatted item total
+    const getFormattedItemTotal = (item: any) => {
+        if (!item.yvarprod) return '$0.00';
+        
+        const productCurrency = currencies.find(c => c.xdeviseid === item.yvarprod?.xdeviseidfk);
+        const price = item.yvarprod.yvarprodprixpromotion || item.yvarprod.yvarprodprixcatalogue || 0;
+        const convertedPrice = convertPrice(price, productCurrency);
+        const total = convertedPrice * item.ypanierqte;
+        
+        return formatPrice(total);
+    };
 
     const handleQuantityChange = (itemId: number, newQuantity: number) => {
         if (newQuantity < 1) {
@@ -121,16 +159,11 @@ export default function CartPage() {
                                             </h3>
                                             <div className="flex items-center gap-4">
                                                 <span className="text-morpheus-gold-light font-semibold">
-                                                    $
-                                                    {(
-                                                        item.yvarprod?.yvarprodprixpromotion ||
-                                                        item.yvarprod?.yvarprodprixcatalogue ||
-                                                        0
-                                                    ).toFixed(2)}
+                                                    {getFormattedItemPrice(item)}
                                                 </span>
-                                                {item.yvarprod?.yvarprodprixpromotion && item.yvarprod?.yvarprodprixcatalogue && (
+                                                {getFormattedOriginalPrice(item) && (
                                                     <span className="text-gray-300 text-sm line-through">
-                                                        ${item.yvarprod.yvarprodprixcatalogue.toFixed(2)}
+                                                        {getFormattedOriginalPrice(item)}
                                                     </span>
                                                 )}
                                             </div>
@@ -207,12 +240,7 @@ export default function CartPage() {
                                         <div className="flex justify-between items-center">
                                             <span className="text-gray-300">{t("cart.itemTotal")}</span>
                                             <span className="text-morpheus-gold-light font-semibold">
-                                                $
-                                                {(
-                                                    (item.yvarprod?.yvarprodprixpromotion ||
-                                                        item.yvarprod?.yvarprodprixcatalogue ||
-                                                        0) * item.ypanierqte
-                                                ).toFixed(2)}
+                                                {getFormattedItemTotal(item)}
                                             </span>
                                         </div>
                                     </div>
@@ -230,7 +258,7 @@ export default function CartPage() {
                                         <span className="text-gray-300">
                                             {t("cart.items")} ({totalItems}):
                                         </span>
-                                        <span className="text-white">${totalPrice.toFixed(2)}</span>
+                                        <span className="text-white">{formatPrice(totalPrice)}</span>
                                     </div>
                                     <div className="flex justify-between items-center">
                                         <span className="text-gray-300">{t("cart.shipping")}:</span>
@@ -244,7 +272,7 @@ export default function CartPage() {
                                         <div className="flex justify-between items-center">
                                             <span className="text-lg font-semibold text-white">{t("cart.total")}</span>
                                             <span className="text-xl font-bold text-morpheus-gold-light">
-                                                ${totalPrice.toFixed(2)}
+                                                {formatPrice(totalPrice)}
                                             </span>
                                         </div>
                                     </div>

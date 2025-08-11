@@ -4,6 +4,7 @@ import { useWishlist } from "@/app/_hooks/wishlist/useWishlist";
 import { useAddToCart } from "@/app/_hooks/cart/useAddToCart";
 import { useRemoveFromWishlist } from "@/app/_hooks/wishlist/useRemoveFromWishlist";
 import { useLanguage } from "@/hooks/useLanguage";
+import { useCurrency } from "@/hooks/useCurrency";
 import Link from "next/link";
 
 export default function WishlistPage() {
@@ -11,6 +12,7 @@ export default function WishlistPage() {
     const addToCartMutation = useAddToCart();
     const removeFromWishlistMutation = useRemoveFromWishlist();
     const { t } = useLanguage();
+    const { formatPrice, currencies } = useCurrency();
 
     const handleRemoveFromWishlist = (wishlistId: number) => {
         removeFromWishlistMutation.mutate({ ywishlistid: wishlistId });
@@ -36,6 +38,24 @@ export default function WishlistPage() {
                 removeFromWishlistMutation.mutate({ ywishlistid: item.ywishlistid });
             }
         });
+    };
+
+    // Helper function to get formatted price for an item
+    const getFormattedItemPrice = (item: any) => {
+        if (!item.yvarprod) return '$0.00';
+        
+        const productCurrency = currencies.find(c => c.xdeviseid === item.yvarprod?.xdeviseidfk);
+        const price = item.yvarprod.yvarprodprixpromotion || item.yvarprod.yvarprodprixcatalogue || 0;
+        
+        return formatPrice(price, productCurrency);
+    };
+
+    // Helper function to get formatted original price for an item
+    const getFormattedOriginalPrice = (item: any) => {
+        if (!item.yvarprod?.yvarprodprixpromotion || !item.yvarprod?.yvarprodprixcatalogue) return null;
+        
+        const productCurrency = currencies.find(c => c.xdeviseid === item.yvarprod?.xdeviseidfk);
+        return formatPrice(item.yvarprod.yvarprodprixcatalogue, productCurrency);
     };
 
     if (isLoading) {
@@ -158,16 +178,11 @@ export default function WishlistPage() {
                                     {/* Price */}
                                     <div className="flex items-center gap-2 mb-4">
                                         <span className="text-morpheus-gold-light font-bold text-lg">
-                                            $
-                                            {(
-                                                item.yvarprod?.yvarprodprixpromotion ||
-                                                item.yvarprod?.yvarprodprixcatalogue ||
-                                                0
-                                            ).toFixed(2)}
+                                            {getFormattedItemPrice(item)}
                                         </span>
-                                        {item.yvarprod?.yvarprodprixpromotion && item.yvarprod?.yvarprodprixcatalogue && (
+                                        {getFormattedOriginalPrice(item) && (
                                             <span className="text-gray-400 line-through text-sm">
-                                                ${item.yvarprod.yvarprodprixcatalogue.toFixed(2)}
+                                                {getFormattedOriginalPrice(item)}
                                             </span>
                                         )}
                                     </div>
