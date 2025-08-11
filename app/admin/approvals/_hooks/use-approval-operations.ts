@@ -9,6 +9,7 @@ interface ApprovalData {
     categoryId?: number;
     infoactionId?: number;
     selectedEventId?: number;
+    assignmentId?: number; // Optional: specific ydetailsevent ID to use when designer has multiple active assignments
     variants?: Array<{
         yvarprodid: number;
         yvarprodprixcatalogue: number;
@@ -62,9 +63,9 @@ export function useApprovalOperations() {
                     throw new Error(`Failed to get product designer: ${productError.message}`);
                 }
 
-                // Find the designer's active assignment
+                // Find the designer's active assignments
                 const today = new Date().toISOString().split('T')[0];
-                const { data: activeAssignment, error: assignmentError } = await supabase
+                const { data: activeAssignments, error: assignmentError } = await supabase
                     .schema('morpheus')
                     .from('ydetailsevent')
                     .select(`
@@ -75,11 +76,26 @@ export function useApprovalOperations() {
                     .is('yprodidfk', null)
                     .not('yboutiqueidfk', 'is', null)
                     .gte('yevent.yeventdatefin', today)
-                    .lte('yevent.yeventdatedeb', today)
-                    .single();
+                    .lte('yevent.yeventdatedeb', today);
 
-                if (assignmentError || !activeAssignment) {
+                if (assignmentError || !activeAssignments || activeAssignments.length === 0) {
                     throw new Error('No active event assignment found for this designer');
+                }
+
+                // If a specific assignment ID is provided, use that one
+                let activeAssignment;
+                if (approvalData.assignmentId) {
+                    activeAssignment = activeAssignments.find(a => a.ydetailseventid === approvalData.assignmentId);
+                    if (!activeAssignment) {
+                        throw new Error(`Specified assignment ID ${approvalData.assignmentId} not found in active assignments`);
+                    }
+                } else {
+                    // If multiple assignments exist, use the first one
+                    activeAssignment = activeAssignments[0];
+                    
+                    if (activeAssignments.length > 1) {
+                        console.warn(`Designer ${productData.ydesignidfk} has ${activeAssignments.length} active assignments. Using the first one. Consider specifying assignmentId for precise control.`);
+                    }
                 }
 
                 // Create a new ydetailsevent record for the product
