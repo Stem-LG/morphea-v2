@@ -48,20 +48,57 @@ export function useApprovalOperations() {
                 throw new Error(updateError.message || 'Failed to update product status');
             }
 
-            // Update infospotaction in ydetailsevent if provided
+            // Create or update infospotaction in ydetailsevent if provided
             if (approvalData.infoactionId) {
-                const { error: detailsError } = await supabase
+                // First, get the product's designer ID and active assignment details
+                const { data: productData, error: productError } = await supabase
+                    .schema('morpheus')
+                    .from('yprod')
+                    .select('ydesignidfk')
+                    .eq('yprodid', productId)
+                    .single();
+
+                if (productError) {
+                    throw new Error(`Failed to get product designer: ${productError.message}`);
+                }
+
+                // Find the designer's active assignment
+                const today = new Date().toISOString().split('T')[0];
+                const { data: activeAssignment, error: assignmentError } = await supabase
                     .schema('morpheus')
                     .from('ydetailsevent')
-                    .update({
-                        yinfospotactionId: approvalData.infoactionId.toString(),
-                        sysdate: currentTime,
-                        sysaction: 'update'
-                    })
-                    .eq('yprodidfk', productId);
+                    .select(`
+                        *,
+                        yevent:yeventidfk(yeventdatedeb, yeventdatefin)
+                    `)
+                    .eq('ydesignidfk', productData.ydesignidfk)
+                    .is('yprodidfk', null)
+                    .not('yboutiqueidfk', 'is', null)
+                    .gte('yevent.yeventdatefin', today)
+                    .lte('yevent.yeventdatedeb', today)
+                    .single();
 
-                if (detailsError) {
-                    throw new Error(detailsError.message || 'Failed to update product placement');
+                if (assignmentError || !activeAssignment) {
+                    throw new Error('No active event assignment found for this designer');
+                }
+
+                // Create a new ydetailsevent record for the product
+                const { error: insertError } = await supabase
+                    .schema('morpheus')
+                    .from('ydetailsevent')
+                    .insert({
+                        yeventidfk: activeAssignment.yeventidfk,
+                        ydesignidfk: activeAssignment.ydesignidfk,
+                        yboutiqueidfk: activeAssignment.yboutiqueidfk,
+                        ymallidfk: activeAssignment.ymallidfk,
+                        yprodidfk: productId,
+                        yinfospotactionId: approvalData.infoactionId,
+                        sysdate: currentTime,
+                        sysaction: 'insert'
+                    });
+
+                if (insertError) {
+                    throw new Error(`Failed to create product placement: ${insertError.message}`);
                 }
             }
 
