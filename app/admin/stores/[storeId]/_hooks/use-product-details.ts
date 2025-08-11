@@ -27,23 +27,8 @@ export function useProductDetails({ productId, eventId, enabled = true }: UsePro
                 throw new Error(`Failed to fetch product: ${productError.message}`);
             }
 
-            // Fetch infospotaction assignment from ydetailsevent if eventId is provided
-            let infospotactionId = null;
-            if (eventId) {
-                const { data: detailsEvent, error: detailsEventError } = await supabase
-                    .schema("morpheus")
-                    .from("ydetailsevent")
-                    .select("yinfospotactionId")
-                    .eq("yprodidfk", productId)
-                    .eq("yeventidfk", eventId)
-                    .single();
-
-                if (detailsEventError) {
-                    console.warn(`Failed to fetch infospotaction for product ${productId} in event ${eventId}:`, detailsEventError);
-                } else {
-                    infospotactionId = detailsEvent?.yinfospotactionId ? parseInt(detailsEvent.yinfospotactionId) : null;
-                }
-            }
+            // Get infospotaction assignment from the product itself
+            const infospotactionId = product.yinfospotactionsidfk;
 
             // Fetch product variants with color and size information
             const { data: variants, error: variantsError } = await supabase
@@ -97,8 +82,8 @@ export function useProductDetails({ productId, eventId, enabled = true }: UsePro
                     }
 
                     // Separate media by type
-                    const images = variantMedia?.filter(vm => vm.ymedia?.ymediaboolphotoprod === "1").map(vm => vm.ymedia) || [];
-                    const videos = variantMedia?.filter(vm => vm.ymedia?.ymediaboolvideo === true).map(vm => vm.ymedia) || [];
+                    const images = variantMedia?.filter(vm => (vm.ymedia as any)?.ymediaboolphotoprod === "1").map(vm => vm.ymedia) || [];
+                    const videos = variantMedia?.filter(vm => (vm.ymedia as any)?.ymediaboolvideo === true).map(vm => vm.ymedia) || [];
 
                     return {
                         ...variant,

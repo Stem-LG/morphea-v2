@@ -1,15 +1,23 @@
 import { createClient } from "@/lib/client";
-import { useQuery } from "@tanstack/react-query"
+import { useQuery } from "@tanstack/react-query";
+import type { Database } from "@/lib/supabase";
 
+type Product = Database["morpheus"]["Tables"]["yprod"]["Row"] & {
+    yvarprod?: Array<Database["morpheus"]["Tables"]["yvarprod"]["Row"] & {
+        xcouleur?: Database["morpheus"]["Tables"]["xcouleur"]["Row"];
+        xtaille?: Database["morpheus"]["Tables"]["xtaille"]["Row"];
+        xdevise?: Database["morpheus"]["Tables"]["xdevise"]["Row"];
+        yobjet3d?: Database["morpheus"]["Tables"]["yobjet3d"]["Row"][];
+    }>;
+    yinfospotactions?: Database["morpheus"]["Tables"]["yinfospotactions"]["Row"];
+};
 
 export function useSceneProducts(infospotActionId: string | null) {
-
-
-    const supabase = createClient()
+    const supabase = createClient();
 
     return useQuery({
         queryKey: ['sceneProducts', infospotActionId],
-        queryFn: async () => {
+        queryFn: async (): Promise<Product[]> => {
             if (!infospotActionId) {
                 console.log("No infospotActionId provided to useSceneProducts");
                 return [];
@@ -43,7 +51,7 @@ export function useSceneProducts(infospotActionId: string | null) {
                     code: error.code,
                     infospotActionId: infospotActionId
                 });
-                return [];
+                throw new Error(error.message);
             }
 
             console.log("Fetched products for infospot action", infospotActionId, ":", data);
@@ -51,6 +59,5 @@ export function useSceneProducts(infospotActionId: string | null) {
             return data || [];
         },
         enabled: !!infospotActionId // Only run query if infospotActionId is provided
-    })
-
+    });
 }

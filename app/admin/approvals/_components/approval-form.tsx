@@ -31,6 +31,38 @@ import { createClient } from "@/lib/client";
 import { useQuery } from "@tanstack/react-query";
 import { Model3DViewer } from "./three-d-viewer";
 import { useAuth } from "@/hooks/useAuth";
+import type { Database } from "@/lib/supabase";
+
+// Type definitions
+type ProductVariant = Database["morpheus"]["Tables"]["yvarprod"]["Row"] & {
+    xcouleur?: Database["morpheus"]["Tables"]["xcouleur"]["Row"];
+    xtaille?: Database["morpheus"]["Tables"]["xtaille"]["Row"];
+    xdevise?: Database["morpheus"]["Tables"]["xdevise"]["Row"];
+    yobjet3d?: Database["morpheus"]["Tables"]["yobjet3d"]["Row"][];
+    yvarprodmedia?: Array<{
+        ymedia: Database["morpheus"]["Tables"]["ymedia"]["Row"];
+    }>;
+};
+
+type Product = Database["morpheus"]["Tables"]["yprod"]["Row"] & {
+    yvarprod?: ProductVariant[];
+    ydetailsevent?: Array<{
+        yboutique?: Database["morpheus"]["Tables"]["yboutique"]["Row"];
+        ydesign?: Database["morpheus"]["Tables"]["ydesign"]["Row"];
+        ymall?: Database["morpheus"]["Tables"]["ymall"]["Row"];
+        yevent?: Database["morpheus"]["Tables"]["yevent"]["Row"];
+    }>;
+};
+
+type Category = Database["morpheus"]["Tables"]["xcategprod"]["Row"];
+
+interface PromotionData {
+    catalogPrice?: number;
+    currencyId?: number;
+    promotionPrice?: number;
+    promotionStartDate?: string;
+    promotionEndDate?: string;
+}
 
 // Variant Card Component
 interface VariantCardProps {
@@ -116,8 +148,8 @@ function VariantCard({ variant, onApprove, onReject, isLoading, eventStartDate, 
         },
     });
     // Extract media data directly from the variant object (already loaded in main query)
-    const models3d = variant.yobjet3d?.map((obj: any) => obj.yobjet3durl) || [];
-    const allMedia = variant.yvarprodmedia?.map((media: any) => media.ymedia).filter(Boolean) || [];
+    const models3d = variant.yobjet3d?.map((obj) => obj.yobjet3durl) || [];
+    const allMedia = variant.yvarprodmedia?.map((media) => media.ymedia).filter(Boolean) || [];
 
     // Debug media data
     console.log("Debug media for variant", variant.yvarprodid, {
@@ -127,7 +159,7 @@ function VariantCard({ variant, onApprove, onReject, isLoading, eventStartDate, 
     });
 
     // First, separate videos explicitly
-    const videos = allMedia.filter((media: any) => {
+    const videos = allMedia.filter((media) => {
         const isVideo =
             media.ymediaboolvideo === true ||
             media.ymediaboolvideo === "1" ||
@@ -144,7 +176,7 @@ function VariantCard({ variant, onApprove, onReject, isLoading, eventStartDate, 
     });
 
     // Then, treat everything else as images (including explicit image flags and fallback)
-    const images = allMedia.filter((media: any) => {
+    const images = allMedia.filter((media) => {
         // First check if it's explicitly a video
         const isVideo =
             media.ymediaboolvideo === true ||
@@ -590,8 +622,13 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                 .eq("yprodid", productId)
                 .single();
 
-            if (error) throw new Error(error.message);
-            return data;
+            console.log("Raw product query result:", { data, error });
+
+            if (error) {
+                throw new Error(error.message);
+            }
+
+            return data as Product;
         },
         enabled: !!productId && isOpen,
     });
@@ -606,19 +643,29 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
     const mall = eventDetail?.ymall;
     const event = eventDetail?.yevent;
 
+    // Debug logging
+    console.log("Debug approval form data:", {
+        product: product?.yprodid,
+        eventDetail,
+        store,
+        storeId: store?.yboutiqueid,
+        ydetailsevent: product?.ydetailsevent
+    });
+
     // Get boutique ID for infospotactions
     const boutiqueId = store?.yboutiqueid;
     
     // Fetch infospotactions for the current boutique (admin only)
+    // If no boutiqueId, we'll fetch all available infospotactions as fallback
     const { data: infospotactions } = useInfospotactions({
         boutiqueId,
-        enabled: isAdmin && !!boutiqueId && isOpen
+        enabled: isAdmin && isOpen
     });
 
     // Get pending variants count
-    const pendingVariants = product?.yvarprod?.filter((v: any) => v.yvarprodstatut === "not_approved") || [];
-    const approvedVariants = product?.yvarprod?.filter((v: any) => v.yvarprodstatut === "approved") || [];
-    const rejectedVariants = product?.yvarprod?.filter((v: any) => v.yvarprodstatut === "rejected") || [];
+    const pendingVariants = product?.yvarprod?.filter((v) => v.yvarprodstatut === "not_approved") || [];
+    const approvedVariants = product?.yvarprod?.filter((v) => v.yvarprodstatut === "approved") || [];
+    const rejectedVariants = product?.yvarprod?.filter((v) => v.yvarprodstatut === "rejected") || [];
 
     const handleApproveProduct = async () => {
         if (!productId || !product) return;
@@ -648,8 +695,8 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
         }
     };
 
-    const handleApproveVariant = async (variantId: number, approvalData?: any) => {
-        const variant = product?.yvarprod?.find((v: any) => v.yvarprodid === variantId);
+    const handleApproveVariant = async (variantId: number, approvalData?: PromotionData) => {
+        const variant = product?.yvarprod?.find((v) => v.yvarprodid === variantId);
         if (!variant) return;
 
         try {
@@ -680,7 +727,7 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
     const handleBulkApproveVariants = async () => {
         if (!product?.yvarprod || pendingVariants.length === 0) return;
 
-        const variantApprovals = pendingVariants.map((variant: any) => ({
+        const variantApprovals = pendingVariants.map((variant) => ({
             variantId: variant.yvarprodid,
             approvalData: {
                 yvarprodprixcatalogue: variant.yvarprodprixcatalogue || 1,
@@ -794,7 +841,7 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                                         <SelectValue placeholder={t("admin.approvals.selectCategory")} />
                                                     </SelectTrigger>
                                                     <SelectContent className="bg-gray-800 border-gray-600">
-                                                        {categories?.map((cat) => (
+                                                        {categories?.map((cat: Category) => (
                                                             <SelectItem
                                                                 key={cat.xcategprodid}
                                                                 value={cat.xcategprodid.toString()}
@@ -816,6 +863,12 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                         {isAdmin && product.yprodstatut === "not_approved" && (
                                             <div>
                                                 <Label className="text-gray-300 text-sm">{t("admin.approvals.productPlacement")}</Label>
+                                                {!boutiqueId && (
+                                                    <div className="text-xs text-yellow-400 mb-1 flex items-center gap-1">
+                                                        <AlertTriangle className="h-3 w-3" />
+                                                        Product not linked to a boutique - showing all available placements
+                                                    </div>
+                                                )}
                                                 <Select
                                                     value={selectedInfospotactionId?.toString() || ""}
                                                     onValueChange={(value) =>
@@ -833,6 +886,11 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                                                 className="text-white hover:bg-gray-700"
                                                             >
                                                                 {action.yinfospotactionstitle}
+                                                                {!boutiqueId && (
+                                                                    <span className="text-xs text-gray-400 ml-2">
+                                                                        (Global)
+                                                                    </span>
+                                                                )}
                                                             </SelectItem>
                                                         ))}
                                                     </SelectContent>
@@ -964,7 +1022,7 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
 
                             <ScrollArea className="h-[calc(95vh-300px)] overflow-y-auto">
                                 <div className="space-y-4 pr-4">
-                                    {product.yvarprod?.map((variant: any) => (
+                                    {product.yvarprod?.map((variant: ProductVariant) => (
                                         <VariantCard
                                             key={variant.yvarprodid}
                                             variant={variant}

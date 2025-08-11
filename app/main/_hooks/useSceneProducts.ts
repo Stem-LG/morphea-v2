@@ -21,29 +21,28 @@ export function useSceneProducts(infospotActionId: string | null) {
             
             console.log("Fetching products for infospotActionId:", infospotActionId, "and eventId:", currentEvent.yeventid);
             
-            // Query products through ydetailsevent table with proper relationships
+            // Query products through yprod table with proper relationships
             const { data, error } = await supabase
                 .schema("morpheus")
-                .from("ydetailsevent")
+                .from("yprod")
                 .select(`
                     *,
-                    yprod!yprodidfk (
+                    yvarprod (
                         *,
-                        yvarprod (
-                            *,
-                            xcouleur(*),
-                            xtaille(*),
-                            xdevise(*),
-                            yvarprodmedia (
-                                ymedia (*)
-                            ),
-                            yobjet3d (*)
-                        )
+                        xcouleur(*),
+                        xtaille(*),
+                        xdevise(*),
+                        yvarprodmedia (
+                            ymedia (*)
+                        ),
+                        yobjet3d (*)
+                    ),
+                    ydetailsevent!yprodidfk (
+                        yeventidfk
                     )
                 `)
-                .eq("yinfospotactionId", infospotActionId)
-                .eq("yeventidfk", currentEvent.yeventid)
-                .not("yprodidfk", "is", null); // Ensure we have a product
+                .eq("yinfospotactionsidfk", infospotActionId)
+                .eq("yprodstatut", "approved"); // Only get approved products
 
             if (error) {
                 console.error("Error fetching products for infospot action:", {
@@ -57,17 +56,16 @@ export function useSceneProducts(infospotActionId: string | null) {
                 return [];
             }
 
-            // Filter for approved products only and transform the data
-            const approvedProducts = data
-                ?.filter(detailEvent =>
-                    detailEvent.yprod &&
-                    detailEvent.yprod.yprodstatut === "approved"
+            // Filter products that are part of the current event
+            const eventProducts = data?.filter(product =>
+                product.ydetailsevent?.some((detail: any) =>
+                    detail.yeventidfk === currentEvent.yeventid
                 )
-                .map(detailEvent => detailEvent.yprod) || [];
+            ) || [];
 
-            console.log("Fetched approved products for infospot action", infospotActionId, "in event", currentEvent.yeventid, ":", approvedProducts);
+            console.log("Fetched approved products for infospot action", infospotActionId, "in event", currentEvent.yeventid, ":", eventProducts);
 
-            return approvedProducts;
+            return eventProducts;
         },
         enabled: !!infospotActionId && !!currentEvent // Only run query if both infospotActionId and currentEvent are available
     });

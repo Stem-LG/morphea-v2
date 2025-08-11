@@ -89,28 +89,28 @@ export default function OrderPage() {
         const paymentValid = Object.values(paymentForm).every((value) => value.trim() !== "");
 
         if (!addressValid) {
-            toast.error("Please fill in all address fields");
+            toast.error(t("order.pleaseCompleteAddressFields"));
             return;
         }
 
         if (!paymentValid) {
-            toast.error("Please fill in all payment fields");
+            toast.error(t("order.pleaseCompletePaymentFields"));
             return;
         }
 
         // Simulate card validation (for demo purposes)
         if (paymentForm.cardNumber.length < 16) {
-            toast.error("Invalid card number");
+            toast.error(t("order.invalidCardNumber"));
             return;
         }
 
         try {
             await createOrderMutation.mutateAsync({ cartItems });
-            toast.success("Order placed successfully!");
+            toast.success(t("order.orderPlacedSuccessfully"));
             router.push("/order-confirmation");
         } catch (error) {
             console.log(error);
-            toast.error("Failed to place order");
+            toast.error(t("order.failedToPlaceOrder"));
         }
     };
 
@@ -128,13 +128,13 @@ export default function OrderPage() {
                 <Card className="max-w-md mx-auto bg-white/10 backdrop-blur-md border border-morpheus-gold-dark/20">
                     <CardContent className="text-center py-8">
                         <ShoppingCart className="w-16 h-16 mx-auto text-morpheus-gold-light/50 mb-4" />
-                        <h2 className="text-xl font-semibold text-white mb-2">Your cart is empty</h2>
-                        <p className="text-gray-300 mb-4">Add some items to proceed with checkout</p>
+                        <h2 className="text-xl font-semibold text-white mb-2">{t("cart.yourCartIsEmpty")}</h2>
+                        <p className="text-gray-300 mb-4">{t("order.addItemsToCheckout")}</p>
                         <Button
                             onClick={() => router.push("/")}
                             className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-morpheus-gold-light hover:to-morpheus-gold-dark text-white"
                         >
-                            Continue Shopping
+                            {t("cart.continueShopping")}
                         </Button>
                     </CardContent>
                 </Card>
@@ -149,9 +149,9 @@ export default function OrderPage() {
                 <div className="flex items-center gap-4 mb-8">
                     <Button variant="ghost" onClick={() => router.back()} className="text-white hover:bg-white/10">
                         <ArrowLeft className="w-4 h-4 mr-2" />
-                        Back
+                        {t("common.back")}
                     </Button>
-                    <h1 className="text-3xl font-bold text-white">Checkout</h1>
+                    <h1 className="text-3xl font-bold text-white">{t("order.checkout")}</h1>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -162,7 +162,7 @@ export default function OrderPage() {
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2 text-white">
                                     <ShoppingCart className="w-5 h-5 text-morpheus-gold-light" />
-                                    Order Items ({cartItems.length})
+                                    {t("order.orderItems")} ({cartItems.length})
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
@@ -191,7 +191,7 @@ export default function OrderPage() {
                                         {/* Product Details */}
                                         <div className="flex-1">
                                             <h4 className="font-medium text-white">
-                                                {item.yvarprod?.yvarprodintitule || "Unknown Product"}
+                                                {item.yvarprod?.yvarprodintitule || t("cart.unknownProduct")}
                                             </h4>
                                             <div className="flex items-center gap-2 text-sm text-gray-300">
                                                 {item.yvarprod?.xcouleur && (
@@ -210,7 +210,7 @@ export default function OrderPage() {
                                                 )}
                                             </div>
                                             <div className="flex items-center justify-between mt-2">
-                                                <span className="text-sm text-gray-300">Qty: {item.ypanierqte}</span>
+                                                <span className="text-sm text-gray-300">{t("orders.quantity")}: {item.ypanierqte}</span>
                                                 <div className="flex items-center gap-2">
                                                     <span className="font-semibold text-morpheus-gold-dark">
                                                         $
@@ -239,83 +239,83 @@ export default function OrderPage() {
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2 text-white">
                                     <MapPin className="w-5 h-5 text-morpheus-gold-light" />
-                                    Shipping Address
+                                    {t("order.shippingAddress")}
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
                                         <Label htmlFor="fullName" className="text-white">
-                                            Full Name
+                                            {t("profile.fullName")}
                                         </Label>
                                         <Input
                                             id="fullName"
                                             value={addressForm.fullName}
                                             onChange={(e) => handleAddressChange("fullName", e.target.value)}
                                             className="bg-white/10 border-morpheus-gold-dark/30 text-white placeholder:text-gray-400"
-                                            placeholder="John Doe"
+                                            placeholder={t("order.fullNamePlaceholder")}
                                         />
                                     </div>
                                     <div>
                                         <Label htmlFor="phone" className="text-white">
-                                            Phone
+                                            {t("visitorForm.phone")}
                                         </Label>
                                         <Input
                                             id="phone"
                                             value={addressForm.phone}
                                             onChange={(e) => handleAddressChange("phone", e.target.value)}
                                             className="bg-white/10 border-morpheus-gold-dark/30 text-white placeholder:text-gray-400"
-                                            placeholder="+1 234 567 8900"
+                                            placeholder={t("order.phonePlaceholder")}
                                         />
                                     </div>
                                 </div>
                                 <div>
                                     <Label htmlFor="address" className="text-white">
-                                        Address
+                                        {t("visitorForm.address")}
                                     </Label>
                                     <Input
                                         id="address"
                                         value={addressForm.address}
                                         onChange={(e) => handleAddressChange("address", e.target.value)}
                                         className="bg-white/10 border-morpheus-gold-dark/30 text-white placeholder:text-gray-400"
-                                        placeholder="123 Main Street"
+                                        placeholder={t("order.addressPlaceholder")}
                                     />
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                     <div>
                                         <Label htmlFor="city" className="text-white">
-                                            City
+                                            {t("order.city")}
                                         </Label>
                                         <Input
                                             id="city"
                                             value={addressForm.city}
                                             onChange={(e) => handleAddressChange("city", e.target.value)}
                                             className="bg-white/10 border-morpheus-gold-dark/30 text-white placeholder:text-gray-400"
-                                            placeholder="New York"
+                                            placeholder={t("order.cityPlaceholder")}
                                         />
                                     </div>
                                     <div>
                                         <Label htmlFor="postalCode" className="text-white">
-                                            Postal Code
+                                            {t("order.postalCode")}
                                         </Label>
                                         <Input
                                             id="postalCode"
                                             value={addressForm.postalCode}
                                             onChange={(e) => handleAddressChange("postalCode", e.target.value)}
                                             className="bg-white/10 border-morpheus-gold-dark/30 text-white placeholder:text-gray-400"
-                                            placeholder="10001"
+                                            placeholder={t("order.postalCodePlaceholder")}
                                         />
                                     </div>
                                     <div>
                                         <Label htmlFor="country" className="text-white">
-                                            Country
+                                            {t("order.country")}
                                         </Label>
                                         <Input
                                             id="country"
                                             value={addressForm.country}
                                             onChange={(e) => handleAddressChange("country", e.target.value)}
                                             className="bg-white/10 border-morpheus-gold-dark/30 text-white placeholder:text-gray-400"
-                                            placeholder="United States"
+                                            placeholder={t("order.countryPlaceholder")}
                                         />
                                     </div>
                                 </div>
@@ -327,59 +327,59 @@ export default function OrderPage() {
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2 text-white">
                                     <CreditCard className="w-5 h-5 text-morpheus-gold-light" />
-                                    Payment Information
+                                    {t("order.paymentInformation")}
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div>
                                     <Label htmlFor="cardholderName" className="text-white">
-                                        Cardholder Name
+                                        {t("order.cardholderName")}
                                     </Label>
                                     <Input
                                         id="cardholderName"
                                         value={paymentForm.cardholderName}
                                         onChange={(e) => handlePaymentChange("cardholderName", e.target.value)}
                                         className="bg-white/10 border-morpheus-gold-dark/30 text-white placeholder:text-gray-400"
-                                        placeholder="John Doe"
+                                        placeholder={t("order.cardholderNamePlaceholder")}
                                     />
                                 </div>
                                 <div>
                                     <Label htmlFor="cardNumber" className="text-white">
-                                        Card Number
+                                        {t("order.cardNumber")}
                                     </Label>
                                     <Input
                                         id="cardNumber"
                                         value={paymentForm.cardNumber}
                                         onChange={(e) => handlePaymentChange("cardNumber", e.target.value)}
                                         className="bg-white/10 border-morpheus-gold-dark/30 text-white placeholder:text-gray-400"
-                                        placeholder="1234 5678 9012 3456"
+                                        placeholder={t("order.cardNumberPlaceholder")}
                                         maxLength={19}
                                     />
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
                                         <Label htmlFor="expiryDate" className="text-white">
-                                            Expiry Date
+                                            {t("order.expiryDate")}
                                         </Label>
                                         <Input
                                             id="expiryDate"
                                             value={paymentForm.expiryDate}
                                             onChange={(e) => handlePaymentChange("expiryDate", e.target.value)}
                                             className="bg-white/10 border-morpheus-gold-dark/30 text-white placeholder:text-gray-400"
-                                            placeholder="MM/YY"
+                                            placeholder={t("order.expiryDatePlaceholder")}
                                             maxLength={5}
                                         />
                                     </div>
                                     <div>
                                         <Label htmlFor="cvv" className="text-white">
-                                            CVV
+                                            {t("order.cvv")}
                                         </Label>
                                         <Input
                                             id="cvv"
                                             value={paymentForm.cvv}
                                             onChange={(e) => handlePaymentChange("cvv", e.target.value)}
                                             className="bg-white/10 border-morpheus-gold-dark/30 text-white placeholder:text-gray-400"
-                                            placeholder="123"
+                                            placeholder={t("order.cvvPlaceholder")}
                                             maxLength={4}
                                         />
                                     </div>
@@ -392,26 +392,26 @@ export default function OrderPage() {
                     <div className="lg:col-span-1">
                         <Card className="bg-white/10 backdrop-blur-md border border-morpheus-gold-dark/20 sticky top-8">
                             <CardHeader>
-                                <CardTitle className="text-white">Order Summary</CardTitle>
+                                <CardTitle className="text-white">{t("cart.orderSummary")}</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div className="flex justify-between text-white">
-                                    <span>Subtotal</span>
+                                    <span>{t("order.subtotal")}</span>
                                     <span>${subtotal.toFixed(2)}</span>
                                 </div>
                                 {discount > 0 && (
                                     <div className="flex justify-between text-green-400">
-                                        <span>Discount</span>
+                                        <span>{t("order.discount")}</span>
                                         <span>-${discount.toFixed(2)}</span>
                                     </div>
                                 )}
                                 <div className="flex justify-between text-white">
-                                    <span>Shipping</span>
+                                    <span>{t("cart.shipping")}</span>
                                     <span>${shipping.toFixed(2)}</span>
                                 </div>
                                 <Separator className="bg-morpheus-gold-dark/30" />
                                 <div className="flex justify-between text-lg font-semibold">
-                                    <span className="text-white">Total</span>
+                                    <span className="text-white">{t("cart.total")}</span>
                                     <span className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light bg-clip-text text-transparent">
                                         ${total.toFixed(2)}
                                     </span>
@@ -421,7 +421,7 @@ export default function OrderPage() {
                                     disabled={createOrderMutation.isPending}
                                     className="w-full bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-morpheus-gold-light hover:to-morpheus-gold-dark text-white"
                                 >
-                                    {createOrderMutation.isPending ? "Processing..." : "Place Order"}
+                                    {createOrderMutation.isPending ? t("order.processing") : t("order.placeOrder")}
                                 </Button>
                             </CardContent>
                         </Card>

@@ -421,7 +421,16 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
             return;
         }
 
-        if (!designer) {
+        // For edit mode, get designer from existing product
+        let designerId: number;
+        if (isEditMode && productDetails?.product?.ydesignidfk) {
+            designerId = productDetails.product.ydesignidfk;
+        } else if (designer) {
+            // For non-admin users, use their designer info
+            designerId = designer.ydesignid;
+        } else {
+            // Admin creating new product - this shouldn't happen in normal flow
+            // but we'll handle it gracefully
             toast.error(t("admin.createProduct.designerInfoNotFound"));
             return;
         }
@@ -446,7 +455,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                 await updateProductMutation.mutateAsync({
                     productId,
                     storeId,
-                    designerId: designer.ydesignid,
+                    designerId: designerId,
                     categoryId,
                     productCode: productCode || undefined,
                     productName,
@@ -479,7 +488,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                 await createProductMutation.mutateAsync({
                     storeId,
                     eventId: selectedEventId,
-                    designerId: designer.ydesignid,
+                    designerId: designerId,
                     categoryId,
                     productCode: productCode || undefined,
                     productName,
