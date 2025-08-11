@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useLanguage } from "@/hooks/useLanguage";
 import {
     Credenza,
     CredenzaBody,
@@ -29,6 +30,7 @@ interface AssignDesignerDialogProps {
 }
 
 export function AssignDesignerDialog({ user, open, onOpenChange }: AssignDesignerDialogProps) {
+    const { t } = useLanguage();
     const [step, setStep] = useState(1);
     const [designerData, setDesignerData] = useState({
         nom: user?.name || "",
@@ -114,11 +116,11 @@ export function AssignDesignerDialog({ user, open, onOpenChange }: AssignDesigne
         <Credenza open={open} onOpenChange={handleClose}>
             <CredenzaContent className="max-w-2xl bg-gradient-to-br from-morpheus-blue-dark to-morpheus-blue-light">
                 <CredenzaHeader>
-                    <CredenzaTitle>Assign Designer Role</CredenzaTitle>
+                    <CredenzaTitle>{t("admin.users.assignDesignerRole")}</CredenzaTitle>
                     <CredenzaDescription>
                         {step === 1
-                            ? "Fill in the designer information for this user"
-                            : "Assign brand colors for the designer"}
+                            ? t("admin.users.fillDesignerInfo")
+                            : t("admin.users.assignBrandColors")}
                     </CredenzaDescription>
                 </CredenzaHeader>
 
@@ -158,22 +160,22 @@ export function AssignDesignerDialog({ user, open, onOpenChange }: AssignDesigne
                         onClick={step === 1 ? handleClose : handleBack}
                         disabled={assignDesigner.isPending}
                     >
-                        {step === 1 ? "Cancel" : "Back"}
+                        {step === 1 ? t("common.cancel") : t("admin.users.stepper.back")}
                     </Button>
 
                     {step === 1 ? (
                         <Button onClick={handleNext} disabled={assignDesigner.isPending}>
-                            Next
+                            {t("admin.users.stepper.next")}
                         </Button>
                     ) : (
                         <Button onClick={handleSubmit} disabled={assignDesigner.isPending}>
                             {assignDesigner.isPending ? (
                                 <>
                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    Assigning...
+                                    {t("admin.users.assigning")}
                                 </>
                             ) : (
-                                "Assign Designer Role"
+                                t("admin.users.assignDesignerRole")
                             )}
                         </Button>
                     )}

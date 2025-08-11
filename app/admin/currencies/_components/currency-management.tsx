@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { useLanguage } from "@/hooks/useLanguage";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -34,6 +35,7 @@ interface CurrencyFormData {
 }
 
 export function CurrencyManagement() {
+    const { t } = useLanguage();
     const [searchTerm, setSearchTerm] = useState("");
     const [showForm, setShowForm] = useState(false);
     const [editingCurrency, setEditingCurrency] = useState<number | null>(null);
@@ -100,12 +102,12 @@ export function CurrencyManagement() {
     };
 
     const handleDelete = async (currencyId: number) => {
-        if (confirm('Are you sure you want to delete this currency? This action cannot be undone.')) {
+        if (confirm(t('admin.currencies.confirmDelete'))) {
             try {
                 await deleteCurrencyMutation.mutateAsync(currencyId);
             } catch (error) {
                 console.error('Failed to delete currency:', error);
-                const errorMessage = error instanceof Error ? error.message : 'Failed to delete currency';
+                const errorMessage = error instanceof Error ? error.message : t('admin.currencies.failedToDelete');
                 alert(errorMessage);
             }
         }
@@ -128,7 +130,7 @@ export function CurrencyManagement() {
                 <div className="flex items-center justify-center h-64">
                     <div className="text-center">
                         <div className="animate-spin rounded-full h-12 w-12 border-4 border-morpheus-gold-light/30 border-t-morpheus-gold-light mx-auto mb-4"></div>
-                        <p className="text-white text-lg">Loading currencies...</p>
+                        <p className="text-white text-lg">{t('admin.currencies.loadingCurrencies')}</p>
                     </div>
                 </div>
             </div>
@@ -141,10 +143,10 @@ export function CurrencyManagement() {
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                 <div>
                     <h1 className="text-3xl lg:text-4xl font-bold text-white mb-2">
-                        Currency Management
+                        {t('admin.currencies.title')}
                     </h1>
                     <p className="text-lg text-gray-300">
-                        Manage currencies for the platform
+                        {t('admin.currencies.subtitle')}
                     </p>
                 </div>
                 <Button
@@ -152,7 +154,7 @@ export function CurrencyManagement() {
                     className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-morpheus-gold-light hover:to-morpheus-gold-dark text-white shadow-lg"
                 >
                     <Plus className="h-4 w-4 mr-2" />
-                    Add Currency
+                    {t('admin.currencies.addCurrency')}
                 </Button>
             </div>
 
@@ -165,7 +167,7 @@ export function CurrencyManagement() {
                                 <DollarSign className="h-5 w-5 text-morpheus-gold-light" />
                             </div>
                             <div>
-                                <p className="text-sm text-gray-400">Total Currencies</p>
+                                <p className="text-sm text-gray-400">{t('admin.currencies.totalCurrencies')}</p>
                                 <p className="text-2xl font-bold text-white">{currencies?.length || 0}</p>
                             </div>
                         </div>
@@ -179,7 +181,7 @@ export function CurrencyManagement() {
                                 <Package className="h-5 w-5 text-green-400" />
                             </div>
                             <div>
-                                <p className="text-sm text-gray-400">Currencies in Use</p>
+                                <p className="text-sm text-gray-400">{t('admin.currencies.currenciesInUse')}</p>
                                 <p className="text-2xl font-bold text-white">
                                     {currencies?.filter(curr => getVariantCount(curr) > 0).length || 0}
                                 </p>
@@ -195,7 +197,7 @@ export function CurrencyManagement() {
                                 <CheckCircle className="h-5 w-5 text-blue-400" />
                             </div>
                             <div>
-                                <p className="text-sm text-gray-400">Payment Enabled</p>
+                                <p className="text-sm text-gray-400">{t('admin.currencies.paymentEnabled')}</p>
                                 <p className="text-2xl font-bold text-white">
                                     {currencies?.filter(curr => curr.xdeviseboolautorisepaiement === "Y").length || 0}
                                 </p>
@@ -209,7 +211,7 @@ export function CurrencyManagement() {
             <div className="relative max-w-md">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <Input
-                    placeholder="Search currencies..."
+                    placeholder={t('admin.currencies.searchPlaceholder')}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-10 bg-morpheus-blue-dark/30 border-slate-600 text-white placeholder-gray-400"
@@ -222,46 +224,46 @@ export function CurrencyManagement() {
                     <CardHeader>
                         <CardTitle className="text-white flex items-center gap-2">
                             <DollarSign className="h-5 w-5 text-morpheus-gold-light" />
-                            {editingCurrency ? 'Edit Currency' : 'Add New Currency'}
+                            {editingCurrency ? t('admin.currencies.editCurrency') : t('admin.currencies.addNewCurrency')}
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <Label className="text-gray-300">Currency Name *</Label>
+                                    <Label className="text-gray-300">{t('admin.currencies.currencyNameRequired')}</Label>
                                     <Input
                                         value={formData.xdeviseintitule}
                                         onChange={(e) => setFormData(prev => ({ ...prev, xdeviseintitule: e.target.value }))}
                                         className="bg-morpheus-blue-dark/30 border-slate-600 text-white"
-                                        placeholder="e.g., US Dollar"
+                                        placeholder={t('admin.currencies.currencyNamePlaceholder')}
                                         required
                                     />
                                 </div>
                                 <div>
-                                    <Label className="text-gray-300">Alpha Code *</Label>
+                                    <Label className="text-gray-300">{t('admin.currencies.alphaCodeRequired')}</Label>
                                     <Input
                                         value={formData.xdevisecodealpha}
                                         onChange={(e) => setFormData(prev => ({ ...prev, xdevisecodealpha: e.target.value.toUpperCase() }))}
                                         className="bg-morpheus-blue-dark/30 border-slate-600 text-white"
-                                        placeholder="e.g., USD"
+                                        placeholder={t('admin.currencies.alphaCodePlaceholder')}
                                         maxLength={3}
                                         required
                                     />
                                 </div>
                                 <div>
-                                    <Label className="text-gray-300">Numeric Code *</Label>
+                                    <Label className="text-gray-300">{t('admin.currencies.numericCodeRequired')}</Label>
                                     <Input
                                         value={formData.xdevisecodenum}
                                         onChange={(e) => setFormData(prev => ({ ...prev, xdevisecodenum: e.target.value }))}
                                         className="bg-morpheus-blue-dark/30 border-slate-600 text-white"
-                                        placeholder="e.g., 840"
+                                        placeholder={t('admin.currencies.numericCodePlaceholder')}
                                         maxLength={3}
                                         required
                                     />
                                 </div>
                                 <div>
-                                    <Label className="text-gray-300">Decimal Places *</Label>
+                                    <Label className="text-gray-300">{t('admin.currencies.decimalPlacesRequired')}</Label>
                                     <Input
                                         type="number"
                                         min="0"
@@ -286,7 +288,7 @@ export function CurrencyManagement() {
                                     className="rounded border-slate-600"
                                 />
                                 <Label htmlFor="allowPayment" className="text-gray-300">
-                                    Allow payments in this currency
+                                    {t('admin.currencies.allowPayments')}
                                 </Label>
                             </div>
 
@@ -297,7 +299,7 @@ export function CurrencyManagement() {
                                     className="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white"
                                 >
                                     <Save className="h-4 w-4 mr-2" />
-                                    {editingCurrency ? 'Update' : 'Create'} Currency
+                                    {editingCurrency ? t('admin.currencies.updateCurrency') : t('admin.currencies.createCurrency')}
                                 </Button>
                                 <Button
                                     type="button"
@@ -306,7 +308,7 @@ export function CurrencyManagement() {
                                     className="border-slate-600 text-gray-300 hover:bg-slate-700/50"
                                 >
                                     <X className="h-4 w-4 mr-2" />
-                                    Cancel
+                                    {t('common.cancel')}
                                 </Button>
                             </div>
                         </form>
@@ -319,12 +321,12 @@ export function CurrencyManagement() {
                 <div className="text-center py-12">
                     <DollarSign className="h-16 w-16 text-gray-400 mx-auto mb-4" />
                     <h3 className="text-xl font-medium text-white mb-2">
-                        {searchTerm ? "No currencies match your search" : "No currencies found"}
+                        {searchTerm ? t('admin.currencies.noMatchingCurrencies') : t('admin.currencies.noCurrenciesFound')}
                     </h3>
                     <p className="text-gray-300">
-                        {searchTerm 
-                            ? "Try adjusting your search criteria"
-                            : "Start by adding your first currency to the system."
+                        {searchTerm
+                            ? t('admin.currencies.adjustSearchCriteria')
+                            : t('admin.currencies.addFirstCurrency')
                         }
                     </p>
                 </div>
@@ -348,13 +350,13 @@ export function CurrencyManagement() {
                                             {currency.xdeviseboolautorisepaiement === "Y" && (
                                                 <Badge className="px-2 py-1 text-xs font-medium flex items-center gap-1 border text-green-400 bg-green-400/10 border-green-400/20">
                                                     <CheckCircle className="h-3 w-3" />
-                                                    Payment
+                                                    {t('admin.currencies.payment')}
                                                 </Badge>
                                             )}
                                             {isInUse && (
                                                 <Badge className="px-2 py-1 text-xs font-medium flex items-center gap-1 border text-blue-400 bg-blue-400/10 border-blue-400/20">
                                                     <Package className="h-3 w-3" />
-                                                    {variantCount} variants
+                                                    {variantCount} {t('admin.currencies.variants')}
                                                 </Badge>
                                             )}
                                         </div>
@@ -364,21 +366,21 @@ export function CurrencyManagement() {
                                 <CardContent className="space-y-3">
                                     <div className="grid grid-cols-2 gap-3 text-sm">
                                         <div>
-                                            <span className="text-gray-400">Alpha Code:</span>
+                                            <span className="text-gray-400">{t('admin.currencies.alphaCode')}:</span>
                                             <p className="text-white font-medium">{currency.xdevisecodealpha}</p>
                                         </div>
                                         <div>
-                                            <span className="text-gray-400">Numeric:</span>
+                                            <span className="text-gray-400">{t('admin.currencies.numeric')}:</span>
                                             <p className="text-white font-medium">{currency.xdevisecodenum}</p>
                                         </div>
                                         <div>
-                                            <span className="text-gray-400">Decimals:</span>
+                                            <span className="text-gray-400">{t('admin.currencies.decimals')}:</span>
                                             <p className="text-white font-medium">{currency.xdevisenbrdec}</p>
                                         </div>
                                         <div>
-                                            <span className="text-gray-400">Status:</span>
+                                            <span className="text-gray-400">{t('admin.currencies.status')}:</span>
                                             <p className={`font-medium ${isInUse ? "text-green-400" : "text-gray-400"}`}>
-                                                {isInUse ? `Active (${variantCount} variants)` : "Unused"}
+                                                {isInUse ? `${t('admin.currencies.active')} (${variantCount} ${t('admin.currencies.variants')})` : t('admin.currencies.unused')}
                                             </p>
                                         </div>
                                     </div>
@@ -391,7 +393,7 @@ export function CurrencyManagement() {
                                             className="flex-1 border-slate-600 text-white hover:bg-slate-700/50"
                                         >
                                             <Edit className="h-4 w-4 mr-1" />
-                                            Edit
+                                            {t('common.edit')}
                                         </Button>
                                         <Tooltip>
                                             <TooltipTrigger asChild>
@@ -411,9 +413,9 @@ export function CurrencyManagement() {
                                                 </span>
                                             </TooltipTrigger>
                                             <TooltipContent>
-                                                <p>{isInUse 
-                                                    ? `Cannot delete: currency is used by ${variantCount} product variant${variantCount !== 1 ? 's' : ''}` 
-                                                    : "Delete currency"
+                                                <p>{isInUse
+                                                    ? `${t('admin.currencies.cannotDelete')}: ${t('admin.currencies.currencyUsedBy')} ${variantCount} ${t('admin.currencies.productVariant')}${variantCount !== 1 ? 's' : ''}`
+                                                    : t('admin.currencies.deleteCurrency')
                                                 }</p>
                                             </TooltipContent>
                                         </Tooltip>

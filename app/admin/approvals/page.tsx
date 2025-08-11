@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useLanguage } from "@/hooks/useLanguage";
 import { useQueryStates, parseAsInteger, parseAsString } from "nuqs";
 import { SortingState } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
@@ -29,6 +30,8 @@ import { Toaster } from "./_components/toaster";
 type Product = any;
 
 export default function ApprovalsPage() {
+    const { t } = useLanguage();
+    
     // State for pagination, filters, and sorting using nuqs
     const [{ page, approvalType, category, store, search, sortBy, sortOrder }, setFilters] = useQueryStates({
         page: parseAsInteger.withDefault(1),
@@ -79,10 +82,10 @@ export default function ApprovalsPage() {
 
     // Prepare filter options
     const approvalTypeOptions = [
-        { value: "all", label: "All Products" },
-        { value: "not_approved", label: "New Products" },
-        { value: "variant_approval", label: "Variant Approvals" },
-        { value: "rejected", label: "Rejected" }
+        { value: "all", label: t("admin.approvals.allProducts") },
+        { value: "not_approved", label: t("admin.approvals.newProducts") },
+        { value: "variant_approval", label: t("admin.approvals.variantApprovals") },
+        { value: "rejected", label: t("admin.approvals.rejected") }
     ];
 
     const categoryOptions = categories?.map(cat => ({
@@ -91,7 +94,7 @@ export default function ApprovalsPage() {
     })) || [];
 
     const allCategoryOptions = [
-        { value: "all", label: "All Categories" },
+        { value: "all", label: t("admin.approvals.allCategories") },
         ...categoryOptions
     ];
 
@@ -101,7 +104,7 @@ export default function ApprovalsPage() {
     })) || [];
 
     const allStoreOptions = [
-        { value: "all", label: "All Stores" },
+        { value: "all", label: t("admin.approvals.allStores") },
         ...storeOptions
     ];
 
@@ -171,11 +174,11 @@ export default function ApprovalsPage() {
                 <div className="flex items-center gap-2">
                     <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30">
                         <Clock className="h-3 w-3 mr-1" />
-                        Product Pending
+                        {t("admin.approvals.productPending")}
                     </Badge>
                     {variants.length > 0 && (
                         <Badge variant="secondary" className="bg-gray-500/20 text-gray-300 border-gray-500/30 text-xs">
-                            {variants.length} variants
+                            {variants.length} {t("admin.approvals.variants")}
                         </Badge>
                     )}
                 </div>
@@ -185,11 +188,11 @@ export default function ApprovalsPage() {
                 <div className="flex items-center gap-2">
                     <Badge variant="secondary" className="bg-red-500/20 text-red-300 border-red-500/30">
                         <AlertTriangle className="h-3 w-3 mr-1" />
-                        Rejected
+                        {t("admin.approvals.rejected")}
                     </Badge>
                     {variants.length > 0 && (
                         <Badge variant="secondary" className="bg-gray-500/20 text-gray-300 border-gray-500/30 text-xs">
-                            {variants.length} variants
+                            {variants.length} {t("admin.approvals.variants")}
                         </Badge>
                     )}
                 </div>
@@ -199,22 +202,22 @@ export default function ApprovalsPage() {
                 <div className="flex items-center gap-2">
                     <Badge variant="secondary" className="bg-blue-500/20 text-blue-300 border-blue-500/30">
                         <Package className="h-3 w-3 mr-1" />
-                        Variant Issues
+                        {t("admin.approvals.variantIssues")}
                     </Badge>
                     <div className="flex items-center gap-1">
                         {pendingVariants > 0 && (
                             <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30 text-xs">
-                                {pendingVariants} pending
+                                {pendingVariants} {t("admin.approvals.pending")}
                             </Badge>
                         )}
                         {rejectedVariants > 0 && (
                             <Badge variant="secondary" className="bg-red-500/20 text-red-300 border-red-500/30 text-xs">
-                                {rejectedVariants} rejected
+                                {rejectedVariants} {t("admin.approvals.rejected")}
                             </Badge>
                         )}
                         {approvedVariants > 0 && (
                             <Badge variant="secondary" className="bg-green-500/20 text-green-300 border-green-500/30 text-xs">
-                                {approvedVariants} approved
+                                {approvedVariants} {t("admin.approvals.approved")}
                             </Badge>
                         )}
                     </div>
@@ -228,7 +231,7 @@ export default function ApprovalsPage() {
     const columns: ColumnDef<Product>[] = [
         {
             accessorKey: "yprodcode",
-            header: "Product Code",
+            header: t("admin.approvals.productCode"),
             enableSorting: true,
             cell: ({ row }) => (
                 <div className="font-mono text-sm">
@@ -238,7 +241,7 @@ export default function ApprovalsPage() {
         },
         {
             accessorKey: "yprodintitule",
-            header: "Product Name",
+            header: t("admin.approvals.productName"),
             enableSorting: true,
             cell: ({ row }) => (
                 <div className="font-medium">
@@ -248,26 +251,26 @@ export default function ApprovalsPage() {
         },
         {
             accessorKey: "xcategprodidfk",
-            header: "Category",
+            header: t("admin.approvals.category"),
             enableSorting: true,
             cell: ({ row }) => {
                 const categoryId = row.getValue("xcategprodidfk") as number;
                 const category = categories?.find(cat => cat.xcategprodid === categoryId);
                 return (
                     <Badge variant="secondary" className="bg-blue-500/20 text-blue-300 border-blue-500/30">
-                        {category?.xcategprodintitule || "Unknown"}
+                        {category?.xcategprodintitule || t("admin.approvals.unknown")}
                     </Badge>
                 );
             },
         },
         {
             id: "status",
-            header: "Status",
+            header: t("admin.approvals.status"),
             cell: ({ row }) => getStatusBadge(row.original),
         },
         {
             accessorKey: "sysdate",
-            header: "Created",
+            header: t("admin.approvals.created"),
             enableSorting: true,
             cell: ({ row }) => {
                 const date = new Date(row.getValue("sysdate"));
@@ -280,7 +283,7 @@ export default function ApprovalsPage() {
         },
         {
             id: "actions",
-            header: "Actions",
+            header: t("admin.approvals.actions"),
             cell: ({ row }) => {
                 const product = row.original;
                 return (
@@ -289,10 +292,10 @@ export default function ApprovalsPage() {
                         variant="ghost"
                         onClick={() => handleAuditProduct(product)}
                         className="h-8 px-3 text-gray-400 hover:text-blue-400 hover:bg-blue-900/50"
-                        title="Audit Product"
+                        title={t("admin.approvals.auditProduct")}
                     >
                         <FileSearch className="h-3 w-3 mr-1" />
-                        Audit
+                        {t("admin.approvals.audit")}
                     </Button>
                 );
             },
@@ -317,8 +320,8 @@ export default function ApprovalsPage() {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl lg:text-4xl font-bold text-white">Product Approvals</h1>
-                    <p className="text-lg text-gray-300">Review and approve pending products</p>
+                    <h1 className="text-3xl lg:text-4xl font-bold text-white">{t("admin.approvals.title")}</h1>
+                    <p className="text-lg text-gray-300">{t("admin.approvals.subtitle")}</p>
                 </div>
                 <div className="flex items-center gap-2">
                     <Button
@@ -327,7 +330,7 @@ export default function ApprovalsPage() {
                         onClick={() => setViewMode('table')}
                         className="border-gray-600"
                     >
-                        Table
+                        {t("admin.approvals.table")}
                     </Button>
                     <Button
                         variant={viewMode === 'cards' ? 'default' : 'outline'}
@@ -335,7 +338,7 @@ export default function ApprovalsPage() {
                         onClick={() => setViewMode('cards')}
                         className="border-gray-600"
                     >
-                        Cards
+                        {t("admin.approvals.cards")}
                     </Button>
                 </div>
             </div>
@@ -347,7 +350,7 @@ export default function ApprovalsPage() {
                         <CardContent className="p-4">
                             <div className="flex items-center gap-2 mb-2">
                                 <AlertTriangle className="h-5 w-5 text-red-400" />
-                                <span className="text-sm font-medium text-gray-300">Total Rejected</span>
+                                <span className="text-sm font-medium text-gray-300">{t("admin.approvals.totalRejected")}</span>
                             </div>
                             <div className="text-2xl font-bold text-white">
                                 {stats.rejected || 0}
@@ -358,7 +361,7 @@ export default function ApprovalsPage() {
                         <CardContent className="p-4">
                             <div className="flex items-center gap-2 mb-2">
                                 <Clock className="h-5 w-5 text-yellow-400" />
-                                <span className="text-sm font-medium text-gray-300">Total Pending</span>
+                                <span className="text-sm font-medium text-gray-300">{t("admin.approvals.totalPending")}</span>
                             </div>
                             <div className="text-2xl font-bold text-white">
                                 {stats.pending || 0}
@@ -369,7 +372,7 @@ export default function ApprovalsPage() {
                         <CardContent className="p-4">
                             <div className="flex items-center gap-2 mb-2">
                                 <CheckCircle className="h-5 w-5 text-green-400" />
-                                <span className="text-sm font-medium text-gray-300">Total Approved</span>
+                                <span className="text-sm font-medium text-gray-300">{t("admin.approvals.totalApproved")}</span>
                             </div>
                             <div className="text-2xl font-bold text-white">
                                 {stats.approved || 0}
@@ -380,7 +383,7 @@ export default function ApprovalsPage() {
                         <CardContent className="p-4">
                             <div className="flex items-center gap-2 mb-2">
                                 <Package className="h-5 w-5 text-blue-400" />
-                                <span className="text-sm font-medium text-gray-300">Total Products</span>
+                                <span className="text-sm font-medium text-gray-300">{t("admin.approvals.totalProducts")}</span>
                             </div>
                             <div className="text-2xl font-bold text-white">
                                 {stats.total || 0}
@@ -397,7 +400,7 @@ export default function ApprovalsPage() {
                     <CardHeader>
                         <CardTitle className="text-xl text-white flex items-center gap-2">
                             <Package className="h-5 w-5" />
-                            Products Awaiting Approval
+                            {t("admin.approvals.productsAwaitingApproval")}
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -418,14 +421,14 @@ export default function ApprovalsPage() {
                                         value={approvalType}
                                         onValueChange={handleApprovalTypeChange}
                                         options={approvalTypeOptions}
-                                        placeholder="Filter by type"
+                                        placeholder={t("admin.approvals.filterByType")}
                                         className="w-48"
                                     />
                                     <SuperSelect
                                         value={categoryFilter || "all"}
                                         onValueChange={handleCategoryFilterChange}
                                         options={allCategoryOptions}
-                                        placeholder="Filter by category"
+                                        placeholder={t("admin.approvals.filterByCategory")}
                                         className="w-48"
                                         disabled={categoriesLoading}
                                     />
@@ -433,7 +436,7 @@ export default function ApprovalsPage() {
                                         value={storeFilter || "all"}
                                         onValueChange={handleStoreFilterChange}
                                         options={allStoreOptions}
-                                        placeholder="Filter by store"
+                                        placeholder={t("admin.approvals.filterByStore")}
                                         className="w-48"
                                         disabled={storesLoading}
                                     />
@@ -461,14 +464,14 @@ export default function ApprovalsPage() {
                                     value={approvalType}
                                     onValueChange={handleApprovalTypeChange}
                                     options={approvalTypeOptions}
-                                    placeholder="Filter by type"
+                                    placeholder={t("admin.approvals.filterByType")}
                                     className="w-48"
                                 />
                                 <SuperSelect
                                     value={categoryFilter || "all"}
                                     onValueChange={handleCategoryFilterChange}
                                     options={allCategoryOptions}
-                                    placeholder="Filter by category"
+                                    placeholder={t("admin.approvals.filterByCategory")}
                                     className="w-48"
                                     disabled={categoriesLoading}
                                 />
@@ -476,7 +479,7 @@ export default function ApprovalsPage() {
                                     value={storeFilter || "all"}
                                     onValueChange={handleStoreFilterChange}
                                     options={allStoreOptions}
-                                    placeholder="Filter by store"
+                                    placeholder={t("admin.approvals.filterByStore")}
                                     className="w-48"
                                     disabled={storesLoading}
                                 />

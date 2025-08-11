@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useLanguage } from "@/hooks/useLanguage";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -37,6 +38,7 @@ interface UpdateCategoryDialogProps {
 }
 
 export function UpdateCategoryDialog({ children, category }: UpdateCategoryDialogProps) {
+    const { t } = useLanguage();
     const [isOpen, setIsOpen] = useState(false);
     const [formData, setFormData] = useState<CategoryFormData>({
         xcategprodintitule: "",
@@ -77,7 +79,7 @@ export function UpdateCategoryDialog({ children, category }: UpdateCategoryDialo
         e.preventDefault();
         
         if (!validateForm()) {
-            toast.error("Please fill in all required fields");
+            toast.error(t("admin.categories.fillRequiredFields"));
             return;
         }
 
@@ -87,10 +89,10 @@ export function UpdateCategoryDialog({ children, category }: UpdateCategoryDialo
                 updates: formData
             });
             setIsOpen(false);
-            toast.success("Category updated successfully");
+            toast.success(t("admin.categories.categoryUpdatedSuccess"));
         } catch (error) {
             console.error('Failed to update category:', error);
-            const errorMessage = error instanceof Error ? error.message : 'Failed to update category';
+            const errorMessage = error instanceof Error ? error.message : t("admin.categories.failedToUpdateCategory");
             toast.error(errorMessage);
         }
     };
@@ -109,7 +111,7 @@ export function UpdateCategoryDialog({ children, category }: UpdateCategoryDialo
                 <CredenzaHeader>
                     <CredenzaTitle className="text-white flex items-center gap-2">
                         <Tag className="h-5 w-5 text-morpheus-gold-light" />
-                        Edit Category
+                        {t("admin.categories.editCategory")}
                     </CredenzaTitle>
                 </CredenzaHeader>
 
@@ -117,23 +119,23 @@ export function UpdateCategoryDialog({ children, category }: UpdateCategoryDialo
                     <CredenzaBody className="space-y-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <Label className="text-gray-300">Category Name *</Label>
+                                <Label className="text-gray-300">{t("admin.categories.categoryName")} *</Label>
                                 <Input
                                     value={formData.xcategprodintitule}
                                     onChange={(e) => setFormData(prev => ({ ...prev, xcategprodintitule: e.target.value }))}
                                     className="bg-morpheus-blue-dark/30 border-slate-600 text-white"
-                                    placeholder="e.g., Electronics"
+                                    placeholder={t("admin.categories.categoryNamePlaceholder")}
                                     required
                                     disabled={updateCategoryMutation.isPending}
                                 />
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-gray-300">Category Code *</Label>
+                                <Label className="text-gray-300">{t("admin.categories.categoryCode")} *</Label>
                                 <Input
                                     value={formData.xcategprodcode}
                                     onChange={(e) => setFormData(prev => ({ ...prev, xcategprodcode: e.target.value.toUpperCase() }))}
                                     className="bg-morpheus-blue-dark/30 border-slate-600 text-white"
-                                    placeholder="e.g., ELEC"
+                                    placeholder={t("admin.categories.categoryCodePlaceholder")}
                                     required
                                     disabled={updateCategoryMutation.isPending}
                                 />
@@ -141,12 +143,12 @@ export function UpdateCategoryDialog({ children, category }: UpdateCategoryDialo
                         </div>
                         
                         <div className="space-y-2">
-                            <Label className="text-gray-300">Description *</Label>
+                            <Label className="text-gray-300">{t("admin.categories.description")} *</Label>
                             <Textarea
                                 value={formData.xcategprodinfobulle}
                                 onChange={(e) => setFormData(prev => ({ ...prev, xcategprodinfobulle: e.target.value }))}
                                 className="bg-morpheus-blue-dark/30 border-slate-600 text-white"
-                                placeholder="Describe this category..."
+                                placeholder={t("admin.categories.descriptionPlaceholder")}
                                 rows={3}
                                 required
                                 disabled={updateCategoryMutation.isPending}
@@ -163,7 +165,7 @@ export function UpdateCategoryDialog({ children, category }: UpdateCategoryDialo
                             className="flex-1 border-slate-600 text-gray-300 hover:bg-slate-700/50"
                         >
                             <X className="h-4 w-4 mr-2" />
-                            Cancel
+                            {t("common.cancel")}
                         </Button>
                         <Button
                             type="submit"
@@ -171,7 +173,7 @@ export function UpdateCategoryDialog({ children, category }: UpdateCategoryDialo
                             className="flex-1 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white"
                         >
                             <Save className="h-4 w-4 mr-2" />
-                            {updateCategoryMutation.isPending ? 'Updating...' : 'Update Category'}
+                            {updateCategoryMutation.isPending ? t("admin.categories.updating") : t("admin.categories.updateCategory")}
                         </Button>
                     </CredenzaFooter>
                 </form>

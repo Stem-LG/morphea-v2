@@ -1,6 +1,7 @@
 "use client";
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { useLanguage } from "@/hooks/useLanguage";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -24,6 +25,7 @@ export function ApprovalCard({
     onAudit,
     categories = []
 }: ApprovalCardProps) {
+    const { t } = useLanguage();
     // Get category name
     const category = categories.find(cat => cat.xcategprodid === product.xcategprodidfk);
     
@@ -41,11 +43,11 @@ export function ApprovalCard({
                     <div className="flex flex-col items-end gap-1">
                         <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30">
                             <Clock className="h-3 w-3 mr-1" />
-                            Product Pending
+                            {t("admin.approvals.productPending")}
                         </Badge>
                         {variants.length > 0 && (
                             <Badge variant="secondary" className="bg-gray-500/20 text-gray-300 border-gray-500/30 text-xs">
-                                {variants.length} variants
+                                {variants.length} {t("admin.approvals.variants")}
                             </Badge>
                         )}
                     </div>
@@ -58,11 +60,11 @@ export function ApprovalCard({
                     <div className="flex flex-col items-end gap-1">
                         <Badge variant="secondary" className="bg-orange-500/20 text-orange-300 border-orange-500/30">
                             <AlertTriangle className="h-3 w-3 mr-1" />
-                            Needs Revision
+                            {t("admin.approvals.needsRevision")}
                         </Badge>
                         {variants.length > 0 && (
                             <Badge variant="secondary" className="bg-gray-500/20 text-gray-300 border-gray-500/30 text-xs">
-                                {variants.length} variants
+                                {variants.length} {t("admin.approvals.variants")}
                             </Badge>
                         )}
                     </div>
@@ -75,27 +77,27 @@ export function ApprovalCard({
                     <div className="flex flex-col items-end gap-1">
                         <Badge variant="secondary" className="bg-blue-500/20 text-blue-300 border-blue-500/30">
                             <Package className="h-3 w-3 mr-1" />
-                            Variant Issues
+                            {t("admin.approvals.variantIssues")}
                         </Badge>
                         <div className="flex flex-wrap gap-1 justify-end">
                             {pendingVariants > 0 && (
                                 <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30 text-xs">
-                                    {pendingVariants} pending
+                                    {pendingVariants} {t("admin.approvals.pending")}
                                 </Badge>
                             )}
                             {revisionVariants > 0 && (
                                 <Badge variant="secondary" className="bg-orange-500/20 text-orange-300 border-orange-500/30 text-xs">
-                                    {revisionVariants} revision
+                                    {revisionVariants} {t("admin.approvals.revision")}
                                 </Badge>
                             )}
                             {rejectedVariants > 0 && (
                                 <Badge variant="secondary" className="bg-red-500/20 text-red-300 border-red-500/30 text-xs">
-                                    {rejectedVariants} rejected
+                                    {rejectedVariants} {t("admin.approvals.rejected")}
                                 </Badge>
                             )}
                             {approvedVariants > 0 && (
                                 <Badge variant="secondary" className="bg-green-500/20 text-green-300 border-green-500/30 text-xs">
-                                    {approvedVariants} approved
+                                    {approvedVariants} {t("admin.approvals.approved")}
                                 </Badge>
                             )}
                         </div>
@@ -122,16 +124,16 @@ export function ApprovalCard({
                 <div className="relative w-full h-32 bg-gradient-to-br from-purple-900/30 to-blue-900/30 rounded-lg flex items-center justify-center border border-purple-500/30">
                     <div className="flex flex-col items-center">
                         <Box className="h-10 w-10 text-purple-400 mb-2" />
-                        <span className="text-purple-300 text-xs font-medium">3D Model Available</span>
+                        <span className="text-purple-300 text-xs font-medium">{t("admin.approvals.model3DAvailable")}</span>
                     </div>
                     <div className="absolute top-2 right-2">
                         <Badge variant="secondary" className="bg-purple-500/20 text-purple-300 border-purple-500/30 text-xs">
-                            3D Preview
+                            {t("admin.approvals.preview3D")}
                         </Badge>
                     </div>
                     <div className="absolute top-2 left-2">
                         <Badge variant="secondary" className="bg-blue-500/20 text-blue-300 border-blue-500/30 text-xs">
-                            {product.yobjet3d.length} Model{product.yobjet3d.length > 1 ? 's' : ''}
+                            {product.yobjet3d.length} {product.yobjet3d.length > 1 ? t("admin.approvals.models") : t("admin.approvals.model")}
                         </Badge>
                     </div>
                 </div>
@@ -148,7 +150,7 @@ export function ApprovalCard({
                     <Play className="h-8 w-8 text-gray-400" />
                     <div className="absolute top-2 right-2">
                         <Badge variant="secondary" className="bg-purple-500/20 text-purple-300 border-purple-500/30 text-xs">
-                            Video
+                            {t("admin.approvals.video")}
                         </Badge>
                     </div>
                 </div>
@@ -207,48 +209,48 @@ export function ApprovalCard({
                 {getMediaPreview() || (
                     <div className="w-full h-32 bg-gray-800 rounded-lg flex items-center justify-center">
                         <ImageIcon className="h-8 w-8 text-gray-400" />
-                        <span className="text-gray-500 text-sm ml-2">No Media</span>
+                        <span className="text-gray-500 text-sm ml-2">{t("admin.approvals.noMedia")}</span>
                     </div>
                 )}
 
                 {/* Product Info */}
                 <div className="space-y-2">
                     <div className="flex items-center justify-between text-xs">
-                        <span className="text-gray-400">Category:</span>
+                        <span className="text-gray-400">{t("admin.approvals.category")}:</span>
                         <Badge variant="secondary" className="bg-blue-500/20 text-blue-300 border-blue-500/30 text-xs">
-                            {category?.xcategprodintitule || "Unknown"}
+                            {category?.xcategprodintitule || t("admin.approvals.unknown")}
                         </Badge>
                     </div>
                     
                     <div className="flex items-center justify-between text-xs">
-                        <span className="text-gray-400">Store:</span>
+                        <span className="text-gray-400">{t("admin.approvals.store")}:</span>
                         <span className="text-white">
-                            {product.store?.yboutiqueintitule || "Unknown Store"}
+                            {product.store?.yboutiqueintitule || t("admin.approvals.unknownStore")}
                         </span>
                     </div>
 
                     <div className="flex items-center justify-between text-xs">
-                        <span className="text-gray-400">Variants:</span>
+                        <span className="text-gray-400">{t("admin.approvals.variants")}:</span>
                         <div className="flex items-center gap-1 flex-wrap justify-end">
                             <span className="text-white">{variants.length || 0}</span>
                             {variantCounts.pending > 0 && (
                                 <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30 text-xs">
-                                    {variantCounts.pending} pending
+                                    {variantCounts.pending} {t("admin.approvals.pending")}
                                 </Badge>
                             )}
                             {variantCounts.revision > 0 && (
                                 <Badge variant="secondary" className="bg-orange-500/20 text-orange-300 border-orange-500/30 text-xs">
-                                    {variantCounts.revision} revision
+                                    {variantCounts.revision} {t("admin.approvals.revision")}
                                 </Badge>
                             )}
                             {variantCounts.rejected > 0 && (
                                 <Badge variant="secondary" className="bg-red-500/20 text-red-300 border-red-500/30 text-xs">
-                                    {variantCounts.rejected} rejected
+                                    {variantCounts.rejected} {t("admin.approvals.rejected")}
                                 </Badge>
                             )}
                             {variantCounts.approved > 0 && (
                                 <Badge variant="secondary" className="bg-green-500/20 text-green-300 border-green-500/30 text-xs">
-                                    {variantCounts.approved} approved
+                                    {variantCounts.approved} {t("admin.approvals.approved")}
                                 </Badge>
                             )}
                         </div>
@@ -257,7 +259,7 @@ export function ApprovalCard({
                     {/* 3D Models indicator */}
                     {product.yobjet3d?.length > 0 && (
                         <div className="flex items-center justify-between text-xs">
-                            <span className="text-gray-400">3D Models:</span>
+                            <span className="text-gray-400">{t("admin.approvals.models3D")}:</span>
                             <div className="flex items-center gap-1">
                                 <Box className="h-3 w-3 text-purple-400" />
                                 <span className="text-purple-400">{product.yobjet3d.length}</span>
@@ -266,7 +268,7 @@ export function ApprovalCard({
                     )}
 
                     <div className="flex items-center justify-between text-xs">
-                        <span className="text-gray-400">Created:</span>
+                        <span className="text-gray-400">{t("admin.approvals.created")}:</span>
                         <span className="text-white">
                             {new Date(product.sysdate).toLocaleDateString()}
                         </span>
@@ -279,10 +281,10 @@ export function ApprovalCard({
                         size="sm"
                         onClick={onAudit}
                         className="w-full h-9 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white"
-                        title="Audit Product"
+                        title={t("admin.approvals.auditProduct")}
                     >
                         <FileSearch className="h-4 w-4 mr-2" />
-                        Audit Product
+                        {t("admin.approvals.auditProduct")}
                     </Button>
                 </div>
             </CardContent>

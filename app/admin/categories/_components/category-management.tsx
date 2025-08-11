@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { useLanguage } from "@/hooks/useLanguage";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -35,13 +36,15 @@ export function CategoryManagement() {
     ) || [];
 
 
+    const { t } = useLanguage();
+
     const handleDelete = async (categoryId: number) => {
-        if (confirm('Are you sure you want to delete this category? This action cannot be undone.')) {
+        if (confirm(t("admin.categories.confirmDelete"))) {
             try {
                 await deleteCategoryMutation.mutateAsync(categoryId);
             } catch (error) {
                 console.error('Failed to delete category:', error);
-                const errorMessage = error instanceof Error ? error.message : 'Failed to delete category. It may be in use by products.';
+                const errorMessage = error instanceof Error ? error.message : t("admin.categories.deleteError");
                 alert(errorMessage);
             }
         }
@@ -58,7 +61,7 @@ export function CategoryManagement() {
                 <div className="flex items-center justify-center h-64">
                     <div className="text-center">
                         <div className="animate-spin rounded-full h-12 w-12 border-4 border-morpheus-gold-light/30 border-t-morpheus-gold-light mx-auto mb-4"></div>
-                        <p className="text-white text-lg">Loading categories...</p>
+                        <p className="text-white text-lg">{t("admin.categories.loadingCategories")}</p>
                     </div>
                 </div>
             </div>
@@ -71,16 +74,16 @@ export function CategoryManagement() {
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                 <div>
                     <h1 className="text-3xl lg:text-4xl font-bold text-white mb-2">
-                        Category Management
+                        {t("admin.categories.title")}
                     </h1>
                     <p className="text-lg text-gray-300">
-                        Manage global product categories for the platform
+                        {t("admin.categories.subtitle")}
                     </p>
                 </div>
                 <CreateCategoryDialog>
                     <Button className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-morpheus-gold-light hover:to-morpheus-gold-dark text-white shadow-lg">
                         <Plus className="h-4 w-4 mr-2" />
-                        Add Category
+                        {t("admin.categories.addCategory")}
                     </Button>
                 </CreateCategoryDialog>
             </div>
@@ -94,7 +97,7 @@ export function CategoryManagement() {
                                 <Tag className="h-5 w-5 text-morpheus-gold-light" />
                             </div>
                             <div>
-                                <p className="text-sm text-gray-400">Total Categories</p>
+                                <p className="text-sm text-gray-400">{t("admin.categories.totalCategories")}</p>
                                 <p className="text-2xl font-bold text-white">{categories?.length || 0}</p>
                             </div>
                         </div>
@@ -108,7 +111,7 @@ export function CategoryManagement() {
                                 <Package className="h-5 w-5 text-green-400" />
                             </div>
                             <div>
-                                <p className="text-sm text-gray-400">Categories in Use</p>
+                                <p className="text-sm text-gray-400">{t("admin.categories.categoriesInUse")}</p>
                                 <p className="text-2xl font-bold text-white">
                                     {categories?.filter(cat => getProductCount(cat) > 0).length || 0}
                                 </p>
@@ -124,7 +127,7 @@ export function CategoryManagement() {
                                 <Search className="h-5 w-5 text-blue-400" />
                             </div>
                             <div>
-                                <p className="text-sm text-gray-400">Search Results</p>
+                                <p className="text-sm text-gray-400">{t("admin.categories.searchResults")}</p>
                                 <p className="text-2xl font-bold text-white">{filteredCategories.length}</p>
                             </div>
                         </div>
@@ -136,7 +139,7 @@ export function CategoryManagement() {
             <div className="relative max-w-md">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <Input
-                    placeholder="Search categories..."
+                    placeholder={t("admin.categories.searchPlaceholder")}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-10 bg-morpheus-blue-dark/30 border-slate-600 text-white placeholder-gray-400"
@@ -149,12 +152,12 @@ export function CategoryManagement() {
                 <div className="text-center py-12">
                     <Tag className="h-16 w-16 text-gray-400 mx-auto mb-4" />
                     <h3 className="text-xl font-medium text-white mb-2">
-                        {searchTerm ? "No categories match your search" : "No categories found"}
+                        {searchTerm ? t("admin.categories.noMatchingCategories") : t("admin.categories.noCategoriesFound")}
                     </h3>
                     <p className="text-gray-300">
-                        {searchTerm 
-                            ? "Try adjusting your search criteria"
-                            : "Start by adding your first category to the system."
+                        {searchTerm
+                            ? t("admin.categories.adjustSearchCriteria")
+                            : t("admin.categories.addFirstCategory")
                         }
                     </p>
                 </div>
@@ -178,7 +181,7 @@ export function CategoryManagement() {
                                             {isInUse && (
                                                 <Badge className="px-2 py-1 text-xs font-medium flex items-center gap-1 border text-green-400 bg-green-400/10 border-green-400/20">
                                                     <Package className="h-3 w-3" />
-                                                    {productCount} products
+                                                    {productCount} {t("admin.categories.products")}
                                                 </Badge>
                                             )}
                                         </div>
@@ -188,19 +191,19 @@ export function CategoryManagement() {
                                 <CardContent className="space-y-3">
                                     <div className="space-y-2 text-sm">
                                         <div>
-                                            <span className="text-gray-400">Code:</span>
+                                            <span className="text-gray-400">{t("admin.categories.code")}:</span>
                                             <p className="text-white font-medium">{category.xcategprodcode}</p>
                                         </div>
                                         <div>
-                                            <span className="text-gray-400">Description:</span>
+                                            <span className="text-gray-400">{t("admin.categories.description")}:</span>
                                             <p className="text-white text-sm leading-relaxed">
                                                 {category.xcategprodinfobulle}
                                             </p>
                                         </div>
                                         <div>
-                                            <span className="text-gray-400">Status:</span>
+                                            <span className="text-gray-400">{t("admin.categories.status")}:</span>
                                             <p className={`font-medium ${isInUse ? "text-green-400" : "text-gray-400"}`}>
-                                                {isInUse ? `Active (${productCount} products)` : "Unused"}
+                                                {isInUse ? `${t("admin.categories.active")} (${productCount} ${t("admin.categories.products")})` : t("admin.categories.unused")}
                                             </p>
                                         </div>
                                     </div>
@@ -213,7 +216,7 @@ export function CategoryManagement() {
                                                 className="flex-1 border-slate-600 text-white hover:bg-slate-700/50"
                                             >
                                                 <Edit className="h-4 w-4 mr-1" />
-                                                Edit
+                                                {t("common.edit")}
                                             </Button>
                                         </UpdateCategoryDialog>
                                         <Tooltip>
@@ -234,9 +237,9 @@ export function CategoryManagement() {
                                                 </span>
                                             </TooltipTrigger>
                                             <TooltipContent>
-                                                <p>{isInUse 
-                                                    ? `Cannot delete: category is used by ${productCount} product${productCount !== 1 ? 's' : ''}` 
-                                                    : "Delete category"
+                                                <p>{isInUse
+                                                    ? `${t("admin.categories.cannotDelete")}: ${t("admin.categories.categoryUsedBy")} ${productCount} ${t("admin.categories.product")}${productCount !== 1 ? 's' : ''}`
+                                                    : t("admin.categories.deleteCategory")
                                                 }</p>
                                             </TooltipContent>
                                         </Tooltip>

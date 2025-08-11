@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useLanguage } from "@/hooks/useLanguage";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -42,6 +43,7 @@ interface VariantCardProps {
 }
 
 function VariantCard({ variant, onApprove, onReject, isLoading, eventStartDate, eventEndDate }: VariantCardProps) {
+    const { t } = useLanguage();
     const [showPromotionForm, setShowPromotionForm] = useState(false);
     const [promotionPrice, setPromotionPrice] = useState(variant.yvarprodprixpromotion || "");
     const [promotionStartDate, setPromotionStartDate] = useState(variant.yvarprodpromotiondatedeb || "");
@@ -60,7 +62,7 @@ function VariantCard({ variant, onApprove, onReject, isLoading, eventStartDate, 
         if (!promotionStartDate || !promotionEndDate) {
             return {
                 isValid: false,
-                error: "Both start and end dates are required when setting a promotion price"
+                error: t("admin.approvals.promotionDatesRequired")
             };
         }
 
@@ -70,7 +72,7 @@ function VariantCard({ variant, onApprove, onReject, isLoading, eventStartDate, 
         if (endDate <= startDate) {
             return {
                 isValid: false,
-                error: "End date must be after start date"
+                error: t("admin.approvals.endDateAfterStart")
             };
         }
 
@@ -82,14 +84,14 @@ function VariantCard({ variant, onApprove, onReject, isLoading, eventStartDate, 
             if (startDate < eventStart || startDate > eventEnd) {
                 return {
                     isValid: false,
-                    error: "Promotion start date must be within the event period"
+                    error: t("admin.approvals.promotionStartWithinEvent")
                 };
             }
 
             if (endDate < eventStart || endDate > eventEnd) {
                 return {
                     isValid: false,
-                    error: "Promotion end date must be within the event period"
+                    error: t("admin.approvals.promotionEndWithinEvent")
                 };
             }
         }
@@ -177,21 +179,21 @@ function VariantCard({ variant, onApprove, onReject, isLoading, eventStartDate, 
                 return (
                     <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30">
                         <AlertTriangle className="h-3 w-3 mr-1" />
-                        Pending
+                        {t("admin.approvals.pending")}
                     </Badge>
                 );
             case "approved":
                 return (
                     <Badge variant="secondary" className="bg-green-500/20 text-green-300 border-green-500/30">
                         <CheckCircle className="h-3 w-3 mr-1" />
-                        Approved
+                        {t("admin.approvals.approved")}
                     </Badge>
                 );
             case "rejected":
                 return (
                     <Badge variant="secondary" className="bg-red-500/20 text-red-300 border-red-500/30">
                         <X className="h-3 w-3 mr-1" />
-                        Rejected
+                        {t("admin.approvals.rejected")}
                     </Badge>
                 );
             default:
@@ -215,7 +217,7 @@ function VariantCard({ variant, onApprove, onReject, isLoading, eventStartDate, 
                 {/* 3D Models */}
                 {models3d.length > 0 && (
                     <div className="space-y-1">
-                        <div className="text-xs text-purple-400 font-medium">3D Models ({models3d.length})</div>
+                        <div className="text-xs text-purple-400 font-medium">{t("admin.approvals.models3D")} ({models3d.length})</div>
                         <div className="grid gap-2">
                             {models3d.map((modelUrl, index) => (
                                 <Model3DViewer
@@ -232,7 +234,7 @@ function VariantCard({ variant, onApprove, onReject, isLoading, eventStartDate, 
                 {/* Images */}
                 {images.length > 0 && (
                     <div className="space-y-1">
-                        <div className="text-xs text-blue-400 font-medium">Images ({images.length})</div>
+                        <div className="text-xs text-blue-400 font-medium">{t("admin.approvals.images")} ({images.length})</div>
                         <div className="grid gap-2">
                             {images.map((image) => (
                                 <div
@@ -264,7 +266,7 @@ function VariantCard({ variant, onApprove, onReject, isLoading, eventStartDate, 
                 {/* Videos */}
                 {videos.length > 0 && (
                     <div className="space-y-1">
-                        <div className="text-xs text-green-400 font-medium">Videos ({videos.length})</div>
+                        <div className="text-xs text-green-400 font-medium">{t("admin.approvals.videos")} ({videos.length})</div>
                         <div className="grid gap-2">
                             {videos.map((video) => (
                                 <div
@@ -309,28 +311,28 @@ function VariantCard({ variant, onApprove, onReject, isLoading, eventStartDate, 
                 {/* Variant Details */}
                 <div className="space-y-2 text-xs">
                     <div className="flex justify-between">
-                        <span className="text-gray-400">Price:</span>
+                        <span className="text-gray-400">{t("admin.approvals.price")}:</span>
                         <span className="text-white">
                             {variant.yvarprodprixcatalogue
                                 ? `${variant.yvarprodprixcatalogue} ${variant.xdevise?.xdevisecodealpha || ""}`
-                                : "Not set"}
+                                : t("admin.approvals.notSet")}
                         </span>
                     </div>
                     <div className="flex justify-between">
-                        <span className="text-gray-400">Delivery:</span>
-                        <span className="text-white">{variant.yvarprodnbrjourlivraison || 0} days</span>
+                        <span className="text-gray-400">{t("admin.approvals.delivery")}:</span>
+                        <span className="text-white">{variant.yvarprodnbrjourlivraison || 0} {t("admin.approvals.days")}</span>
                     </div>
                     {variant.yvarprodprixpromotion && (
                         <>
                             <div className="flex justify-between">
-                                <span className="text-gray-400">Promo:</span>
+                                <span className="text-gray-400">{t("admin.approvals.promo")}:</span>
                                 <span className="text-green-400">
                                     {variant.yvarprodprixpromotion} {variant.xdevise?.xdevisecodealpha || ""}
                                 </span>
                             </div>
                             {(variant.yvarprodpromotiondatedeb || variant.yvarprodpromotiondatefin) && (
                                 <div className="flex justify-between">
-                                    <span className="text-gray-400">Promo Period:</span>
+                                    <span className="text-gray-400">{t("admin.approvals.promoPeriod")}:</span>
                                     <span className="text-green-400 text-xs">
                                         {variant.yvarprodpromotiondatedeb && new Date(variant.yvarprodpromotiondatedeb).toLocaleDateString()}
                                         {variant.yvarprodpromotiondatedeb && variant.yvarprodpromotiondatefin && " - "}
@@ -377,30 +379,30 @@ function VariantCard({ variant, onApprove, onReject, isLoading, eventStartDate, 
                     <div className="space-y-3 pt-2 border-t border-gray-700">
                         <div className="flex items-center gap-2">
                             <Settings className="h-4 w-4 text-blue-400" />
-                            <span className="text-sm font-medium text-blue-400">Pricing & Promotion Settings</span>
+                            <span className="text-sm font-medium text-blue-400">{t("admin.approvals.pricingPromotionSettings")}</span>
                         </div>
                         <div className="space-y-2">
                             <div className="grid grid-cols-2 gap-2">
                                 <div>
-                                    <Label className="text-xs text-gray-400">Catalog Price *</Label>
+                                    <Label className="text-xs text-gray-400">{t("admin.approvals.catalogPriceRequired")}</Label>
                                     <Input
                                         type="number"
                                         step="0.01"
                                         value={catalogPrice}
                                         onChange={(e) => setCatalogPrice(e.target.value)}
                                         className="h-8 text-xs bg-gray-800 border-gray-600 text-white"
-                                        placeholder="Required catalog price"
+                                        placeholder={t("admin.approvals.requiredCatalogPrice")}
                                         required
                                     />
                                 </div>
                                 <div>
-                                    <Label className="text-xs text-gray-400">Currency</Label>
+                                    <Label className="text-xs text-gray-400">{t("admin.approvals.currency")}</Label>
                                     <Select
                                         value={selectedCurrencyId?.toString() || ""}
                                         onValueChange={(value) => setSelectedCurrencyId(parseInt(value))}
                                     >
                                         <SelectTrigger className="h-8 text-xs bg-gray-800 border-gray-600 text-white">
-                                            <SelectValue placeholder="Select currency" />
+                                            <SelectValue placeholder={t("admin.approvals.selectCurrency")} />
                                         </SelectTrigger>
                                         <SelectContent className="bg-gray-800 border-gray-600">
                                             {currencies?.map((currency) => (
@@ -417,19 +419,19 @@ function VariantCard({ variant, onApprove, onReject, isLoading, eventStartDate, 
                                 </div>
                             </div>
                             <div>
-                                <Label className="text-xs text-gray-400">Promotion Price</Label>
+                                <Label className="text-xs text-gray-400">{t("admin.approvals.promotionPrice")}</Label>
                                 <Input
                                     type="number"
                                     step="0.01"
                                     value={promotionPrice}
                                     onChange={(e) => setPromotionPrice(e.target.value)}
                                     className="h-8 text-xs bg-gray-800 border-gray-600 text-white"
-                                    placeholder="Optional promotion price"
+                                    placeholder={t("admin.approvals.optionalPromotionPrice")}
                                 />
                             </div>
                             <div className="grid grid-cols-2 gap-2">
                                 <div>
-                                    <Label className="text-xs text-gray-400">Start Date</Label>
+                                    <Label className="text-xs text-gray-400">{t("admin.approvals.startDate")}</Label>
                                     <Input
                                         type="datetime-local"
                                         value={promotionStartDate}
@@ -440,7 +442,7 @@ function VariantCard({ variant, onApprove, onReject, isLoading, eventStartDate, 
                                     />
                                 </div>
                                 <div>
-                                    <Label className="text-xs text-gray-400">End Date</Label>
+                                    <Label className="text-xs text-gray-400">{t("admin.approvals.endDate")}</Label>
                                     <Input
                                         type="datetime-local"
                                         value={promotionEndDate}
@@ -466,7 +468,7 @@ function VariantCard({ variant, onApprove, onReject, isLoading, eventStartDate, 
                                 className="w-full h-8 border-blue-600 text-blue-400 hover:bg-blue-900/50 text-xs"
                             >
                                 <Settings className="h-3 w-3 mr-1" />
-                                Set Price & Promotion
+                                {t("admin.approvals.setPricePromotion")}
                             </Button>
                         )}
                         {/* Validation Error Display */}
@@ -499,7 +501,7 @@ function VariantCard({ variant, onApprove, onReject, isLoading, eventStartDate, 
                                 className="flex-1 h-8 bg-green-600 hover:bg-green-700 text-white text-xs disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 <CheckCircle className="h-3 w-3 mr-1" />
-                                Approve
+                                {t("admin.approvals.approve")}
                             </Button>
                             <Button
                                 size="sm"
@@ -509,7 +511,7 @@ function VariantCard({ variant, onApprove, onReject, isLoading, eventStartDate, 
                                 className="flex-1 h-8 border-red-600 text-red-400 hover:bg-red-900/50 text-xs"
                             >
                                 <X className="h-3 w-3 mr-1" />
-                                Reject
+                                {t("admin.approvals.reject")}
                             </Button>
                         </div>
                         {showPromotionForm && (
@@ -519,7 +521,7 @@ function VariantCard({ variant, onApprove, onReject, isLoading, eventStartDate, 
                                 onClick={() => setShowPromotionForm(false)}
                                 className="w-full h-6 text-xs text-gray-400 hover:text-white"
                             >
-                                Cancel
+                                {t("common.cancel")}
                             </Button>
                         )}
                     </div>
@@ -536,6 +538,7 @@ interface ApprovalFormProps {
 }
 
 export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) {
+    const { t } = useLanguage();
     const { data: user } = useAuth();
     const isAdmin = user?.app_metadata?.roles?.includes("admin");
     
@@ -702,21 +705,21 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                 return (
                     <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30">
                         <AlertTriangle className="h-4 w-4 mr-1" />
-                        Pending Approval
+                        {t("admin.approvals.pendingApproval")}
                     </Badge>
                 );
             case "approved":
                 return (
                     <Badge variant="secondary" className="bg-green-500/20 text-green-300 border-green-500/30">
                         <CheckCircle className="h-4 w-4 mr-1" />
-                        Approved
+                        {t("admin.approvals.approved")}
                     </Badge>
                 );
             case "rejected":
                 return (
                     <Badge variant="secondary" className="bg-red-500/20 text-red-300 border-red-500/30">
                         <X className="h-4 w-4 mr-1" />
-                        Rejected
+                        {t("admin.approvals.rejected")}
                     </Badge>
                 );
             default:
@@ -727,7 +730,7 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
     if (productLoading) {
         return (
             <Dialog open={isOpen} onOpenChange={onClose}>
-                <DialogTitle className="text-lg text-white">Loading Product Approval...</DialogTitle>
+                <DialogTitle className="text-lg text-white">{t("admin.approvals.loadingProductApproval")}</DialogTitle>
                 <DialogContent className="max-w-6xl max-h-[90vh] bg-gray-900 border-gray-700">
                     <div className="flex items-center justify-center py-12">
                         <Loader2 className="h-8 w-8 animate-spin text-blue-400" />
@@ -748,7 +751,7 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                     <div className="flex items-center justify-between">
                         <div>
                             <DialogTitle className="text-xl text-white">
-                                Product Approval: {product.yprodintitule}
+                                {t("admin.approvals.productApproval")}: {product.yprodintitule}
                             </DialogTitle>
                             <p className="text-sm text-gray-400 font-mono mt-1">{product.yprodcode}</p>
                         </div>
@@ -766,20 +769,20 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                     <CardHeader>
                                         <CardTitle className="text-white text-lg flex items-center gap-2">
                                             <Package className="h-5 w-5" />
-                                            Product Information
+                                            {t("admin.approvals.productInformation")}
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent className="space-y-4">
                                         <div>
-                                            <Label className="text-gray-300 text-sm">Product Name</Label>
+                                            <Label className="text-gray-300 text-sm">{t("admin.approvals.productName")}</Label>
                                             <div className="text-white font-medium">{product.yprodintitule}</div>
                                         </div>
                                         <div>
-                                            <Label className="text-gray-300 text-sm">Product Code</Label>
+                                            <Label className="text-gray-300 text-sm">{t("admin.approvals.productCode")}</Label>
                                             <div className="text-white font-mono text-sm">{product.yprodcode}</div>
                                         </div>
                                         <div>
-                                            <Label className="text-gray-300 text-sm">Category</Label>
+                                            <Label className="text-gray-300 text-sm">{t("admin.approvals.category")}</Label>
                                             {product.yprodstatut === "not_approved" ? (
                                                 <Select
                                                     value={selectedCategoryId?.toString() || product.xcategprodidfk?.toString() || ""}
@@ -788,7 +791,7 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                                     }
                                                 >
                                                     <SelectTrigger className="h-8 text-xs bg-gray-800 border-gray-600 text-white">
-                                                        <SelectValue placeholder="Select category" />
+                                                        <SelectValue placeholder={t("admin.approvals.selectCategory")} />
                                                     </SelectTrigger>
                                                     <SelectContent className="bg-gray-800 border-gray-600">
                                                         {categories?.map((cat) => (
@@ -804,7 +807,7 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                                 </Select>
                                             ) : (
                                                 <div className="text-white">
-                                                    {category?.xcategprodintitule || "Unknown"}
+                                                    {category?.xcategprodintitule || t("admin.approvals.unknown")}
                                                 </div>
                                             )}
                                         </div>
@@ -812,7 +815,7 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                         {/* Infospotaction Selection (Admin Only) */}
                                         {isAdmin && product.yprodstatut === "not_approved" && (
                                             <div>
-                                                <Label className="text-gray-300 text-sm">Product Placement</Label>
+                                                <Label className="text-gray-300 text-sm">{t("admin.approvals.productPlacement")}</Label>
                                                 <Select
                                                     value={selectedInfospotactionId?.toString() || ""}
                                                     onValueChange={(value) =>
@@ -820,7 +823,7 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                                     }
                                                 >
                                                     <SelectTrigger className="h-8 text-xs bg-gray-800 border-gray-600 text-white">
-                                                        <SelectValue placeholder="Select product placement" />
+                                                        <SelectValue placeholder={t("admin.approvals.selectProductPlacement")} />
                                                     </SelectTrigger>
                                                     <SelectContent className="bg-gray-800 border-gray-600">
                                                         {infospotactions?.map((action) => (
@@ -838,15 +841,15 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                         )}
                                         
                                         <div>
-                                            <Label className="text-gray-300 text-sm">Technical Details</Label>
+                                            <Label className="text-gray-300 text-sm">{t("admin.approvals.technicalDetails")}</Label>
                                             <div className="text-gray-300 text-sm bg-gray-800 p-3 rounded border border-gray-600">
-                                                {product.yproddetailstech || "No technical details provided"}
+                                                {product.yproddetailstech || t("admin.approvals.noTechnicalDetails")}
                                             </div>
                                         </div>
                                         <div>
-                                            <Label className="text-gray-300 text-sm">Info Bubble</Label>
+                                            <Label className="text-gray-300 text-sm">{t("admin.approvals.infoBubble")}</Label>
                                             <div className="text-gray-300 text-sm bg-gray-800 p-3 rounded border border-gray-600">
-                                                {product.yprodinfobulle || "No info bubble provided"}
+                                                {product.yprodinfobulle || t("admin.approvals.noInfoBubble")}
                                             </div>
                                         </div>
                                     </CardContent>
@@ -857,7 +860,7 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                     <CardHeader>
                                         <CardTitle className="text-white text-lg flex items-center gap-2">
                                             <MapPin className="h-5 w-5" />
-                                            Context Information
+                                            {t("admin.approvals.contextInformation")}
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent className="space-y-4">
@@ -865,7 +868,7 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                             <div className="flex items-center gap-3">
                                                 <User className="h-4 w-4 text-gray-400" />
                                                 <div>
-                                                    <Label className="text-gray-300 text-sm">Designer</Label>
+                                                    <Label className="text-gray-300 text-sm">{t("admin.approvals.designer")}</Label>
                                                     <div className="text-white">
                                                         {designer.ydesignnom} ({designer.ydesignmarque})
                                                     </div>
@@ -876,7 +879,7 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                             <div className="flex items-center gap-3">
                                                 <Store className="h-4 w-4 text-gray-400" />
                                                 <div>
-                                                    <Label className="text-gray-300 text-sm">Store</Label>
+                                                    <Label className="text-gray-300 text-sm">{t("admin.approvals.store")}</Label>
                                                     <div className="text-white">
                                                         {store.yboutiqueintitule || store.yboutiquecode}
                                                     </div>
@@ -887,7 +890,7 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                             <div className="flex items-center gap-3">
                                                 <MapPin className="h-4 w-4 text-gray-400" />
                                                 <div>
-                                                    <Label className="text-gray-300 text-sm">Mall</Label>
+                                                    <Label className="text-gray-300 text-sm">{t("admin.approvals.mall")}</Label>
                                                     <div className="text-white">{mall.ymallintitule}</div>
                                                 </div>
                                             </div>
@@ -896,10 +899,10 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                             <div className="flex items-center gap-3">
                                                 <Calendar className="h-4 w-4 text-gray-400" />
                                                 <div>
-                                                    <Label className="text-gray-300 text-sm">Event</Label>
+                                                    <Label className="text-gray-300 text-sm">{t("admin.approvals.event")}</Label>
                                                     <div className="text-white">{event.yeventintitule}</div>
                                                     <div className="text-gray-400 text-xs">
-                                                        {event.yeventdatedeb} to {event.yeventdatefin}
+                                                        {event.yeventdatedeb} {t("admin.approvals.to")} {event.yeventdatefin}
                                                     </div>
                                                 </div>
                                             </div>
@@ -910,7 +913,7 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                 {/* Variant Summary */}
                                 <Card className="bg-gray-800/50 border-gray-700">
                                     <CardHeader>
-                                        <CardTitle className="text-white text-lg">Variant Summary</CardTitle>
+                                        <CardTitle className="text-white text-lg">{t("admin.approvals.variantSummary")}</CardTitle>
                                     </CardHeader>
                                     <CardContent>
                                         <div className="grid grid-cols-3 gap-4 text-center">
@@ -918,19 +921,19 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                                 <div className="text-2xl font-bold text-yellow-400">
                                                     {pendingVariants.length}
                                                 </div>
-                                                <div className="text-xs text-gray-400">Pending</div>
+                                                <div className="text-xs text-gray-400">{t("admin.approvals.pending")}</div>
                                             </div>
                                             <div>
                                                 <div className="text-2xl font-bold text-green-400">
                                                     {approvedVariants.length}
                                                 </div>
-                                                <div className="text-xs text-gray-400">Approved</div>
+                                                <div className="text-xs text-gray-400">{t("admin.approvals.approved")}</div>
                                             </div>
                                             <div>
                                                 <div className="text-2xl font-bold text-red-400">
                                                     {rejectedVariants.length}
                                                 </div>
-                                                <div className="text-xs text-gray-400">Rejected</div>
+                                                <div className="text-xs text-gray-400">{t("admin.approvals.rejected")}</div>
                                             </div>
                                         </div>
                                     </CardContent>
@@ -944,7 +947,7 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                         <div className="p-6">
                             <div className="flex items-center justify-between mb-4">
                                 <h3 className="text-lg font-semibold text-white">
-                                    Product Variants ({product.yvarprod?.length || 0})
+                                    {t("admin.approvals.productVariants")} ({product.yvarprod?.length || 0})
                                 </h3>
                                 {pendingVariants.length > 0 && (
                                     <Button
@@ -954,7 +957,7 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                         className="bg-green-600 hover:bg-green-700 text-white"
                                     >
                                         <CheckCircle className="h-4 w-4 mr-2" />
-                                        Approve All ({pendingVariants.length})
+                                        {t("admin.approvals.approveAll")} ({pendingVariants.length})
                                     </Button>
                                 )}
                             </div>
@@ -988,7 +991,7 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                         disabled={isLoading || variantLoading}
                         className="border-gray-600 text-gray-300 hover:bg-gray-800/50"
                     >
-                        Cancel
+                        {t("common.cancel")}
                     </Button>
                     <Button
                         type="button"
@@ -998,7 +1001,7 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                         className="border-red-600 text-red-400 hover:bg-red-900/50"
                     >
                         <X className="h-4 w-4 mr-2" />
-                        Reject Product
+                        {t("admin.approvals.rejectProduct")}
                     </Button>
                     <Button
                         type="button"
@@ -1009,12 +1012,12 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                         {isLoading || variantLoading ? (
                             <div className="flex items-center gap-2">
                                 <Loader2 className="h-4 w-4 animate-spin" />
-                                Processing...
+                                {t("admin.approvals.processing")}
                             </div>
                         ) : (
                             <>
                                 <CheckCircle className="h-4 w-4 mr-2" />
-                                Approve Product
+                                {t("admin.approvals.approveProduct")}
                             </>
                         )}
                     </Button>

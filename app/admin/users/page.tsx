@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useLanguage } from "@/hooks/useLanguage"
 import { useUsers } from "./_hooks/use-users"
 import { DataTable } from "@/components/data-table"
 import { ColumnDef } from "@tanstack/react-table"
@@ -22,6 +23,7 @@ interface UserRow {
 }
 
 export default function UsersPage() {
+  const { t } = useLanguage()
   const [selectedUser, setSelectedUser] = useState<UserRow | null>(null)
   const [dialogOpen, setDialogOpen] = useState(false)
   
@@ -45,7 +47,7 @@ export default function UsersPage() {
   const columns: ColumnDef<UserRow>[] = [
     {
       accessorKey: "email",
-      header: "Email",
+      header: t("admin.users.email"),
       cell: ({ row }) => (
         <div>
           <div className="font-medium">{row.original.email}</div>
@@ -57,7 +59,7 @@ export default function UsersPage() {
     },
     {
       accessorKey: "roles",
-      header: "Roles",
+      header: t("admin.users.roles"),
       cell: ({ row }) => (
         <div className="flex gap-1 flex-wrap">
           {row.original.roles.map((role) => (
@@ -69,7 +71,7 @@ export default function UsersPage() {
               {role === 'admin' && <Shield className="w-3 h-3 mr-1" />}
               {role === 'store_admin' && <UserPlus className="w-3 h-3 mr-1" />}
               {role === 'user' && <User className="w-3 h-3 mr-1" />}
-              {role === 'store_admin' ? 'Designer' : role}
+              {role === 'store_admin' ? t("admin.users.designer") : role === 'admin' ? t("admin.users.admin") : t("admin.users.user")}
             </Badge>
           ))}
         </div>
@@ -77,7 +79,7 @@ export default function UsersPage() {
     },
     {
       accessorKey: "created_at",
-      header: "Created",
+      header: t("admin.users.createdAt"),
       cell: ({ row }) => (
         <div className="text-sm">
           {new Date(row.original.created_at).toLocaleDateString()}
@@ -86,19 +88,19 @@ export default function UsersPage() {
     },
     {
       accessorKey: "last_sign_in_at",
-      header: "Last Sign In",
+      header: t("admin.users.lastSignIn"),
       cell: ({ row }) => (
         <div className="text-sm">
           {row.original.last_sign_in_at 
             ? new Date(row.original.last_sign_in_at).toLocaleDateString()
-            : 'Never'
+            : t("admin.users.never")
           }
         </div>
       )
     },
     {
       id: "actions",
-      header: "Actions",
+      header: t("admin.users.actions"),
       cell: ({ row }) => {
         const hasOnlyUserRole = row.original.roles.length === 1 && row.original.roles[0] === 'user'
         
@@ -111,7 +113,7 @@ export default function UsersPage() {
                 onClick={() => handleAssignDesigner(row.original)}
               >
                 <UserPlus className="w-4 h-4 mr-1" />
-                Make Designer
+                {t("admin.users.makeDesigner")}
               </Button>
             )}
           </div>
@@ -121,18 +123,18 @@ export default function UsersPage() {
   ]
 
   const roleOptions = [
-    { value: '', label: 'All Roles' },
-    { value: 'user', label: 'User' },
-    { value: 'store_admin', label: 'Designer' },
-    { value: 'admin', label: 'Admin' }
+    { value: '', label: t("admin.users.allRoles") },
+    { value: 'user', label: t("admin.users.user") },
+    { value: 'store_admin', label: t("admin.users.designer") },
+    { value: 'admin', label: t("admin.users.admin") }
   ]
 
   return (
     <div className="container mx-auto py-6">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold">User Management</h1>
+        <h1 className="text-3xl font-bold">{t("admin.users.title")}</h1>
         <p className="text-muted-foreground mt-2">
-          Manage users and assign designer roles
+          {t("admin.users.subtitle")}
         </p>
       </div>
 
@@ -147,7 +149,7 @@ export default function UsersPage() {
             value={roleFilter}
             onValueChange={(value) => setRoleFilter(value as string)}
             options={roleOptions}
-            placeholder="Filter by role"
+            placeholder={t("admin.users.filterByRole")}
             className="w-48"
           />
         }

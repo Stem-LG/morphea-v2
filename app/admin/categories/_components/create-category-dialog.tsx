@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useLanguage } from "@/hooks/useLanguage";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -29,6 +30,7 @@ interface CreateCategoryDialogProps {
 }
 
 export function CreateCategoryDialog({ children }: CreateCategoryDialogProps) {
+    const { t } = useLanguage();
     const [isOpen, setIsOpen] = useState(false);
     const [formData, setFormData] = useState<CategoryFormData>({
         xcategprodintitule: "",
@@ -56,7 +58,7 @@ export function CreateCategoryDialog({ children }: CreateCategoryDialogProps) {
         e.preventDefault();
         
         if (!validateForm()) {
-            toast.error("Please fill in all required fields");
+            toast.error(t("admin.categories.fillRequiredFields"));
             return;
         }
 
@@ -64,10 +66,10 @@ export function CreateCategoryDialog({ children }: CreateCategoryDialogProps) {
             await createCategoryMutation.mutateAsync(formData);
             resetForm();
             setIsOpen(false);
-            toast.success("Category created successfully");
+            toast.success(t("admin.categories.categoryCreatedSuccess"));
         } catch (error) {
             console.error('Failed to create category:', error);
-            const errorMessage = error instanceof Error ? error.message : 'Failed to create category';
+            const errorMessage = error instanceof Error ? error.message : t("admin.categories.failedToCreateCategory");
             toast.error(errorMessage);
         }
     };
@@ -86,7 +88,7 @@ export function CreateCategoryDialog({ children }: CreateCategoryDialogProps) {
                 <CredenzaHeader>
                     <CredenzaTitle className="text-white flex items-center gap-2">
                         <Tag className="h-5 w-5 text-morpheus-gold-light" />
-                        Add New Category
+                        {t("admin.categories.addNewCategory")}
                     </CredenzaTitle>
                 </CredenzaHeader>
 
@@ -94,23 +96,23 @@ export function CreateCategoryDialog({ children }: CreateCategoryDialogProps) {
                     <CredenzaBody className="space-y-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <Label className="text-gray-300">Category Name *</Label>
+                                <Label className="text-gray-300">{t("admin.categories.categoryName")} *</Label>
                                 <Input
                                     value={formData.xcategprodintitule}
                                     onChange={(e) => setFormData(prev => ({ ...prev, xcategprodintitule: e.target.value }))}
                                     className="bg-morpheus-blue-dark/30 border-slate-600 text-white"
-                                    placeholder="e.g., Electronics"
+                                    placeholder={t("admin.categories.categoryNamePlaceholder")}
                                     required
                                     disabled={createCategoryMutation.isPending}
                                 />
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-gray-300">Category Code *</Label>
+                                <Label className="text-gray-300">{t("admin.categories.categoryCode")} *</Label>
                                 <Input
                                     value={formData.xcategprodcode}
                                     onChange={(e) => setFormData(prev => ({ ...prev, xcategprodcode: e.target.value.toUpperCase() }))}
                                     className="bg-morpheus-blue-dark/30 border-slate-600 text-white"
-                                    placeholder="e.g., ELEC"
+                                    placeholder={t("admin.categories.categoryCodePlaceholder")}
                                     required
                                     disabled={createCategoryMutation.isPending}
                                 />
@@ -118,12 +120,12 @@ export function CreateCategoryDialog({ children }: CreateCategoryDialogProps) {
                         </div>
                         
                         <div className="space-y-2">
-                            <Label className="text-gray-300">Description *</Label>
+                            <Label className="text-gray-300">{t("admin.categories.description")} *</Label>
                             <Textarea
                                 value={formData.xcategprodinfobulle}
                                 onChange={(e) => setFormData(prev => ({ ...prev, xcategprodinfobulle: e.target.value }))}
                                 className="bg-morpheus-blue-dark/30 border-slate-600 text-white"
-                                placeholder="Describe this category..."
+                                placeholder={t("admin.categories.descriptionPlaceholder")}
                                 rows={3}
                                 required
                                 disabled={createCategoryMutation.isPending}
@@ -140,7 +142,7 @@ export function CreateCategoryDialog({ children }: CreateCategoryDialogProps) {
                             className="flex-1 border-slate-600 text-gray-300 hover:bg-slate-700/50"
                         >
                             <X className="h-4 w-4 mr-2" />
-                            Cancel
+                            {t("common.cancel")}
                         </Button>
                         <Button
                             type="submit"
@@ -148,7 +150,7 @@ export function CreateCategoryDialog({ children }: CreateCategoryDialogProps) {
                             className="flex-1 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white"
                         >
                             <Save className="h-4 w-4 mr-2" />
-                            {createCategoryMutation.isPending ? 'Creating...' : 'Create Category'}
+                            {createCategoryMutation.isPending ? t("admin.categories.creating") : t("admin.categories.createCategory")}
                         </Button>
                     </CredenzaFooter>
                 </form>
