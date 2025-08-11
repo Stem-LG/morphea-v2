@@ -69,19 +69,18 @@ export function useUpdateProduct() {
                     throw new Error(`Failed to update product: ${productError.message}`);
                 }
 
-                // Step 1.5: Update infospotaction in ydetailsevent if provided
-                if (productData.infospotactionId !== undefined && productData.eventId) {
-                    const { error: detailsEventError } = await supabase
+                // Step 1.5: Update infospotaction in product if provided
+                if (productData.infospotactionId !== undefined) {
+                    const { error: infospotActionError } = await supabase
                         .schema("morpheus")
-                        .from("ydetailsevent")
+                        .from("yprod")
                         .update({
-                            yinfospotactionId: productData.infospotactionId.toString(),
+                            yinfospotactionsidfk: productData.infospotactionId,
                         })
-                        .eq("yprodidfk", productData.productId)
-                        .eq("yeventidfk", productData.eventId);
+                        .eq("yprodid", productData.productId);
 
-                    if (detailsEventError) {
-                        console.warn(`Failed to update infospotaction: ${detailsEventError.message}`);
+                    if (infospotActionError) {
+                        console.warn(`Failed to update infospotaction: ${infospotActionError.message}`);
                     }
                 }
 

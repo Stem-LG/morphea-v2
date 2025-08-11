@@ -80,8 +80,8 @@ export function useFilteredStores({ eventId, mallId, userRole, userId }: Filtere
             assignments.forEach(assignment => {
               if (assignment.yboutiqueidfk && assignment.ydesign) {
                 designerMap.set(assignment.yboutiqueidfk, {
-                  designer_name: assignment.ydesign.ydesignnom,
-                  designer_contact: assignment.ydesign.ydesigncontactemail
+                  designer_name: (assignment.ydesign as any).ydesignnom,
+                  designer_contact: (assignment.ydesign as any).ydesigncontactemail
                 });
               }
             });

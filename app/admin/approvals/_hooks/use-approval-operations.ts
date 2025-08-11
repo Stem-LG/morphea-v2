@@ -48,17 +48,17 @@ export function useApprovalOperations() {
                 throw new Error(updateError.message || 'Failed to update product status');
             }
 
-            // Update infospotaction in ydetailsevent if provided
+            // Update infospotaction in product if provided
             if (approvalData.infoactionId) {
                 const { error: detailsError } = await supabase
                     .schema('morpheus')
-                    .from('ydetailsevent')
+                    .from('yprod')
                     .update({
-                        yinfospotactionId: approvalData.infoactionId.toString(),
+                        yinfospotactionsidfk: approvalData.infoactionId,
                         sysdate: currentTime,
                         sysaction: 'update'
                     })
-                    .eq('yprodidfk', productId);
+                    .eq('yprodid', productId);
 
                 if (detailsError) {
                     throw new Error(detailsError.message || 'Failed to update product placement');

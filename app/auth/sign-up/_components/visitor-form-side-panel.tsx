@@ -83,16 +83,16 @@ export function VisitorFormSidePanel({ onDataChange, initialData }: VisitorFormS
                 <CardHeader className="pb-4">
                     <CardTitle className="text-xl font-bold text-morpheus-gold-light flex items-center gap-2">
                         <Users className="w-5 h-5" />
-                        Additional Information
+                        {t("visitorForm.additionalInfo")}
                     </CardTitle>
-                    <p className="text-gray-300 text-sm">Help us know you better</p>
+                    <p className="text-gray-300 text-sm">{t("visitorForm.helpUsKnowYouBetter")}</p>
                 </CardHeader>
                 <CardContent className="space-y-6">
                     {/* Contact Information */}
                     <div className="space-y-4">
                         <div className="space-y-2">
                             <Label htmlFor="phone" className="text-white text-sm font-medium">
-                                Téléphone
+                                {t("visitorForm.phone")}
                             </Label>
                             <Input
                                 id="phone"
@@ -100,13 +100,13 @@ export function VisitorFormSidePanel({ onDataChange, initialData }: VisitorFormS
                                 value={formData.phone}
                                 onChange={(e) => handleInputChange("phone", e.target.value)}
                                 className="bg-slate-700 border-slate-600 text-white placeholder:text-gray-400 h-10 text-sm focus:border-morpheus-gold-light focus:ring-morpheus-gold-light rounded-none"
-                                placeholder="Entrez votre numéro de téléphone"
+                                placeholder={t("visitorForm.phonePlaceholder")}
                             />
                         </div>
 
                         <div className="space-y-2">
                             <Label htmlFor="address" className="text-white text-sm font-medium">
-                                Adresse
+                                {t("visitorForm.address")}
                             </Label>
                             <Input
                                 id="address"
@@ -114,7 +114,7 @@ export function VisitorFormSidePanel({ onDataChange, initialData }: VisitorFormS
                                 value={formData.address}
                                 onChange={(e) => handleInputChange("address", e.target.value)}
                                 className="bg-slate-700 border-slate-600 text-white placeholder:text-gray-400 h-10 text-sm focus:border-morpheus-gold-light focus:ring-morpheus-gold-light rounded-none"
-                                placeholder="Entrez votre adresse"
+                                placeholder={t("visitorForm.addressPlaceholder")}
                             />
                         </div>
                     </div>
@@ -122,26 +122,26 @@ export function VisitorFormSidePanel({ onDataChange, initialData }: VisitorFormS
                     {/* Visitor Types */}
                     <div className="space-y-4">
                         <div>
-                            <Label className="text-white text-sm font-medium">Vos intérêts</Label>
-                            <p className="text-gray-400 text-xs mt-1">{"Sélectionnez tout ce qui s'applique"}</p>
+                            <Label className="text-white text-sm font-medium">{t("visitorForm.visitorTypes")}</Label>
+                            <p className="text-gray-400 text-xs mt-1">{t("visitorForm.selectAllThatApply")}</p>
                         </div>
 
                         <div className="grid grid-cols-1 gap-2 max-h-48 overflow-y-auto">
                             {[
-                                { key: "grandpublic", label: "Grand Public" },
-                                { key: "clientprive", label: "Client Privé" },
-                                { key: "acheteurluxe", label: "Acheteur de Luxe" },
-                                { key: "acheteurpro", label: "Acheteur Professionnel" },
-                                { key: "artisan", label: "Artisan" },
-                                { key: "createur", label: "Créateur/Designer" },
-                                { key: "collectionneur", label: "Collectionneur" },
-                                { key: "investisseur", label: "Investisseur" },
-                                { key: "influenceur", label: "Influenceur" },
-                                { key: "journaliste", label: "Journaliste" },
-                                { key: "pressespecialisee", label: "Presse Spécialisée" },
-                                { key: "culturel", label: "Professionnel Culturel" },
-                                { key: "vip", label: "VIP" },
-                            ].map(({ key, label }) => (
+                                "grandpublic",
+                                "clientprive",
+                                "acheteurluxe",
+                                "acheteurpro",
+                                "artisan",
+                                "createur",
+                                "collectionneur",
+                                "investisseur",
+                                "influenceur",
+                                "journaliste",
+                                "pressespecialisee",
+                                "culturel",
+                                "vip",
+                            ].map((key) => (
                                 <label
                                     key={key}
                                     className="flex items-center space-x-2 cursor-pointer p-2 rounded hover:bg-morpheus-blue-dark/30 transition-colors"
@@ -157,7 +157,7 @@ export function VisitorFormSidePanel({ onDataChange, initialData }: VisitorFormS
                                         }
                                         className="w-3 h-3 text-morpheus-gold-light bg-morpheus-blue-dark border-morpheus-gold-dark/30 rounded focus:ring-morpheus-gold-light focus:ring-1"
                                     />
-                                    <span className="text-gray-300 text-xs">{label}</span>
+                                    <span className="text-gray-300 text-xs">{t(`visitorForm.visitorTypeLabels.${key}`)}</span>
                                 </label>
                             ))}
                         </div>

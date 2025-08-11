@@ -15,6 +15,13 @@ export function useDesigner() {
                 throw new Error("User not authenticated");
             }
 
+            // Check if user is admin - admins don't have designer records
+            const isAdmin = user?.app_metadata?.roles?.includes("admin");
+            if (isAdmin) {
+                // Return null for admins - they don't have designer records
+                return null;
+            }
+
             const { data, error } = await supabase
                 .schema("morpheus")
                 .from("ydesign")
@@ -23,6 +30,10 @@ export function useDesigner() {
                 .single();
 
             if (error) {
+                // If no designer record found, return null instead of throwing error
+                if (error.code === 'PGRST116') {
+                    return null;
+                }
                 throw new Error(error.message);
             }
 

@@ -48,7 +48,7 @@ export function BoutiqueMultiSelect({
 
     // Group boutiques by mall
     const boutiquesByMall = boutiques.reduce((acc, boutique) => {
-        const mallName = boutique.ymall?.ymallintitule || "Unknown Mall";
+        const mallName = (boutique.ymall as any)?.ymallintitule || "Unknown Mall";
         if (!acc[mallName]) {
             acc[mallName] = [];
         }

@@ -45,7 +45,7 @@ export default function TourAdminViewer({
   const { infospots, loading: infospotsLoading, createInfospot, updateInfospot, deleteInfospot } = useInfospots()
   const { scenelinks, loading: scenelinksLoading, createSceneLink, updateSceneLink, deleteSceneLink } = useSceneLinks()
   const { actions, createAction } = useInfoactions()
-  const { data: stores, isLoading: storesLoading } = useStores()
+  const { data: stores } = useStores()
 
   const [currentScene, setCurrentScene] = useState<Scene | null>(null)
   const [isTransitioning, setIsTransitioning] = useState(false)

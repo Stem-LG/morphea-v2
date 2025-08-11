@@ -11,13 +11,37 @@ interface UseInfospotactionsParams {
 export function useInfospotactions({ boutiqueId, enabled = true }: UseInfospotactionsParams) {
     const supabase = createClient();
 
+    console.log("useInfospotactions called with:", { boutiqueId, enabled });
+
     return useQuery({
         queryKey: ["infospotactions", boutiqueId],
         queryFn: async () => {
-            if (!boutiqueId) return [];
+            console.log("useInfospotactions queryFn executing with boutiqueId:", boutiqueId);
+            
+            if (!boutiqueId) {
+                console.log("No boutiqueId provided, fetching all available infospotactions as fallback");
+                
+                // Fallback: Get all infospotactions from all scenes
+                const { data, error } = await supabase
+                    .schema("morpheus")
+                    .from("yinfospotactions")
+                    .select("*")
+                    .order("yinfospotactionstitle");
+
+                console.log("Fallback infospotactions query result:", { data, error });
+
+                if (error) {
+                    console.error("Error fetching fallback infospotactions:", error);
+                    throw new Error(error.message);
+                }
+
+                console.log("Final fallback infospot actions:", data || []);
+                return data || [];
+            }
 
             // Since yboutiqueidfk moved from yinfospotactions to yscenes,
             // we need to get actions through scenes -> infospots -> actions
+            console.log("Fetching scenes for boutiqueId:", boutiqueId);
             const { data, error } = await supabase
                 .schema("morpheus")
                 .from("yscenes")
@@ -28,6 +52,8 @@ export function useInfospotactions({ boutiqueId, enabled = true }: UseInfospotac
                 `)
                 .eq("yboutiqueidfk", boutiqueId);
 
+            console.log("Scenes query result:", { data, error, boutiqueId });
+
             if (error) {
                 console.error("Error fetching infospotactions:", error);
                 throw new Error(error.message);
@@ -36,8 +62,11 @@ export function useInfospotactions({ boutiqueId, enabled = true }: UseInfospotac
             // Flatten the nested structure to get unique actions
             const actions = new Map();
             data?.forEach(scene => {
+                console.log("Processing scene:", scene);
                 scene.yinfospots?.forEach((infospot: any) => {
+                    console.log("Processing infospot:", infospot);
                     if (infospot.yinfospotactions) {
+                        console.log("Found infospot action:", infospot.yinfospotactions);
                         actions.set(infospot.yinfospotactions.yinfospotactionsid, infospot.yinfospotactions);
                     }
                 });
@@ -48,8 +77,10 @@ export function useInfospotactions({ boutiqueId, enabled = true }: UseInfospotac
                 (a.yinfospotactionstitle || '').localeCompare(b.yinfospotactionstitle || '')
             );
 
+            console.log("Final infospot actions for boutique", boutiqueId, ":", actionsArray);
+
             return actionsArray;
         },
-        enabled: enabled && !!boutiqueId,
+        enabled: enabled,
     });
 }

@@ -799,6 +799,8 @@ export type Database = {
           xdeviseid: number
           xdeviseintitule: string
           xdevisenbrdec: number
+          xispivot: boolean
+          xtauxechange: number
         }
         Insert: {
           sysaction?: string | null
@@ -811,6 +813,8 @@ export type Database = {
           xdeviseid?: number
           xdeviseintitule: string
           xdevisenbrdec: number
+          xispivot?: boolean
+          xtauxechange?: number
         }
         Update: {
           sysaction?: string | null
@@ -823,6 +827,8 @@ export type Database = {
           xdeviseid?: number
           xdeviseintitule?: string
           xdevisenbrdec?: number
+          xispivot?: boolean
+          xtauxechange?: number
         }
         Relationships: []
       }
@@ -928,7 +934,7 @@ export type Database = {
           sysdate?: string | null
           sysuser?: string | null
           ycomptecreationdate: string
-          ycompteid: number
+          ycompteid?: number
           ycompteno: string
           ycomptestatut: string
           yuseridfk: string
@@ -1050,7 +1056,6 @@ export type Database = {
           ydesignidfk: number | null
           ydetailseventid: number
           yeventidfk: number
-          yinfospotactionId: number | null
           ymallidfk: number
           yprodidfk: number | null
         }
@@ -1063,7 +1068,6 @@ export type Database = {
           ydesignidfk?: number | null
           ydetailseventid?: number
           yeventidfk: number
-          yinfospotactionId?: number | null
           ymallidfk: number
           yprodidfk?: number | null
         }
@@ -1076,7 +1080,6 @@ export type Database = {
           ydesignidfk?: number | null
           ydetailseventid?: number
           yeventidfk?: number
-          yinfospotactionId?: number | null
           ymallidfk?: number
           yprodidfk?: number | null
         }
@@ -1101,13 +1104,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "yevent"
             referencedColumns: ["yeventid"]
-          },
-          {
-            foreignKeyName: "ydetailsevent_yinfospotactionId_fkey"
-            columns: ["yinfospotactionId"]
-            isOneToOne: false
-            referencedRelation: "yinfospotactions"
-            referencedColumns: ["yinfospotactionsid"]
           },
           {
             foreignKeyName: "ydetailsevent_ymallidfk_fkey"

@@ -30,6 +30,7 @@ interface DesignerSelectionDialogProps {
 
 interface Designer {
     ydesignid: number;
+    ydesigncode: string;
     ydesignnom: string;
     ydesignmarque: string;
     ydesignspecialite: string;
@@ -37,7 +38,7 @@ interface Designer {
     ydesigncontactemail: string;
     ydesigncontactpersonne: string;
     ydesigncontacttelephone: string;
-    isAssigned?: boolean;
+    isAssigned: boolean;
 }
 
 export function DesignerSelectionDialog({
