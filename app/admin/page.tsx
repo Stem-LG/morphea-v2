@@ -1,10 +1,11 @@
 "use client";
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Store, Package, BarChart3, TrendingUp, ShoppingBag, Loader2, AlertCircle } from "lucide-react";
+import { Store, Package, TrendingUp, ShoppingBag, Loader2, AlertCircle } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/hooks/useAuth";
 import { useDashboardStats } from "./_hooks/use-dashboard-stats";
+import { SceneAnalyticsChart } from "./_components/scene-analytics-chart";
 
 export default function DashboardContent() {
     const { t } = useLanguage();
@@ -96,18 +97,10 @@ export default function DashboardContent() {
                 </Card>
             </div>
 
-            {/* Recent Activity - Placeholder */}
+            {/* Scene Analytics */}
             <div>
-                <h2 className="text-2xl font-bold text-white mb-4">{t("admin.recentActivity")}</h2>
-                <Card className="bg-gradient-to-br from-morpheus-blue-dark/40 to-morpheus-blue-light/40 border-slate-700/50 shadow-xl">
-                    <CardContent className="p-6">
-                        <div className="text-center py-8">
-                            <BarChart3 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                            <p className="text-gray-300 text-lg">{t("admin.recentActivityPlaceholder")}</p>
-                            <p className="text-gray-400 text-sm mt-2">{t("admin.comingSoon")}</p>
-                        </div>
-                    </CardContent>
-                </Card>
+                <h2 className="text-2xl font-bold text-white mb-4">Scene View Analytics</h2>
+                <SceneAnalyticsChart />
             </div>
         </div>
     );

@@ -43,6 +43,7 @@
         "ogl": "^1.0.11",
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
+        "recharts": "^3.1.2",
         "sonner": "^2.0.6",
         "supabase": "^2.31.8",
         "tailwind-merge": "^3.3.1",

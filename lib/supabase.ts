@@ -12,7 +12,7 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
   }
-    auth: {
+      auth: {
     Tables: {
       audit_log_entries: {
         Row: {
@@ -1695,6 +1695,7 @@ export type Database = {
           sysdate: string | null
           sysuser: string | null
           yboutiqueidfk: number | null
+          ynombrevu: number | null
           yscenesaxexyaw: number
           yscenesaxeypitch: number
           yscenesid: number
@@ -1708,6 +1709,7 @@ export type Database = {
           sysdate?: string | null
           sysuser?: string | null
           yboutiqueidfk?: number | null
+          ynombrevu?: number | null
           yscenesaxexyaw: number
           yscenesaxeypitch: number
           yscenesid?: number
@@ -1721,6 +1723,7 @@ export type Database = {
           sysdate?: string | null
           sysuser?: string | null
           yboutiqueidfk?: number | null
+          ynombrevu?: number | null
           yscenesaxexyaw?: number
           yscenesaxeypitch?: number
           yscenesid?: number
@@ -2264,7 +2267,7 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
-    auth: {
+      auth: {
     Enums: {
       aal_level: ["aal1", "aal2", "aal3"],
       code_challenge_method: ["s256", "plain"],

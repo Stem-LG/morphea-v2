@@ -27,7 +27,8 @@ export const enTranslations = {
     "back": "Back",
     "confirm": "Confirm",
     "optional": "Optional",
-    "close": "Close"
+    "close": "Close",
+    "retry": "Retry"
   },
   "auth": {
     "name": "Name",
@@ -222,7 +223,22 @@ export const enTranslations = {
         "selectBoutiquesFirst": "Please select boutiques first to assign designers"
       }
     },
-    "analytics": "Analytics",
+    "analytics": {
+      "sceneViewAnalytics": "Scene View Analytics",
+      "views": "views",
+      "sceneViews": "Scene Views",
+      "allBoutiques": "All Boutiques",
+      "allScenes": "All Scenes",
+      "noSceneData": "No Scene Data",
+      "noScenesMatchingFilters": "No scenes found matching the selected filters",
+      "noSceneViewData": "No scene view data available",
+      "clearFilters": "Clear Filters",
+      "failedToLoad": "Failed to load analytics",
+      "viewsByBoutique": "Views by Boutique",
+      "scene": "scene",
+      "scenes": "scenes",
+      "boutique": "Boutique"
+    },
     "settings": "Settings",
     "panel": "Panel",
     "account": "Account",

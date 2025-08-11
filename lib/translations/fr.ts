@@ -26,7 +26,8 @@ export const frTranslations = {
     "back": "Retour",
     "confirm": "Confirmer",
     "optional": "Optionnel",
-    "close": "Fermer"
+    "close": "Fermer",
+    "retry": "Réessayer"
   },
   "auth": {
     "name": "Nom",
@@ -243,7 +244,22 @@ export const frTranslations = {
         "viewAllOrders": "Voir toutes les commandes"
       },
     },
-    "analytics": "Analytiques",
+    "analytics": {
+      "sceneViewAnalytics": "Analytiques des Vues de Scènes",
+      "views": "vues",
+      "sceneViews": "Vues de Scènes",
+      "allBoutiques": "Toutes les Boutiques",
+      "allScenes": "Toutes les Scènes",
+      "noSceneData": "Aucune Donnée de Scène",
+      "noScenesMatchingFilters": "Aucune scène trouvée correspondant aux filtres sélectionnés",
+      "noSceneViewData": "Aucune donnée de vue de scène disponible",
+      "clearFilters": "Effacer les Filtres",
+      "failedToLoad": "Échec du chargement des analytiques",
+      "viewsByBoutique": "Vues par Boutique",
+      "scene": "scène",
+      "scenes": "scènes",
+      "boutique": "Boutique"
+    },
     "settings": "Paramètres",
     "panel": "Panneau",
     "account": "Compte",

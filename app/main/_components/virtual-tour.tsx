@@ -5,6 +5,7 @@ import { Viewer } from "@photo-sphere-viewer/core";
 import { MarkersPlugin } from "@photo-sphere-viewer/markers-plugin";
 import ProductsListModal from "./products-list-modal";
 import { InfoSpotAction, getTourData, TourData, Scene } from "@/app/_consts/tourdata";
+import { useIncrementSceneView } from "../_hooks/use-increment-scene-view";
 
 interface VirtualTourProps {
     className?: string;
@@ -30,6 +31,9 @@ export default function VirtualTour({
     const containerRef = useRef<HTMLDivElement>(null);
     const viewerRef = useRef<Viewer | null>(null);
     const markersPluginRef = useRef<MarkersPlugin | null>(null);
+    
+    // Initialize the scene view increment hook
+    const incrementSceneView = useIncrementSceneView();
 
     // Get scene from URL on initial load only
     const getInitialScene = useCallback(() => {
@@ -55,6 +59,9 @@ export default function VirtualTour({
     const animationIntervalRef = useRef<NodeJS.Timeout | null>(null);
     const isUpdatingUrlRef = useRef(false);
     const isTransitioningRef = useRef(false);
+    
+    // Track viewed scenes to prevent duplicate increments
+    const [viewedScenes, setViewedScenes] = useState<Set<string>>(new Set());
 
     // Calculate the actual height accounting for navbar
     const getActualHeight = () => {
@@ -403,6 +410,27 @@ export default function VirtualTour({
             try {
                 console.log("Starting transition to scene:", currentSceneData.id, "Initial load:", isInitialLoad);
 
+                // Helper function to increment scene view count
+                const incrementViewCount = () => {
+                    // Only increment if this scene hasn't been viewed yet in this session
+                    if (!viewedScenes.has(currentSceneData.id)) {
+                        console.log("Incrementing view count for scene:", currentSceneData.id);
+                        
+                        // Convert scene ID to number for the API call
+                        const sceneIdNumber = parseInt(currentSceneData.id, 10);
+                        if (!isNaN(sceneIdNumber)) {
+                            incrementSceneView.mutate(sceneIdNumber);
+                            
+                            // Mark this scene as viewed
+                            setViewedScenes(prev => new Set(prev).add(currentSceneData.id));
+                        } else {
+                            console.warn("Invalid scene ID for view increment:", currentSceneData.id);
+                        }
+                    } else {
+                        console.log("Scene already viewed in this session:", currentSceneData.id);
+                    }
+                };
+
                 if (isInitialLoad) {
                     await viewerRef.current!.setPanorama(currentSceneData.panorama, {
                         transition: false, // Disable transition on initial load
@@ -411,6 +439,20 @@ export default function VirtualTour({
 
                     setTimeout(() => {
                         addMarkers();
+                        // Increment view count for initial scene load
+                        incrementViewCount();
+                        
+                        // Dispatch custom event for initial scene load
+                        if (typeof window !== 'undefined') {
+                            const sceneChangeEvent = new CustomEvent('sceneChanged', {
+                                detail: {
+                                    sceneId: currentSceneData.id,
+                                    sceneName: currentSceneData.name,
+                                    isInitialLoad: true
+                                }
+                            });
+                            window.dispatchEvent(sceneChangeEvent);
+                        }
                     }, 200);
 
                     setIsInitialLoad(false);
@@ -445,6 +487,21 @@ export default function VirtualTour({
                 setTimeout(() => {
                     console.log("Adding markers after delay");
                     addMarkers();
+                    
+                    // Increment view count after scene is fully loaded and visible
+                    incrementViewCount();
+
+                    // Dispatch custom event for test page monitoring
+                    if (typeof window !== 'undefined') {
+                        const sceneChangeEvent = new CustomEvent('sceneChanged', {
+                            detail: {
+                                sceneId: currentSceneData.id,
+                                sceneName: currentSceneData.name,
+                                viewCount: currentSceneData.id // We'll get the actual count from the database
+                            }
+                        });
+                        window.dispatchEvent(sceneChangeEvent);
+                    }
 
                     // Update URL after transition is complete using simple history API
                     setTimeout(() => {
