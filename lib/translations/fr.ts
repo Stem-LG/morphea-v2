@@ -839,7 +839,10 @@ export const frTranslations = {
       "createFirstScene": "Créer Votre Première Scène",
       "store": "Magasin",
       "selectStore": "Sélectionner un magasin",
-      "pleaseSelectStore": "Veuillez sélectionner un magasin"
+      "pleaseSelectStore": "Veuillez sélectionner un magasin",
+      "boutique": "Boutique",
+      "noBoutique": "Aucune Boutique",
+      "boutiqueDescription": "Sélectionnez une boutique à associer à cette scène"
     }
   },
   "product3DViewer": {

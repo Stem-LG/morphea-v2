@@ -77,10 +77,11 @@ export function useStoreStatsClient(storeId: string | null) {
         console.error('Error getting rejected products:', rejectedProductsError);
       }
 
-      // Get categories count (using yinfospotactions table as per the API route)
+      // Get categories count from scenes associated with this boutique
+      // Since yboutiqueidfk moved to yscenes, we count scenes for this boutique
       const { count: categories, error: categoriesError } = await supabase
         .schema('morpheus')
-        .from('yinfospotactions')
+        .from('yscenes')
         .select('*', { count: 'exact', head: true })
         .eq('yboutiqueidfk', storeIdNum);
 
@@ -166,10 +167,11 @@ export function useMultipleStoreStatsClient(storeIds: number[]) {
             console.error(`Error getting rejected products for store ${storeId}:`, rejectedProductsError);
           }
 
-          // Get categories count
+          // Get categories count from scenes associated with this boutique
+          // Since yboutiqueidfk moved to yscenes, we count scenes for this boutique
           const { count: categories, error: categoriesError } = await supabase
             .schema('morpheus')
-            .from('yinfospotactions')
+            .from('yscenes')
             .select('*', { count: 'exact', head: true })
             .eq('yboutiqueidfk', storeId);
 

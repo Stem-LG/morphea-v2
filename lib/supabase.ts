@@ -1212,7 +1212,6 @@ export type Database = {
           sysadresseip: string | null
           sysdate: string | null
           sysuser: string | null
-          yboutiqueidfk: number
           yinfospotactionscustomhandler: string
           yinfospotactionsdescription: string
           yinfospotactionsid: number
@@ -1225,7 +1224,6 @@ export type Database = {
           sysadresseip?: string | null
           sysdate?: string | null
           sysuser?: string | null
-          yboutiqueidfk: number
           yinfospotactionscustomhandler: string
           yinfospotactionsdescription: string
           yinfospotactionsid: number
@@ -1238,7 +1236,6 @@ export type Database = {
           sysadresseip?: string | null
           sysdate?: string | null
           sysuser?: string | null
-          yboutiqueidfk?: number
           yinfospotactionscustomhandler?: string
           yinfospotactionsdescription?: string
           yinfospotactionsid?: number
@@ -1246,15 +1243,7 @@ export type Database = {
           yinfospotactionstitle?: string
           yinfospotactionstype?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "yinfospotactions_yboutiqueidfk_fkey"
-            columns: ["yboutiqueidfk"]
-            isOneToOne: false
-            referencedRelation: "yboutique"
-            referencedColumns: ["yboutiqueid"]
-          },
-        ]
+        Relationships: []
       }
       yinfospots: {
         Row: {
@@ -1709,6 +1698,7 @@ export type Database = {
           sysadresseip: string | null
           sysdate: string | null
           sysuser: string | null
+          yboutiqueidfk: number | null
           yscenesaxexyaw: number
           yscenesaxeypitch: number
           yscenesid: number
@@ -1721,6 +1711,7 @@ export type Database = {
           sysadresseip?: string | null
           sysdate?: string | null
           sysuser?: string | null
+          yboutiqueidfk?: number | null
           yscenesaxexyaw: number
           yscenesaxeypitch: number
           yscenesid?: number
@@ -1733,6 +1724,7 @@ export type Database = {
           sysadresseip?: string | null
           sysdate?: string | null
           sysuser?: string | null
+          yboutiqueidfk?: number | null
           yscenesaxexyaw?: number
           yscenesaxeypitch?: number
           yscenesid?: number
@@ -1740,7 +1732,15 @@ export type Database = {
           yscenespanorama?: string
           ysceneszoomfov?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "yscenes_yboutiqueidfk_fkey"
+            columns: ["yboutiqueidfk"]
+            isOneToOne: false
+            referencedRelation: "yboutique"
+            referencedColumns: ["yboutiqueid"]
+          },
+        ]
       }
       yvarprod: {
         Row: {
