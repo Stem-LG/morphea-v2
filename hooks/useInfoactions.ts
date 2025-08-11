@@ -17,7 +17,6 @@ interface UseInfoactions {
     description?: string | null
     modalType?: string | null
     customHandler?: string | null
-    boutiqueId?: number | null
   }) => Promise<InfoSpotAction | null>
   updateAction: (id: number, updateData: {
     type?: string
@@ -25,7 +24,6 @@ interface UseInfoactions {
     description?: string | null
     modalType?: string | null
     customHandler?: string | null
-    boutiqueId?: number | null
   }) => Promise<InfoSpotAction | null>
   deleteAction: (id: number) => Promise<boolean>
   refreshActions: () => Promise<void>
@@ -69,7 +67,6 @@ export function useInfoactions(): UseInfoactions {
     description?: string | null
     modalType?: string | null
     customHandler?: string | null
-    boutiqueId?: number | null
   }): Promise<InfoSpotAction | null> => {
     try {
       setError(null)
@@ -84,7 +81,6 @@ export function useInfoactions(): UseInfoactions {
           yinfospotactionsdescription: actionData.description || '',
           yinfospotactionsmodaltype: actionData.modalType || '',
           yinfospotactionscustomhandler: actionData.customHandler || '',
-          yboutiqueidfk: actionData.boutiqueId || 1, // Default to 1 if not provided
         }])
         .select()
         .single()
@@ -109,7 +105,6 @@ export function useInfoactions(): UseInfoactions {
     description?: string | null
     modalType?: string | null
     customHandler?: string | null
-    boutiqueId?: number | null
   }): Promise<InfoSpotAction | null> => {
     try {
       setError(null)
@@ -123,7 +118,6 @@ export function useInfoactions(): UseInfoactions {
           ...(updateData.description !== undefined && { yinfospotactionsdescription: updateData.description }),
           ...(updateData.modalType !== undefined && { yinfospotactionsmodaltype: updateData.modalType }),
           ...(updateData.customHandler !== undefined && { yinfospotactionscustomhandler: updateData.customHandler }),
-          ...(updateData.boutiqueId !== undefined && { yboutiqueidfk: updateData.boutiqueId }),
         })
         .eq('yinfospotactionsid', id)
         .select()

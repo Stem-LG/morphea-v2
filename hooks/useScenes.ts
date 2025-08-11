@@ -17,6 +17,7 @@ interface UseScenes {
     yaw?: number
     pitch?: number
     fov?: number
+    boutiqueId?: number | null
   }) => Promise<Scene | null>
   updateScene: (id: number, updateData: {
     name?: string
@@ -24,9 +25,11 @@ interface UseScenes {
     yaw?: number
     pitch?: number
     fov?: number
+    boutiqueId?: number | null
   }) => Promise<Scene | null>
   deleteScene: (id: number) => Promise<boolean>
   refreshScenes: () => Promise<void>
+  getSceneById: (id: number) => Scene | null
 }
 
 export function useScenes(): UseScenes {
@@ -67,6 +70,7 @@ export function useScenes(): UseScenes {
     yaw?: number
     pitch?: number
     fov?: number
+    boutiqueId?: number | null
   }): Promise<Scene | null> => {
     try {
       setError(null)
@@ -80,6 +84,7 @@ export function useScenes(): UseScenes {
         yscenesaxexyaw: sceneData.yaw || 0,
         yscenesaxeypitch: sceneData.pitch || 0,
         ysceneszoomfov: sceneData.fov || 75,
+        yboutiqueidfk: sceneData.boutiqueId || null,
       }
       
       const { data, error } = await supabase
@@ -94,7 +99,10 @@ export function useScenes(): UseScenes {
       }
       
       const newScene = data
+      
+      // Update local state optimistically
       setScenes(prev => [...prev, newScene])
+      
       return newScene
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')
@@ -109,6 +117,7 @@ export function useScenes(): UseScenes {
     yaw?: number
     pitch?: number
     fov?: number
+    boutiqueId?: number | null
   }): Promise<Scene | null> => {
     try {
       setError(null)
@@ -121,6 +130,7 @@ export function useScenes(): UseScenes {
       if (updateData.yaw !== undefined) updateFields.yscenesaxexyaw = updateData.yaw
       if (updateData.pitch !== undefined) updateFields.yscenesaxeypitch = updateData.pitch
       if (updateData.fov !== undefined) updateFields.ysceneszoomfov = updateData.fov
+      if (updateData.boutiqueId !== undefined) updateFields.yboutiqueidfk = updateData.boutiqueId
       
       const { data, error } = await supabase
         .schema('morpheus')
@@ -135,9 +145,12 @@ export function useScenes(): UseScenes {
       }
       
       const updatedScene = data
+      
+      // Update local state optimistically to avoid disrupting the viewer
       setScenes(prev => prev.map(scene =>
         scene.yscenesid === id ? updatedScene : scene
       ))
+      
       return updatedScene
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')
@@ -162,7 +175,9 @@ export function useScenes(): UseScenes {
         throw new Error(error.message || 'Failed to delete scene')
       }
       
+      // Update local state optimistically
       setScenes(prev => prev.filter(scene => scene.yscenesid !== id))
+      
       return true
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')
@@ -173,6 +188,10 @@ export function useScenes(): UseScenes {
 
   const refreshScenes = async () => {
     await fetchScenes()
+  }
+
+  const getSceneById = (id: number): Scene | null => {
+    return scenes.find(scene => scene.yscenesid === id) || null
   }
 
   useEffect(() => {
@@ -187,5 +206,6 @@ export function useScenes(): UseScenes {
     updateScene,
     deleteScene,
     refreshScenes,
+    getSceneById,
   }
 }

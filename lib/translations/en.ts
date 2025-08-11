@@ -977,7 +977,10 @@ export const enTranslations = {
       "createFirstScene": "Create Your First Scene",
       "store": "Store",
       "selectStore": "Select a store",
-      "pleaseSelectStore": "Please select a store"
+      "pleaseSelectStore": "Please select a store",
+      "boutique": "Boutique",
+      "noBoutique": "No Boutique",
+      "boutiqueDescription": "Select a boutique to associate with this scene"
     }
   },
   "product3DViewer": {

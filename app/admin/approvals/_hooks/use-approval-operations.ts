@@ -9,6 +9,7 @@ interface ApprovalData {
     categoryId?: number;
     infoactionId?: number;
     selectedEventId?: number;
+    assignmentId?: number; // Optional: specific ydetailsevent ID to use when designer has multiple active assignments
     variants?: Array<{
         yvarprodid: number;
         yvarprodprixcatalogue: number;
@@ -48,20 +49,72 @@ export function useApprovalOperations() {
                 throw new Error(updateError.message || 'Failed to update product status');
             }
 
-            // Update infospotaction in ydetailsevent if provided
+            // Create or update infospotaction in ydetailsevent if provided
             if (approvalData.infoactionId) {
-                const { error: detailsError } = await supabase
+                // First, get the product's designer ID and active assignment details
+                const { data: productData, error: productError } = await supabase
+                    .schema('morpheus')
+                    .from('yprod')
+                    .select('ydesignidfk')
+                    .eq('yprodid', productId)
+                    .single();
+
+                if (productError) {
+                    throw new Error(`Failed to get product designer: ${productError.message}`);
+                }
+
+                // Find the designer's active assignments
+                const today = new Date().toISOString().split('T')[0];
+                const { data: activeAssignments, error: assignmentError } = await supabase
                     .schema('morpheus')
                     .from('ydetailsevent')
-                    .update({
-                        yinfospotactionId: approvalData.infoactionId.toString(),
-                        sysdate: currentTime,
-                        sysaction: 'update'
-                    })
-                    .eq('yprodidfk', productId);
+                    .select(`
+                        *,
+                        yevent:yeventidfk(yeventdatedeb, yeventdatefin)
+                    `)
+                    .eq('ydesignidfk', productData.ydesignidfk)
+                    .is('yprodidfk', null)
+                    .not('yboutiqueidfk', 'is', null)
+                    .gte('yevent.yeventdatefin', today)
+                    .lte('yevent.yeventdatedeb', today);
 
-                if (detailsError) {
-                    throw new Error(detailsError.message || 'Failed to update product placement');
+                if (assignmentError || !activeAssignments || activeAssignments.length === 0) {
+                    throw new Error('No active event assignment found for this designer');
+                }
+
+                // If a specific assignment ID is provided, use that one
+                let activeAssignment;
+                if (approvalData.assignmentId) {
+                    activeAssignment = activeAssignments.find(a => a.ydetailseventid === approvalData.assignmentId);
+                    if (!activeAssignment) {
+                        throw new Error(`Specified assignment ID ${approvalData.assignmentId} not found in active assignments`);
+                    }
+                } else {
+                    // If multiple assignments exist, use the first one
+                    activeAssignment = activeAssignments[0];
+                    
+                    if (activeAssignments.length > 1) {
+                        console.warn(`Designer ${productData.ydesignidfk} has ${activeAssignments.length} active assignments. Using the first one. Consider specifying assignmentId for precise control.`);
+                    }
+                }
+
+                // Create a new ydetailsevent record for the product
+                const { error: insertError } = await supabase
+                    .schema('morpheus')
+                    .from('ydetailsevent')
+                    .insert({
+                        yeventidfk: activeAssignment.yeventidfk,
+                        ydesignidfk: activeAssignment.ydesignidfk,
+                        yboutiqueidfk: activeAssignment.yboutiqueidfk,
+                        ymallidfk: activeAssignment.ymallidfk,
+                        yprodidfk: productId,
+                        yinfospotactionId: approvalData.infoactionId,
+                        sysdate: currentTime,
+                        sysaction: 'insert'
+                    });
+
+                if (insertError) {
+                    throw new Error(`Failed to create product placement: ${insertError.message}`);
                 }
             }
 

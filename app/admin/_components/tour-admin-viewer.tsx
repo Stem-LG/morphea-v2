@@ -15,8 +15,8 @@ import { useInfospots } from '@/hooks/useInfospots'
 import { useSceneLinks } from '@/hooks/useSceneLinks'
 import { useInfoactions } from '@/hooks/useInfoactions'
 import { useLanguage } from '@/hooks/useLanguage'
+import { useStores } from '@/app/admin/stores/_hooks/use-stores'
 import { Database } from '@/lib/supabase'
-import { useStores } from '../stores/_hooks/use-stores'
 
 type Scene = Database['morpheus']['Tables']['yscenes']['Row']
 type InfoSpot = Database['morpheus']['Tables']['yinfospots']['Row']
@@ -41,7 +41,7 @@ export default function TourAdminViewer({
   const [containerElement, setContainerElement] = useState<HTMLDivElement | null>(null)
   const [viewerInstance, setViewerInstance] = useState<Viewer | null>(null)
 
-  const { scenes, loading: scenesLoading, deleteScene, refreshScenes, createScene } = useScenes()
+  const { scenes, loading: scenesLoading, deleteScene, refreshScenes, createScene, updateScene, getSceneById } = useScenes()
   const { infospots, loading: infospotsLoading, createInfospot, updateInfospot, deleteInfospot } = useInfospots()
   const { scenelinks, loading: scenelinksLoading, createSceneLink, updateSceneLink, deleteSceneLink } = useSceneLinks()
   const { actions, createAction } = useInfoactions()
@@ -72,7 +72,6 @@ export default function TourAdminViewer({
   const [isAddingAction, setIsAddingAction] = useState<boolean>(false)
   const [newActionForm, setNewActionForm] = useState({
     title: '',
-    type: '',
     description: ''
   })
   
@@ -83,7 +82,8 @@ export default function TourAdminViewer({
     panorama: '',
     yaw: 0,
     pitch: 0,
-    fov: 50
+    fov: 50,
+    boutiqueId: null as number | null
   })
   
   // State for editing scene
@@ -94,7 +94,8 @@ export default function TourAdminViewer({
     panorama: '',
     yaw: 0,
     pitch: 0,
-    fov: 50
+    fov: 50,
+    boutiqueId: null as number | null
   })
   
   // Refs to store current state values to avoid stale closure issues
@@ -125,7 +126,7 @@ export default function TourAdminViewer({
     console.log('isAddingScene changed:', isAddingScene)
   }, [isAddingScene])
 
-  const loading = scenesLoading || infospotsLoading || scenelinksLoading || storesLoading
+  const loading = scenesLoading || infospotsLoading || scenelinksLoading
 
   // Add markers for navigation links and info spots
   const addMarkers = useCallback(() => {
@@ -390,6 +391,17 @@ export default function TourAdminViewer({
       }
     }
   }, [scenes, initialSceneId, currentScene, searchParams, router])
+
+  // Sync currentScene with updated scene data from the hook
+  useEffect(() => {
+    if (currentScene && scenes.length > 0) {
+      const updatedScene = getSceneById(currentScene.yscenesid)
+      if (updatedScene && updatedScene !== currentScene) {
+        console.log('Syncing currentScene with updated data:', updatedScene.yscenesname)
+        setCurrentScene(updatedScene)
+      }
+    }
+  }, [scenes, currentScene, getSceneById])
 
   // Initialize Photo Sphere Viewer (only once)
   useEffect(() => {
@@ -856,7 +868,8 @@ export default function TourAdminViewer({
                     panorama: '',
                     yaw: 0,
                     pitch: 0,
-                    fov: 50
+                    fov: 50,
+                    boutiqueId: null
                   })
                   console.log('isAddingScene set to true')
                 }}
@@ -962,7 +975,8 @@ export default function TourAdminViewer({
                         panorama: newSceneForm.panorama.trim(),
                         yaw: newSceneForm.yaw,
                         pitch: newSceneForm.pitch,
-                        fov: newSceneForm.fov
+                        fov: newSceneForm.fov,
+                        boutiqueId: newSceneForm.boutiqueId
                       })
                       
                       if (newScene) {
@@ -973,7 +987,8 @@ export default function TourAdminViewer({
                           panorama: '',
                           yaw: 0,
                           pitch: 0,
-                          fov: 50
+                          fov: 50,
+                          boutiqueId: null
                         })
                         
                         // Navigate to the new scene to preview it
@@ -1009,7 +1024,8 @@ export default function TourAdminViewer({
                       panorama: '',
                       yaw: 0,
                       pitch: 0,
-                      fov: 50
+                      fov: 50,
+                      boutiqueId: null
                     })
                   }}
                   className="flex-1"
@@ -1042,7 +1058,7 @@ export default function TourAdminViewer({
     <div className={`relative ${className}`} style={{ height, width }}>
       {/* Admin Controls */}
       <div className="absolute top-4 left-4 z-20 space-y-2">
-        <Card className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm w-64">
+        <Card className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm w-74">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm flex items-center gap-2 text-gray-900 dark:text-white">
               <Settings className="w-4 h-4" />
@@ -1238,7 +1254,8 @@ export default function TourAdminViewer({
                       panorama: currentScene.yscenespanorama,
                       yaw: 0, // Default values for camera position
                       pitch: 0,
-                      fov: 50
+                      fov: 50,
+                      boutiqueId: currentScene.yboutiqueidfk
                     })
                   }}
                   className="w-full"
@@ -1257,7 +1274,8 @@ export default function TourAdminViewer({
                       panorama: '',
                       yaw: 0,
                       pitch: 0,
-                      fov: 50
+                      fov: 50,
+                      boutiqueId: null
                     })
                   }}
                   className="w-full"
@@ -1414,7 +1432,7 @@ export default function TourAdminViewer({
                       variant="outline"
                       onClick={() => {
                         setIsAddingAction(true)
-                        setNewActionForm({ title: '', type: '', description: '' })
+                        setNewActionForm({ title: '', description: '' })
                       }}
                       className="w-full mt-1 text-xs h-6"
                     >
@@ -1768,7 +1786,7 @@ export default function TourAdminViewer({
                       variant="outline"
                       onClick={() => {
                         setIsAddingAction(true)
-                        setNewActionForm({ title: '', type: '', description: '' })
+                        setNewActionForm({ title: '', description: '' })
                       }}
                       className="w-full mt-1 text-xs h-6"
                     >
@@ -2020,7 +2038,7 @@ export default function TourAdminViewer({
                 <button
                   onClick={() => {
                     setIsAddingAction(false)
-                    setNewActionForm({ title: '', type: '', description: '' })
+                    setNewActionForm({ title: '', description: '' })
                   }}
                   className="text-white hover:text-gray-200 transition-colors"
                 >
@@ -2047,23 +2065,6 @@ export default function TourAdminViewer({
                   />
                 </div>
                 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    {t('admin.tour.store')} *
-                  </label>
-                  <select
-                    value={newActionForm.type}
-                    onChange={(e) => setNewActionForm(prev => ({ ...prev, type: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  >
-                    <option value="">{t('admin.tour.selectStore')}</option>
-                    {stores?.map(store => (
-                      <option key={store.yboutiqueid} value={store.yboutiqueid.toString()}>
-                        {store.yboutiqueintitule || store.yboutiquecode}
-                      </option>
-                    ))}
-                  </select>
-                </div>
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -2086,7 +2087,7 @@ export default function TourAdminViewer({
                 variant="outline"
                 onClick={() => {
                   setIsAddingAction(false)
-                  setNewActionForm({ title: '', type: '', description: '' })
+                  setNewActionForm({ title: '', description: '' })
                 }}
               >
                 {t('admin.tour.cancel')}
@@ -2099,10 +2100,6 @@ export default function TourAdminViewer({
                     return
                   }
                   
-                  if (!newActionForm.type) {
-                    alert(t('admin.tour.pleaseSelectStore'))
-                    return
-                  }
                   
                   try {
                     // Create new action using the hook function with fixed values
@@ -2111,8 +2108,7 @@ export default function TourAdminViewer({
                       title: newActionForm.title.trim(),
                       description: newActionForm.description.trim() || 'Products list modal action',
                       modalType: 'products-list',
-                      customHandler: '',
-                      boutiqueId: parseInt(newActionForm.type) // Store ID is stored in type field
+                      customHandler: ''
                     })
                     
                     if (newAction) {
@@ -2130,7 +2126,7 @@ export default function TourAdminViewer({
                     
                     // Close the modal
                     setIsAddingAction(false)
-                    setNewActionForm({ title: '', type: '', description: '' })
+                    setNewActionForm({ title: '', description: '' })
                     
                   } catch (error) {
                     console.error('Error creating action:', error)
@@ -2138,7 +2134,7 @@ export default function TourAdminViewer({
                   }
                 }}
                 className="bg-green-600 hover:bg-green-700 text-white"
-                disabled={!newActionForm.title.trim() || !newActionForm.type}
+                disabled={!newActionForm.title.trim()}
               >
                 <Plus className="w-4 h-4 mr-1" />
                 {t('admin.tour.createAction')}
@@ -2163,7 +2159,8 @@ export default function TourAdminViewer({
                       panorama: '',
                       yaw: 0,
                       pitch: 0,
-                      fov: 50
+                      fov: 50,
+                      boutiqueId: null
                     })
                   }}
                   className="text-white hover:text-gray-200 transition-colors"
@@ -2204,6 +2201,27 @@ export default function TourAdminViewer({
                   />
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     {t('admin.tour.panoramaUrlDescription')}
+                  </p>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    {t('admin.tour.boutique')}
+                  </label>
+                  <select
+                    value={newSceneForm.boutiqueId?.toString() || ''}
+                    onChange={(e) => setNewSceneForm(prev => ({ ...prev, boutiqueId: e.target.value ? parseInt(e.target.value) : null }))}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  >
+                    <option value="">{t('admin.tour.noBoutique')}</option>
+                    {stores?.map(store => (
+                      <option key={store.yboutiqueid} value={store.yboutiqueid}>
+                        {store.yboutiqueintitule || store.yboutiquecode}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    {t('admin.tour.boutiqueDescription')}
                   </p>
                 </div>
                 
@@ -2297,7 +2315,8 @@ export default function TourAdminViewer({
                     panorama: '',
                     yaw: 0,
                     pitch: 0,
-                    fov: 50
+                    fov: 50,
+                    boutiqueId: null
                   })
                 }}
               >
@@ -2324,7 +2343,8 @@ export default function TourAdminViewer({
                       panorama: newSceneForm.panorama.trim(),
                       yaw: newSceneForm.yaw,
                       pitch: newSceneForm.pitch,
-                      fov: newSceneForm.fov
+                      fov: newSceneForm.fov,
+                      boutiqueId: newSceneForm.boutiqueId
                     })
                     
                     if (newScene) {
@@ -2335,7 +2355,8 @@ export default function TourAdminViewer({
                         panorama: '',
                         yaw: 0,
                         pitch: 0,
-                        fov: 50
+                        fov: 50,
+                        boutiqueId: null
                       })
                       
                       // Navigate to the new scene to preview it
@@ -2396,7 +2417,8 @@ export default function TourAdminViewer({
                       panorama: '',
                       yaw: 0,
                       pitch: 0,
-                      fov: 50
+                      fov: 50,
+                      boutiqueId: null
                     })
                   }}
                   className="text-white hover:text-gray-200 transition-colors"
@@ -2437,6 +2459,27 @@ export default function TourAdminViewer({
                   />
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     {t('admin.tour.panoramaUrlDescription')}
+                  </p>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    {t('admin.tour.boutique')}
+                  </label>
+                  <select
+                    value={editSceneForm.boutiqueId?.toString() || ''}
+                    onChange={(e) => setEditSceneForm(prev => ({ ...prev, boutiqueId: e.target.value ? parseInt(e.target.value) : null }))}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  >
+                    <option value="">{t('admin.tour.noBoutique')}</option>
+                    {stores?.map(store => (
+                      <option key={store.yboutiqueid} value={store.yboutiqueid}>
+                        {store.yboutiqueintitule || store.yboutiquecode}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    {t('admin.tour.boutiqueDescription')}
                   </p>
                 </div>
                 
@@ -2481,7 +2524,8 @@ export default function TourAdminViewer({
                     panorama: '',
                     yaw: 0,
                     pitch: 0,
-                    fov: 50
+                    fov: 50,
+                    boutiqueId: null
                   })
                 }}
               >
@@ -2501,9 +2545,14 @@ export default function TourAdminViewer({
                   }
                   
                   try {
-                    // Update scene using the hook function (we need to add updateScene to useScenes hook)
-                    // For now, we'll use a placeholder - this would need to be implemented in the hook
-                    console.log('Updating scene:', editSceneForm)
+                    // Update scene using the hook function
+                    const updatedScene = await updateScene(editSceneForm.id, {
+                      name: editSceneForm.name.trim(),
+                      panorama: editSceneForm.panorama.trim(),
+                      boutiqueId: editSceneForm.boutiqueId
+                    })
+                    
+                    if (!updatedScene) throw new Error('Failed to update scene')
                     
                     // Close the modal
                     setIsEditingScene(false)
@@ -2513,7 +2562,8 @@ export default function TourAdminViewer({
                       panorama: '',
                       yaw: 0,
                       pitch: 0,
-                      fov: 50
+                      fov: 50,
+                      boutiqueId: null
                     })
                     
                     // Refresh the current scene if panorama changed
