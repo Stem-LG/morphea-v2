@@ -618,7 +618,6 @@ export const enTranslations = {
       "makeDesigner": "Make Designer",
       "allRoles": "All Roles",
       "user": "User",
-      "designer": "Designer",
       "admin": "Admin",
       "filterByRole": "Filter by role",
       "assignDesignerRole": "Assign Designer Role",
@@ -685,7 +684,24 @@ export const enTranslations = {
       "designerDetails": "Designer Details",
       "noDesignerProfile": "No designer profile",
       "anonymousUser": "Anonymous User",
-      "insufficientPermissions": "Insufficient permissions to assign stores"
+      "insufficientPermissions": "Insufficient permissions to assign stores",
+      "designer": {
+        "nameRequired": "Designer Name *",
+        "namePlaceholder": "Enter designer name",
+        "brandRequired": "Brand Name *",
+        "brandPlaceholder": "Enter brand name",
+        "contactPersonRequired": "Contact Person *",
+        "contactPersonPlaceholder": "Enter contact person name",
+        "emailRequired": "Email Address *",
+        "emailPlaceholder": "Enter email address",
+        "phoneRequired": "Phone Number *",
+        "phonePlaceholder": "Enter phone number",
+        "countryRequired": "Country *",
+        "countryPlaceholder": "Enter country",
+        "specialtyRequired": "Specialty *",
+        "specialtyPlaceholder": "Enter specialty",
+        "requiredFields": "* Required fields"
+      }
     },
     "virtualTourAdmin": "Virtual Tour",
     "loadingVirtualTourAdmin": "Loading virtual tour admin...",
@@ -1021,7 +1037,10 @@ export const enTranslations = {
     "size": "Size",
     "view": "View",
     "deliveryIn": "Delivery in",
-    "days": "days"
+    "days": "days",
+    "noVariantsAvailable": "No Variants Available",
+    "noVariantsMessage": "This product currently has no available variants.",
+    "noMediaAvailable": "No media available"
   },
   "cart": {
     "title": "Shopping Cart",

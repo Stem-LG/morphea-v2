@@ -188,7 +188,7 @@ interface ProductDetailsPageProps {
 
 export function ProductDetailsPage({ productData, onClose }: ProductDetailsPageProps) {
     const { t } = useLanguage();
-    const { formatPrice, convertPrice, currencies } = useCurrency();
+    const { formatPrice, currencies } = useCurrency();
     
     // Filter to only show approved variants
     const approvedVariants = useMemo(() => {

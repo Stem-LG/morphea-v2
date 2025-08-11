@@ -3,15 +3,14 @@
 import { useCurrency } from '@/hooks/useCurrency';
 
 export const CurrencyTest = () => {
-  const { 
-    currencies, 
-    currentCurrency, 
-    pivotCurrency, 
-    isLoading, 
-    error, 
-    setCurrency, 
-    convertPrice, 
-    formatPrice 
+  const {
+    currencies,
+    currentCurrency,
+    pivotCurrency,
+    isLoading,
+    error,
+    setCurrency,
+    formatPrice
   } = useCurrency();
 
   if (isLoading) return <div>Loading currencies...</div>;

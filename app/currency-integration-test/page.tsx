@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useCurrency } from "@/hooks/useCurrency";
-import { useLanguage } from "@/hooks/useLanguage";
+// import { useLanguage } from "@/hooks/useLanguage"; // TODO: Add translations when needed
 import { CurrencySwitcher } from "@/components/currency-switcher";
 
 // Mock product data for testing
@@ -48,7 +48,7 @@ export default function CurrencyIntegrationTestPage() {
         convertPrice,
         setCurrency 
     } = useCurrency();
-    const { t } = useLanguage();
+    // const { t } = useLanguage(); // TODO: Add translations when needed
     
     const [selectedTestCurrency, setSelectedTestCurrency] = useState<number | null>(null);
 

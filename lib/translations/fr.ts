@@ -639,7 +639,6 @@ export const frTranslations = {
       "makeDesigner": "Faire Designer",
       "allRoles": "Tous les Rôles",
       "user": "Utilisateur",
-      "designer": "Designer",
       "admin": "Admin",
       "filterByRole": "Filtrer par rôle",
       "assignDesignerRole": "Assigner le Rôle de Designer",
@@ -713,7 +712,24 @@ export const frTranslations = {
       "designerDetails": "Détails du Designer",
       "noDesignerProfile": "Aucun profil designer",
       "anonymousUser": "Utilisateur Anonyme",
-      "insufficientPermissions": "Permissions insuffisantes pour assigner des boutiques"
+      "insufficientPermissions": "Permissions insuffisantes pour assigner des boutiques",
+      "designer": {
+        "nameRequired": "Nom du Designer *",
+        "namePlaceholder": "Entrez le nom du designer",
+        "brandRequired": "Nom de la Marque *",
+        "brandPlaceholder": "Entrez le nom de la marque",
+        "contactPersonRequired": "Personne de Contact *",
+        "contactPersonPlaceholder": "Entrez le nom de la personne de contact",
+        "emailRequired": "Adresse Email *",
+        "emailPlaceholder": "Entrez l'adresse email",
+        "phoneRequired": "Numéro de Téléphone *",
+        "phonePlaceholder": "Entrez le numéro de téléphone",
+        "countryRequired": "Pays *",
+        "countryPlaceholder": "Entrez le pays",
+        "specialtyRequired": "Spécialité *",
+        "specialtyPlaceholder": "Entrez la spécialité",
+        "requiredFields": "* Champs requis"
+      }
     },
     "designerAssignments": {
       "title": "Attributions de Designers",
@@ -1049,7 +1065,10 @@ export const frTranslations = {
     "size": "Taille",
     "view": "Vue",
     "deliveryIn": "Livraison en",
-    "days": "jours"
+    "days": "jours",
+    "noVariantsAvailable": "Aucune Variante Disponible",
+    "noVariantsMessage": "Ce produit n'a actuellement aucune variante disponible.",
+    "noMediaAvailable": "Aucun média disponible"
   },
   "cart": {
     "title": "Panier",

@@ -2,11 +2,11 @@
 
 import { CurrencySwitcher } from "@/components/currency-switcher";
 import { useCurrency } from "@/hooks/useCurrency";
-import { useLanguage } from "@/hooks/useLanguage";
+// import { useLanguage } from "@/hooks/useLanguage"; // TODO: Add translations when needed
 
 export default function CurrencyTestPage() {
   const { currentCurrency, currencies, isLoading, formatPrice } = useCurrency();
-  const { t } = useLanguage();
+  // const { t } = useLanguage(); // TODO: Add translations when needed
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-morpheus-blue-dark to-morpheus-blue-light p-8">
