@@ -556,14 +556,13 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
     const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
     const [selectedInfospotactionId, setSelectedInfospotactionId] = useState<number | null>(null);
 
-    // Fetch product details with active designer event assignment
+    // Fetch product details
     const { data: product, isLoading: productLoading } = useQuery({
         queryKey: ["product-details-approval", productId],
         queryFn: async () => {
             if (!productId) return null;
 
-            // First get the product with its designer
-            const { data: productData, error: productError } = await supabase
+            const { data, error } = await supabase
                 .schema("morpheus")
                 .from("yprod")
                 .select(
@@ -578,43 +577,21 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                         yvarprodmedia(
                             ymedia:ymediaidfk(*)
                         )
+                    ),
+                    ydetailsevent(
+                        *,
+                        yboutique:yboutiqueidfk(*),
+                        ydesign:ydesignidfk(*),
+                        ymall:ymallidfk(*),
+                        yevent:yeventidfk(*)
                     )
                 `
                 )
                 .eq("yprodid", productId)
                 .single();
 
-            if (productError) throw new Error(productError.message);
-
-            // Now find the active event assignment for this designer
-            const today = new Date().toISOString().split('T')[0];
-            
-            const { data: activeAssignment, error: assignmentError } = await supabase
-                .schema("morpheus")
-                .from("ydetailsevent")
-                .select(`
-                    *,
-                    yboutique:yboutiqueidfk(*),
-                    ydesign:ydesignidfk(*),
-                    ymall:ymallidfk(*),
-                    yevent:yeventidfk(*)
-                `)
-                .eq("ydesignidfk", productData.ydesignidfk)
-                .is("yprodidfk", null) // Must be null for designer assignment
-                .not("yboutiqueidfk", "is", null) // Must have a boutique assignment
-                .gte("yevent.yeventdatefin", today) // Event end date >= today
-                .lte("yevent.yeventdatedeb", today) // Event start date <= today
-                .single();
-
-            if (assignmentError && assignmentError.code !== 'PGRST116') {
-                console.error("Error fetching active assignment:", assignmentError);
-            }
-
-            // Combine the data
-            return {
-                ...productData,
-                activeAssignment: activeAssignment || null
-            };
+            if (error) throw new Error(error.message);
+            return data;
         },
         enabled: !!productId && isOpen,
     });
@@ -622,18 +599,18 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
     // Get category name
     const category = categories?.find((cat) => cat.xcategprodid === product?.xcategprodidfk);
 
-    // Get active assignment details
-    const activeAssignment = product?.activeAssignment;
-    const store = activeAssignment?.yboutique;
-    const designer = activeAssignment?.ydesign;
-    const mall = activeAssignment?.ymall;
-    const event = activeAssignment?.yevent;
+    // Get event details
+    const eventDetail = product?.ydetailsevent?.[0];
+    const store = eventDetail?.yboutique;
+    const designer = eventDetail?.ydesign;
+    const mall = eventDetail?.ymall;
+    const event = eventDetail?.yevent;
 
-    // Get boutique ID from the active assignment
-    const boutiqueId = activeAssignment?.yboutiqueidfk;
+    // Get boutique ID for infospotactions
+    const boutiqueId = store?.yboutiqueid;
     
     // Fetch infospotactions for the current boutique (admin only)
-    const { data: infospotactions, isLoading: infospotactionsLoading, error: infospotactionsError } = useInfospotactions({
+    const { data: infospotactions } = useInfospotactions({
         boutiqueId,
         enabled: isAdmin && !!boutiqueId && isOpen
     });
@@ -848,24 +825,16 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                                     <SelectTrigger className="h-8 text-xs bg-gray-800 border-gray-600 text-white">
                                                         <SelectValue placeholder={t("admin.approvals.selectProductPlacement")} />
                                                     </SelectTrigger>
-                                                    <SelectContent className="bg-gray-800 border-gray-600 max-h-60">
-                                                        {infospotactions?.length === 0 ? (
-                                                            <div className="p-3 text-gray-400 text-sm">
-                                                                No placement locations available for this boutique
-                                                            </div>
-                                                        ) : (
-                                                            infospotactions?.map((action) => (
-                                                                <SelectItem
-                                                                    key={action.yinfospotactionsid}
-                                                                    value={action.yinfospotactionsid.toString()}
-                                                                    className="text-white hover:bg-gray-700"
-                                                                >
-                                                                    <div className="truncate">
-                                                                        {action.yinfospotactionstitle} • {action._sceneName}
-                                                                    </div>
-                                                                </SelectItem>
-                                                            ))
-                                                        )}
+                                                    <SelectContent className="bg-gray-800 border-gray-600">
+                                                        {infospotactions?.map((action) => (
+                                                            <SelectItem
+                                                                key={action.yinfospotactionsid}
+                                                                value={action.yinfospotactionsid.toString()}
+                                                                className="text-white hover:bg-gray-700"
+                                                            >
+                                                                {action.yinfospotactionstitle}
+                                                            </SelectItem>
+                                                        ))}
                                                     </SelectContent>
                                                 </Select>
                                             </div>
