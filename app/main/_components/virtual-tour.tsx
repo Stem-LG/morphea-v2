@@ -54,6 +54,7 @@ export default function VirtualTour({
     const [pressedKeys, setPressedKeys] = useState<Set<string>>(new Set());
     const animationIntervalRef = useRef<NodeJS.Timeout | null>(null);
     const isUpdatingUrlRef = useRef(false);
+    const isTransitioningRef = useRef(false);
 
     // Calculate the actual height accounting for navbar
     const getActualHeight = () => {
@@ -333,7 +334,7 @@ export default function VirtualTour({
                 maxFov: 120,
                 loadingImg: "/loading.gif", // Remove loading icon
                 loadingTxt: "", // Remove loading text
-                navbar: showNavbar && !isProductDetailsOpen && !isProductsListOpen ? ["zoom", "plein écran"] : false,
+                navbar: showNavbar && !isProductDetailsOpen && !isProductsListOpen ? ["zoom", "fullscreen"] : false,
                 plugins: [
                     [
                         MarkersPlugin,
@@ -392,6 +393,12 @@ export default function VirtualTour({
         const currentSceneData = tourData.scenes.find((scene) => scene.id === currentScene);
         if (!currentSceneData) return;
 
+        // Prevent multiple concurrent transitions
+        if (isTransitioningRef.current) {
+            console.log("Transition already in progress, skipping");
+            return;
+        }
+
         const transitionToScene = async () => {
             try {
                 console.log("Starting transition to scene:", currentSceneData.id, "Initial load:", isInitialLoad);
@@ -411,6 +418,7 @@ export default function VirtualTour({
                 }
 
                 // Normal transition for scene changes
+                isTransitioningRef.current = true;
                 setIsTransitioning(true);
 
                 // Check if image is preloaded for faster transition
@@ -422,12 +430,21 @@ export default function VirtualTour({
                     showLoader: !isImagePreloaded, // Only show loader if image isn't preloaded
                 });
 
+                // Reset transition state immediately after setPanorama completes
+                console.log("Transition completed, resetting state");
+                isTransitioningRef.current = false;
+                
+                // Force state update with a callback to ensure it's applied
+                setIsTransitioning((prev) => {
+                    console.log("Setting isTransitioning from", prev, "to false");
+                    return false;
+                });
+
                 // Update markers after transition with reduced delay for faster feel
                 const delay = isImagePreloaded ? 0 : 100; // Reduced delay from 200ms to 100ms
                 setTimeout(() => {
-                    console.log("Transition completed, updating markers");
+                    console.log("Adding markers after delay");
                     addMarkers();
-                    setIsTransitioning(false);
 
                     // Update URL after transition is complete using simple history API
                     setTimeout(() => {
@@ -450,6 +467,7 @@ export default function VirtualTour({
                 }, delay);
             } catch (error) {
                 console.error("Error transitioning to scene:", error);
+                isTransitioningRef.current = false;
                 setIsTransitioning(false);
             }
         };
@@ -588,10 +606,12 @@ export default function VirtualTour({
             };
         }) => {
             console.log("Marker clicked:", e.marker);
-            console.log("Is transitioning:", isTransitioning);
+            console.log("Is transitioning (state):", isTransitioning);
+            console.log("Is transitioning (ref):", isTransitioningRef.current);
 
-            if (isTransitioning) {
-                console.log("Ignoring click - transitioning");
+            // Use only ref for transition checking since it's more reliable
+            if (isTransitioningRef.current) {
+                console.log("Ignoring click - transitioning (ref check)");
                 return; // Prevent clicks during transitions
             }
 
