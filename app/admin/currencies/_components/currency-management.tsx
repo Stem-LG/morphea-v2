@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import {
     Plus,
@@ -17,14 +18,14 @@ import {
     X,
     Save,
     AlertTriangle,
-    Package
+    Package,
+    Star,
+    TrendingUp
 } from "lucide-react";
-import {
-    useCurrenciesWithStats,
-    useCreateCurrency,
-    useUpdateCurrency,
-    useDeleteCurrency
-} from "@/hooks/useCurrencies";
+import { useCurrenciesWithStats } from "../_hooks/use-currencies-with-stats";
+import { useCreateCurrency } from "../_hooks/use-create-currency";
+import { useUpdateCurrency } from "../_hooks/use-update-currency";
+import { useDeleteCurrency } from "../_hooks/use-delete-currency";
 
 interface CurrencyFormData {
     xdeviseintitule: string;
@@ -32,6 +33,8 @@ interface CurrencyFormData {
     xdevisecodenum: string;
     xdevisenbrdec: number;
     xdeviseboolautorisepaiement: string;
+    xispivot: boolean;
+    xtauxechange: number;
 }
 
 export function CurrencyManagement() {
@@ -44,7 +47,9 @@ export function CurrencyManagement() {
         xdevisecodealpha: "",
         xdevisecodenum: "",
         xdevisenbrdec: 2,
-        xdeviseboolautorisepaiement: "false"
+        xdeviseboolautorisepaiement: "false",
+        xispivot: false,
+        xtauxechange: 1.0
     });
 
     const { data: currencies, isLoading } = useCurrenciesWithStats();
@@ -65,7 +70,9 @@ export function CurrencyManagement() {
             xdevisecodealpha: "",
             xdevisecodenum: "",
             xdevisenbrdec: 2,
-            xdeviseboolautorisepaiement: "false"
+            xdeviseboolautorisepaiement: "false",
+            xispivot: false,
+            xtauxechange: 1.0
         });
         setEditingCurrency(null);
         setShowForm(false);
@@ -77,7 +84,9 @@ export function CurrencyManagement() {
             xdevisecodealpha: currency.xdevisecodealpha || "",
             xdevisecodenum: currency.xdevisecodenum || "",
             xdevisenbrdec: currency.xdevisenbrdec || 2,
-            xdeviseboolautorisepaiement: currency.xdeviseboolautorisepaiement === "Y" ? "true" : "false"
+            xdeviseboolautorisepaiement: currency.xdeviseboolautorisepaiement === "Y" ? "true" : "false",
+            xispivot: currency.xispivot || false,
+            xtauxechange: currency.xtauxechange || 1.0
         });
         setEditingCurrency(currency.xdeviseid);
         setShowForm(true);
@@ -118,11 +127,21 @@ export function CurrencyManagement() {
     };
 
     const validateForm = () => {
-        return formData.xdeviseintitule.trim() !== "" &&
+        const basicValidation = formData.xdeviseintitule.trim() !== "" &&
                formData.xdevisecodealpha.trim() !== "" &&
                formData.xdevisecodenum.trim() !== "" &&
                formData.xdevisenbrdec >= 0;
+        
+        // If this is set as pivot currency, exchange rate must be positive
+        if (formData.xispivot && formData.xtauxechange <= 0) {
+            return false;
+        }
+        
+        return basicValidation;
     };
+
+    // Get current pivot currency
+    const currentPivotCurrency = currencies?.find(currency => currency.xispivot);
 
     if (isLoading) {
         return (
@@ -159,7 +178,7 @@ export function CurrencyManagement() {
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <Card className="bg-gradient-to-br from-morpheus-blue-dark/40 to-morpheus-blue-light/40 border-slate-700/50">
                     <CardContent className="p-4">
                         <div className="flex items-center gap-3">
@@ -205,7 +224,42 @@ export function CurrencyManagement() {
                         </div>
                     </CardContent>
                 </Card>
+
+                <Card className="bg-gradient-to-br from-morpheus-blue-dark/40 to-morpheus-blue-light/40 border-slate-700/50">
+                    <CardContent className="p-4">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-yellow-500/20 rounded-lg">
+                                <Star className="h-5 w-5 text-yellow-400" />
+                            </div>
+                            <div>
+                                <p className="text-sm text-gray-400">Pivot Currency</p>
+                                <p className="text-lg font-bold text-white">
+                                    {currentPivotCurrency?.xdevisecodealpha || "None"}
+                                </p>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
             </div>
+
+            {/* Pivot Currency Info */}
+            {currentPivotCurrency && (
+                <Card className="bg-gradient-to-br from-yellow-500/10 to-yellow-600/10 border-yellow-500/20">
+                    <CardContent className="p-4">
+                        <div className="flex items-center gap-3">
+                            <Star className="h-5 w-5 text-yellow-400" />
+                            <div>
+                                <p className="text-yellow-400 font-medium">
+                                    Current Pivot Currency: {currentPivotCurrency.xdeviseintitule} ({currentPivotCurrency.xdevisecodealpha})
+                                </p>
+                                <p className="text-sm text-gray-300">
+                                    Exchange Rate: {currentPivotCurrency.xtauxechange || 1.0}
+                                </p>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+            )}
 
             {/* Search */}
             <div className="relative max-w-md">
@@ -276,21 +330,95 @@ export function CurrencyManagement() {
                                 </div>
                             </div>
                             
-                            <div className="flex items-center gap-2">
-                                <input
-                                    type="checkbox"
-                                    id="allowPayment"
-                                    checked={formData.xdeviseboolautorisepaiement === "true"}
-                                    onChange={(e) => setFormData(prev => ({ 
-                                        ...prev, 
-                                        xdeviseboolautorisepaiement: e.target.checked ? "true" : "false" 
-                                    }))}
-                                    className="rounded border-slate-600"
-                                />
-                                <Label htmlFor="allowPayment" className="text-gray-300">
-                                    {t('admin.currencies.allowPayments')}
-                                </Label>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="flex items-center gap-2">
+                                    <input
+                                        type="checkbox"
+                                        id="allowPayment"
+                                        checked={formData.xdeviseboolautorisepaiement === "true"}
+                                        onChange={(e) => setFormData(prev => ({
+                                            ...prev,
+                                            xdeviseboolautorisepaiement: e.target.checked ? "true" : "false"
+                                        }))}
+                                        className="rounded border-slate-600"
+                                    />
+                                    <Label htmlFor="allowPayment" className="text-gray-300">
+                                        {t('admin.currencies.allowPayments')}
+                                    </Label>
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                    <Switch
+                                        id="isPivot"
+                                        checked={formData.xispivot}
+                                        onCheckedChange={(checked) => setFormData(prev => ({
+                                            ...prev,
+                                            xispivot: checked,
+                                            // Set exchange rate to 1.0 when setting as pivot
+                                            xtauxechange: checked ? 1.0 : prev.xtauxechange
+                                        }))}
+                                        className="data-[state=checked]:bg-yellow-500"
+                                    />
+                                    <Label htmlFor="isPivot" className="text-gray-300 flex items-center gap-1">
+                                        <Star className="h-4 w-4 text-yellow-400" />
+                                        Set as Pivot Currency
+                                    </Label>
+                                </div>
                             </div>
+
+                            {formData.xispivot && (
+                                <div className="p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <AlertTriangle className="h-4 w-4 text-yellow-400" />
+                                        <p className="text-yellow-400 font-medium">Pivot Currency Settings</p>
+                                    </div>
+                                    <p className="text-sm text-gray-300 mb-3">
+                                        Setting this currency as pivot will automatically unset the current pivot currency.
+                                        The exchange rate for pivot currency should typically be 1.0.
+                                    </p>
+                                    <div>
+                                        <Label className="text-gray-300">Exchange Rate</Label>
+                                        <Input
+                                            type="number"
+                                            step="0.0001"
+                                            min="0.0001"
+                                            value={formData.xtauxechange}
+                                            onChange={(e) => setFormData(prev => ({
+                                                ...prev,
+                                                xtauxechange: parseFloat(e.target.value) || 1.0
+                                            }))}
+                                            className="bg-morpheus-blue-dark/30 border-slate-600 text-white"
+                                            placeholder="1.0000"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+                            )}
+
+                            {!formData.xispivot && (
+                                <div>
+                                    <Label className="text-gray-300">Exchange Rate (relative to pivot currency)</Label>
+                                    <div className="flex items-center gap-2">
+                                        <TrendingUp className="h-4 w-4 text-blue-400" />
+                                        <Input
+                                            type="number"
+                                            step="0.0001"
+                                            min="0.0001"
+                                            value={formData.xtauxechange}
+                                            onChange={(e) => setFormData(prev => ({
+                                                ...prev,
+                                                xtauxechange: parseFloat(e.target.value) || 1.0
+                                            }))}
+                                            className="bg-morpheus-blue-dark/30 border-slate-600 text-white"
+                                            placeholder="1.0000"
+                                            required
+                                        />
+                                    </div>
+                                    <p className="text-xs text-gray-400 mt-1">
+                                        How many units of this currency equal 1 unit of the pivot currency
+                                    </p>
+                                </div>
+                            )}
 
                             <div className="flex gap-3 pt-4">
                                 <Button
@@ -343,10 +471,19 @@ export function CurrencyManagement() {
                             >
                                 <CardHeader className="pb-3">
                                     <div className="flex items-start justify-between">
-                                        <CardTitle className="text-white text-lg">
+                                        <CardTitle className="text-white text-lg flex items-center gap-2">
+                                            {currency.xispivot && (
+                                                <Star className="h-5 w-5 text-yellow-400 fill-yellow-400" />
+                                            )}
                                             {currency.xdeviseintitule}
                                         </CardTitle>
-                                        <div className="flex items-center gap-2">
+                                        <div className="flex items-center gap-2 flex-wrap">
+                                            {currency.xispivot && (
+                                                <Badge className="px-2 py-1 text-xs font-medium flex items-center gap-1 border text-yellow-400 bg-yellow-400/10 border-yellow-400/20">
+                                                    <Star className="h-3 w-3" />
+                                                    Pivot
+                                                </Badge>
+                                            )}
                                             {currency.xdeviseboolautorisepaiement === "Y" && (
                                                 <Badge className="px-2 py-1 text-xs font-medium flex items-center gap-1 border text-green-400 bg-green-400/10 border-green-400/20">
                                                     <CheckCircle className="h-3 w-3" />
@@ -378,6 +515,19 @@ export function CurrencyManagement() {
                                             <p className="text-white font-medium">{currency.xdevisenbrdec}</p>
                                         </div>
                                         <div>
+                                            <span className="text-gray-400">Exchange Rate:</span>
+                                            <p className="text-white font-medium flex items-center gap-1">
+                                                {currency.xispivot ? (
+                                                    <span className="text-yellow-400">1.0 (Pivot)</span>
+                                                ) : (
+                                                    <>
+                                                        <TrendingUp className="h-3 w-3 text-blue-400" />
+                                                        {currency.xtauxechange || 1.0}
+                                                    </>
+                                                )}
+                                            </p>
+                                        </div>
+                                        <div className="col-span-2">
                                             <span className="text-gray-400">{t('admin.currencies.status')}:</span>
                                             <p className={`font-medium ${isInUse ? "text-green-400" : "text-gray-400"}`}>
                                                 {isInUse ? `${t('admin.currencies.active')} (${variantCount} ${t('admin.currencies.variants')})` : t('admin.currencies.unused')}
@@ -397,23 +547,25 @@ export function CurrencyManagement() {
                                         </Button>
                                         <Tooltip>
                                             <TooltipTrigger asChild>
-                                                <span className={isInUse ? "cursor-not-allowed" : ""}>
+                                                <span className={isInUse || currency.xispivot ? "cursor-not-allowed" : ""}>
                                                     <Button
                                                         variant="outline"
                                                         size="sm"
                                                         onClick={() => handleDelete(currency.xdeviseid)}
-                                                        disabled={deleteCurrencyMutation.isPending || isInUse}
-                                                        className={`px-3 ${isInUse 
-                                                            ? "border-gray-600 text-gray-500 cursor-not-allowed" 
+                                                        disabled={deleteCurrencyMutation.isPending || isInUse || currency.xispivot}
+                                                        className={`px-3 ${isInUse || currency.xispivot
+                                                            ? "border-gray-600 text-gray-500 cursor-not-allowed"
                                                             : "border-red-600 text-red-400 hover:bg-red-600/10"
                                                         }`}
                                                     >
-                                                        {isInUse ? <AlertTriangle className="h-4 w-4" /> : <Trash2 className="h-4 w-4" />}
+                                                        {isInUse || currency.xispivot ? <AlertTriangle className="h-4 w-4" /> : <Trash2 className="h-4 w-4" />}
                                                     </Button>
                                                 </span>
                                             </TooltipTrigger>
                                             <TooltipContent>
-                                                <p>{isInUse
+                                                <p>{currency.xispivot
+                                                    ? "Cannot delete the pivot currency. Set another currency as pivot first."
+                                                    : isInUse
                                                     ? `${t('admin.currencies.cannotDelete')}: ${t('admin.currencies.currencyUsedBy')} ${variantCount} ${t('admin.currencies.productVariant')}${variantCount !== 1 ? 's' : ''}`
                                                     : t('admin.currencies.deleteCurrency')
                                                 }</p>
