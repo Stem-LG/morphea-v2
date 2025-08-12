@@ -2,6 +2,7 @@ export const enTranslations = {
   "nav": {
     "boutique": "Shops",
     "virtualTours": "Virtual Tour",
+    "shop": "Shop",
     "products3d": "3D Products",
     "administration": "Administration",
     "profile": "Profile",
@@ -1294,5 +1295,32 @@ export const enTranslations = {
     "emailConfirmation": "You'll receive an email confirmation shortly",
     "shippingNotification": "We'll notify you when your order ships",
     "trackOrder": "Track your order status in your account"
+  },
+  "shop": {
+    "title": "Shop",
+    "search": "Search",
+    "searchPlaceholder": "Search products...",
+    "mall": "Mall",
+    "allMalls": "All Malls",
+    "boutique": "Shop",
+    "allBoutiques": "All Shops",
+    "category": "Category",
+    "allCategories": "All Categories",
+    "clearFilters": "Clear Filters",
+    "filters": "Filters",
+    "showing": "Showing",
+    "of": "of",
+    "products": "products",
+    "noProductsFound": "No products found",
+    "viewDetails": "View Details",
+    "quickView": "Quick View",
+    "addToWishlist": "Add to Wishlist",
+    "addToCart": "Add to Cart",
+    "sortBy": "Sort by",
+    "priceAsc": "Price: Low to High",
+    "priceDesc": "Price: High to Low",
+    "nameAsc": "Name: A to Z",
+    "nameDesc": "Name: Z to A",
+    "newest": "Newest First"
   }
 };

@@ -66,6 +66,14 @@ export default function NavBar() {
                                 <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light group-hover:w-full transition-all duration-300"></span>
                             </Link>
 
+                            <Link
+                                href="/shop"
+                                className="relative text-gray-300 hover:text-morpheus-gold-light transition-all duration-300 font-medium group"
+                            >
+                                {t("nav.shop")}
+                                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light group-hover:w-full transition-all duration-300"></span>
+                            </Link>
+
                             {(userRoles.includes("admin") || userRoles.includes("store_admin")) && (
                                 <Link
                                     href="/admin"
@@ -229,6 +237,14 @@ export default function NavBar() {
                                     onClick={closeMobileMenu}
                                 >
                                     {t("nav.virtualTours")}
+                                </Link>
+
+                                <Link
+                                    href="/shop"
+                                    className="text-gray-300 hover:text-morpheus-gold-light hover:bg-morpheus-gold-dark/10 block px-4 py-3 text-base font-medium transition-all duration-300 rounded"
+                                    onClick={closeMobileMenu}
+                                >
+                                    {t("nav.shop")}
                                 </Link>
 
                                 <Link

@@ -2,8 +2,10 @@ export const frTranslations = {
   "nav": {
     "boutique": "Boutiques",
     "virtualTours": "Visite Virtuelle",
+    "shop": "Boutique",
     "products3d": "Produits 3D",
     "administration": "Administration",
+    "profile": "Profil",
     "login": "Connexion",
     "signup": "Commencer",
     "loading": "Chargement..."
@@ -1322,5 +1324,32 @@ export const frTranslations = {
     "emailConfirmation": "Vous recevrez un email de confirmation sous peu",
     "shippingNotification": "Nous vous préviendrons quand votre commande sera expédiée",
     "trackOrder": "Suivez le statut de votre commande dans votre compte"
+  },
+  "shop": {
+    "title": "Boutique",
+    "search": "Rechercher",
+    "searchPlaceholder": "Rechercher des produits...",
+    "mall": "Centre commercial",
+    "allMalls": "Tous les centres commerciaux",
+    "boutique": "Boutique",
+    "allBoutiques": "Toutes les boutiques",
+    "category": "Catégorie",
+    "allCategories": "Toutes les catégories",
+    "clearFilters": "Effacer les filtres",
+    "filters": "Filtres",
+    "showing": "Affichage",
+    "of": "sur",
+    "products": "produits",
+    "noProductsFound": "Aucun produit trouvé",
+    "viewDetails": "Voir les détails",
+    "quickView": "Aperçu rapide",
+    "addToWishlist": "Ajouter aux favoris",
+    "addToCart": "Ajouter au panier",
+    "sortBy": "Trier par",
+    "priceAsc": "Prix : Croissant",
+    "priceDesc": "Prix : Décroissant",
+    "nameAsc": "Nom : A à Z",
+    "nameDesc": "Nom : Z à A",
+    "newest": "Plus récent"
   }
 };

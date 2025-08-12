@@ -184,12 +184,13 @@ interface ProductDetailsPageProps {
         yvarprod: ProductVariant[];
     };
     onClose: () => void;
+    extraTop?: boolean;
 }
 
-export function ProductDetailsPage({ productData, onClose }: ProductDetailsPageProps) {
+export function ProductDetailsPage({ productData, onClose, extraTop = false }: ProductDetailsPageProps) {
     const { t } = useLanguage();
     const { formatPrice, currencies } = useCurrency();
-    
+
     // Filter to only show approved variants
     const approvedVariants = useMemo(() => {
         if (!productData.yvarprod || productData.yvarprod.length === 0) return [];
@@ -198,9 +199,7 @@ export function ProductDetailsPage({ productData, onClose }: ProductDetailsPageP
 
     const [selectedMediaIndex, setSelectedMediaIndex] = useState(0);
     const [selectedColorId, setSelectedColorId] = useState<number>(() => {
-        return approvedVariants && approvedVariants.length > 0
-            ? approvedVariants[0].xcouleur.xcouleurid
-            : 0;
+        return approvedVariants && approvedVariants.length > 0 ? approvedVariants[0].xcouleur.xcouleurid : 0;
     });
     const [selectedSizeId, setSelectedSizeId] = useState<number>(() => {
         return approvedVariants && approvedVariants.length > 0 ? approvedVariants[0].xtaille.xtailleid : 0;
@@ -212,7 +211,7 @@ export function ProductDetailsPage({ productData, onClose }: ProductDetailsPageP
     const addToCartMutation = useAddToCart();
     const addToWishlistMutation = useAddToWishlist();
     const removeFromWishlistMutation = useRemoveFromWishlist();
-    
+
     // Get all unique colors and sizes from approved variants only
     const availableColors = useMemo(() => {
         if (!approvedVariants || approvedVariants.length === 0) return [];
@@ -292,11 +291,18 @@ export function ProductDetailsPage({ productData, onClose }: ProductDetailsPageP
 
     // Calculate pricing with currency conversion
     const pricing = useMemo(() => {
-        if (!selectedVariant) return { price: 0, originalPrice: null, hasDiscount: false, formattedPrice: '', formattedOriginalPrice: null };
+        if (!selectedVariant)
+            return {
+                price: 0,
+                originalPrice: null,
+                hasDiscount: false,
+                formattedPrice: "",
+                formattedOriginalPrice: null,
+            };
 
         // Find the product's base currency
-        const productCurrency = currencies.find(c => c.xdeviseid === selectedVariant.xdeviseidfk);
-        
+        const productCurrency = currencies.find((c) => c.xdeviseid === selectedVariant.xdeviseidfk);
+
         // Get raw prices
         const rawCurrentPrice = selectedVariant.yvarprodprixpromotion || selectedVariant.yvarprodprixcatalogue;
         const rawOriginalPrice = selectedVariant.yvarprodprixpromotion ? selectedVariant.yvarprodprixcatalogue : null;
@@ -311,7 +317,7 @@ export function ProductDetailsPage({ productData, onClose }: ProductDetailsPageP
             originalPrice: rawOriginalPrice,
             hasDiscount,
             formattedPrice,
-            formattedOriginalPrice
+            formattedOriginalPrice,
         };
     }, [selectedVariant, currencies, formatPrice]);
 
@@ -408,7 +414,7 @@ export function ProductDetailsPage({ productData, onClose }: ProductDetailsPageP
     }
 
     return (
-        <div className="fixed inset-0 z-[70] bg-black/90 backdrop-blur-sm">
+        <div className={"fixed inset-0 z-[70] bg-black/90 backdrop-blur-sm" + (extraTop ? " pt-16" : "")}>
             <div className="relative w-full h-full bg-gradient-to-br from-morpheus-blue-dark via-morpheus-blue-dark/95 to-morpheus-blue-light/90 backdrop-blur-md shadow-2xl shadow-black/50 overflow-y-auto">
                 {/* Close button - top right */}
                 <button
