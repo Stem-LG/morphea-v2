@@ -126,6 +126,7 @@ export const enTranslations = {
     "storeManagement": "Stores",
     "eventManagement": "Events",
     "currencyManagement": "Currencies",
+    "categoryManagement": "Categories",
     "events": {
       "title": "Events Management",
       "subtitle": "Manage all events",
