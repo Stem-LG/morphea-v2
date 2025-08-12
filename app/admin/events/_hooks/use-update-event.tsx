@@ -15,6 +15,7 @@ interface useUpdateEventProps {
     imagesToRemove?: number[]; // ymedia IDs to remove
     selectedMallIds: number[];
     selectedBoutiqueIds: number[];
+    originalStartDate?: string; // Add original start date for validation
 }
 
 export function useUpdateEvent() {
@@ -39,12 +40,19 @@ export function useUpdateEvent() {
                    const start = eventFields.startDate ? new Date(eventFields.startDate) : undefined;
                    const end = eventFields.endDate ? new Date(eventFields.endDate) : undefined;
 
-                   if (start && start < now) {
-                       throw new Error("Event start date cannot be in the past");
+                   // For start date validation: allow past dates but not before the original start date
+                   if (start && updateData.originalStartDate) {
+                       const originalStart = new Date(updateData.originalStartDate);
+                       if (start < originalStart) {
+                           throw new Error("Event start date cannot be before the original start date");
+                       }
                    }
+                   
+                   // For end date validation: still prevent past end dates
                    if (end && end < now) {
                        throw new Error("Event end date cannot be in the past");
                    }
+                   
                    if (start && end && end < start) {
                        throw new Error("Event end date cannot be before start date");
                    }
@@ -159,7 +167,27 @@ export function useUpdateEvent() {
                 }
 
                 // Step 4: Update mall/boutique/designer relationships
-                // First, remove all existing ydetailsevent records for this event
+                // Preserve existing designer assignments BEFORE deletion
+                let preservedAssignments: { yboutiqueidfk: number; ydesignidfk: number }[] = [];
+                try {
+                    const { data: assignmentsBeforeDelete, error: assignmentsFetchError } = await supabase
+                        .schema("morpheus")
+                        .from("ydetailsevent")
+                        .select("yboutiqueidfk, ydesignidfk")
+                        .eq("yeventidfk", eventId)
+                        .not("yboutiqueidfk", "is", null)
+                        .not("ydesignidfk", "is", null);
+
+                    if (assignmentsFetchError) {
+                        console.warn("Could not fetch existing designer assignments before delete:", assignmentsFetchError.message);
+                    } else {
+                        preservedAssignments = assignmentsBeforeDelete || [];
+                    }
+                } catch (e) {
+                    console.warn("Unexpected error while preserving assignments:", (e as Error).message);
+                }
+
+                // Now remove all existing ydetailsevent records for this event
                 const { error: removeDetailsError } = await supabase
                     .schema("morpheus")
                     .from("ydetailsevent")
@@ -200,34 +228,20 @@ export function useUpdateEvent() {
                         throw new Error(`Failed to fetch boutique data: ${boutiquesError.message}`);
                     }
 
-                    // Get existing designer assignments for this event to preserve them
-                    const { data: existingAssignments, error: assignmentsError } = await supabase
-                        .schema("morpheus")
-                        .from("ydetailsevent")
-                        .select("yboutiqueidfk, ydesignidfk")
-                        .eq("yeventidfk", eventId)
-                        .not("yboutiqueidfk", "is", null)
-                        .not("ydesignidfk", "is", null);
-
-                    if (assignmentsError) {
-                        console.warn("Could not fetch existing designer assignments:", assignmentsError.message);
-                    }
-
+                    // Use preservedAssignments fetched before deletion to keep designer assignments
+                    // Recreate base boutique rows WITHOUT designer assignment
                     const boutiqueDetailRecords = selectedBoutiqueIds.map((boutiqueId) => {
                         // Find the mall ID for this boutique
                         const boutique = boutiquesData?.find(b => b.yboutiqueid === boutiqueId);
                         if (!boutique) {
                             throw new Error(`Boutique with ID ${boutiqueId} not found`);
                         }
-                        
-                        // Try to preserve existing designer assignment
-                        const existingAssignment = existingAssignments?.find(a => a.yboutiqueidfk === boutiqueId);
-                        
+
                         return {
                             yeventidfk: eventId,
                             ymallidfk: boutique.ymallidfk,
                             yboutiqueidfk: boutiqueId,
-                            ydesignidfk: existingAssignment?.ydesignidfk || null,
+                            ydesignidfk: null, // keep base record without designer
                         };
                     });
 
@@ -239,6 +253,35 @@ export function useUpdateEvent() {
 
                         if (boutiqueDetailsError) {
                             throw new Error(`Failed to create boutique event details: ${boutiqueDetailsError.message}`);
+                        }
+                    }
+
+                    // Recreate preserved designer assignments as SEPARATE rows
+                    if (preservedAssignments && preservedAssignments.length > 0) {
+                        const assignmentRows = preservedAssignments
+                            .filter(a => selectedBoutiqueIds.includes(a.yboutiqueidfk))
+                            .map(a => {
+                                const boutique = boutiquesData?.find(b => b.yboutiqueid === a.yboutiqueidfk);
+                                if (!boutique) {
+                                    throw new Error(`Boutique with ID ${a.yboutiqueidfk} not found for assignment`);
+                                }
+                                return {
+                                    yeventidfk: eventId,
+                                    ymallidfk: boutique.ymallidfk,
+                                    yboutiqueidfk: a.yboutiqueidfk,
+                                    ydesignidfk: a.ydesignidfk,
+                                };
+                            });
+
+                        if (assignmentRows.length > 0) {
+                            const { error: assignmentInsertError } = await supabase
+                                .schema("morpheus")
+                                .from("ydetailsevent")
+                                .insert(assignmentRows);
+
+                            if (assignmentInsertError) {
+                                throw new Error(`Failed to recreate designer assignments: ${assignmentInsertError.message}`);
+                            }
                         }
                     }
                 }

@@ -191,7 +191,8 @@ export function UpdateEventDialog({ children, event }: UpdateEventDialogProps) {
                 imagesToAdd: newFiles.length > 0 ? newFiles : undefined,
                 imagesToRemove: imagesToRemove.length > 0 ? imagesToRemove : undefined,
                 selectedMallIds,
-                selectedBoutiqueIds
+                selectedBoutiqueIds,
+                originalStartDate: event.yeventdatedeb // Pass original start date for validation
             });
 
             // Invalidate and refetch events

@@ -32,7 +32,15 @@ export default function DashboardContent() {
     );
 
     // Content display component that handles loading/error states
-    const StatValue = ({ value, isLoading, error }: { value: number | string; isLoading: boolean; error: Error | null }) => {
+    const StatValue = ({
+        value,
+        isLoading,
+        error,
+    }: {
+        value: number | string;
+        isLoading: boolean;
+        error: Error | null;
+    }) => {
         if (isLoading) return <LoadingSkeleton />;
         if (error) return <ErrorDisplay />;
         return <div className="text-2xl font-bold text-white">{value}</div>;
@@ -88,20 +96,13 @@ export default function DashboardContent() {
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <StatValue
-                            value={totalVisitors}
-                            isLoading={isLoading}
-                            error={error}
-                        />
+                        <StatValue value={totalVisitors} isLoading={isLoading} error={error} />
                     </CardContent>
                 </Card>
             </div>
 
             {/* Scene Analytics */}
-            <div>
-                <h2 className="text-2xl font-bold text-white mb-4">Scene View Analytics</h2>
-                <SceneAnalyticsChart />
-            </div>
+            <SceneAnalyticsChart />
         </div>
     );
 }
