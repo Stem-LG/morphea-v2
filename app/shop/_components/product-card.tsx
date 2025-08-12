@@ -5,6 +5,9 @@ import Image from "next/image";
 import { ShoppingCart, Heart, Eye } from "lucide-react";
 import { useCurrency } from "@/hooks/useCurrency";
 import { useLanguage } from "@/hooks/useLanguage";
+import { useAddToWishlist } from "@/app/_hooks/wishlist/useAddToWishlist";
+import { useRemoveFromWishlist } from "@/app/_hooks/wishlist/useRemoveFromWishlist";
+import { useIsInWishlist } from "@/app/_hooks/wishlist/useIsInWishlist";
 import { cn } from "@/lib/utils";
 
 interface ProductCardProps {
@@ -42,12 +45,19 @@ export function ProductCard({ product, viewMode, onViewDetails }: ProductCardPro
     const { t } = useLanguage();
     const [imageError, setImageError] = useState(false);
     const [hoveredColor, setHoveredColor] = useState<string | null>(null);
+    
+    // Wishlist hooks
+    const addToWishlistMutation = useAddToWishlist();
+    const removeFromWishlistMutation = useRemoveFromWishlist();
 
     // Get the first variant for pricing and media
     const firstVariant = product.yvarprod?.[0];
     const activeVariant = hoveredColor
         ? product.yvarprod?.find(v => v.xcouleur.xcouleurhexa === hoveredColor) || firstVariant
         : firstVariant;
+
+    // Check if current variant is in wishlist
+    const { data: isInWishlist = false } = useIsInWishlist(activeVariant?.yvarprodid || 0);
 
     // Get the first image from the active variant
     const firstImage = activeVariant?.yvarprodmedia?.find(
@@ -86,6 +96,17 @@ export function ProductCard({ product, viewMode, onViewDetails }: ProductCardPro
         }
         return acc;
     }, [] as Array<{ hex: string; name: string }>);
+
+    // Handle wishlist actions
+    const handleWishlistClick = () => {
+        if (!activeVariant) return;
+        
+        if (isInWishlist) {
+            removeFromWishlistMutation.mutate({ yvarprodidfk: activeVariant.yvarprodid });
+        } else {
+            addToWishlistMutation.mutate({ yvarprodidfk: activeVariant.yvarprodid });
+        }
+    };
 
     if (viewMode === 'list') {
         return (
@@ -172,8 +193,18 @@ export function ProductCard({ product, viewMode, onViewDetails }: ProductCardPro
                             >
                                 {t("shop.viewDetails")}
                             </button>
-                            <button className="p-2 bg-morpheus-blue-dark/40 border border-morpheus-gold-dark/30 rounded-lg hover:bg-morpheus-blue-dark/60 text-morpheus-gold-light hover:text-white transition-all duration-300">
-                                <Heart className="w-5 h-5" />
+                            <button
+                                onClick={handleWishlistClick}
+                                disabled={addToWishlistMutation.isPending || removeFromWishlistMutation.isPending}
+                                className={cn(
+                                    "p-2 border rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed",
+                                    isInWishlist
+                                        ? "bg-red-500/80 border-red-500/60 text-white hover:bg-red-500"
+                                        : "bg-morpheus-blue-dark/40 border-morpheus-gold-dark/30 text-morpheus-gold-light hover:bg-morpheus-blue-dark/60 hover:text-white"
+                                )}
+                                title={isInWishlist ? t("shop.removeFromWishlist") : t("shop.addToWishlist")}
+                            >
+                                <Heart className={cn("w-5 h-5", isInWishlist && "fill-current")} />
                             </button>
                         </div>
                     </div>
@@ -218,10 +249,17 @@ export function ProductCard({ product, viewMode, onViewDetails }: ProductCardPro
                         <Eye className="w-5 h-5" />
                     </button>
                     <button
-                        className="bg-morpheus-blue-dark/60 border border-morpheus-gold-dark/40 text-morpheus-gold-light p-3 rounded-full hover:bg-morpheus-blue-dark/80 hover:text-white transition-all duration-300 shadow-lg"
-                        title={t("shop.addToWishlist")}
+                        onClick={handleWishlistClick}
+                        disabled={addToWishlistMutation.isPending || removeFromWishlistMutation.isPending}
+                        className={cn(
+                            "border p-3 rounded-full transition-all duration-300 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed",
+                            isInWishlist
+                                ? "bg-red-500/80 border-red-500/60 text-white hover:bg-red-500"
+                                : "bg-morpheus-blue-dark/60 border-morpheus-gold-dark/40 text-morpheus-gold-light hover:bg-morpheus-blue-dark/80 hover:text-white"
+                        )}
+                        title={isInWishlist ? t("shop.removeFromWishlist") : t("shop.addToWishlist")}
                     >
-                        <Heart className="w-5 h-5" />
+                        <Heart className={cn("w-5 h-5", isInWishlist && "fill-current")} />
                     </button>
                 </div>
             </div>

@@ -1315,6 +1315,7 @@ export const enTranslations = {
     "viewDetails": "View Details",
     "quickView": "Quick View",
     "addToWishlist": "Add to Wishlist",
+    "removeFromWishlist": "Remove from Wishlist",
     "addToCart": "Add to Cart",
     "sortBy": "Sort by",
     "priceAsc": "Price: Low to High",

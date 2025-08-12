@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { Grid, List, ChevronLeft, ChevronRight, Filter, X } from "lucide-react";
 import { useQueryStates, parseAsInteger, parseAsString, parseAsStringEnum } from "nuqs";
 import { useLanguage } from "@/hooks/useLanguage";
@@ -10,7 +10,7 @@ import { ProductCard } from "./_components/product-card";
 import { ProductDetailsPage } from "@/app/main/_components/product-details-page";
 import { cn } from "@/lib/utils";
 
-export default function ShopPage() {
+function ShopContent() {
     const { t } = useLanguage();
 
     // URL state management for filters and view mode
@@ -420,15 +420,27 @@ export default function ShopPage() {
 
             {/* Product Details Modal */}
             {showProductDetails && selectedProduct && (
-                    <ProductDetailsPage
-                        productData={selectedProduct}
-                        onClose={() => {
-                            setShowProductDetails(false);
-                            setSelectedProduct(null);
-                        }}
-                        extraTop
-                    />
+                <ProductDetailsPage
+                    productData={selectedProduct}
+                    onClose={() => {
+                        setShowProductDetails(false);
+                        setSelectedProduct(null);
+                    }}
+                    extraTop
+                />
             )}
         </div>
+    );
+}
+
+export default function ShopPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-gradient-to-br from-morpheus-blue-dark via-morpheus-blue-dark/95 to-morpheus-blue-light/90 flex items-center justify-center">
+                <div className="animate-spin rounded-full h-16 w-16 border-4 border-morpheus-gold-dark/30 border-t-morpheus-gold-light"></div>
+            </div>
+        }>
+            <ShopContent />
+        </Suspense>
     );
 }

@@ -77,6 +77,7 @@ export function useCreateProduct() {
                         yproddetailstech: productData.fullDescription,
                         xcategprodidfk: productData.categoryId || null,
                         ydesignidfk: productData.designerId,
+                        yinfospotactionsidfk: productData.infospotactionId || null,
                     })
                     .select("*")
                     .single();
@@ -107,7 +108,6 @@ export function useCreateProduct() {
                         yboutiqueidfk: productData.storeId,
                         ymallidfk: storeData.ymallidfk,
                         ydesignidfk: productData.designerId,
-                        yinfospotactionId: productData.infospotactionId?.toString() || null,
                     });
 
                 if (detailsEventError) {
