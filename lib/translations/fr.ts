@@ -29,7 +29,9 @@ export const frTranslations = {
     "confirm": "Confirmer",
     "optional": "Optionnel",
     "close": "Fermer",
-    "retry": "Réessayer"
+    "retry": "Réessayer",
+    "none": "Aucun",
+    "actions": "Actions"
   },
   "auth": {
     "name": "Nom",
@@ -92,7 +94,8 @@ export const frTranslations = {
     "termsContentPlaceholder": "Le contenu des conditions générales sera ajouté ici.",
     "developmentPlaceholder": "Ceci est une page de développement temporaire.",
     "backToSignUp": "← Retour à l'inscription",
-    "backToMorpheusMall": "← Retour à Morpheus Mall"
+    "backToMorpheusMall": "← Retour à Morpheus Mall",
+    "morpheusMall": "Morpheus Mall"
   },
   "landing": {
     "title": "Bienvenue chez Morpheus Mall",
@@ -543,7 +546,36 @@ export const frTranslations = {
       "productVariant": "variante de produit",
       "deleteCurrency": "Supprimer la devise",
       "confirmDelete": "Êtes-vous sûr de vouloir supprimer cette devise ? Cette action ne peut pas être annulée.",
-      "failedToDelete": "Échec de la suppression de la devise"
+      "failedToDelete": "Échec de la suppression de la devise",
+      "currencyName": "Nom de la Devise",
+      "codes": "Codes Alpha/Numérique",
+      "exchangeRate": "Taux de Change",
+      "pivot": "Pivot",
+      "pivotCurrency": "Devise Pivot",
+      "currentPivotCurrency": "Devise Pivot Actuelle",
+      "setAsPivot": "Définir comme Pivot",
+      "cannotDeletePivot": "Impossible de supprimer la devise pivot. Définissez d'abord une autre devise comme pivot.",
+      "cannotDeleteInUse": "Impossible de supprimer : Devise utilisée par {count} variante{plural} de produit",
+      "editCurrencyDialog": "Modifier la Devise",
+      "editCurrencyDialogDescription": "Mettez à jour les informations de la devise ci-dessous. Notez que le paramètre de devise pivot est géré séparément.",
+      "currencyUpdatedSuccess": "Devise mise à jour avec succès !",
+      "failedToUpdateCurrency": "Échec de la mise à jour de la devise",
+      "updating": "Mise à jour...",
+      "currencyInformation": "Informations de la Devise",
+      "paymentSettings": "Paramètres de Paiement",
+      "exchangeRateSettings": "Paramètres du Taux de Change",
+      "exchangeRateLabel": "Taux de Change",
+      "exchangeRateDescription": "Taux de change par rapport à la devise pivot",
+      "exchangeRatePlaceholder": "1,0000",
+      "exchangeRateHelp": "Combien d'unités de cette devise équivalent à 1 unité de la devise pivot",
+      "validationRequired": "Ce champ est requis",
+      "validationAlphaCode": "Le code alpha doit contenir exactement 3 caractères",
+      "validationNumericCode": "Le code numérique doit contenir exactement 3 chiffres",
+      "validationDecimalPlaces": "Le nombre de décimales doit être entre 0 et 4",
+      "validationExchangeRate": "Le taux de change doit être supérieur à 0",
+      "formErrors": "Veuillez corriger les erreurs suivantes :",
+      "closeDialog": "Fermer",
+      "actions": "Actions"
     },
     "createProduct": {
       "fillColorCodeAndName": "Veuillez remplir le code et le nom de la couleur",

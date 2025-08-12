@@ -29,7 +29,9 @@ export const enTranslations = {
     "confirm": "Confirm",
     "optional": "Optional",
     "close": "Close",
-    "retry": "Retry"
+    "retry": "Retry",
+    "none": "None",
+    "actions": "Actions"
   },
   "auth": {
     "name": "Name",
@@ -92,7 +94,8 @@ export const enTranslations = {
     "termsContentPlaceholder": "Terms and conditions content will be added here.",
     "developmentPlaceholder": "This is a placeholder page for development purposes.",
     "backToSignUp": "← Back to Sign Up",
-    "backToMorpheusMall": "← Back to Morpheus Mall"
+    "backToMorpheusMall": "← Back to Morpheus Mall",
+    "morpheusMall": "Morpheus Mall"
   },
   "landing": {
     "title": "Welcome to Morpheus Mall",
@@ -522,7 +525,36 @@ export const enTranslations = {
       "productVariant": "product variant",
       "deleteCurrency": "Delete currency",
       "confirmDelete": "Are you sure you want to delete this currency? This action cannot be undone.",
-      "failedToDelete": "Failed to delete currency"
+      "failedToDelete": "Failed to delete currency",
+      "currencyName": "Currency Name",
+      "codes": "Alpha/Numeric Codes",
+      "exchangeRate": "Exchange Rate",
+      "pivot": "Pivot",
+      "pivotCurrency": "Pivot Currency",
+      "currentPivotCurrency": "Current Pivot Currency",
+      "setAsPivot": "Set as Pivot",
+      "cannotDeletePivot": "Cannot delete the pivot currency. Set another currency as pivot first.",
+      "cannotDeleteInUse": "Cannot delete: Currency used by {count} product variant{plural}",
+      "editCurrencyDialog": "Edit Currency",
+      "editCurrencyDialogDescription": "Update the currency information below. Note that the pivot currency setting is managed separately.",
+      "currencyUpdatedSuccess": "Currency updated successfully!",
+      "failedToUpdateCurrency": "Failed to update currency",
+      "updating": "Updating...",
+      "currencyInformation": "Currency Information",
+      "paymentSettings": "Payment Settings",
+      "exchangeRateSettings": "Exchange Rate Settings",
+      "exchangeRateLabel": "Exchange Rate",
+      "exchangeRateDescription": "Exchange rate relative to the pivot currency",
+      "exchangeRatePlaceholder": "1.0000",
+      "exchangeRateHelp": "How many units of this currency equal 1 unit of the pivot currency",
+      "validationRequired": "This field is required",
+      "validationAlphaCode": "Alpha code must be exactly 3 characters",
+      "validationNumericCode": "Numeric code must be exactly 3 digits",
+      "validationDecimalPlaces": "Decimal places must be between 0 and 4",
+      "validationExchangeRate": "Exchange rate must be greater than 0",
+      "formErrors": "Please fix the following errors:",
+      "closeDialog": "Close",
+      "actions": "Actions"
     },
     "createProduct": {
       "fillColorCodeAndName": "Please fill in color code and name",
