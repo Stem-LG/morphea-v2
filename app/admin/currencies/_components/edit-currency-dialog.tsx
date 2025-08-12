@@ -118,7 +118,7 @@ export function EditCurrencyDialog({ currency, isOpen, onClose }: EditCurrencyDi
                 updates: formData
             });
             onClose();
-        } catch (error) {
+        } catch {
             // Error handling is done by the mutation hook
         }
     };

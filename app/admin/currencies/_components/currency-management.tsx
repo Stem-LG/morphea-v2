@@ -15,7 +15,6 @@ import {
     Edit,
     Trash2,
     DollarSign,
-    Search,
     CheckCircle,
     X,
     Save,
@@ -283,7 +282,7 @@ export function CurrencyManagement() {
         try {
             await createCurrencyMutation.mutateAsync(formData);
             resetForm();
-        } catch (error) {
+        } catch {
             // Error handling is done by the mutation hooks
         }
     };
