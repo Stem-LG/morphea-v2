@@ -8,21 +8,20 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogOverlay,
-  DialogPortal,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Star, 
-  AlertTriangle, 
-  TrendingUp, 
-  X, 
+import {
+  Star,
+  AlertTriangle,
+  TrendingUp,
+  X,
   Save,
   Loader2
 } from "lucide-react";
+import { useLanguage } from "@/hooks/useLanguage";
 import { usePivotChange } from "../_hooks/use-pivot-change";
 
 interface PivotChangeDialogProps {
@@ -30,6 +29,7 @@ interface PivotChangeDialogProps {
 }
 
 export function PivotChangeDialog({ pivotChangeHook }: PivotChangeDialogProps) {
+  const { t } = useLanguage();
   const {
     isDialogOpen,
     selectedCurrency,
@@ -41,21 +41,22 @@ export function PivotChangeDialog({ pivotChangeHook }: PivotChangeDialogProps) {
     handleSubmitPivotChange,
   } = pivotChangeHook;
 
-  if (!selectedCurrency) return null;
+  if (!selectedCurrency) {
+    return null;
+  }
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={handleCloseDialog}>
-      <DialogPortal>
-        <DialogOverlay className="bg-black/30" />
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-gradient-to-br from-morpheus-blue-dark to-morpheus-blue-light border-slate-700/50">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-gradient-to-br from-morpheus-blue-dark to-morpheus-blue-light border-slate-700/50">
         <DialogHeader>
           <DialogTitle className="text-white flex items-center gap-2">
             <Star className="h-5 w-5 text-yellow-400" />
-            Change Pivot Currency
+            {t('admin.currencies.changePivotCurrency')}
           </DialogTitle>
           <DialogDescription className="text-gray-300">
-            You are about to set <strong>{selectedCurrency.xdeviseintitule}</strong> ({selectedCurrency.xdevisecodealpha}) as the new pivot currency.
-            Please enter the exchange rates for all other currencies relative to this new pivot.
+            {t('admin.currencies.changePivotCurrencyDescription')
+              .replace('{currency}', selectedCurrency.xdeviseintitule || '')
+              .replace('{code}', selectedCurrency.xdevisecodealpha || '')}
           </DialogDescription>
         </DialogHeader>
 
@@ -63,7 +64,7 @@ export function PivotChangeDialog({ pivotChangeHook }: PivotChangeDialogProps) {
         <div className="p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
           <div className="flex items-center gap-2 mb-2">
             <AlertTriangle className="h-4 w-4 text-yellow-400" />
-            <p className="text-yellow-400 font-medium">Important Information</p>
+            <p className="text-yellow-400 font-medium">{t('admin.currencies.importantInformation')}</p>
           </div>
           <ul className="text-sm text-gray-300 space-y-1 ml-6">
             <li>• <strong>{selectedCurrency.xdeviseintitule}</strong> will become the new pivot currency with an exchange rate of 1.0</li>
@@ -79,7 +80,7 @@ export function PivotChangeDialog({ pivotChangeHook }: PivotChangeDialogProps) {
             <div className="flex items-center gap-3">
               <Star className="h-5 w-5 text-yellow-400" />
               <div>
-                <p className="text-yellow-400 font-medium">New Pivot Currency</p>
+                <p className="text-yellow-400 font-medium">{t('admin.currencies.newPivotCurrency')}</p>
                 <p className="text-white text-lg font-semibold">
                   {selectedCurrency.xdeviseintitule} ({selectedCurrency.xdevisecodealpha})
                 </p>
@@ -96,7 +97,7 @@ export function PivotChangeDialog({ pivotChangeHook }: PivotChangeDialogProps) {
           <div className="flex items-center gap-2 mb-4">
             <TrendingUp className="h-4 w-4 text-blue-400" />
             <h3 className="text-white font-medium">
-              Set Exchange Rates (relative to {selectedCurrency.xdevisecodealpha})
+              {t('admin.currencies.setExchangeRatesRelativeTo').replace('{code}', selectedCurrency.xdevisecodealpha || '')}
             </h3>
           </div>
 
@@ -145,7 +146,7 @@ export function PivotChangeDialog({ pivotChangeHook }: PivotChangeDialogProps) {
             className="border-slate-600 text-gray-300 hover:bg-slate-700/50"
           >
             <X className="h-4 w-4 mr-2" />
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button
             type="button"
@@ -156,18 +157,17 @@ export function PivotChangeDialog({ pivotChangeHook }: PivotChangeDialogProps) {
             {isLoading ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Updating...
+                {t('admin.currencies.updatingPivot')}
               </>
             ) : (
               <>
                 <Save className="h-4 w-4 mr-2" />
-                Change Pivot Currency
+                {t('admin.currencies.changePivotCurrencyButton')}
               </>
             )}
           </Button>
         </DialogFooter>
-        </DialogContent>
-      </DialogPortal>
+      </DialogContent>
     </Dialog>
   );
 }

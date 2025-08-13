@@ -4,6 +4,7 @@ import { useState } from "react";
 import { createClient } from "@/lib/client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { useLanguage } from "@/hooks/useLanguage";
 import type { Database } from "@/lib/supabase";
 
 type Currency = Database['morpheus']['Tables']['xdevise']['Row'];
@@ -21,6 +22,7 @@ interface PivotChangeData {
 }
 
 export function usePivotChange() {
+  const { t } = useLanguage();
   const queryClient = useQueryClient();
   const supabase = createClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -73,13 +75,14 @@ export function usePivotChange() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['currencies-with-stats'] });
       queryClient.invalidateQueries({ queryKey: ['currencies'] });
-      toast.success("Pivot currency changed successfully", {
-        description: `${selectedCurrency?.xdeviseintitule} is now the pivot currency with all exchange rates updated.`
+      toast.success(t('admin.currencies.pivotCurrencyChangedSuccess'), {
+        description: t('admin.currencies.pivotCurrencyChangedDescription')
+          .replace('{currency}', selectedCurrency?.xdeviseintitule || '')
       });
       handleCloseDialog();
     },
     onError: (error) => {
-      toast.error("Failed to change pivot currency", {
+      toast.error(t('admin.currencies.failedToChangePivotCurrency'), {
         description: error instanceof Error ? error.message : "An unexpected error occurred"
       });
     }
@@ -137,7 +140,7 @@ export function usePivotChange() {
       
       // Check if rate is empty
       if (!rate.trim()) {
-        newErrors[currencyId] = "Exchange rate is required";
+        newErrors[currencyId] = t('admin.currencies.exchangeRateRequired');
         isValid = false;
         return;
       }
@@ -145,7 +148,7 @@ export function usePivotChange() {
       // Check if rate is a valid positive number
       const numericRate = parseFloat(rate);
       if (isNaN(numericRate) || numericRate <= 0) {
-        newErrors[currencyId] = "Exchange rate must be a positive number";
+        newErrors[currencyId] = t('admin.currencies.exchangeRatePositive');
         isValid = false;
         return;
       }
@@ -153,7 +156,7 @@ export function usePivotChange() {
       // Check decimal places (max 4)
       const decimalPlaces = (rate.split('.')[1] || '').length;
       if (decimalPlaces > 4) {
-        newErrors[currencyId] = "Exchange rate can have at most 4 decimal places";
+        newErrors[currencyId] = t('admin.currencies.exchangeRateMaxDecimals');
         isValid = false;
         return;
       }
@@ -167,7 +170,7 @@ export function usePivotChange() {
     if (!selectedCurrency) return;
 
     if (!validateExchangeRates()) {
-      toast.error("Please fix the validation errors before proceeding");
+      toast.error(t('admin.currencies.fixValidationErrors'));
       return;
     }
 

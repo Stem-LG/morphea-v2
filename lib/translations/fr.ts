@@ -575,7 +575,22 @@ export const frTranslations = {
       "validationExchangeRate": "Le taux de change doit être supérieur à 0",
       "formErrors": "Veuillez corriger les erreurs suivantes :",
       "closeDialog": "Fermer",
-      "actions": "Actions"
+      "actions": "Actions",
+      "changePivotCurrency": "Changer la Devise Pivot",
+      "changePivotCurrencyDescription": "Vous êtes sur le point de définir {currency} ({code}) comme nouvelle devise pivot. Veuillez saisir les taux de change pour toutes les autres devises par rapport à ce nouveau pivot.",
+      "importantInformation": "Informations Importantes",
+      "newPivotCurrency": "Nouvelle Devise Pivot",
+      "setExchangeRates": "Définir les Taux de Change",
+      "setExchangeRatesRelativeTo": "Définir les Taux de Change (par rapport à {code})",
+      "exchangeRateRequired": "Le taux de change est requis",
+      "exchangeRatePositive": "Le taux de change doit être un nombre positif",
+      "exchangeRateMaxDecimals": "Le taux de change peut avoir au maximum 4 décimales",
+      "fixValidationErrors": "Veuillez corriger les erreurs de validation avant de continuer",
+      "changePivotCurrencyButton": "Changer la Devise Pivot",
+      "updatingPivot": "Mise à jour...",
+      "pivotCurrencyChangedSuccess": "Devise pivot changée avec succès",
+      "pivotCurrencyChangedDescription": "{currency} est maintenant la devise pivot avec tous les taux de change mis à jour.",
+      "failedToChangePivotCurrency": "Échec du changement de devise pivot"
     },
     "createProduct": {
       "fillColorCodeAndName": "Veuillez remplir le code et le nom de la couleur",

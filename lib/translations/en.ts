@@ -554,7 +554,22 @@ export const enTranslations = {
       "validationExchangeRate": "Exchange rate must be greater than 0",
       "formErrors": "Please fix the following errors:",
       "closeDialog": "Close",
-      "actions": "Actions"
+      "actions": "Actions",
+      "changePivotCurrency": "Change Pivot Currency",
+      "changePivotCurrencyDescription": "You are about to set {currency} ({code}) as the new pivot currency. Please enter the exchange rates for all other currencies relative to this new pivot.",
+      "importantInformation": "Important Information",
+      "newPivotCurrency": "New Pivot Currency",
+      "setExchangeRates": "Set Exchange Rates",
+      "setExchangeRatesRelativeTo": "Set Exchange Rates (relative to {code})",
+      "exchangeRateRequired": "Exchange rate is required",
+      "exchangeRatePositive": "Exchange rate must be a positive number",
+      "exchangeRateMaxDecimals": "Exchange rate can have at most 4 decimal places",
+      "fixValidationErrors": "Please fix the validation errors before proceeding",
+      "changePivotCurrencyButton": "Change Pivot Currency",
+      "updatingPivot": "Updating...",
+      "pivotCurrencyChangedSuccess": "Pivot currency changed successfully",
+      "pivotCurrencyChangedDescription": "{currency} is now the pivot currency with all exchange rates updated.",
+      "failedToChangePivotCurrency": "Failed to change pivot currency"
     },
     "createProduct": {
       "fillColorCodeAndName": "Please fill in color code and name",
