@@ -95,7 +95,8 @@ export const frTranslations = {
     "developmentPlaceholder": "Ceci est une page de développement temporaire.",
     "backToSignUp": "← Retour à l'inscription",
     "backToMorpheusMall": "← Retour à Morpheus Mall",
-    "morpheusMall": "Morpheus Mall"
+    "morpheusMall": "Morpheus Mall",
+    "signOut": "Déconnexion"
   },
   "landing": {
     "title": "Bienvenue chez Morpheus Mall",
@@ -124,7 +125,20 @@ export const frTranslations = {
     "deleteProduct": "Supprimer le produit",
     "adminPanel": "Menu",
     "productManagement": "Produits",
-    "productApprovals": "Approbations de produits",
+    "productApprovals": {
+      "title": "Approbations de produits",
+      "pendingReview": "En attente de révision",
+      "approveSelected": "Approuver la sélection",
+      "rejectSelected": "Rejeter la sélection",
+      "bulkActions": "Actions groupées",
+      "filterStatus": "Filtrer par statut",
+      "noProducts": "Aucun produit à approuver.",
+      "details": "Détails",
+      "code": "Code",
+      "status": "Statut",
+      "approve": "Approuver",
+      "needsRevision": "Nécessite une révision"
+    },
     "userManagement": "Utilisateurs",
     "storeManagement": "Boutiques",
     "eventManagement": "Événements",
@@ -263,7 +277,10 @@ export const frTranslations = {
       "viewsByBoutique": "Vues par Boutique",
       "scene": "scène",
       "scenes": "scènes",
-      "boutique": "Boutique"
+      "boutique": "Boutique",
+      "totalViews": "Total des vues",
+      "totalScenes": "Total des scènes",
+      "averageViews": "Vues moyennes"
     },
     "settings": "Paramètres",
     "panel": "Panneau",
@@ -794,7 +811,7 @@ export const frTranslations = {
         "specialtyRequired": "Spécialité *",
         "specialtyPlaceholder": "Entrez la spécialité",
         "requiredFields": "* Champs requis"
-      }
+      },
     },
     "designerAssignments": {
       "title": "Attributions de Designers",
@@ -1159,7 +1176,8 @@ export const frTranslations = {
     "removeFromCart": "Retirer du panier",
     "oneItem": "article",
     "multipleItems": "articles",
-    "inYourCart": "dans votre panier"
+    "inYourCart": "dans votre panier",
+    "emptyMessage": "Votre panier est vide"
   },
   "wishlist": {
     "title": "Ma liste de souhaits",
@@ -1186,7 +1204,8 @@ export const frTranslations = {
     "moreItems": "articles de plus",
     "oneItem": "article",
     "multipleItems": "articles",
-    "savedForLater": "sauvegardés pour plus tard"
+    "savedForLater": "sauvegardés pour plus tard",
+    "emptyMessage": "Sauvegardez vos articles préférés pour plus tard"
   },
   "profile": {
     "title": "Profil utilisateur",
