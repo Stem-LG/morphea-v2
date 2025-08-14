@@ -133,11 +133,13 @@ function GLBModel({ url, name }: { url: string; name: string }) {
 }
 
 // Product Model component
-function ProductModel({ url, name }: { url: string; name: string }) {
+function ProductModel({ url, name, backgroundColor }: { url: string; name: string; backgroundColor?: string }) {
     return (
-        <Suspense fallback={<LoadingSpinner />}>
-            <GLBModel url={url} name={name} />
-        </Suspense>
+        <div style={{ backgroundColor: backgroundColor || "#f0f0f0" }}>
+            <Suspense fallback={<LoadingSpinner />}>
+                <GLBModel url={url} name={name} />
+            </Suspense>
+        </div>
     );
 }
 
@@ -172,6 +174,7 @@ type ProductVariant = {
     yobjet3d?: Array<{
         yobjet3did: number;
         yobjet3durl: string;
+        ycouleurarriereplan?: string | null;
     }>;
 };
 
@@ -623,6 +626,7 @@ export function ProductDetailsPage({ productData, onClose, extraTop = false }: P
                                                     <ProductModel
                                                         url={selected3DModel.yobjet3durl}
                                                         name={productData.yprodintitule}
+                                                        backgroundColor={selected3DModel?.ycouleurarriereplan || "#f0f0f0"}
                                                     />
                                                 )}
 
