@@ -9,6 +9,7 @@ interface Model3DViewerProps {
     modelUrl: string;
     className?: string;
     autoRotate?: boolean;
+    backgroundColor?: string;
 }
 
 // Loading component for 3D model
@@ -135,7 +136,7 @@ function ProductModel({ url, name }: { url: string; name: string }) {
     );
 }
 
-export function Model3DViewer({ modelUrl, className = "", autoRotate = false }: Model3DViewerProps) {
+export function Model3DViewer({ modelUrl, className = "", autoRotate = false, backgroundColor = "#f0f0f0" }: Model3DViewerProps) {
     if (!modelUrl) {
         return (
             <div className={`bg-gray-800 rounded-lg flex items-center justify-center ${className}`}>
@@ -145,7 +146,7 @@ export function Model3DViewer({ modelUrl, className = "", autoRotate = false }: 
     }
 
     return (
-        <div className={`bg-gray-100 rounded-lg overflow-hidden ${className}`} style={{ backgroundColor: "#f0f0f0" }}>
+        <div className={`bg-gray-100 rounded-lg overflow-hidden ${className}`} style={{ backgroundColor }}>
             <Canvas
                 camera={{ position: [3, 3, 3], fov: 50 }}
                 shadows
@@ -157,7 +158,7 @@ export function Model3DViewer({ modelUrl, className = "", autoRotate = false }: 
                 style={{ width: "100%", height: "100%" }}
             >
                 <Suspense fallback={<LoadingSpinner />}>
-                    <fog attach="fog" args={["#f0f0f0", 10, 30]} />
+                    <fog attach="fog" args={[backgroundColor, 10, 30]} />
                     <ambientLight intensity={1.0} color="#ffffff" />
                     <directionalLight
                         position={[5, 8, 5]}
