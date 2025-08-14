@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
@@ -1536,6 +1536,51 @@ export type Database = {
           ymediaid?: number
           ymediaintitule?: string
           ymediaurl?: string
+        }
+        Relationships: []
+      }
+      ynotification: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          created_ip: string | null
+          updated_at: string | null
+          updated_by: string | null
+          updated_ip: string | null
+          ycible: string | null
+          yest_lu: boolean | null
+          ylien: string | null
+          ymessage: string | null
+          ynotificationid: string
+          ytitre: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          created_ip?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+          updated_ip?: string | null
+          ycible?: string | null
+          yest_lu?: boolean | null
+          ylien?: string | null
+          ymessage?: string | null
+          ynotificationid?: string
+          ytitre: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          created_ip?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+          updated_ip?: string | null
+          ycible?: string | null
+          yest_lu?: boolean | null
+          ylien?: string | null
+          ymessage?: string | null
+          ynotificationid?: string
+          ytitre?: string
         }
         Relationships: []
       }

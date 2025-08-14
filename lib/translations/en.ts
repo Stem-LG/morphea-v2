@@ -8,7 +8,8 @@ export const enTranslations = {
     "profile": "Profile",
     "login": "Login",
     "signup": "Get Started",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "notifications": "Notifications"
   },
   "common": {
     "welcome": "Welcome",
@@ -1390,5 +1391,24 @@ export const enTranslations = {
     "nameAsc": "Name: A to Z",
     "nameDesc": "Name: Z to A",
     "newest": "Newest First"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "unreadCount": "You have {count} unread notification(s)",
+    "markAllAsSeen": "Mark all as seen",
+    "markAsSeen": "Mark as seen",
+    "empty": "No notifications to display",
+    "loading": "Loading notifications...",
+    "error": "Error loading notifications",
+    "seen": "Seen",
+    "timestamp": "{time} ago",
+    "markAllRead": "Mark all read",
+    "markAsRead": "Mark as read",
+    "loadingMore": "Loading more...",
+    "unableToLoad": "Unable to load notifications",
+    "tryAgainLater": "Please try again later",
+    "allCaughtUp": "You're all caught up!",
+    "noNewNotifications": "No new notifications to show",
+    "defaultTitle": "Notification"
   }
 };
