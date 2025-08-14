@@ -308,7 +308,7 @@ export default function NavBar() {
                                                                                     )}
                                                                                 </div>
                                                                                 <span className="text-xs text-gray-500 dark:text-gray-400 flex-shrink-0 ml-2">
-                                                                                    {new Date(n.created_at).toLocaleDateString()}
+                                                                                    {new Date(n.sysdate).toLocaleDateString()}
                                                                                 </span>
                                                                             </div>
                                                                             
@@ -320,7 +320,7 @@ export default function NavBar() {
                                                                             
                                                                             <div className="flex items-center justify-between w-full">
                                                                                 <span className="text-xs text-gray-400 dark:text-gray-500">
-                                                                                    {new Date(n.created_at).toLocaleTimeString([], { 
+                                                                                    {new Date(n.sysdate).toLocaleTimeString([], { 
                                                                                         hour: '2-digit', 
                                                                                         minute: '2-digit' 
                                                                                     })}

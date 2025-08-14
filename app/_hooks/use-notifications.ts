@@ -30,7 +30,7 @@ export function useNotifications(userId: string) {
         .from("ynotification")
         .select("*")
         .eq("ycible", userId)
-        .order("created_at", { ascending: false })
+        .order("sysdate", { ascending: false })
         .range(pageParam, pageParam + PAGE_SIZE - 1);
 
       if (error) throw error;

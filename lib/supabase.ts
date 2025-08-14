@@ -1541,42 +1541,36 @@ export type Database = {
       }
       ynotification: {
         Row: {
-          created_at: string
-          created_by: string | null
-          created_ip: string | null
-          updated_at: string | null
-          updated_by: string | null
-          updated_ip: string | null
-          ycible: string | null
-          yest_lu: boolean | null
+          sysaction: string | null
+          sysadresseip: string | null
+          sysdate: string
+          sysuser: string | null
+          ycible: string
+          yest_lu: boolean
           ylien: string | null
           ymessage: string | null
           ynotificationid: string
           ytitre: string
         }
         Insert: {
-          created_at?: string
-          created_by?: string | null
-          created_ip?: string | null
-          updated_at?: string | null
-          updated_by?: string | null
-          updated_ip?: string | null
-          ycible?: string | null
-          yest_lu?: boolean | null
+          sysaction?: string | null
+          sysadresseip?: string | null
+          sysdate?: string
+          sysuser?: string | null
+          ycible: string
+          yest_lu?: boolean
           ylien?: string | null
           ymessage?: string | null
           ynotificationid?: string
           ytitre: string
         }
         Update: {
-          created_at?: string
-          created_by?: string | null
-          created_ip?: string | null
-          updated_at?: string | null
-          updated_by?: string | null
-          updated_ip?: string | null
-          ycible?: string | null
-          yest_lu?: boolean | null
+          sysaction?: string | null
+          sysadresseip?: string | null
+          sysdate?: string
+          sysuser?: string | null
+          ycible?: string
+          yest_lu?: boolean
           ylien?: string | null
           ymessage?: string | null
           ynotificationid?: string
