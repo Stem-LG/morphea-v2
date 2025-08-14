@@ -257,6 +257,7 @@ function VariantCard({ variant, onApprove, onReject, isLoading, eventStartDate, 
                                     modelUrl={modelUrl}
                                     className="aspect-video"
                                     autoRotate={true}
+                                    backgroundColor={variant.yobjet3d?.[index]?.ycouleurarriereplan || "#ffffff"}
                                 />
                             ))}
                         </div>

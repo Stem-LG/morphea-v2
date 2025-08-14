@@ -13,6 +13,7 @@ import {
     Box,
     FileSearch,
 } from "lucide-react";
+import { Model3DViewer } from "./three-d-viewer";
 
 interface ApprovalCardProps {
     product: any;
@@ -118,14 +119,20 @@ export function ApprovalCard({
     const getMediaPreview = () => {
         // Check if product has 3D models first
         const has3DModels = product.yobjet3d?.length > 0;
-        
+
         if (has3DModels) {
+            // Use the first 3D model for preview
+            const model = product.yobjet3d[0];
+            // Use ycouleurarriereplan if set, else fallback to white
+            const backgroundColor = model?.ycouleurarriereplan || "#ffffff";
             return (
-                <div className="relative w-full h-32 bg-gradient-to-br from-purple-900/30 to-blue-900/30 rounded-lg flex items-center justify-center border border-purple-500/30">
-                    <div className="flex flex-col items-center">
-                        <Box className="h-10 w-10 text-purple-400 mb-2" />
-                        <span className="text-purple-300 text-xs font-medium">{t("admin.approvals.model3DAvailable")}</span>
-                    </div>
+                <div className="relative w-full h-40 rounded-lg flex items-center justify-center border border-purple-500/30 bg-gray-900/30">
+                    <Model3DViewer
+                        modelUrl={model?.ymodelurl}
+                        backgroundColor={backgroundColor}
+                        className="w-full h-40"
+                        autoRotate={true}
+                    />
                     <div className="absolute top-2 right-2">
                         <Badge variant="secondary" className="bg-purple-500/20 text-purple-300 border-purple-500/30 text-xs">
                             {t("admin.approvals.preview3D")}

@@ -25,6 +25,7 @@ import { useApprovalStats } from "./_hooks/use-approval-stats";
 import { ApprovalCard } from "./_components/approval-card";
 import { ApprovalForm } from "./_components/approval-form";
 import { Toaster } from "./_components/toaster";
+import { Model3DViewer } from "./_components/three-d-viewer";
 
 // Let Supabase infer the types automatically
 type Product = any;
@@ -230,14 +231,54 @@ export default function ApprovalsPage() {
     // Define table columns
     const columns: ColumnDef<Product>[] = [
         {
-            accessorKey: "yprodcode",
-            header: t("admin.approvals.productCode"),
-            enableSorting: true,
-            cell: ({ row }) => (
-                <div className="font-mono text-sm">
-                    {row.getValue("yprodcode")}
-                </div>
-            ),
+            id: "preview",
+            header: t("admin.approvals.preview"),
+            cell: ({ row }) => {
+                const product = row.original;
+                // 3D preview logic
+                if (product.yobjet3d?.length > 0) {
+                    const model = product.yobjet3d[0];
+                    const backgroundColor = model?.ycouleurarriereplan || "#ffffff";
+                    return (
+                        <div className="w-24 h-24 flex items-center justify-center">
+                            <Model3DViewer
+                                modelUrl={model?.ymodelurl}
+                                backgroundColor={backgroundColor}
+                                className="w-24 h-24"
+                                autoRotate={true}
+                            />
+                        </div>
+                    );
+                }
+                // Fallback to image/video preview
+                const media = product.media?.[0];
+                if (media) {
+                    if (media.ymediaboolvideo) {
+                        return (
+                            <div className="w-24 h-24 flex items-center justify-center bg-gray-800 rounded-lg">
+                                <span className="text-xs text-gray-400">Video</span>
+                            </div>
+                        );
+                    } else {
+                        return (
+                            <div className="w-24 h-24 flex items-center justify-center bg-gray-800 rounded-lg overflow-hidden">
+                                <img
+                                    src={media.ymediaurl}
+                                    alt={media.ymediaintitule}
+                                    className="w-full h-full object-cover"
+                                    style={{ maxWidth: "100%", maxHeight: "100%" }}
+                                />
+                            </div>
+                        );
+                    }
+                }
+                // No media fallback
+                return (
+                    <div className="w-24 h-24 flex items-center justify-center bg-gray-800 rounded-lg">
+                        <span className="text-xs text-gray-400">{t("admin.approvals.noMedia")}</span>
+                    </div>
+                );
+            },
         },
         {
             accessorKey: "yprodintitule",
