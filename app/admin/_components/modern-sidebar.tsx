@@ -140,7 +140,7 @@ export function ModernSidebar({ isOpen, isCollapsed, onToggle, onCollapse, userR
             },
             {
                 id: "settings",
-                label: "Settings",
+                label: t("admin.settings.title"),
                 icon: Settings,
                 href: "/admin/settings",
                 roles: ["admin"],

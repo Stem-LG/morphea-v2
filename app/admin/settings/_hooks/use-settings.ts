@@ -2,6 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { createClient } from '@/lib/client'
+import { useLanguage } from '@/hooks/useLanguage'
 import { toast } from 'sonner'
 
 interface Setting {
@@ -43,6 +44,7 @@ const ALLOWED_SETTING_KEYS = [
 ]
 
 export function useUpdateSetting() {
+  const { t } = useLanguage()
   const queryClient = useQueryClient()
   const supabase = createClient()
 
@@ -88,15 +90,16 @@ export function useUpdateSetting() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['settings'] })
-      toast.success('Setting updated successfully')
+      toast.success(t('admin.settings.settingUpdatedSuccessfully'))
     },
     onError: (error: Error) => {
-      toast.error(`Failed to update setting: ${error.message}`)
+      toast.error(`${t('admin.settings.failedToUpdateSetting')}: ${error.message}`)
     },
   })
 }
 
 export function useDeleteSetting() {
+  const { t } = useLanguage()
   const queryClient = useQueryClient()
   const supabase = createClient()
 
@@ -104,13 +107,13 @@ export function useDeleteSetting() {
     mutationFn: async (key: string) => {
       // Check if the setting key is allowed to be deleted
       if (!ALLOWED_SETTING_KEYS.includes(key)) {
-        throw new Error(`Setting key "${key}" is not allowed to be deleted`)
+        throw new Error(t('admin.settings.settingNotAllowed'))
       }
 
       // Additional check for required settings
       const requiredSettings = ['website_url']
       if (requiredSettings.includes(key)) {
-        throw new Error(`Setting "${key}" is required and cannot be deleted`)
+        throw new Error(t('admin.settings.settingRequired'))
       }
 
       const { error } = await supabase
@@ -123,10 +126,10 @@ export function useDeleteSetting() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['settings'] })
-      toast.success('Setting deleted successfully')
+      toast.success(t('admin.settings.settingDeletedSuccessfully'))
     },
     onError: (error: Error) => {
-      toast.error(`Failed to delete setting: ${error.message}`)
+      toast.error(`${t('admin.settings.failedToDeleteSetting')}: ${error.message}`)
     },
   })
 }

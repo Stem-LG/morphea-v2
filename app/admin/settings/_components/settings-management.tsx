@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge'
 import { Save, Trash2, Settings as SettingsIcon, Loader2 } from 'lucide-react'
 import { useSettings, useUpdateSetting, useDeleteSetting } from '../_hooks/use-settings'
 import { useCurrencies } from '@/app/_hooks/use-currencies'
+import { useLanguage } from '@/hooks/useLanguage'
 import { toast } from 'sonner'
 
 interface PredefinedSetting {
@@ -23,20 +24,20 @@ interface PredefinedSetting {
   options?: Array<{ value: string; label: string }>
 }
 
-// Predefined settings with descriptions
-const PREDEFINED_SETTINGS: PredefinedSetting[] = [
+// Get predefined settings with translations
+const getPredefinedSettings = (t: (key: string) => string): PredefinedSetting[] => [
   {
     key: 'website_url',
-    label: 'Website URL',
-    description: 'The main website URL for your application',
+    label: t('admin.settings.websiteUrl'),
+    description: t('admin.settings.websiteUrlDescription'),
     type: 'url' as const,
     defaultValue: 'https://morpheus.com',
     required: true
   },
   {
     key: 'default_currency_id',
-    label: 'Default Currency',
-    description: 'The default currency for new users and pricing display',
+    label: t('admin.settings.defaultCurrency'),
+    description: t('admin.settings.defaultCurrencyDescription'),
     type: 'currency_select' as const,
     defaultValue: '',
     required: false
@@ -44,12 +45,16 @@ const PREDEFINED_SETTINGS: PredefinedSetting[] = [
 ]
 
 export function SettingsManagement() {
+  const { t } = useLanguage()
   const { data: settings, isLoading, error } = useSettings()
   const { data: currencies = [], isLoading: isLoadingCurrencies } = useCurrencies()
   const updateSetting = useUpdateSetting()
   const deleteSetting = useDeleteSetting()
   
   const [editingSettings, setEditingSettings] = useState<Record<string, string>>({})
+  
+  // Get predefined settings with current translations
+  const PREDEFINED_SETTINGS = getPredefinedSettings(t)
 
   // Get current value for a setting
   const getCurrentValue = (key: string) => {
@@ -100,11 +105,11 @@ export function SettingsManagement() {
   const handleDeleteSetting = async (key: string) => {
     const setting = PREDEFINED_SETTINGS.find(s => s.key === key)
     if (setting?.required) {
-      toast.error('This setting is required and cannot be deleted')
+      toast.error(t('admin.settings.settingRequired'))
       return
     }
 
-    if (window.confirm(`Are you sure you want to delete the setting "${key}"?`)) {
+    if (window.confirm(`${t('admin.settings.confirmDeleteSetting')} "${key}"?`)) {
       try {
         await deleteSetting.mutateAsync(key)
       } catch (error) {
@@ -117,6 +122,7 @@ export function SettingsManagement() {
     return (
       <div className="flex items-center justify-center h-64">
         <Loader2 className="h-8 w-8 animate-spin" />
+        <span className="ml-2 text-gray-400">{t('admin.settings.loadingSettings')}</span>
       </div>
     )
   }
@@ -124,7 +130,7 @@ export function SettingsManagement() {
   if (error) {
     return (
       <div className="text-center text-red-500 p-8">
-        Error loading settings: {error.message}
+        {t('admin.settings.errorLoadingSettings')}: {error.message}
       </div>
     )
   }
@@ -135,16 +141,16 @@ export function SettingsManagement() {
       <div className="flex items-center gap-3">
         <SettingsIcon className="h-8 w-8 text-morpheus-gold-light" />
         <div>
-          <h1 className="text-3xl font-bold text-white">App Settings</h1>
-          <p className="text-gray-400">Manage application-wide settings and configuration</p>
+          <h1 className="text-3xl font-bold text-white">{t('admin.settings.title')}</h1>
+          <p className="text-gray-400">{t('admin.settings.subtitle')}</p>
         </div>
       </div>
 
       {/* Predefined Settings */}
       <Card className="bg-slate-800/50 border-slate-700">
         <CardHeader>
-          <CardTitle className="text-white">Application Settings</CardTitle>
-          <CardDescription>Configure core application settings</CardDescription>
+          <CardTitle className="text-white">{t('admin.settings.applicationSettings')}</CardTitle>
+          <CardDescription>{t('admin.settings.configureCore')}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {PREDEFINED_SETTINGS.map((setting) => {
@@ -162,7 +168,7 @@ export function SettingsManagement() {
                   <div className="flex items-center gap-2">
                     {getCurrentValue(setting.key) && (
                       <Badge variant="secondary" className="text-xs">
-                        Set
+                        {t('admin.settings.settingSet')}
                       </Badge>
                     )}
                   </div>
@@ -198,11 +204,11 @@ export function SettingsManagement() {
                         className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md text-white"
                         disabled={isLoadingCurrencies}
                       >
-                        <option value="">Select default currency...</option>
+                        <option value="">{t('admin.settings.selectDefaultCurrency')}</option>
                         {currencies.map((currency) => (
                           <option key={currency.xdeviseid} value={currency.xdeviseid.toString()}>
                             {currency.xdeviseintitule} ({currency.xdevisecodealpha})
-                            {currency.xispivot ? ' - Pivot Currency' : ''}
+                            {currency.xispivot ? ` ${t('admin.settings.pivotCurrency')}` : ''}
                           </option>
                         ))}
                       </select>
@@ -238,7 +244,7 @@ export function SettingsManagement() {
                           variant="outline"
                           onClick={() => handleCancelEdit(setting.key)}
                         >
-                          Cancel
+                          {t('admin.settings.cancel')}
                         </Button>
                       </>
                     )}
