@@ -391,6 +391,7 @@ function VariantViewCard({ variant, t }: { variant: any; t: (key: string) => str
                                     modelUrl={modelUrl}
                                     className="aspect-video"
                                     autoRotate={true}
+                                    backgroundColor={variant.yobjet3d?.[index]?.ycouleurarriereplan || "#f0f0f0"}
                                 />
                             ))}
                         </div>

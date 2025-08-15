@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useLanguage } from "@/hooks/useLanguage";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,12 +8,13 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { DataTable } from "@/components/data-table";
+import { ColumnDef } from "@tanstack/react-table";
 import {
     Plus,
     Edit,
     Trash2,
     DollarSign,
-    Search,
     CheckCircle,
     X,
     Save,
@@ -26,6 +27,14 @@ import { useCurrenciesWithStats } from "../_hooks/use-currencies-with-stats";
 import { useCreateCurrency } from "../_hooks/use-create-currency";
 import { useUpdateCurrency } from "../_hooks/use-update-currency";
 import { useDeleteCurrency } from "../_hooks/use-delete-currency";
+import { usePivotChange } from "../_hooks/use-pivot-change";
+import { PivotChangeDialog } from "./pivot-change-dialog";
+import { EditCurrencyDialog } from "./edit-currency-dialog";
+import type { Database } from "@/lib/supabase";
+
+type Currency = Database['morpheus']['Tables']['xdevise']['Row'] & {
+    yvarprod: { count: number }[]
+};
 
 interface CurrencyFormData {
     xdeviseintitule: string;
@@ -41,7 +50,8 @@ export function CurrencyManagement() {
     const { t } = useLanguage();
     const [searchTerm, setSearchTerm] = useState("");
     const [showForm, setShowForm] = useState(false);
-    const [editingCurrency, setEditingCurrency] = useState<number | null>(null);
+    const [editingCurrency, setEditingCurrency] = useState<Currency | null>(null);
+    const [showEditDialog, setShowEditDialog] = useState(false);
     const [formData, setFormData] = useState<CurrencyFormData>({
         xdeviseintitule: "",
         xdevisecodealpha: "",
@@ -56,13 +66,186 @@ export function CurrencyManagement() {
     const createCurrencyMutation = useCreateCurrency();
     const updateCurrencyMutation = useUpdateCurrency();
     const deleteCurrencyMutation = useDeleteCurrency();
+    const pivotChangeHook = usePivotChange();
+    const { openPivotChangeDialog } = pivotChangeHook;
 
-    // Filter currencies based on search term
-    const filteredCurrencies = currencies?.filter(currency =>
-        currency.xdeviseintitule?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        currency.xdevisecodealpha?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        currency.xdevisecodenum?.toLowerCase().includes(searchTerm.toLowerCase())
-    ) || [];
+    // Get current pivot currency
+    const currentPivotCurrency = currencies?.find(currency => currency.xispivot);
+
+    // Helper function to get variant count
+    const getVariantCount = (currency: Currency) => {
+        return currency.yvarprod?.[0]?.count || 0;
+    };
+
+    // Define table columns
+    const columns = useMemo<ColumnDef<Currency>[]>(() => [
+        {
+            id: "pivot",
+            header: "",
+            cell: ({ row }) => (
+                <div className="flex justify-center">
+                    {row.original.xispivot && (
+                        <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
+                    )}
+                </div>
+            ),
+            enableSorting: false,
+            size: 50,
+        },
+        {
+            accessorKey: "xdeviseintitule",
+            header: ({ column }) => (
+                <Button
+                    variant="ghost"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                    className="h-auto p-0 font-semibold text-white hover:text-morpheus-gold-light"
+                >
+                    {t('admin.currencies.currencyName')}
+                </Button>
+            ),
+            cell: ({ row }) => (
+                <div className="font-medium text-white">
+                    {row.original.xdeviseintitule}
+                </div>
+            ),
+        },
+        {
+            id: "codes",
+            header: t('admin.currencies.codes'),
+            cell: ({ row }) => (
+                <div className="space-y-1">
+                    <div className="text-sm text-white font-medium">
+                        {row.original.xdevisecodealpha}
+                    </div>
+                    <div className="text-xs text-gray-400">
+                        {row.original.xdevisecodenum}
+                    </div>
+                </div>
+            ),
+            enableSorting: false,
+        },
+        {
+            accessorKey: "xdevisenbrdec",
+            header: t('admin.currencies.decimals'),
+            cell: ({ row }) => (
+                <div className="text-white font-medium">
+                    {row.original.xdevisenbrdec}
+                </div>
+            ),
+        },
+        {
+            accessorKey: "xtauxechange",
+            header: t('admin.currencies.exchangeRate'),
+            cell: ({ row }) => (
+                <div className="text-white font-medium flex items-center gap-1">
+                    {row.original.xispivot ? (
+                        <span className="text-yellow-400">1.0 (Pivot)</span>
+                    ) : (
+                        <>
+                            <TrendingUp className="h-3 w-3 text-blue-400" />
+                            {row.original.xtauxechange || 1.0}
+                        </>
+                    )}
+                </div>
+            ),
+        },
+        {
+            id: "status",
+            header: t('admin.currencies.status'),
+            cell: ({ row }) => {
+                const variantCount = getVariantCount(row.original);
+                const isInUse = variantCount > 0;
+                const isPaymentEnabled = row.original.xdeviseboolautorisepaiement === "Y";
+                
+                return (
+                    <div className="flex flex-wrap gap-1">
+                        {row.original.xispivot && (
+                            <Badge className="px-2 py-1 text-xs font-medium flex items-center gap-1 border text-yellow-400 bg-yellow-400/10 border-yellow-400/20">
+                                <Star className="h-3 w-3" />
+                                {t('admin.currencies.pivot')}
+                            </Badge>
+                        )}
+                        {isPaymentEnabled && (
+                            <Badge className="px-2 py-1 text-xs font-medium flex items-center gap-1 border text-green-400 bg-green-400/10 border-green-400/20">
+                                <CheckCircle className="h-3 w-3" />
+                                {t('admin.currencies.payment')}
+                            </Badge>
+                        )}
+                        {isInUse && (
+                            <Badge className="px-2 py-1 text-xs font-medium flex items-center gap-1 border text-blue-400 bg-blue-400/10 border-blue-400/20">
+                                <Package className="h-3 w-3" />
+                                {variantCount} {t('admin.currencies.variants')}
+                            </Badge>
+                        )}
+                    </div>
+                );
+            },
+            enableSorting: false,
+        },
+        {
+            id: "actions",
+            header: t('admin.currencies.actions'),
+            cell: ({ row }) => {
+                const variantCount = getVariantCount(row.original);
+                const isInUse = variantCount > 0;
+                const isPivot = row.original.xispivot;
+                
+                return (
+                    <div className="flex gap-2">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleEdit(row.original)}
+                            className="border-slate-600 text-white hover:bg-slate-700/50"
+                        >
+                            <Edit className="h-4 w-4 mr-1" />
+                            {t('common.edit')}
+                        </Button>
+                        
+                        {!isPivot && (
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleSetAsPivot(row.original)}
+                                className="border-yellow-600 text-yellow-400 hover:bg-yellow-600/10"
+                            >
+                                <Star className="h-4 w-4 mr-1" />
+                                {t('admin.currencies.setAsPivot')}
+                            </Button>
+                        )}
+                        
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <span className={isInUse || isPivot ? "cursor-not-allowed" : ""}>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => handleDelete(row.original.xdeviseid)}
+                                        disabled={deleteCurrencyMutation.isPending || isInUse || isPivot}
+                                        className={`px-3 ${isInUse || isPivot
+                                            ? "border-gray-600 text-gray-500 cursor-not-allowed"
+                                            : "border-red-600 text-red-400 hover:bg-red-600/10"
+                                        }`}
+                                    >
+                                        {isInUse || isPivot ? <AlertTriangle className="h-4 w-4" /> : <Trash2 className="h-4 w-4" />}
+                                    </Button>
+                                </span>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>{isPivot
+                                    ? t('admin.currencies.cannotDeletePivot')
+                                    : isInUse
+                                    ? `Cannot delete: Currency used by ${variantCount} product variant${variantCount !== 1 ? 's' : ''}`
+                                    : t('admin.currencies.deleteCurrency')
+                                }</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </div>
+                );
+            },
+            enableSorting: false,
+        },
+    ], [deleteCurrencyMutation.isPending, t]);
 
     const resetForm = () => {
         setFormData({
@@ -78,35 +261,29 @@ export function CurrencyManagement() {
         setShowForm(false);
     };
 
-    const handleEdit = (currency: any) => {
-        setFormData({
-            xdeviseintitule: currency.xdeviseintitule || "",
-            xdevisecodealpha: currency.xdevisecodealpha || "",
-            xdevisecodenum: currency.xdevisecodenum || "",
-            xdevisenbrdec: currency.xdevisenbrdec || 2,
-            xdeviseboolautorisepaiement: currency.xdeviseboolautorisepaiement === "Y" ? "true" : "false",
-            xispivot: currency.xispivot || false,
-            xtauxechange: currency.xtauxechange || 1.0
-        });
-        setEditingCurrency(currency.xdeviseid);
-        setShowForm(true);
+    const handleEdit = (currency: Currency) => {
+        setEditingCurrency(currency);
+        setShowEditDialog(true);
+    };
+
+    const handleCloseEditDialog = () => {
+        setEditingCurrency(null);
+        setShowEditDialog(false);
+    };
+
+    const handleSetAsPivot = (currency: Currency) => {
+        if (!currencies) return;
+        openPivotChangeDialog(currency, currencies);
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         
         try {
-            if (editingCurrency) {
-                await updateCurrencyMutation.mutateAsync({
-                    currencyId: editingCurrency,
-                    updates: formData
-                });
-            } else {
-                await createCurrencyMutation.mutateAsync(formData);
-            }
+            await createCurrencyMutation.mutateAsync(formData);
             resetForm();
-        } catch (error) {
-            console.error('Failed to save currency:', error);
+        } catch {
+            // Error handling is done by the mutation hooks
         }
     };
 
@@ -115,15 +292,10 @@ export function CurrencyManagement() {
             try {
                 await deleteCurrencyMutation.mutateAsync(currencyId);
             } catch (error) {
-                console.error('Failed to delete currency:', error);
                 const errorMessage = error instanceof Error ? error.message : t('admin.currencies.failedToDelete');
                 alert(errorMessage);
             }
         }
-    };
-
-    const getVariantCount = (currency: any) => {
-        return currency.yvarprod?.[0]?.count || 0;
     };
 
     const validateForm = () => {
@@ -139,9 +311,6 @@ export function CurrencyManagement() {
         
         return basicValidation;
     };
-
-    // Get current pivot currency
-    const currentPivotCurrency = currencies?.find(currency => currency.xispivot);
 
     if (isLoading) {
         return (
@@ -232,9 +401,9 @@ export function CurrencyManagement() {
                                 <Star className="h-5 w-5 text-yellow-400" />
                             </div>
                             <div>
-                                <p className="text-sm text-gray-400">Pivot Currency</p>
+                                <p className="text-sm text-gray-400">{t('admin.currencies.pivotCurrency')}</p>
                                 <p className="text-lg font-bold text-white">
-                                    {currentPivotCurrency?.xdevisecodealpha || "None"}
+                                    {currentPivotCurrency?.xdevisecodealpha || t('common.none')}
                                 </p>
                             </div>
                         </div>
@@ -250,10 +419,10 @@ export function CurrencyManagement() {
                             <Star className="h-5 w-5 text-yellow-400" />
                             <div>
                                 <p className="text-yellow-400 font-medium">
-                                    Current Pivot Currency: {currentPivotCurrency.xdeviseintitule} ({currentPivotCurrency.xdevisecodealpha})
+                                    {t('admin.currencies.currentPivotCurrency')}: {currentPivotCurrency.xdeviseintitule} ({currentPivotCurrency.xdevisecodealpha})
                                 </p>
                                 <p className="text-sm text-gray-300">
-                                    Exchange Rate: {currentPivotCurrency.xtauxechange || 1.0}
+                                    {t('admin.currencies.exchangeRate')}: {currentPivotCurrency.xtauxechange || 1.0}
                                 </p>
                             </div>
                         </div>
@@ -261,24 +430,13 @@ export function CurrencyManagement() {
                 </Card>
             )}
 
-            {/* Search */}
-            <div className="relative max-w-md">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <Input
-                    placeholder={t('admin.currencies.searchPlaceholder')}
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 bg-morpheus-blue-dark/30 border-slate-600 text-white placeholder-gray-400"
-                />
-            </div>
-
             {/* Currency Form */}
             {showForm && (
                 <Card className="bg-gradient-to-br from-morpheus-blue-dark/40 to-morpheus-blue-light/40 border-slate-700/50">
                     <CardHeader>
                         <CardTitle className="text-white flex items-center gap-2">
                             <DollarSign className="h-5 w-5 text-morpheus-gold-light" />
-                            {editingCurrency ? t('admin.currencies.editCurrency') : t('admin.currencies.addNewCurrency')}
+                            {t('admin.currencies.addNewCurrency')}
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -427,7 +585,7 @@ export function CurrencyManagement() {
                                     className="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white"
                                 >
                                     <Save className="h-4 w-4 mr-2" />
-                                    {editingCurrency ? t('admin.currencies.updateCurrency') : t('admin.currencies.createCurrency')}
+                                    {t('admin.currencies.createCurrency')}
                                 </Button>
                                 <Button
                                     type="button"
@@ -444,140 +602,24 @@ export function CurrencyManagement() {
                 </Card>
             )}
 
-            {/* Currencies List */}
-            {filteredCurrencies.length === 0 ? (
-                <div className="text-center py-12">
-                    <DollarSign className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-xl font-medium text-white mb-2">
-                        {searchTerm ? t('admin.currencies.noMatchingCurrencies') : t('admin.currencies.noCurrenciesFound')}
-                    </h3>
-                    <p className="text-gray-300">
-                        {searchTerm
-                            ? t('admin.currencies.adjustSearchCriteria')
-                            : t('admin.currencies.addFirstCurrency')
-                        }
-                    </p>
-                </div>
-            ) : (
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                    {filteredCurrencies.map((currency) => {
-                        const variantCount = getVariantCount(currency);
-                        const isInUse = variantCount > 0;
-                        
-                        return (
-                            <Card
-                                key={currency.xdeviseid}
-                                className="bg-gradient-to-br from-morpheus-blue-dark/40 to-morpheus-blue-light/40 border-slate-700/50 shadow-xl hover:shadow-2xl transition-all duration-300"
-                            >
-                                <CardHeader className="pb-3">
-                                    <div className="flex items-start justify-between">
-                                        <CardTitle className="text-white text-lg flex items-center gap-2">
-                                            {currency.xispivot && (
-                                                <Star className="h-5 w-5 text-yellow-400 fill-yellow-400" />
-                                            )}
-                                            {currency.xdeviseintitule}
-                                        </CardTitle>
-                                        <div className="flex items-center gap-2 flex-wrap">
-                                            {currency.xispivot && (
-                                                <Badge className="px-2 py-1 text-xs font-medium flex items-center gap-1 border text-yellow-400 bg-yellow-400/10 border-yellow-400/20">
-                                                    <Star className="h-3 w-3" />
-                                                    Pivot
-                                                </Badge>
-                                            )}
-                                            {currency.xdeviseboolautorisepaiement === "Y" && (
-                                                <Badge className="px-2 py-1 text-xs font-medium flex items-center gap-1 border text-green-400 bg-green-400/10 border-green-400/20">
-                                                    <CheckCircle className="h-3 w-3" />
-                                                    {t('admin.currencies.payment')}
-                                                </Badge>
-                                            )}
-                                            {isInUse && (
-                                                <Badge className="px-2 py-1 text-xs font-medium flex items-center gap-1 border text-blue-400 bg-blue-400/10 border-blue-400/20">
-                                                    <Package className="h-3 w-3" />
-                                                    {variantCount} {t('admin.currencies.variants')}
-                                                </Badge>
-                                            )}
-                                        </div>
-                                    </div>
-                                </CardHeader>
-                                
-                                <CardContent className="space-y-3">
-                                    <div className="grid grid-cols-2 gap-3 text-sm">
-                                        <div>
-                                            <span className="text-gray-400">{t('admin.currencies.alphaCode')}:</span>
-                                            <p className="text-white font-medium">{currency.xdevisecodealpha}</p>
-                                        </div>
-                                        <div>
-                                            <span className="text-gray-400">{t('admin.currencies.numeric')}:</span>
-                                            <p className="text-white font-medium">{currency.xdevisecodenum}</p>
-                                        </div>
-                                        <div>
-                                            <span className="text-gray-400">{t('admin.currencies.decimals')}:</span>
-                                            <p className="text-white font-medium">{currency.xdevisenbrdec}</p>
-                                        </div>
-                                        <div>
-                                            <span className="text-gray-400">Exchange Rate:</span>
-                                            <p className="text-white font-medium flex items-center gap-1">
-                                                {currency.xispivot ? (
-                                                    <span className="text-yellow-400">1.0 (Pivot)</span>
-                                                ) : (
-                                                    <>
-                                                        <TrendingUp className="h-3 w-3 text-blue-400" />
-                                                        {currency.xtauxechange || 1.0}
-                                                    </>
-                                                )}
-                                            </p>
-                                        </div>
-                                        <div className="col-span-2">
-                                            <span className="text-gray-400">{t('admin.currencies.status')}:</span>
-                                            <p className={`font-medium ${isInUse ? "text-green-400" : "text-gray-400"}`}>
-                                                {isInUse ? `${t('admin.currencies.active')} (${variantCount} ${t('admin.currencies.variants')})` : t('admin.currencies.unused')}
-                                            </p>
-                                        </div>
-                                    </div>
+            {/* Currencies Table */}
+            <DataTable
+                data={currencies || []}
+                columns={columns}
+                isLoading={isLoading}
+                globalFilter={searchTerm}
+                onGlobalFilterChange={setSearchTerm}
+            />
 
-                                    <div className="flex gap-2 pt-2">
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() => handleEdit(currency)}
-                                            className="flex-1 border-slate-600 text-white hover:bg-slate-700/50"
-                                        >
-                                            <Edit className="h-4 w-4 mr-1" />
-                                            {t('common.edit')}
-                                        </Button>
-                                        <Tooltip>
-                                            <TooltipTrigger asChild>
-                                                <span className={isInUse || currency.xispivot ? "cursor-not-allowed" : ""}>
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        onClick={() => handleDelete(currency.xdeviseid)}
-                                                        disabled={deleteCurrencyMutation.isPending || isInUse || currency.xispivot}
-                                                        className={`px-3 ${isInUse || currency.xispivot
-                                                            ? "border-gray-600 text-gray-500 cursor-not-allowed"
-                                                            : "border-red-600 text-red-400 hover:bg-red-600/10"
-                                                        }`}
-                                                    >
-                                                        {isInUse || currency.xispivot ? <AlertTriangle className="h-4 w-4" /> : <Trash2 className="h-4 w-4" />}
-                                                    </Button>
-                                                </span>
-                                            </TooltipTrigger>
-                                            <TooltipContent>
-                                                <p>{currency.xispivot
-                                                    ? "Cannot delete the pivot currency. Set another currency as pivot first."
-                                                    : isInUse
-                                                    ? `${t('admin.currencies.cannotDelete')}: ${t('admin.currencies.currencyUsedBy')} ${variantCount} ${t('admin.currencies.productVariant')}${variantCount !== 1 ? 's' : ''}`
-                                                    : t('admin.currencies.deleteCurrency')
-                                                }</p>
-                                            </TooltipContent>
-                                        </Tooltip>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        );
-                    })}
-                </div>
-            )}
+            {/* Edit Currency Dialog */}
+            <EditCurrencyDialog
+                currency={editingCurrency}
+                isOpen={showEditDialog}
+                onClose={handleCloseEditDialog}
+            />
+
+            {/* Pivot Change Dialog */}
+            <PivotChangeDialog pivotChangeHook={pivotChangeHook} />
         </div>
     );
 }

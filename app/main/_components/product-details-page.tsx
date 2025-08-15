@@ -133,11 +133,13 @@ function GLBModel({ url, name }: { url: string; name: string }) {
 }
 
 // Product Model component
-function ProductModel({ url, name }: { url: string; name: string }) {
+function ProductModel({ url, name, backgroundColor }: { url: string; name: string; backgroundColor?: string }) {
     return (
-        <Suspense fallback={<LoadingSpinner />}>
-            <GLBModel url={url} name={name} />
-        </Suspense>
+        <div style={{ backgroundColor: backgroundColor || "#f0f0f0" }}>
+            <Suspense fallback={<LoadingSpinner />}>
+                <GLBModel url={url} name={name} />
+            </Suspense>
+        </div>
     );
 }
 
@@ -172,6 +174,7 @@ type ProductVariant = {
     yobjet3d?: Array<{
         yobjet3did: number;
         yobjet3durl: string;
+        ycouleurarriereplan?: string | null;
     }>;
 };
 
@@ -523,7 +526,13 @@ export function ProductDetailsPage({ productData, onClose, extraTop = false }: P
                                     </div>
                                 ) : (
                                     /* 3D Viewer */
-                                    <div className="h-full w-full relative" style={{ backgroundColor: "#f0f0f0" }}>
+                                    <div
+                                        className="h-full w-full relative"
+                                        style={{
+                                            backgroundColor:
+                                                selected3DModel?.ycouleurarriereplan || "#f0f0f0",
+                                        }}
+                                    >
                                         <Canvas
                                             camera={{ position: [120, 120, 120], fov: 30 }}
                                             shadows
@@ -535,7 +544,14 @@ export function ProductDetailsPage({ productData, onClose, extraTop = false }: P
                                             style={{ width: "100%", height: "100%" }}
                                         >
                                             <Suspense fallback={<LoadingSpinner />}>
-                                                <fog attach="fog" args={["#f0f0f0", 400, 1000]} />
+                                                <fog
+                                                    attach="fog"
+                                                    args={[
+                                                        selected3DModel?.ycouleurarriereplan || "#f0f0f0",
+                                                        400,
+                                                        1000,
+                                                    ]}
+                                                />
                                                 <ambientLight intensity={1.0} color="#ffffff" />
                                                 <directionalLight
                                                     position={[150, 200, 150]}
@@ -610,6 +626,7 @@ export function ProductDetailsPage({ productData, onClose, extraTop = false }: P
                                                     <ProductModel
                                                         url={selected3DModel.yobjet3durl}
                                                         name={productData.yprodintitule}
+                                                        backgroundColor={selected3DModel?.ycouleurarriereplan || "#f0f0f0"}
                                                     />
                                                 )}
 

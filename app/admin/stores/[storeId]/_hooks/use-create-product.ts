@@ -17,6 +17,7 @@ interface ProductVariant {
     images: File[];
     videos: File[];
     models3d: File[];
+    backgroundColor?: string; // Hex color for 3D model background
 }
 
 interface CreateProductParams {
@@ -216,6 +217,7 @@ export function useCreateProduct() {
                                 await create3dModel.mutateAsync({
                                     url: url,
                                     productVariantId: createdVariant.yvarprodid,
+                                    backgroundColor: variant.backgroundColor,
                                 });
                             })
                         );

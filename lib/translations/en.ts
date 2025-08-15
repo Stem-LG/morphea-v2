@@ -8,7 +8,8 @@ export const enTranslations = {
     "profile": "Profile",
     "login": "Login",
     "signup": "Get Started",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "notifications": "Notifications"
   },
   "common": {
     "welcome": "Welcome",
@@ -29,7 +30,9 @@ export const enTranslations = {
     "confirm": "Confirm",
     "optional": "Optional",
     "close": "Close",
-    "retry": "Retry"
+    "retry": "Retry",
+    "none": "None",
+    "actions": "Actions"
   },
   "auth": {
     "name": "Name",
@@ -43,6 +46,7 @@ export const enTranslations = {
     "createAccount": "Create Account",
     "signIn": "Sign In",
     "signUp": "Sign Up",
+    "signOut": "Sign Out",
     "updatePassword": "Update Password",
     "welcomeBack": "Sign In",
     "joinTheFuture": "Sign Up",
@@ -92,7 +96,8 @@ export const enTranslations = {
     "termsContentPlaceholder": "Terms and conditions content will be added here.",
     "developmentPlaceholder": "This is a placeholder page for development purposes.",
     "backToSignUp": "← Back to Sign Up",
-    "backToMorpheusMall": "← Back to Morpheus Mall"
+    "backToMorpheusMall": "← Back to Morpheus Mall",
+    "morpheusMall": "Morpheus Mall"
   },
   "landing": {
     "title": "Welcome to Morpheus Mall",
@@ -243,6 +248,9 @@ export const enTranslations = {
       "sceneViewAnalytics": "Scene View Analytics",
       "views": "views",
       "sceneViews": "Scene Views",
+      "totalViews": "Total Views",
+      "totalScenes": "Total Scenes",
+      "averageViews": "Average Views",
       "allBoutiques": "All Boutiques",
       "allScenes": "All Scenes",
       "noSceneData": "No Scene Data",
@@ -536,7 +544,51 @@ export const enTranslations = {
       "productVariant": "product variant",
       "deleteCurrency": "Delete currency",
       "confirmDelete": "Are you sure you want to delete this currency? This action cannot be undone.",
-      "failedToDelete": "Failed to delete currency"
+      "failedToDelete": "Failed to delete currency",
+      "currencyName": "Currency Name",
+      "codes": "Alpha/Numeric Codes",
+      "exchangeRate": "Exchange Rate",
+      "pivot": "Pivot",
+      "pivotCurrency": "Pivot Currency",
+      "currentPivotCurrency": "Current Pivot Currency",
+      "setAsPivot": "Set as Pivot",
+      "cannotDeletePivot": "Cannot delete the pivot currency. Set another currency as pivot first.",
+      "cannotDeleteInUse": "Cannot delete: Currency used by {count} product variant{plural}",
+      "editCurrencyDialog": "Edit Currency",
+      "editCurrencyDialogDescription": "Update the currency information below. Note that the pivot currency setting is managed separately.",
+      "currencyUpdatedSuccess": "Currency updated successfully!",
+      "failedToUpdateCurrency": "Failed to update currency",
+      "updating": "Updating...",
+      "currencyInformation": "Currency Information",
+      "paymentSettings": "Payment Settings",
+      "exchangeRateSettings": "Exchange Rate Settings",
+      "exchangeRateLabel": "Exchange Rate",
+      "exchangeRateDescription": "Exchange rate relative to the pivot currency",
+      "exchangeRatePlaceholder": "1.0000",
+      "exchangeRateHelp": "How many units of this currency equal 1 unit of the pivot currency",
+      "validationRequired": "This field is required",
+      "validationAlphaCode": "Alpha code must be exactly 3 characters",
+      "validationNumericCode": "Numeric code must be exactly 3 digits",
+      "validationDecimalPlaces": "Decimal places must be between 0 and 4",
+      "validationExchangeRate": "Exchange rate must be greater than 0",
+      "formErrors": "Please fix the following errors:",
+      "closeDialog": "Close",
+      "actions": "Actions",
+      "changePivotCurrency": "Change Pivot Currency",
+      "changePivotCurrencyDescription": "You are about to set {currency} ({code}) as the new pivot currency. Please enter the exchange rates for all other currencies relative to this new pivot.",
+      "importantInformation": "Important Information",
+      "newPivotCurrency": "New Pivot Currency",
+      "setExchangeRates": "Set Exchange Rates",
+      "setExchangeRatesRelativeTo": "Set Exchange Rates (relative to {code})",
+      "exchangeRateRequired": "Exchange rate is required",
+      "exchangeRatePositive": "Exchange rate must be a positive number",
+      "exchangeRateMaxDecimals": "Exchange rate can have at most 4 decimal places",
+      "fixValidationErrors": "Please fix the validation errors before proceeding",
+      "changePivotCurrencyButton": "Change Pivot Currency",
+      "updatingPivot": "Updating...",
+      "pivotCurrencyChangedSuccess": "Pivot currency changed successfully",
+      "pivotCurrencyChangedDescription": "{currency} is now the pivot currency with all exchange rates updated.",
+      "failedToChangePivotCurrency": "Failed to change pivot currency"
     },
     "createProduct": {
       "fillColorCodeAndName": "Please fill in color code and name",
@@ -1077,6 +1129,7 @@ export const enTranslations = {
   "cart": {
     "title": "Shopping Cart",
     "empty": "Your cart is empty",
+    "emptyMessage": "Your cart is empty",
     "emptyDescription": "Add some products to get started",
     "color": "Color",
     "checkout": "Proceed to Checkout",
@@ -1103,6 +1156,7 @@ export const enTranslations = {
   "wishlist": {
     "title": "My Wishlist",
     "empty": "Your wishlist is empty",
+    "emptyMessage": "Save items you love for later",
     "emptyDescription": "Save items you love to your wishlist",
     "viewProduct": "View Product",
     "viewAllItems": "View All Items",
@@ -1338,5 +1392,24 @@ export const enTranslations = {
     "nameAsc": "Name: A to Z",
     "nameDesc": "Name: Z to A",
     "newest": "Newest First"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "unreadCount": "You have {count} unread notification(s)",
+    "markAllAsSeen": "Mark all as seen",
+    "markAsSeen": "Mark as seen",
+    "empty": "No notifications to display",
+    "loading": "Loading notifications...",
+    "error": "Error loading notifications",
+    "seen": "Seen",
+    "timestamp": "{time} ago",
+    "markAllRead": "Mark all read",
+    "markAsRead": "Mark as read",
+    "loadingMore": "Loading more...",
+    "unableToLoad": "Unable to load notifications",
+    "tryAgainLater": "Please try again later",
+    "allCaughtUp": "You're all caught up!",
+    "noNewNotifications": "No new notifications to show",
+    "defaultTitle": "Notification"
   }
 };

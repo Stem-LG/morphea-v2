@@ -16,6 +16,7 @@ interface ProductVariant {
     images: (File | { ymediaid: number; ymediaurl: string; ymediaintitule: string })[];
     videos: (File | { ymediaid: number; ymediaurl: string; ymediaintitule: string })[];
     models3d: (File | { yobjet3did: number; yobjet3durl: string })[];
+    backgroundColor?: string; // Hex color for 3D model background
     isDeleted?: boolean; // Mark for deletion
     // Pricing fields
     catalogPrice?: number;
@@ -313,6 +314,7 @@ export function useUpdateProduct() {
                         await create3dModel.mutateAsync({
                             url: url,
                             productVariantId: variantId,
+                            backgroundColor: variant.backgroundColor,
                         });
                     })
                 );

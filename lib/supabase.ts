@@ -7,12 +7,12 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
   }
-  auth: {
+    auth: {
     Tables: {
       audit_log_entries: {
         Row: {
@@ -832,6 +832,60 @@ export type Database = {
         }
         Relationships: []
       }
+      xdevisehist: {
+        Row: {
+          action_timestamp: string
+          action_type: string
+          hist_id: number
+          sysaction: string | null
+          sysadresseip: string | null
+          sysdate: string | null
+          sysuser: string | null
+          xdeviseboolautorisepaiement: string | null
+          xdevisecodealpha: string | null
+          xdevisecodenum: string | null
+          xdeviseid: number | null
+          xdeviseintitule: string | null
+          xdevisenbrdec: string | null
+          xispivot: boolean | null
+          xtauxechange: number | null
+        }
+        Insert: {
+          action_timestamp?: string
+          action_type: string
+          hist_id?: number
+          sysaction?: string | null
+          sysadresseip?: string | null
+          sysdate?: string | null
+          sysuser?: string | null
+          xdeviseboolautorisepaiement?: string | null
+          xdevisecodealpha?: string | null
+          xdevisecodenum?: string | null
+          xdeviseid?: number | null
+          xdeviseintitule?: string | null
+          xdevisenbrdec?: string | null
+          xispivot?: boolean | null
+          xtauxechange?: number | null
+        }
+        Update: {
+          action_timestamp?: string
+          action_type?: string
+          hist_id?: number
+          sysaction?: string | null
+          sysadresseip?: string | null
+          sysdate?: string | null
+          sysuser?: string | null
+          xdeviseboolautorisepaiement?: string | null
+          xdevisecodealpha?: string | null
+          xdevisecodenum?: string | null
+          xdeviseid?: number | null
+          xdeviseintitule?: string | null
+          xdevisenbrdec?: string | null
+          xispivot?: boolean | null
+          xtauxechange?: number | null
+        }
+        Relationships: []
+      }
       xtaille: {
         Row: {
           sysaction: string | null
@@ -1247,7 +1301,7 @@ export type Database = {
           sysadresseip: string | null
           sysdate: string | null
           sysuser: string | null
-          yinfospotactionidfk: number
+          yinfospotactionidfk: number | null
           yinfospotsaxexyaw: string
           yinfospotsaxeypitch: string
           yinfospotsid: number
@@ -1260,7 +1314,7 @@ export type Database = {
           sysadresseip?: string | null
           sysdate?: string | null
           sysuser?: string | null
-          yinfospotactionidfk: number
+          yinfospotactionidfk?: number | null
           yinfospotsaxexyaw: string
           yinfospotsaxeypitch: string
           yinfospotsid: number
@@ -1273,7 +1327,7 @@ export type Database = {
           sysadresseip?: string | null
           sysdate?: string | null
           sysuser?: string | null
-          yinfospotactionidfk?: number
+          yinfospotactionidfk?: number | null
           yinfospotsaxexyaw?: string
           yinfospotsaxeypitch?: string
           yinfospotsid?: number
@@ -1485,12 +1539,52 @@ export type Database = {
         }
         Relationships: []
       }
+      ynotification: {
+        Row: {
+          sysaction: string | null
+          sysadresseip: string | null
+          sysdate: string
+          sysuser: string | null
+          ycible: string
+          yest_lu: boolean
+          ylien: string | null
+          ymessage: string | null
+          ynotificationid: string
+          ytitre: string
+        }
+        Insert: {
+          sysaction?: string | null
+          sysadresseip?: string | null
+          sysdate?: string
+          sysuser?: string | null
+          ycible: string
+          yest_lu?: boolean
+          ylien?: string | null
+          ymessage?: string | null
+          ynotificationid?: string
+          ytitre: string
+        }
+        Update: {
+          sysaction?: string | null
+          sysadresseip?: string | null
+          sysdate?: string
+          sysuser?: string | null
+          ycible?: string
+          yest_lu?: boolean
+          ylien?: string | null
+          ymessage?: string | null
+          ynotificationid?: string
+          ytitre?: string
+        }
+        Relationships: []
+      }
       yobjet3d: {
         Row: {
           sysaction: string | null
           sysadresseip: string | null
           sysdate: string | null
           sysuser: string | null
+          ycouleurarriereplan: string | null
           yobjet3did: number
           yobjet3durl: string
           yvarprodidfk: number
@@ -1500,6 +1594,7 @@ export type Database = {
           sysadresseip?: string | null
           sysdate?: string | null
           sysuser?: string | null
+          ycouleurarriereplan?: string | null
           yobjet3did?: number
           yobjet3durl: string
           yvarprodidfk: number
@@ -1509,6 +1604,7 @@ export type Database = {
           sysadresseip?: string | null
           sysdate?: string | null
           sysuser?: string | null
+          ycouleurarriereplan?: string | null
           yobjet3did?: number
           yobjet3durl?: string
           yvarprodidfk?: number

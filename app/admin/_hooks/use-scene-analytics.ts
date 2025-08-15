@@ -40,15 +40,48 @@ export function useSceneAnalytics(options: UseSceneAnalyticsOptions = {}) {
   const userMetadata = user?.app_metadata as { roles?: string[]; assigned_stores?: number[] };
   const roles = userMetadata?.roles || [];
   const isAdmin = roles.includes("admin");
-  const assignedStores = userMetadata?.assigned_stores || [];
+  const isStoreAdmin = roles.includes("store_admin");
 
   return useQuery({
-    queryKey: ["scene-analytics", user?.id, boutiqueId, sceneId, isAdmin, assignedStores],
+    queryKey: ["scene-analytics", user?.id, boutiqueId, sceneId, isAdmin, isStoreAdmin],
     queryFn: async (): Promise<{
       data: SceneAnalyticsData[];
       stats: SceneAnalyticsStats;
     }> => {
       try {
+        // Get assigned boutique IDs for store admins
+        let assignedBoutiqueIds: number[] = [];
+        
+        if (isStoreAdmin && !isAdmin) {
+          // Find the user's design ID
+          const { data: designData, error: designError } = await supabase
+            .schema("morpheus")
+            .from("ydesign")
+            .select("ydesignid")
+            .eq("yuseridfk", user?.id)
+            .single();
+
+          if (designError || !designData) {
+            console.error("Error fetching user design:", designError);
+            throw new Error("Unable to fetch designer information");
+          }
+
+          // Find assigned boutiques for this designer across all events
+          const { data: detailsEventData, error: detailsError } = await supabase
+            .schema("morpheus")
+            .from("ydetailsevent")
+            .select("yboutiqueidfk")
+            .eq("ydesignidfk", designData.ydesignid)
+            .not("yboutiqueidfk", "is", null);
+
+          if (detailsError) {
+            console.error("Error fetching event details:", detailsError);
+            throw new Error("Unable to fetch assigned boutiques");
+          }
+
+          assignedBoutiqueIds = [...new Set(detailsEventData?.map(detail => detail.yboutiqueidfk) || [])];
+        }
+
         // Build the base query with joins
         let query = supabase
           .schema("morpheus")
@@ -74,8 +107,8 @@ export function useSceneAnalytics(options: UseSceneAnalyticsOptions = {}) {
         }
 
         // Apply role-based filtering for store admins
-        if (!isAdmin && assignedStores.length > 0) {
-          query = query.in("yboutiqueidfk", assignedStores);
+        if (isStoreAdmin && !isAdmin && assignedBoutiqueIds.length > 0) {
+          query = query.in("yboutiqueidfk", assignedBoutiqueIds);
         }
 
         // Order by views descending
@@ -165,11 +198,44 @@ export function useSceneOptions() {
   const userMetadata = user?.app_metadata as { roles?: string[]; assigned_stores?: number[] };
   const roles = userMetadata?.roles || [];
   const isAdmin = roles.includes("admin");
-  const assignedStores = userMetadata?.assigned_stores || [];
+  const isStoreAdmin = roles.includes("store_admin");
 
   return useQuery({
-    queryKey: ["scene-options", user?.id, isAdmin, assignedStores],
+    queryKey: ["scene-options", user?.id, isAdmin, isStoreAdmin],
     queryFn: async () => {
+      // Get assigned boutique IDs for store admins
+      let assignedBoutiqueIds: number[] = [];
+      
+      if (isStoreAdmin && !isAdmin) {
+        // Find the user's design ID
+        const { data: designData, error: designError } = await supabase
+          .schema("morpheus")
+          .from("ydesign")
+          .select("ydesignid")
+          .eq("yuseridfk", user?.id)
+          .single();
+
+        if (designError || !designData) {
+          console.error("Error fetching user design:", designError);
+          throw new Error("Unable to fetch designer information");
+        }
+
+        // Find assigned boutiques for this designer across all events
+        const { data: detailsEventData, error: detailsError } = await supabase
+          .schema("morpheus")
+          .from("ydetailsevent")
+          .select("yboutiqueidfk")
+          .eq("ydesignidfk", designData.ydesignid)
+          .not("yboutiqueidfk", "is", null);
+
+        if (detailsError) {
+          console.error("Error fetching event details:", detailsError);
+          throw new Error("Unable to fetch assigned boutiques");
+        }
+
+        assignedBoutiqueIds = [...new Set(detailsEventData?.map(detail => detail.yboutiqueidfk) || [])];
+      }
+
       let query = supabase
         .schema("morpheus")
         .from("yscenes")
@@ -177,8 +243,8 @@ export function useSceneOptions() {
         .order("yscenesname", { ascending: true });
 
       // Apply role-based filtering for store admins
-      if (!isAdmin && assignedStores.length > 0) {
-        query = query.in("yboutiqueidfk", assignedStores);
+      if (isStoreAdmin && !isAdmin && assignedBoutiqueIds.length > 0) {
+        query = query.in("yboutiqueidfk", assignedBoutiqueIds);
       }
 
       const { data, error } = await query;
@@ -206,11 +272,44 @@ export function useBoutiqueOptions() {
   const userMetadata = user?.app_metadata as { roles?: string[]; assigned_stores?: number[] };
   const roles = userMetadata?.roles || [];
   const isAdmin = roles.includes("admin");
-  const assignedStores = userMetadata?.assigned_stores || [];
+  const isStoreAdmin = roles.includes("store_admin");
 
   return useQuery({
-    queryKey: ["boutique-options", user?.id, isAdmin, assignedStores],
+    queryKey: ["boutique-options", user?.id, isAdmin, isStoreAdmin],
     queryFn: async () => {
+      // Get assigned boutique IDs for store admins
+      let assignedBoutiqueIds: number[] = [];
+      
+      if (isStoreAdmin && !isAdmin) {
+        // Find the user's design ID
+        const { data: designData, error: designError } = await supabase
+          .schema("morpheus")
+          .from("ydesign")
+          .select("ydesignid")
+          .eq("yuseridfk", user?.id)
+          .single();
+
+        if (designError || !designData) {
+          console.error("Error fetching user design:", designError);
+          throw new Error("Unable to fetch designer information");
+        }
+
+        // Find assigned boutiques for this designer across all events
+        const { data: detailsEventData, error: detailsError } = await supabase
+          .schema("morpheus")
+          .from("ydetailsevent")
+          .select("yboutiqueidfk")
+          .eq("ydesignidfk", designData.ydesignid)
+          .not("yboutiqueidfk", "is", null);
+
+        if (detailsError) {
+          console.error("Error fetching event details:", detailsError);
+          throw new Error("Unable to fetch assigned boutiques");
+        }
+
+        assignedBoutiqueIds = [...new Set(detailsEventData?.map(detail => detail.yboutiqueidfk) || [])];
+      }
+
       let query = supabase
         .schema("morpheus")
         .from("yboutique")
@@ -218,8 +317,8 @@ export function useBoutiqueOptions() {
         .order("yboutiqueintitule", { ascending: true });
 
       // Apply role-based filtering for store admins
-      if (!isAdmin && assignedStores.length > 0) {
-        query = query.in("yboutiqueid", assignedStores);
+      if (isStoreAdmin && !isAdmin && assignedBoutiqueIds.length > 0) {
+        query = query.in("yboutiqueid", assignedBoutiqueIds);
       }
 
       const { data, error } = await query;

@@ -55,6 +55,7 @@ interface ProductVariant {
     images: (File | { ymediaid: number; ymediaurl: string; ymediaintitule: string })[];
     videos: (File | { ymediaid: number; ymediaurl: string; ymediaintitule: string })[];
     models3d: (File | { yobjet3did: number; yobjet3durl: string })[];
+    backgroundColor?: string; // Hex color for 3D model background
     isDeleted?: boolean; // Mark for deletion
     status?: 'approved' | 'not_approved' | 'rejected'; // Variant status
     // Pricing fields (admin only)
@@ -103,6 +104,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
             images: [],
             videos: [],
             models3d: [],
+            backgroundColor: "#ffffff",
         },
     ]);
 
@@ -179,6 +181,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                 images: variant.images || [],
                 videos: variant.videos || [],
                 models3d: variant.models3d || [],
+                backgroundColor: variant.backgroundColor || "#ffffff", // Default to white if not set
                 status: variant.yvarprodstatut || 'not_approved',
                 // Populate pricing data
                 catalogPrice: variant.yvarprodprixcatalogue || 0,
@@ -200,6 +203,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                               images: [],
                               videos: [],
                               models3d: [],
+                              backgroundColor: "#ffffff",
                               status: 'not_approved',
                           },
                       ]
@@ -221,6 +225,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                     images: [],
                     videos: [],
                     models3d: [],
+                    backgroundColor: "#ffffff",
                     status: 'not_approved',
                     catalogPrice: 0,
                     promotionPrice: null,
@@ -267,6 +272,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
             images: [],
             videos: [],
             models3d: [],
+            backgroundColor: "#ffffff",
             status: 'not_approved',
             catalogPrice: 0,
             promotionPrice: null,
@@ -473,6 +479,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                         images: v.images,
                         videos: v.videos,
                         models3d: v.models3d,
+                        backgroundColor: v.backgroundColor,
                         isDeleted: v.isDeleted,
                         // Include pricing data
                         catalogPrice: v.catalogPrice,
@@ -503,6 +510,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                         images: v.images.filter((img): img is File => img instanceof File),
                         videos: v.videos.filter((vid): vid is File => vid instanceof File),
                         models3d: v.models3d.filter((model): model is File => model instanceof File),
+                        backgroundColor: v.backgroundColor,
                     })),
                 });
                 toast.success(t("admin.createProduct.productCreatedSuccessfully"));
@@ -1285,6 +1293,46 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                                     {t("admin.createProduct.upload")}
                                                                 </Button>
                                                             </div>
+                                                            
+                                                            {/* Background Color Input */}
+                                                            <div className="mb-3">
+                                                                <Label className="text-gray-300 text-sm flex items-center gap-1">
+                                                                    <Palette className="h-3 w-3" />
+                                                                    3D Model Background Color
+                                                                </Label>
+                                                                <div className="flex gap-2 mt-1">
+                                                                    <input
+                                                                        type="color"
+                                                                        value={variant.backgroundColor || "#ffffff"}
+                                                                        onChange={(e) =>
+                                                                            handleVariantChange(
+                                                                                variant.id,
+                                                                                "backgroundColor",
+                                                                                e.target.value
+                                                                            )
+                                                                        }
+                                                                        className="w-12 h-8 bg-gray-700/50 border border-gray-600 rounded cursor-pointer"
+                                                                        title="Select background color for 3D model"
+                                                                    />
+                                                                    <Input
+                                                                        value={variant.backgroundColor || "#ffffff"}
+                                                                        onChange={(e) =>
+                                                                            handleVariantChange(
+                                                                                variant.id,
+                                                                                "backgroundColor",
+                                                                                e.target.value
+                                                                            )
+                                                                        }
+                                                                        placeholder="#ffffff"
+                                                                        className="flex-1 bg-gray-600/50 border-gray-500 text-white text-sm"
+                                                                        maxLength={7}
+                                                                    />
+                                                                </div>
+                                                                <div className="text-xs text-gray-400 mt-1">
+                                                                    Background color for the 3D model viewer
+                                                                </div>
+                                                            </div>
+                                                            
                                                             <div className="flex flex-wrap gap-2">
                                                                 {variant.models3d.map((file, fileIndex) => (
                                                                     <Badge
