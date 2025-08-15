@@ -12,7 +12,7 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
   }
-    auth: {
+  auth: {
     Tables: {
       audit_log_entries: {
         Row: {
@@ -718,6 +718,24 @@ export type Database = {
   }
   morpheus: {
     Tables: {
+      settings: {
+        Row: {
+          id: number
+          key: string | null
+          value: string | null
+        }
+        Insert: {
+          id?: number
+          key?: string | null
+          value?: string | null
+        }
+        Update: {
+          id?: number
+          key?: string | null
+          value?: string | null
+        }
+        Relationships: []
+      }
       xcategprod: {
         Row: {
           sysaction: string | null

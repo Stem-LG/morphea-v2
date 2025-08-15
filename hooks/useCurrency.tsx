@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useCurrencies } from '@/app/_hooks/use-currencies';
+import { useDefaultCurrencyId } from '@/hooks/use-website-url';
 import { Tables } from '@/lib/supabase';
 
 // Types
@@ -37,17 +38,18 @@ interface CurrencyProviderProps {
 
 export const CurrencyProvider = ({ children }: CurrencyProviderProps) => {
   const { data: currencies = [], isLoading, error } = useCurrencies();
+  const { data: defaultCurrencyId, isLoading: isLoadingDefaultCurrency } = useDefaultCurrencyId();
   const [currentCurrency, setCurrentCurrency] = useState<Currency | null>(null);
   const [pivotCurrency, setPivotCurrency] = useState<Currency | null>(null);
 
   // Find pivot currency and set default currency
   useEffect(() => {
-    if (currencies.length > 0) {
+    if (currencies.length > 0 && !isLoadingDefaultCurrency) {
       // Find the pivot currency
       const pivot = currencies.find(currency => currency.xispivot === true);
       setPivotCurrency(pivot || null);
 
-      // Set current currency from localStorage or default to pivot
+      // Set current currency from localStorage first
       if (typeof window !== 'undefined') {
         const savedCurrencyId = localStorage.getItem('selectedCurrency');
         if (savedCurrencyId) {
@@ -59,10 +61,19 @@ export const CurrencyProvider = ({ children }: CurrencyProviderProps) => {
         }
       }
       
-      // Default to pivot currency or first currency
+      // If no saved currency, try to use the default currency from settings
+      if (defaultCurrencyId) {
+        const defaultCurrency = currencies.find(c => c.xdeviseid === defaultCurrencyId);
+        if (defaultCurrency) {
+          setCurrentCurrency(defaultCurrency);
+          return;
+        }
+      }
+      
+      // Fallback to pivot currency or first currency
       setCurrentCurrency(pivot || currencies[0] || null);
     }
-  }, [currencies]);
+  }, [currencies, defaultCurrencyId, isLoadingDefaultCurrency]);
 
   // Set currency and persist to localStorage
   const setCurrency = (currency: Currency) => {

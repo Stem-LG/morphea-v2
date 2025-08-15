@@ -20,6 +20,7 @@ import {
     Package,
     Store,
     ShoppingBag,
+    Settings,
 } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
 
@@ -135,6 +136,13 @@ export function ModernSidebar({ isOpen, isCollapsed, onToggle, onCollapse, userR
                 label: t("admin.virtualTourAdmin"),
                 icon: Eye,
                 href: "/admin/tour",
+                roles: ["admin"],
+            },
+            {
+                id: "settings",
+                label: "Settings",
+                icon: Settings,
+                href: "/admin/settings",
                 roles: ["admin"],
             },
         ];

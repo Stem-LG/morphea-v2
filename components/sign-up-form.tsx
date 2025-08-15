@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useVisitorData } from "@/hooks/useVisitorData";
+import { useWebsiteUrl } from "@/hooks/use-website-url";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useEffect, useMemo } from "react";
@@ -29,6 +30,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
     const router = useRouter();
     const { t } = useLanguage();
     const { visitorData, isLoading: isLoadingVisitor } = useVisitorData();
+    const { data: websiteUrl, isLoading: isLoadingWebsiteUrl } = useWebsiteUrl();
 
     // Prefill form with visitor data when available
     useEffect(() => {
@@ -110,11 +112,15 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
             const currentUser = currentUserData?.user;
 
             // Sign up with email and password
+            const redirectUrl = websiteUrl && !isLoadingWebsiteUrl 
+                ? `${websiteUrl}/main`
+                : `${process.env.NEXT_PUBLIC_SITE_URL || window.location.origin}/main`;
+
             const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
                 email,
                 password,
                 options: {
-                    emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || window.location.origin}/main`,
+                    emailRedirectTo: redirectUrl,
                     data: {
                         full_name: name.trim(),
                     },

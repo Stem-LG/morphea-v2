@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useLanguage } from "@/hooks/useLanguage";
+import { useWebsiteUrl } from "@/hooks/use-website-url";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -15,6 +16,7 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
     const [success, setSuccess] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const { t } = useLanguage();
+    const { data: websiteUrl, isLoading: isLoadingWebsiteUrl } = useWebsiteUrl();
 
     const handleForgotPassword = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -24,8 +26,12 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
 
         try {
             // The url which will be included in the email. This URL needs to be configured in your redirect URLs in the Supabase dashboard at https://supabase.com/dashboard/project/_/auth/url-configuration
+            const redirectUrl = websiteUrl && !isLoadingWebsiteUrl 
+                ? `${websiteUrl}/auth/update-password`
+                : `${process.env.NEXT_PUBLIC_SITE_URL || window.location.origin}/auth/update-password`;
+
             const { error } = await supabase.auth.resetPasswordForEmail(email, {
-                redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || window.location.origin}/auth/update-password`,
+                redirectTo: redirectUrl,
             });
             if (error) throw error;
             setSuccess(true);
