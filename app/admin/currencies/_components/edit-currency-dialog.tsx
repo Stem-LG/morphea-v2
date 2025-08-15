@@ -278,8 +278,8 @@ export function EditCurrencyDialog({ currency, isOpen, onClose }: EditCurrencyDi
                                 <TrendingUp className="h-4 w-4 text-blue-400" />
                                 <Input
                                     type="number"
-                                    step="0.0001"
-                                    min="0.0001"
+                                    step="0.0000000001"
+                                    min="0.0000000001"
                                     value={formData.xtauxechange}
                                     onChange={(e) => setFormData(prev => ({
                                         ...prev,
