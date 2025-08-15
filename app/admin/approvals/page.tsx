@@ -10,7 +10,6 @@ import { DataTable } from "@/components/data-table";
 import { SuperSelect } from "@/components/super-select";
 import { Badge } from "@/components/ui/badge";
 import {
-    CheckCircle,
     Clock,
     Package,
     Filter,
@@ -21,7 +20,6 @@ import { ColumnDef } from "@tanstack/react-table";
 import { useApprovals } from "./_hooks/use-approvals";
 import { useCategories } from "../stores/[storeId]/_hooks/use-categories";
 import { useStores } from "../stores/_hooks/use-stores";
-import { useApprovalStats } from "./_hooks/use-approval-stats";
 import { ApprovalCard } from "./_components/approval-card";
 import { ApprovalForm } from "./_components/approval-form";
 import { Toaster } from "./_components/toaster";
@@ -35,7 +33,7 @@ export default function ApprovalsPage() {
     // State for pagination, filters, and sorting using nuqs
     const [{ page, approvalType, category, store, search, sortBy, sortOrder }, setFilters] = useQueryStates({
         page: parseAsInteger.withDefault(1),
-        approvalType: parseAsString.withDefault("all"),
+        approvalType: parseAsString.withDefault("not_approved"),
         category: parseAsInteger,
         store: parseAsInteger,
         search: parseAsString.withDefault(""),
@@ -78,14 +76,11 @@ export default function ApprovalsPage() {
     
     const { data: categories, isLoading: categoriesLoading } = useCategories();
     const { data: storesData, isLoading: storesLoading } = useStores();
-    const { data: stats } = useApprovalStats();
 
     // Prepare filter options
     const approvalTypeOptions = [
-        { value: "all", label: t("admin.approvals.allProducts") },
-        { value: "not_approved", label: t("admin.approvals.newProducts") },
-        { value: "variant_approval", label: t("admin.approvals.variantApprovals") },
-        { value: "rejected", label: t("admin.approvals.rejected") }
+        { value: "not_approved", label: t("admin.approvals.pendingProducts") || "Pending Products" },
+        { value: "variant_approval", label: t("admin.approvals.variantApprovals") || "Variant Approvals" }
     ];
 
     const categoryOptions = categories?.map(cat => ({
@@ -343,64 +338,19 @@ export default function ApprovalsPage() {
                 </div>
             </div>
 
-            {/* Stats Cards */}
-            {stats && (
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <Card className="bg-gradient-to-br from-gray-900/50 to-gray-800/30 border-gray-700/50 backdrop-blur-sm">
-                        <CardContent className="p-4">
-                            <div className="flex items-center gap-2 mb-2">
-                                <AlertTriangle className="h-5 w-5 text-red-400" />
-                                <span className="text-sm font-medium text-gray-300">{t("admin.approvals.totalRejected")}</span>
-                            </div>
-                            <div className="text-2xl font-bold text-white">
-                                {stats.rejected || 0}
-                            </div>
-                        </CardContent>
-                    </Card>
-                    <Card className="bg-gradient-to-br from-gray-900/50 to-gray-800/30 border-gray-700/50 backdrop-blur-sm">
-                        <CardContent className="p-4">
-                            <div className="flex items-center gap-2 mb-2">
-                                <Clock className="h-5 w-5 text-yellow-400" />
-                                <span className="text-sm font-medium text-gray-300">{t("admin.approvals.totalPending")}</span>
-                            </div>
-                            <div className="text-2xl font-bold text-white">
-                                {stats.pending || 0}
-                            </div>
-                        </CardContent>
-                    </Card>
-                    <Card className="bg-gradient-to-br from-gray-900/50 to-gray-800/30 border-gray-700/50 backdrop-blur-sm">
-                        <CardContent className="p-4">
-                            <div className="flex items-center gap-2 mb-2">
-                                <CheckCircle className="h-5 w-5 text-green-400" />
-                                <span className="text-sm font-medium text-gray-300">{t("admin.approvals.totalApproved")}</span>
-                            </div>
-                            <div className="text-2xl font-bold text-white">
-                                {stats.approved || 0}
-                            </div>
-                        </CardContent>
-                    </Card>
-                    <Card className="bg-gradient-to-br from-gray-900/50 to-gray-800/30 border-gray-700/50 backdrop-blur-sm">
-                        <CardContent className="p-4">
-                            <div className="flex items-center gap-2 mb-2">
-                                <Package className="h-5 w-5 text-blue-400" />
-                                <span className="text-sm font-medium text-gray-300">{t("admin.approvals.totalProducts")}</span>
-                            </div>
-                            <div className="text-2xl font-bold text-white">
-                                {stats.total || 0}
-                            </div>
-                        </CardContent>
-                    </Card>
-                </div>
-            )}
-
 
             {/* Content */}
             {viewMode === 'table' ? (
                 <Card className="bg-gradient-to-br from-gray-900/50 to-gray-800/30 border-gray-700/50 backdrop-blur-sm">
                     <CardHeader>
-                        <CardTitle className="text-xl text-white flex items-center gap-2">
-                            <Package className="h-5 w-5" />
-                            {t("admin.approvals.productsAwaitingApproval")}
+                        <CardTitle className="text-xl text-white flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <Package className="h-5 w-5" />
+                                {t("admin.approvals.productsAwaitingApproval")}
+                            </div>
+                            <div className="text-sm text-gray-300">
+                                {approvalsData?.count || 0} {t("admin.totalItems") || "total"}
+                            </div>
                         </CardTitle>
                     </CardHeader>
                     <CardContent>

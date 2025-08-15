@@ -87,17 +87,31 @@ export function ModernSidebar({ isOpen, isCollapsed, onToggle, onCollapse, userR
                 isDropdown: true,
                 children: [
                     {
+                        id: "approvals",
+                        label: t("admin.pendingProducts") || "Pending Products",
+                        icon: CheckCircle,
+                        href: "/admin/approvals",
+                        roles: ["admin"],
+                    },
+                    {
+                        id: "approved-products",
+                        label: t("admin.approvedProducts") || "Approved Products",
+                        icon: Package,
+                        href: "/admin/products",
+                        roles: ["admin"],
+                    },
+                    {
+                        id: "rejected-products",
+                        label: t("admin.rejectedProducts") || "Rejected Products",
+                        icon: Package,
+                        href: "/admin/products/rejected",
+                        roles: ["admin"],
+                    },
+                    {
                         id: "categories",
                         label: t("admin.categoryManagement"),
                         icon: FolderTree,
                         href: "/admin/categories",
-                        roles: ["admin"],
-                    },
-                    {
-                        id: "approvals",
-                        label: "Approbation",
-                        icon: CheckCircle,
-                        href: "/admin/approvals",
                         roles: ["admin"],
                     },
                 ],
@@ -216,44 +230,102 @@ export function ModernSidebar({ isOpen, isCollapsed, onToggle, onCollapse, userR
                         if (item.isDropdown) {
                             const isDropdownOpen = openDropdowns.includes(item.id);
                             const hasActiveChild = isDropdownActive(item);
+                            const isDropdownItemActive = item.href ? (() => {
+                                if (item.href === "/admin") {
+                                    return pathname === "/admin";
+                                }
+                                return pathname === item.href;
+                            })() : false;
+
+                            const isActive = hasActiveChild || isDropdownItemActive;
 
                             return (
                                 <div key={key}>
                                     {/* Dropdown trigger */}
-                                    <Button
-                                        variant="ghost"
-                                        className={`w-full rounded-none h-12 ${
-                                            isCollapsed ? "justify-center" : "justify-start"
-                                        } transition-all duration-200 ${
-                                            hasActiveChild
-                                                ? "bg-gradient-to-r from-morpheus-gold-dark/20 to-morpheus-gold-light/20 text-morpheus-gold-light border border-morpheus-gold-light/30"
-                                                : "text-gray-300 hover:text-white hover:bg-slate-700/50"
-                                        }`}
-                                        title={isCollapsed ? item.label : undefined}
-                                        onClick={() => !isCollapsed && toggleDropdown(item.id)}
-                                    >
-                                        <Icon
-                                            className={`h-5 w-5 ${isCollapsed ? "" : "mr-3"} ${
-                                                hasActiveChild ? "text-morpheus-gold-light" : ""
+                                    {item.href ? (
+                                        <Button
+                                            variant="ghost"
+                                            className={`w-full rounded-none h-12 ${
+                                                isCollapsed ? "justify-center" : "justify-start"
+                                            } transition-all duration-200 ${
+                                                isActive
+                                                    ? "bg-gradient-to-r from-morpheus-gold-dark/20 to-morpheus-gold-light/20 text-morpheus-gold-light border border-morpheus-gold-light/30"
+                                                    : "text-gray-300 hover:text-white hover:bg-slate-700/50"
                                             }`}
-                                        />
-                                        {!isCollapsed && (
-                                            <>
-                                                <span
-                                                    className={`flex-1 text-left ${
-                                                        hasActiveChild ? "text-morpheus-gold-light font-medium" : ""
+                                            title={isCollapsed ? item.label : undefined}
+                                            asChild
+                                        >
+                                            <Link href={item.href} className="flex items-center w-full">
+                                                <Icon
+                                                    className={`h-5 w-5 ${isCollapsed ? "" : "mr-3"} ${
+                                                        isActive ? "text-morpheus-gold-light" : ""
                                                     }`}
-                                                >
-                                                    {item.label}
-                                                </span>
-                                                {isDropdownOpen ? (
-                                                    <ChevronUp className="h-4 w-4" />
-                                                ) : (
-                                                    <ChevronDown className="h-4 w-4" />
+                                                />
+                                                {!isCollapsed && (
+                                                    <>
+                                                        <span
+                                                            className={`flex-1 text-left ${
+                                                                isActive ? "text-morpheus-gold-light font-medium" : ""
+                                                            }`}
+                                                        >
+                                                            {item.label}
+                                                        </span>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            className="p-0 h-auto hover:bg-transparent"
+                                                            onClick={(e) => {
+                                                                e.preventDefault();
+                                                                e.stopPropagation();
+                                                                toggleDropdown(item.id);
+                                                            }}
+                                                        >
+                                                            {isDropdownOpen ? (
+                                                                <ChevronUp className="h-4 w-4" />
+                                                            ) : (
+                                                                <ChevronDown className="h-4 w-4" />
+                                                            )}
+                                                        </Button>
+                                                    </>
                                                 )}
-                                            </>
-                                        )}
-                                    </Button>
+                                            </Link>
+                                        </Button>
+                                    ) : (
+                                        <Button
+                                            variant="ghost"
+                                            className={`w-full rounded-none h-12 ${
+                                                isCollapsed ? "justify-center" : "justify-start"
+                                            } transition-all duration-200 ${
+                                                isActive
+                                                    ? "bg-gradient-to-r from-morpheus-gold-dark/20 to-morpheus-gold-light/20 text-morpheus-gold-light border border-morpheus-gold-light/30"
+                                                    : "text-gray-300 hover:text-white hover:bg-slate-700/50"
+                                            }`}
+                                            title={isCollapsed ? item.label : undefined}
+                                            onClick={() => !isCollapsed && toggleDropdown(item.id)}
+                                        >
+                                            <Icon
+                                                className={`h-5 w-5 ${isCollapsed ? "" : "mr-3"} ${
+                                                    isActive ? "text-morpheus-gold-light" : ""
+                                                }`}
+                                            />
+                                            {!isCollapsed && (
+                                                <>
+                                                    <span
+                                                        className={`flex-1 text-left ${
+                                                            isActive ? "text-morpheus-gold-light font-medium" : ""
+                                                        }`}
+                                                    >
+                                                        {item.label}
+                                                    </span>
+                                                    {isDropdownOpen ? (
+                                                        <ChevronUp className="h-4 w-4" />
+                                                    ) : (
+                                                        <ChevronDown className="h-4 w-4" />
+                                                    )}
+                                                </>
+                                            )}
+                                        </Button>
+                                    )}
 
                                     {/* Dropdown content */}
                                     {!isCollapsed && isDropdownOpen && item.children && (
@@ -268,6 +340,11 @@ export function ModernSidebar({ isOpen, isCollapsed, onToggle, onCollapse, userR
                                                     }
                                                     if (pathname === child.href) {
                                                         return true;
+                                                    }
+                                                    // Special case for /admin/products - only active for exact match
+                                                    // to avoid conflict with /admin/products/rejected
+                                                    if (child.href === "/admin/products") {
+                                                        return pathname === "/admin/products";
                                                     }
                                                     if (pathname.startsWith(child.href + "/")) {
                                                         return true;
