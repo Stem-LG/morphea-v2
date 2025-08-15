@@ -1403,7 +1403,7 @@ export const frTranslations = {
     "trackOrder": "Suivez le statut de votre commande dans votre compte"
   },
   "shop": {
-    "title": "Boutique",
+    "title": "Nos Produits",
     "search": "Rechercher",
     "searchPlaceholder": "Rechercher des produits...",
     "mall": "Centre commercial",

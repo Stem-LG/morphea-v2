@@ -1375,7 +1375,7 @@ export const enTranslations = {
     "trackOrder": "Track your order status in your account"
   },
   "shop": {
-    "title": "Shop",
+    "title": "Our Products",
     "search": "Search",
     "searchPlaceholder": "Search products...",
     "mall": "Mall",
