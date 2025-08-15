@@ -206,8 +206,13 @@ export function CurrencyManagement() {
                             <Button
                                 variant="outline"
                                 size="sm"
-                                onClick={() => handleSetAsPivot(row.original)}
-                                className="border-yellow-600 text-yellow-400 hover:bg-yellow-600/10"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    handleSetAsPivot(row.original);
+                                }}
+                                disabled={pivotChangeHook.isLoading}
+                                className="border-yellow-600 text-yellow-400 hover:bg-yellow-600/10 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 <Star className="h-4 w-4 mr-1" />
                                 {t('admin.currencies.setAsPivot')}
@@ -273,6 +278,11 @@ export function CurrencyManagement() {
 
     const handleSetAsPivot = (currency: Currency) => {
         if (!currencies) return;
+        
+        // Prevent multiple clicks by checking if already loading
+        if (pivotChangeHook.isLoading) return;
+        
+        // Ensure we have fresh data
         openPivotChangeDialog(currency, currencies);
     };
 

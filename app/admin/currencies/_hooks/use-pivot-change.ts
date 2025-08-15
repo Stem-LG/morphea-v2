@@ -27,6 +27,7 @@ export function usePivotChange() {
   const supabase = createClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedCurrency, setSelectedCurrency] = useState<Currency | null>(null);
+  const [allCurrencies, setAllCurrencies] = useState<Currency[]>([]);
   const [exchangeRates, setExchangeRates] = useState<ExchangeRateInput[]>([]);
   const [errors, setErrors] = useState<Record<number, string>>({});
 
@@ -34,7 +35,23 @@ export function usePivotChange() {
     mutationFn: async (data: PivotChangeData) => {
       const currentTime = new Date().toISOString();
       
-      // First, set the new pivot currency
+      // First, unset all current pivot currencies to ensure data consistency
+      const { error: unsetError } = await supabase
+        .schema("morpheus")
+        .from("xdevise")
+        .update({
+          xispivot: false,
+          sysdate: currentTime,
+          sysaction: 'update',
+          sysuser: 'admin'
+        })
+        .eq("xispivot", true);
+
+      if (unsetError) {
+        throw new Error(`Failed to unset current pivot currencies: ${unsetError.message}`);
+      }
+
+      // Then set the new pivot currency
       const { error: pivotError } = await supabase
         .schema("morpheus")
         .from("xdevise")
@@ -51,13 +68,12 @@ export function usePivotChange() {
         throw new Error(`Failed to set new pivot currency: ${pivotError.message}`);
       }
 
-      // Then update all other currencies with their new rates and unset pivot
+      // Finally, update all other currencies with their new rates
       for (const [currencyId, rate] of Object.entries(data.exchangeRates)) {
         const { error: updateError } = await supabase
           .schema("morpheus")
           .from("xdevise")
           .update({
-            xispivot: false,
             xtauxechange: rate,
             sysdate: currentTime,
             sysaction: 'update',
@@ -73,8 +89,14 @@ export function usePivotChange() {
       return { success: true };
     },
     onSuccess: () => {
+      // Force refresh all currency-related queries
       queryClient.invalidateQueries({ queryKey: ['currencies-with-stats'] });
       queryClient.invalidateQueries({ queryKey: ['currencies'] });
+      
+      // Also refetch immediately to ensure fresh data
+      queryClient.refetchQueries({ queryKey: ['currencies-with-stats'] });
+      queryClient.refetchQueries({ queryKey: ['currencies'] });
+      
       toast.success(t('admin.currencies.pivotCurrencyChangedSuccess'), {
         description: t('admin.currencies.pivotCurrencyChangedDescription')
           .replace('{currency}', selectedCurrency?.xdeviseintitule || '')
@@ -88,11 +110,12 @@ export function usePivotChange() {
     }
   });
 
-  const openPivotChangeDialog = (currency: Currency, allCurrencies: Currency[]) => {
+  const openPivotChangeDialog = (currency: Currency, currencies: Currency[]) => {
     setSelectedCurrency(currency);
+    setAllCurrencies(currencies);
     
     // Initialize exchange rates for all other currencies (excluding the new pivot)
-    const otherCurrencies = allCurrencies.filter(c => c.xdeviseid !== currency.xdeviseid);
+    const otherCurrencies = currencies.filter(c => c.xdeviseid !== currency.xdeviseid);
     const initialRates: ExchangeRateInput[] = otherCurrencies.map(c => ({
       currencyId: c.xdeviseid,
       currencyName: c.xdeviseintitule || '',
@@ -108,6 +131,7 @@ export function usePivotChange() {
   const handleCloseDialog = () => {
     setIsDialogOpen(false);
     setSelectedCurrency(null);
+    setAllCurrencies([]);
     setExchangeRates([]);
     setErrors({});
   };
@@ -153,9 +177,9 @@ export function usePivotChange() {
         return;
       }
 
-      // Check decimal places (max 4)
+      // Check decimal places (max 10)
       const decimalPlaces = (rate.split('.')[1] || '').length;
-      if (decimalPlaces > 4) {
+      if (decimalPlaces > 10) {
         newErrors[currencyId] = t('admin.currencies.exchangeRateMaxDecimals');
         isValid = false;
         return;
@@ -186,10 +210,21 @@ export function usePivotChange() {
     });
   };
 
+  // New method for stepper workflow
+  const handleStepperComplete = (rates: Record<number, number>) => {
+    if (!selectedCurrency) return;
+
+    pivotChangeMutation.mutate({
+      newPivotCurrencyId: selectedCurrency.xdeviseid,
+      exchangeRates: rates
+    });
+  };
+
   return {
     // State
     isDialogOpen,
     selectedCurrency,
+    allCurrencies,
     exchangeRates,
     errors,
     isLoading: pivotChangeMutation.isPending,
@@ -199,6 +234,7 @@ export function usePivotChange() {
     handleCloseDialog,
     updateExchangeRate,
     handleSubmitPivotChange,
+    handleStepperComplete,
     validateExchangeRates
   };
 }
