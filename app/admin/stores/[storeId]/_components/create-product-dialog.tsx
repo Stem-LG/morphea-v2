@@ -54,7 +54,7 @@ interface ProductVariant {
     sizeId: number | null;
     images: (File | { ymediaid: number; ymediaurl: string; ymediaintitule: string })[];
     videos: (File | { ymediaid: number; ymediaurl: string; ymediaintitule: string })[];
-    models3d: (File | { yobjet3did: number; yobjet3durl: string })[];
+    models3d: (File | { yobjet3did: number; yobjet3durl: string; ycouleurarriereplan?: string })[];
     backgroundColor?: string; // Hex color for 3D model background
     isDeleted?: boolean; // Mark for deletion
     status?: 'approved' | 'not_approved' | 'rejected'; // Variant status
@@ -171,25 +171,32 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
             setSelectedInfospotactionId(infospotactionId || null);
 
             // Populate variants
-            const formattedVariants: ProductVariant[] = productVariants.map((variant, index) => ({
-                id: variant.yvarprodid?.toString() || `existing-${index}`,
-                yvarprodid: variant.yvarprodid,
-                name: variant.yvarprodintitule || "",
-                code: variant.yvarprodcode || "",
-                colorId: variant.xcouleuridfk.xcouleurid || null,
-                sizeId: variant.xtailleidfk.xtailleid || null,
-                images: variant.images || [],
-                videos: variant.videos || [],
-                models3d: variant.models3d || [],
-                backgroundColor: variant.backgroundColor || "#ffffff", // Default to white if not set
-                status: variant.yvarprodstatut || 'not_approved',
-                // Populate pricing data
-                catalogPrice: variant.yvarprodprixcatalogue || 0,
-                promotionPrice: variant.yvarprodprixpromotion || null,
-                promotionStartDate: variant.yvarprodpromotiondatedeb || null,
-                promotionEndDate: variant.yvarprodpromotiondatefin || null,
-                currencyId: variant.xdeviseidfk || null,
-            }));
+            const formattedVariants: ProductVariant[] = productVariants.map((variant, index) => {
+                // Get background color from the first 3D model if available
+                const backgroundColorFrom3D = variant.models3d && variant.models3d.length > 0 
+                    ? variant.models3d[0].ycouleurarriereplan 
+                    : null;
+                
+                return {
+                    id: variant.yvarprodid?.toString() || `existing-${index}`,
+                    yvarprodid: variant.yvarprodid,
+                    name: variant.yvarprodintitule || "",
+                    code: variant.yvarprodcode || "",
+                    colorId: variant.xcouleuridfk.xcouleurid || null,
+                    sizeId: variant.xtailleidfk.xtailleid || null,
+                    images: variant.images || [],
+                    videos: variant.videos || [],
+                    models3d: variant.models3d || [],
+                    backgroundColor: backgroundColorFrom3D || "#ffffff", // Get from 3D model or default to white
+                    status: variant.yvarprodstatut || 'not_approved',
+                    // Populate pricing data
+                    catalogPrice: variant.yvarprodprixcatalogue || 0,
+                    promotionPrice: variant.yvarprodprixpromotion || null,
+                    promotionStartDate: variant.yvarprodpromotiondatedeb || null,
+                    promotionEndDate: variant.yvarprodpromotiondatefin || null,
+                    currencyId: variant.xdeviseidfk || null,
+                };
+            });
 
             setVariants(
                 formattedVariants.length > 0
@@ -290,6 +297,9 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
     };
 
     const handleVariantChange = (variantId: string, field: keyof ProductVariant, value: any) => {
+        if (field === 'backgroundColor') {
+            console.log(`Background color changed for variant ${variantId}: ${value}`);
+        }
         setVariants(variants.map((v) => (v.id === variantId ? { ...v, [field]: value } : v)));
     };
 
@@ -453,11 +463,27 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                 toast.error(t("admin.createProduct.completeVariantInfo"));
                 return;
             }
+            
+            // Validate background color format
+            if (canEdit && variant.backgroundColor) {
+                const hexColorRegex = /^#([0-9A-Fa-f]{6})$/;
+                if (!hexColorRegex.test(variant.backgroundColor)) {
+                    toast.error(`${t("admin.createProduct.invalidBackgroundColor") || "Invalid background color format"}: ${variant.name || `Variant ${variants.indexOf(variant) + 1}`}`);
+                    return;
+                }
+            }
         }
 
         try {
             if (isEditMode && productId) {
                 // Update existing product
+                const formattedVariants = variants.map((v) => formatVariantForSubmission(v));
+                console.log("Updating product with background colors:", formattedVariants.map(v => ({
+                    name: v.name,
+                    backgroundColor: v.backgroundColor,
+                    ycouleurarriereplan: v.ycouleurarriereplan
+                })));
+                
                 await updateProductMutation.mutateAsync({
                     productId,
                     storeId,
@@ -469,29 +495,31 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                     fullDescription,
                     infospotactionId: selectedInfospotactionId || undefined,
                     eventId: selectedEventId || undefined,
-                    variants: variants.map((v) => ({
-                        id: v.id,
-                        yvarprodid: v.yvarprodid,
-                        name: v.name,
-                        code: v.code,
-                        colorId: v.colorId!,
-                        sizeId: v.sizeId!,
-                        images: v.images,
-                        videos: v.videos,
-                        models3d: v.models3d,
-                        backgroundColor: v.backgroundColor,
-                        isDeleted: v.isDeleted,
-                        // Include pricing data
-                        catalogPrice: v.catalogPrice,
-                        promotionPrice: v.promotionPrice,
-                        promotionStartDate: v.promotionStartDate,
-                        promotionEndDate: v.promotionEndDate,
-                        currencyId: v.currencyId,
-                    })),
+                    variants: formattedVariants,
                 });
                 toast.success(t("admin.createProduct.productUpdatedSuccessfully"));
             } else {
                 // Create new product
+                const createVariants = variants.map((v) => {
+                    const normalizedBgColor = normalizeBackgroundColor(v.backgroundColor);
+                    return {
+                        name: v.name,
+                        code: v.code,
+                        colorId: v.colorId!,
+                        sizeId: v.sizeId!,
+                        images: v.images.filter((img): img is File => img instanceof File),
+                        videos: v.videos.filter((vid): vid is File => vid instanceof File),
+                        models3d: v.models3d.filter((model): model is File => model instanceof File),
+                        backgroundColor: normalizedBgColor,
+                        ycouleurarriereplan: normalizedBgColor, // Include database field name
+                    };
+                });
+                
+                console.log("Creating variants with background colors:", createVariants.map(v => ({
+                    name: v.name,
+                    backgroundColor: v.backgroundColor
+                })));
+                
                 await createProductMutation.mutateAsync({
                     storeId,
                     eventId: selectedEventId,
@@ -502,16 +530,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                     shortDescription,
                     fullDescription,
                     infospotactionId: selectedInfospotactionId || undefined,
-                    variants: variants.map((v) => ({
-                        name: v.name,
-                        code: v.code,
-                        colorId: v.colorId!,
-                        sizeId: v.sizeId!,
-                        images: v.images.filter((img): img is File => img instanceof File),
-                        videos: v.videos.filter((vid): vid is File => vid instanceof File),
-                        models3d: v.models3d.filter((model): model is File => model instanceof File),
-                        backgroundColor: v.backgroundColor,
-                    })),
+                    variants: createVariants,
                 });
                 toast.success(t("admin.createProduct.productCreatedSuccessfully"));
             }
@@ -532,6 +551,57 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
             return `${r},${g},${b}`;
         }
         return "0,0,0";
+    };
+
+    // Helper function to normalize background color
+    const normalizeBackgroundColor = (color: string | undefined): string => {
+        if (!color) return "#ffffff";
+        // Ensure it starts with # and is 7 characters long
+        const cleanColor = color.startsWith("#") ? color : `#${color}`;
+        return /^#[0-9A-Fa-f]{6}$/.test(cleanColor) ? cleanColor : "#ffffff";
+    };
+
+    // Helper function to format variant data for API submission
+    const formatVariantForSubmission = (variant: ProductVariant) => {
+        const normalizedBgColor = normalizeBackgroundColor(variant.backgroundColor);
+        
+        // For 3D models, we need to include the background color in the model data
+        const formattedModels3d = variant.models3d.map((model) => {
+            if (model instanceof File) {
+                // For new file uploads, the background color will be handled separately by the API
+                // but we still return the file as-is
+                return model;
+            } else {
+                // For existing models, update the background color
+                return {
+                    ...model,
+                    ycouleurarriereplan: normalizedBgColor
+                };
+            }
+        });
+
+        const submissionData = {
+            id: variant.id,
+            yvarprodid: variant.yvarprodid,
+            name: variant.name,
+            code: variant.code,
+            colorId: variant.colorId!,
+            sizeId: variant.sizeId!,
+            images: variant.images,
+            videos: variant.videos,
+            models3d: formattedModels3d,
+            backgroundColor: normalizedBgColor, // Always include this for the API
+            ycouleurarriereplan: normalizedBgColor, // Include the database field name as well
+            isDeleted: variant.isDeleted,
+            // Include pricing data
+            catalogPrice: variant.catalogPrice,
+            promotionPrice: variant.promotionPrice,
+            promotionStartDate: variant.promotionStartDate,
+            promotionEndDate: variant.promotionEndDate,
+            currencyId: variant.currencyId,
+        };
+
+        return submissionData;
     };
 
     return (
@@ -1298,7 +1368,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                             <div className="mb-3">
                                                                 <Label className="text-gray-300 text-sm flex items-center gap-1">
                                                                     <Palette className="h-3 w-3" />
-                                                                    3D Model Background Color
+                                                                    {t("admin.createProduct.3dBackgroundColor") || "3D Model Background Color"}
                                                                 </Label>
                                                                 <div className="flex gap-2 mt-1">
                                                                     <input
@@ -1312,24 +1382,51 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                                             )
                                                                         }
                                                                         className="w-12 h-8 bg-gray-700/50 border border-gray-600 rounded cursor-pointer"
-                                                                        title="Select background color for 3D model"
+                                                                        title={t("admin.createProduct.selectBackgroundColor") || "Select background color for 3D model"}
                                                                     />
                                                                     <Input
                                                                         value={variant.backgroundColor || "#ffffff"}
-                                                                        onChange={(e) =>
-                                                                            handleVariantChange(
-                                                                                variant.id,
-                                                                                "backgroundColor",
-                                                                                e.target.value
-                                                                            )
-                                                                        }
+                                                                        onChange={(e) => {
+                                                                            // Validate hex color format
+                                                                            const value = e.target.value;
+                                                                            if (value === "" || /^#([0-9A-Fa-f]{0,6})$/.test(value)) {
+                                                                                handleVariantChange(
+                                                                                    variant.id,
+                                                                                    "backgroundColor",
+                                                                                    value
+                                                                                );
+                                                                            }
+                                                                        }}
                                                                         placeholder="#ffffff"
                                                                         className="flex-1 bg-gray-600/50 border-gray-500 text-white text-sm"
                                                                         maxLength={7}
                                                                     />
+                                                                    {/* Quick color presets */}
+                                                                    <div className="flex gap-1">
+                                                                        {["#ffffff", "#f0f0f0", "#e0e0e0", "#d0d0d0", "#000000"].map((presetColor) => (
+                                                                            <button
+                                                                                key={presetColor}
+                                                                                type="button"
+                                                                                onClick={() =>
+                                                                                    handleVariantChange(
+                                                                                        variant.id,
+                                                                                        "backgroundColor",
+                                                                                        presetColor
+                                                                                    )
+                                                                                }
+                                                                                className={`w-6 h-6 rounded border-2 transition-all hover:scale-110 ${
+                                                                                    variant.backgroundColor === presetColor
+                                                                                        ? "border-morpheus-gold-light"
+                                                                                        : "border-gray-500"
+                                                                                }`}
+                                                                                style={{ backgroundColor: presetColor }}
+                                                                                title={`Set background to ${presetColor}`}
+                                                                            />
+                                                                        ))}
+                                                                    </div>
                                                                 </div>
                                                                 <div className="text-xs text-gray-400 mt-1">
-                                                                    Background color for the 3D model viewer
+                                                                    {t("admin.createProduct.backgroundColorDescription") || "Background color for the 3D model viewer"}
                                                                 </div>
                                                             </div>
                                                             
