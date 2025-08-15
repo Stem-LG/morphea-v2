@@ -2,6 +2,7 @@
 
 import AnimatedBackground from "@/components/animated-background";
 import LandingPage from "@/components/landing-page";
+import { PoweredBy } from "@/components/powered-by";
 import { createClient } from "@/lib/client";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -23,6 +24,8 @@ export default function Home() {
             <LandingPage />
             {/* Animated 360° Background */}
             <AnimatedBackground />
+            {/* Powered By Footer */}
+            <PoweredBy />
         </section>
     );
 }

@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { useLanguage } from "@/hooks/useLanguage";
+import { useWebsiteUrl } from "@/hooks/use-website-url";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useEffect, useMemo } from "react";
@@ -42,10 +43,10 @@ interface EnhancedSignupWithVisitorProps extends React.ComponentPropsWithoutRef<
     showVisitorForm?: boolean;
 }
 
-export function EnhancedSignupWithVisitor({ 
-    className, 
+export function EnhancedSignupWithVisitor({
+    className,
     showVisitorForm = false,
-    ...props 
+    ...props
 }: EnhancedSignupWithVisitorProps) {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
@@ -54,7 +55,7 @@ export function EnhancedSignupWithVisitor({
     const [acceptedTerms, setAcceptedTerms] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
-    
+
     // Visitor form data
     const [visitorData, setVisitorData] = useState<VisitorFormData>({
         phone: "",
@@ -75,10 +76,11 @@ export function EnhancedSignupWithVisitor({
             vip: false,
         },
     });
-    
+
     const router = useRouter();
     const { t } = useLanguage();
-    
+    const { data: websiteUrl, isLoading: isLoadingWebsiteUrl } = useWebsiteUrl();
+
     // Local visitor data state
     const [existingVisitorData, setExistingVisitorData] = useState<any>(null);
     const [isLoadingVisitor, setIsLoadingVisitor] = useState(false);
@@ -89,10 +91,10 @@ export function EnhancedSignupWithVisitor({
             try {
                 setIsLoadingVisitor(true);
                 const supabase = createClient();
-                
+
                 // Get current user safely
                 const { data: currentUserData, error: userError } = await supabase.auth.getUser();
-                
+
                 // If there's an auth error, just continue without prefilling
                 if (userError || !currentUserData?.user) {
                     setIsLoadingVisitor(false);
@@ -158,14 +160,14 @@ export function EnhancedSignupWithVisitor({
 
     const isPasswordValid = passwordRequirements.every((req) => req.met);
     const passwordsMatch = password === repeatPassword && repeatPassword.length > 0;
-    
+
     // Check if visitor form is properly filled when displayed
     const isVisitorFormValid = !showVisitorForm || (
         visitorData.phone.trim() &&
         visitorData.address.trim() &&
         Object.values(visitorData.visitorTypes).some(type => type) // At least one visitor type selected
     );
-    
+
     const isFormValid = name.trim() && email.trim() && isPasswordValid && passwordsMatch && acceptedTerms && isVisitorFormValid;
 
     const handleVisitorTypeChange = (type: keyof VisitorFormData["visitorTypes"], checked: boolean) => {
@@ -220,11 +222,15 @@ export function EnhancedSignupWithVisitor({
             const currentUser = currentUserData?.user;
 
             // Sign up with email and password
+            const redirectUrl = websiteUrl && !isLoadingWebsiteUrl
+                ? `${websiteUrl}/main`
+                : `${process.env.NEXT_PUBLIC_SITE_URL || window.location.origin}/main`;
+
             const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
                 email,
                 password,
                 options: {
-                    emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || window.location.origin}/main`,
+                    emailRedirectTo: redirectUrl,
                     data: {
                         full_name: name.trim(),
                     },
@@ -254,7 +260,7 @@ export function EnhancedSignupWithVisitor({
                     // Create new visitor record with form data
                     try {
                         const visitorCode = `V${Date.now().toString().slice(-8)}`;
-                        
+
                         // Get the next available ID
                         const { data: existingVisitors } = await supabase
                             .schema("morpheus")
@@ -534,7 +540,7 @@ export function EnhancedSignupWithVisitor({
                                                     {"Sélectionnez tout ce qui s'applique"}
                                                 </p>
                                             </div>
-                                            
+
                                             <div className="grid grid-cols-1 gap-2 max-h-64 overflow-y-auto">
                                                 {[
                                                     { key: "grandpublic", label: "Grand Public" },
@@ -559,7 +565,7 @@ export function EnhancedSignupWithVisitor({
                                                             type="checkbox"
                                                             checked={
                                                                 visitorData.visitorTypes[
-                                                                    key as keyof VisitorFormData["visitorTypes"]
+                                                                key as keyof VisitorFormData["visitorTypes"]
                                                                 ]
                                                             }
                                                             onChange={(e) =>

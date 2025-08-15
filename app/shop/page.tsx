@@ -1,21 +1,163 @@
 "use client";
 
-import { Suspense, useState } from "react";
-import { Grid, List, ChevronLeft, ChevronRight, Filter, X } from "lucide-react";
+import { Suspense, useState, useCallback } from "react";
+import { Grid, List, ChevronLeft, ChevronRight, Filter, X, Search, Store, Tag, Check } from "lucide-react";
 import { useQueryStates, parseAsInteger, parseAsString, parseAsStringEnum } from "nuqs";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useShopProducts } from "./_hooks/use-shop-products";
-import { useShopMalls, useShopBoutiques, useShopCategories } from "./_hooks/use-shop-filters";
+import { useShopBoutiques, useShopCategories } from "./_hooks/use-shop-filters";
 import { ProductCard } from "./_components/product-card";
 import { ProductDetailsPage } from "@/app/main/_components/product-details-page";
 import { cn } from "@/lib/utils";
+
+interface FilterSidebarProps {
+    isMobile?: boolean;
+    search: string;
+    boutiqueId: number | null;
+    categoryId: number | null;
+    boutiques: any[];
+    categories: any[];
+    hasActiveFilters: boolean;
+    t: (key: string) => string;
+    onFilterChange: (key: string) => (value: any) => void;
+    onClearFilters: () => void;
+}
+
+const FilterSidebar = ({
+    isMobile = false,
+    search,
+    boutiqueId,
+    categoryId,
+    boutiques,
+    categories,
+    hasActiveFilters,
+    t,
+    onFilterChange,
+    onClearFilters,
+}: FilterSidebarProps) => (
+    <div className={cn("space-y-8", isMobile ? "p-4" : "")}>
+        {/* Search */}
+        <div className="space-y-3">
+            <div className="flex items-center gap-2 mb-4">
+                <Search className="w-5 h-5 text-morpheus-gold-light" />
+                <h3 className="font-semibold text-white text-lg">{t("shop.search")}</h3>
+            </div>
+            <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                    type="text"
+                    placeholder={t("shop.searchPlaceholder")}
+                    value={search}
+                    onChange={(e) => onFilterChange("search")(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 bg-morpheus-blue-dark/40 border border-morpheus-gold-dark/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-morpheus-gold-light focus:border-morpheus-gold-light text-white placeholder-gray-400 backdrop-blur-sm transition-all duration-300"
+                />
+            </div>
+        </div>
+
+        {/* Boutique Filter */}
+        {boutiques.length > 0 && (
+            <div className="space-y-4">
+                <div className="flex items-center gap-2 mb-4">
+                    <Store className="w-5 h-5 text-morpheus-gold-light" />
+                    <h3 className="font-semibold text-white text-lg">{t("shop.boutique")}</h3>
+                </div>
+                <div className="space-y-2">
+                    <button
+                        onClick={() => onFilterChange("boutiqueId")(null)}
+                        className={cn(
+                            "w-full flex items-center justify-between p-3 rounded-xl transition-all duration-300 group",
+                            !boutiqueId
+                                ? "bg-gradient-to-r from-morpheus-gold-dark/30 to-morpheus-gold-light/30 border border-morpheus-gold-light/50 text-white shadow-lg"
+                                : "bg-morpheus-blue-dark/30 border border-morpheus-gold-dark/20 text-gray-300 hover:bg-morpheus-blue-dark/50 hover:border-morpheus-gold-dark/40 hover:text-white"
+                        )}
+                    >
+                        <span className="font-medium">{t("shop.allBoutiques")}</span>
+                        {!boutiqueId && <Check className="w-4 h-4 text-morpheus-gold-light" />}
+                    </button>
+                    {boutiques.map((boutique) => (
+                        <button
+                            key={boutique.yboutiqueid}
+                            onClick={() => onFilterChange("boutiqueId")(boutique.yboutiqueid)}
+                            className={cn(
+                                "w-full flex items-center justify-between p-3 rounded-xl transition-all duration-300 group",
+                                boutiqueId === boutique.yboutiqueid
+                                    ? "bg-gradient-to-r from-morpheus-gold-dark/30 to-morpheus-gold-light/30 border border-morpheus-gold-light/50 text-white shadow-lg"
+                                    : "bg-morpheus-blue-dark/30 border border-morpheus-gold-dark/20 text-gray-300 hover:bg-morpheus-blue-dark/50 hover:border-morpheus-gold-dark/40 hover:text-white"
+                            )}
+                        >
+                            <span className="font-medium text-left">
+                                {boutique.yboutiqueintitule || boutique.yboutiquecode}
+                            </span>
+                            {boutiqueId === boutique.yboutiqueid && (
+                                <Check className="w-4 h-4 text-morpheus-gold-light flex-shrink-0" />
+                            )}
+                        </button>
+                    ))}
+                </div>
+            </div>
+        )}
+
+        {/* Category Filter */}
+        {categories.length > 0 && (
+            <div className="space-y-4">
+                <div className="flex items-center gap-2 mb-4">
+                    <Tag className="w-5 h-5 text-morpheus-gold-light" />
+                    <h3 className="font-semibold text-white text-lg">{t("shop.category")}</h3>
+                </div>
+                <div className="space-y-2">
+                    <button
+                        onClick={() => onFilterChange("categoryId")(null)}
+                        className={cn(
+                            "w-full flex items-center justify-between p-3 rounded-xl transition-all duration-300 group",
+                            !categoryId
+                                ? "bg-gradient-to-r from-morpheus-gold-dark/30 to-morpheus-gold-light/30 border border-morpheus-gold-light/50 text-white shadow-lg"
+                                : "bg-morpheus-blue-dark/30 border border-morpheus-gold-dark/20 text-gray-300 hover:bg-morpheus-blue-dark/50 hover:border-morpheus-gold-dark/40 hover:text-white"
+                        )}
+                    >
+                        <span className="font-medium">{t("shop.allCategories")}</span>
+                        {!categoryId && <Check className="w-4 h-4 text-morpheus-gold-light" />}
+                    </button>
+                    {categories.map((category) => (
+                        <button
+                            key={category.xcategprodid}
+                            onClick={() => onFilterChange("categoryId")(category.xcategprodid)}
+                            className={cn(
+                                "w-full flex items-center justify-between p-3 rounded-xl transition-all duration-300 group",
+                                categoryId === category.xcategprodid
+                                    ? "bg-gradient-to-r from-morpheus-gold-dark/30 to-morpheus-gold-light/30 border border-morpheus-gold-light/50 text-white shadow-lg"
+                                    : "bg-morpheus-blue-dark/30 border border-morpheus-gold-dark/20 text-gray-300 hover:bg-morpheus-blue-dark/50 hover:border-morpheus-gold-dark/40 hover:text-white"
+                            )}
+                        >
+                            <span className="font-medium text-left">{category.xcategprodintitule}</span>
+                            {categoryId === category.xcategprodid && (
+                                <Check className="w-4 h-4 text-morpheus-gold-light flex-shrink-0" />
+                            )}
+                        </button>
+                    ))}
+                </div>
+            </div>
+        )}
+
+        {/* Clear Filters */}
+        {hasActiveFilters && (
+            <div className="pt-4 border-t border-morpheus-gold-dark/20">
+                <button
+                    onClick={onClearFilters}
+                    className="w-full py-3 px-4 bg-gradient-to-r from-red-500/20 to-red-600/20 border border-red-500/30 text-red-300 rounded-xl hover:from-red-500/30 hover:to-red-600/30 hover:border-red-400/50 hover:text-red-200 transition-all duration-300 font-medium flex items-center justify-center gap-2"
+                >
+                    <X className="w-4 h-4" />
+                    {t("shop.clearFilters")}
+                </button>
+            </div>
+        )}
+    </div>
+);
 
 function ShopContent() {
     const { t } = useLanguage();
 
     // URL state management for filters and view mode
-    const [{ mallId, boutiqueId, categoryId, search, viewMode, page }, setQueryState] = useQueryStates({
-        mallId: parseAsInteger,
+    const [{ boutiqueId, categoryId, search, viewMode, page }, setQueryState] = useQueryStates({
         boutiqueId: parseAsInteger,
         categoryId: parseAsInteger,
         search: parseAsString.withDefault(""),
@@ -35,7 +177,6 @@ function ShopContent() {
     const { data: productsData, isLoading: isLoadingProducts } = useShopProducts({
         page,
         perPage,
-        mallId,
         boutiqueId,
         categoryId,
         searchQuery: search,
@@ -44,8 +185,7 @@ function ShopContent() {
     const { products = [], totalCount = 0, currentEvent } = productsData || {};
 
     // Fetch filter options
-    const { data: malls = [] } = useShopMalls(currentEvent?.yeventid || null);
-    const { data: boutiques = [] } = useShopBoutiques(currentEvent?.yeventid || null, mallId);
+    const { data: boutiques = [] } = useShopBoutiques(currentEvent?.yeventid || null, null);
     const { data: categories = [] } = useShopCategories(currentEvent?.yeventid || null);
 
     // Calculate pagination
@@ -53,167 +193,23 @@ function ShopContent() {
     const hasNextPage = page < totalPages;
     const hasPrevPage = page > 1;
 
-    // Reset boutique when mall changes
-    const handleMallChange = (selectedMall: number | null) => {
-        setQueryState({
-            mallId: selectedMall,
-            boutiqueId: null,
-            page: 1,
-        });
-    };
-
     // Reset page when filters change
-    const handleFilterChange = (key: string) => (value: any) => {
+    const handleFilterChange = useCallback((key: string) => (value: any) => {
         setQueryState({ [key]: value, page: 1 });
-    };
+    }, [setQueryState]);
 
-    const clearFilters = () => {
+    const clearFilters = useCallback(() => {
         setQueryState({
-            mallId: null,
             boutiqueId: null,
             categoryId: null,
             search: "",
             page: 1,
         });
-    };
+    }, [setQueryState]);
 
-    const hasActiveFilters = mallId || boutiqueId || categoryId || search;
+    const hasActiveFilters = Boolean(boutiqueId || categoryId || search);
 
-    const FilterSidebar = ({ isMobile = false }: { isMobile?: boolean }) => (
-        <div className={cn("space-y-6", isMobile ? "p-4" : "")}>
-            {/* Search */}
-            <div>
-                <h3 className="font-semibold text-white mb-4 text-lg">{t("shop.search")}</h3>
-                <input
-                    type="text"
-                    placeholder={t("shop.searchPlaceholder")}
-                    value={search}
-                    onChange={(e) => handleFilterChange("search")(e.target.value)}
-                    className="w-full px-4 py-3 bg-morpheus-blue-dark/40 border border-morpheus-gold-dark/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-morpheus-gold-light text-white placeholder-gray-400 backdrop-blur-sm transition-all duration-300"
-                />
-            </div>
 
-            {/* Mall Filter */}
-            {malls.length > 0 && (
-                <div>
-                    <h3 className="font-semibold text-white mb-4 text-lg">{t("shop.mall")}</h3>
-                    <div className="space-y-3">
-                        <label className="flex items-center cursor-pointer group">
-                            <input
-                                type="radio"
-                                name="mall"
-                                checked={!mallId}
-                                onChange={() => handleMallChange(null)}
-                                className="mr-3 text-morpheus-gold-light focus:ring-morpheus-gold-light"
-                            />
-                            <span className="text-gray-300 group-hover:text-white transition-colors">
-                                {t("shop.allMalls")}
-                            </span>
-                        </label>
-                        {malls.map((mall) => (
-                            <label key={mall.ymallid} className="flex items-center cursor-pointer group">
-                                <input
-                                    type="radio"
-                                    name="mall"
-                                    checked={mallId === mall.ymallid}
-                                    onChange={() => handleMallChange(mall.ymallid)}
-                                    className="mr-3 text-morpheus-gold-light focus:ring-morpheus-gold-light"
-                                />
-                                <span className="text-gray-300 group-hover:text-white transition-colors">
-                                    {mall.ymallintitule}
-                                </span>
-                            </label>
-                        ))}
-                    </div>
-                </div>
-            )}
-
-            {/* Boutique Filter */}
-            {boutiques.length > 0 && (
-                <div>
-                    <h3 className="font-semibold text-white mb-4 text-lg">{t("shop.boutique")}</h3>
-                    <div className="space-y-3">
-                        <label className="flex items-center cursor-pointer group">
-                            <input
-                                type="radio"
-                                name="boutique"
-                                checked={!boutiqueId}
-                                onChange={() => handleFilterChange("boutiqueId")(null)}
-                                className="mr-3 text-morpheus-gold-light focus:ring-morpheus-gold-light"
-                            />
-                            <span className="text-gray-300 group-hover:text-white transition-colors">
-                                {t("shop.allBoutiques")}
-                            </span>
-                        </label>
-                        {boutiques.map((boutique) => (
-                            <label key={boutique.yboutiqueid} className="flex items-center cursor-pointer group">
-                                <input
-                                    type="radio"
-                                    name="boutique"
-                                    checked={boutiqueId === boutique.yboutiqueid}
-                                    onChange={() => handleFilterChange("boutiqueId")(boutique.yboutiqueid)}
-                                    className="mr-3 text-morpheus-gold-light focus:ring-morpheus-gold-light"
-                                />
-                                <span className="text-gray-300 group-hover:text-white transition-colors">
-                                    {boutique.yboutiqueintitule || boutique.yboutiquecode}
-                                </span>
-                            </label>
-                        ))}
-                    </div>
-                </div>
-            )}
-
-            {/* Category Filter */}
-            {categories.length > 0 && (
-                <div>
-                    <h3 className="font-semibold text-white mb-4 text-lg">{t("shop.category")}</h3>
-                    <div className="space-y-3">
-                        <label className="flex items-center cursor-pointer group">
-                            <input
-                                type="radio"
-                                name="category"
-                                checked={!categoryId}
-                                onChange={() => handleFilterChange("categoryId")(null)}
-                                className="mr-3 text-morpheus-gold-light focus:ring-morpheus-gold-light"
-                            />
-                            <span className="text-gray-300 group-hover:text-white transition-colors">
-                                {t("shop.allCategories")}
-                            </span>
-                        </label>
-                        {categories.map((category) => (
-                            <label key={category.xcategprodid} className="flex items-center cursor-pointer group">
-                                <input
-                                    type="radio"
-                                    name="category"
-                                    checked={categoryId === category.xcategprodid}
-                                    onChange={() => handleFilterChange("categoryId")(category.xcategprodid)}
-                                    className="mr-3 text-morpheus-gold-light focus:ring-morpheus-gold-light"
-                                />
-                                <span className="text-gray-300 group-hover:text-white transition-colors">
-                                    {category.xcategprodintitule}
-                                    {category.productCount && (
-                                        <span className="text-morpheus-gold-light/70 ml-2">
-                                            ({category.productCount})
-                                        </span>
-                                    )}
-                                </span>
-                            </label>
-                        ))}
-                    </div>
-                </div>
-            )}
-
-            {/* Clear Filters */}
-            {hasActiveFilters && (
-                <button
-                    onClick={clearFilters}
-                    className="w-full py-3 px-4 bg-gradient-to-r from-morpheus-gold-dark/20 to-morpheus-gold-light/20 border border-morpheus-gold-dark/30 text-morpheus-gold-light rounded-lg hover:from-morpheus-gold-dark/30 hover:to-morpheus-gold-light/30 transition-all duration-300 font-medium"
-                >
-                    {t("shop.clearFilters")}
-                </button>
-            )}
-        </div>
-    );
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-morpheus-blue-dark via-morpheus-blue-dark/95 to-morpheus-blue-light/90">
@@ -270,7 +266,17 @@ function ShopContent() {
                     {/* Desktop Sidebar */}
                     <aside className="hidden lg:block w-80 flex-shrink-0">
                         <div className="bg-gradient-to-br from-morpheus-blue-dark/40 to-morpheus-blue-light/40 backdrop-blur-md border border-morpheus-gold-dark/20 rounded-xl p-6 sticky top-4 shadow-xl">
-                            <FilterSidebar />
+                            <FilterSidebar
+                                search={search}
+                                boutiqueId={boutiqueId}
+                                categoryId={categoryId}
+                                boutiques={boutiques}
+                                categories={categories}
+                                hasActiveFilters={hasActiveFilters}
+                                t={t}
+                                onFilterChange={handleFilterChange}
+                                onClearFilters={clearFilters}
+                            />
                         </div>
                     </aside>
 
@@ -413,7 +419,18 @@ function ShopContent() {
                                 <X className="w-6 h-6" />
                             </button>
                         </div>
-                        <FilterSidebar isMobile />
+                        <FilterSidebar
+                            isMobile
+                            search={search}
+                            boutiqueId={boutiqueId}
+                            categoryId={categoryId}
+                            boutiques={boutiques}
+                            categories={categories}
+                            hasActiveFilters={hasActiveFilters}
+                            t={t}
+                            onFilterChange={handleFilterChange}
+                            onClearFilters={clearFilters}
+                        />
                     </div>
                 </div>
             )}

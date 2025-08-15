@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { useAuth } from "@/hooks/useAuth";
@@ -14,6 +14,7 @@ import { SuperSelect } from "@/components/super-select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Progress } from "@/components/ui/progress";
 import {
     Plus,
     Trash2,
@@ -77,10 +78,10 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
     const storeId = parseInt(params.storeId as string);
     const { data: user } = useAuth();
     const { t } = useLanguage();
-    
+
     const isAdmin = user?.app_metadata?.roles?.includes("admin");
     const isStoreAdmin = user?.app_metadata?.roles?.includes("store_admin");
-    
+
     // Get event context from URL parameters
     const [selectedEventId] = useQueryState("eventId", {
         defaultValue: null,
@@ -127,12 +128,17 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
         x: "",
     });
 
+    // Progress bar state
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [progress, setProgress] = useState(0);
+    const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
     // Determine if we're in edit mode
     const isEditMode = !!productId;
 
     // Hooks
     const { data: categories, isLoading: categoriesLoading } = useCategories();
-    const { data: colors, isLoading: colorsLoading } = useColors();
+    const { data: colors } = useColors();
     const { data: sizes, isLoading: sizesLoading } = useSizes();
     const { data: currencies, isLoading: currenciesLoading } = useCurrencies();
     const { data: designer, isLoading: designerLoading } = useDesigner();
@@ -145,7 +151,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
         eventId: selectedEventId || undefined,
         enabled: isEditMode,
     });
-    
+
     // Get store ID for infospotactions (admin only)
     const { data: infospotactions } = useInfospotactions({
         boutiqueId: storeId,
@@ -202,18 +208,18 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                 formattedVariants.length > 0
                     ? formattedVariants
                     : [
-                          {
-                              id: "1",
-                              name: "",
-                              colorId: null,
-                              sizeId: null,
-                              images: [],
-                              videos: [],
-                              models3d: [],
-                              backgroundColor: "#ffffff",
-                              status: 'not_approved',
-                          },
-                      ]
+                        {
+                            id: "1",
+                            name: "",
+                            colorId: null,
+                            sizeId: null,
+                            images: [],
+                            videos: [],
+                            models3d: [],
+                            backgroundColor: "#ffffff",
+                            status: 'not_approved',
+                        },
+                    ]
             );
         } else if (!isEditMode) {
             // Reset form for create mode
@@ -309,12 +315,12 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
             variants.map((v) =>
                 v.id === variantId
                     ? {
-                          ...v,
-                          [type]:
-                              type === "models3d"
-                                  ? fileArray.slice(0, 1) // Only allow one 3D model
-                                  : [...v[type], ...fileArray],
-                      }
+                        ...v,
+                        [type]:
+                            type === "models3d"
+                                ? fileArray.slice(0, 1) // Only allow one 3D model
+                                : [...v[type], ...fileArray],
+                    }
                     : v
             )
         );
@@ -325,9 +331,9 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
             variants.map((v) =>
                 v.id === variantId
                     ? {
-                          ...v,
-                          [type]: v[type].filter((_, i) => i !== index),
-                      }
+                        ...v,
+                        [type]: v[type].filter((_, i) => i !== index),
+                    }
                     : v
             )
         );
@@ -373,31 +379,31 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
             // Admin can edit everything except rejected variants
             return variant.status !== 'rejected';
         }
-        
+
         if (isStoreAdmin) {
             // Store admin can only edit pending/not_approved variants
             return variant.status === 'not_approved' || !variant.status;
         }
-        
+
         return false;
     };
 
     // Helper function to check if product info can be edited
     const canEditProductInfo = () => {
         if (!isEditMode || !productDetails?.product) return true; // Allow editing for new products
-        
+
         const productStatus = productDetails.product.yprodstatut;
-        
+
         if (isAdmin) {
             // Admin can edit everything except rejected products
             return productStatus !== 'rejected';
         }
-        
+
         if (isStoreAdmin) {
             // Store admin can only edit pending products, but can add variants to approved products
             return productStatus === 'not_approved';
         }
-        
+
         return false;
     };
 
@@ -427,9 +433,59 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                 label: t("admin.pending")
             }
         };
-        
+
         return statusConfig[status as keyof typeof statusConfig] || statusConfig.not_approved;
     };
+
+    // Start fake progress bar
+    const startProgressBar = () => {
+        setIsSubmitting(true);
+        setProgress(0);
+
+        // Progress from 0 to 90% over 10 seconds
+        const totalTime = 10000; // 10 seconds
+        const targetProgress = 90;
+        const interval = 100; // Update every 100ms
+        const increment = (targetProgress / totalTime) * interval;
+
+        progressIntervalRef.current = setInterval(() => {
+            setProgress(prev => {
+                const newProgress = prev + increment;
+                if (newProgress >= targetProgress) {
+                    if (progressIntervalRef.current) {
+                        clearInterval(progressIntervalRef.current);
+                        progressIntervalRef.current = null;
+                    }
+                    return targetProgress;
+                }
+                return newProgress;
+            });
+        }, interval);
+    };
+
+    // Complete progress bar
+    const completeProgressBar = () => {
+        if (progressIntervalRef.current) {
+            clearInterval(progressIntervalRef.current);
+            progressIntervalRef.current = null;
+        }
+        setProgress(100);
+
+        // Reset after a short delay
+        setTimeout(() => {
+            setIsSubmitting(false);
+            setProgress(0);
+        }, 500);
+    };
+
+    // Cleanup interval on unmount
+    useEffect(() => {
+        return () => {
+            if (progressIntervalRef.current) {
+                clearInterval(progressIntervalRef.current);
+            }
+        };
+    }, []);
 
     const handleSubmit = async () => {
         if (!productName || !shortDescription || !fullDescription) {
@@ -473,6 +529,9 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                 }
             }
         }
+
+        // Start the fake progress bar
+        startProgressBar();
 
         try {
             if (isEditMode && productId) {
@@ -535,10 +594,24 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                 toast.success(t("admin.createProduct.productCreatedSuccessfully"));
             }
 
-            onClose();
+            // Complete the progress bar
+            completeProgressBar();
+
+            // Close dialog after progress completes
+            setTimeout(() => {
+                onClose();
+            }, 600);
         } catch (error) {
             console.error("Failed to create product:", error);
             toast.error(isEditMode ? t("admin.createProduct.failedToUpdateProduct") : t("admin.createProduct.failedToCreateProduct"));
+
+            // Reset progress on error
+            if (progressIntervalRef.current) {
+                clearInterval(progressIntervalRef.current);
+                progressIntervalRef.current = null;
+            }
+            setIsSubmitting(false);
+            setProgress(0);
         }
     };
 
@@ -653,7 +726,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                 </div>
                                             </div>
                                         )}
-                                        
+
                                         <div className="grid grid-cols-2 gap-4">
                                             <div>
                                                 <Label htmlFor="category" className="text-gray-300">
@@ -731,7 +804,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                 disabled={!canEditProductInfo()}
                                             />
                                         </div>
-                                        
+
                                         {/* Infospotaction Selection (Admin Only) */}
                                         {isAdmin && (
                                             <div>
@@ -949,440 +1022,104 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                             const canEdit = canEditVariant(variant);
                                             const statusDisplay = getVariantStatusDisplay(variant);
                                             const StatusIcon = statusDisplay.icon;
-                                            
-                                            return (
-                                            <Card key={variant.id} className={`bg-gray-700/30 border-gray-600/50 ${!canEdit ? 'opacity-75' : ''}`}>
-                                                <CardHeader className="pb-3">
-                                                    <div className="flex items-center justify-between">
-                                                        <div className="flex items-center gap-3">
-                                                            <CardTitle className="text-base text-white">
-                                                                {t("admin.createProduct.variant")} {index + 1}
-                                                            </CardTitle>
-                                                            {variant.yvarprodid && (
-                                                                <Badge
-                                                                    variant="secondary"
-                                                                    className={`${statusDisplay.bgColor} ${statusDisplay.color} ${statusDisplay.borderColor} flex items-center gap-1 text-xs`}
-                                                                >
-                                                                    <StatusIcon className="h-3 w-3" />
-                                                                    {statusDisplay.label}
-                                                                </Badge>
-                                                            )}
-                                                            {!canEdit && variant.yvarprodid && (
-                                                                <Badge variant="secondary" className="bg-gray-500/20 text-gray-400 border-gray-500/30 text-xs">
-                                                                    {t("admin.createProduct.readOnly")}
-                                                                </Badge>
-                                                            )}
-                                                        </div>
-                                                        {variants.length > 1 && canEdit && (
-                                                            <Button
-                                                                onClick={() => handleRemoveVariant(variant.id)}
-                                                                size="sm"
-                                                                variant="outline"
-                                                                className="border-red-600 text-red-400 hover:bg-red-900/50"
-                                                            >
-                                                                <Trash2 className="h-3 w-3" />
-                                                            </Button>
-                                                        )}
-                                                    </div>
-                                                </CardHeader>
-                                                <CardContent className="space-y-4">
-                                                    <div className="grid grid-cols-1 gap-4">
-                                                        <div>
-                                                            <Label className="text-gray-300">
-                                                                {t("admin.createProduct.variantName")} <span className="text-red-400">*</span>
-                                                            </Label>
-                                                            <Input
-                                                                value={variant.name}
-                                                                onChange={(e) =>
-                                                                    handleVariantChange(
-                                                                        variant.id,
-                                                                        "name",
-                                                                        e.target.value
-                                                                    )
-                                                                }
-                                                                placeholder={t("admin.createProduct.enterVariantName")}
-                                                                className="mt-1 bg-gray-600/50 border-gray-500 text-white"
-                                                                disabled={!canEdit}
-                                                            />
-                                                        </div>
-                                                        <div>
-                                                            <Label className="text-gray-300">
-                                                                {t("admin.createProduct.variantCode")}{" "}
-                                                                <span className="text-gray-500 text-sm">
-                                                                    ({t("common.optional")})
-                                                                </span>
-                                                            </Label>
-                                                            <Input
-                                                                value={variant.code || ""}
-                                                                onChange={(e) =>
-                                                                    handleVariantChange(
-                                                                        variant.id,
-                                                                        "code",
-                                                                        e.target.value
-                                                                    )
-                                                                }
-                                                                placeholder={t("admin.createProduct.autoGeneratedIfEmpty")}
-                                                                className="mt-1 bg-gray-600/50 border-gray-500 text-white"
-                                                                disabled={!canEdit}
-                                                            />
-                                                        </div>
-                                                    </div>
 
-                                                    <div className="grid grid-cols-2 gap-4">
-                                                        {/* Color Selection */}
-                                                        <div>
-                                                            <Label className="text-gray-300 flex items-center gap-1">
-                                                                <Palette className="h-3 w-3" />
-                                                                {t("admin.color")} <span className="text-red-400">*</span>
-                                                            </Label>
-                                                            <div className="flex gap-2 mt-1">
-                                                                <SuperSelect
-                                                                    value={variant.colorId}
-                                                                    onValueChange={(value) =>
+                                            return (
+                                                <Card key={variant.id} className={`bg-gray-700/30 border-gray-600/50 ${!canEdit ? 'opacity-75' : ''}`}>
+                                                    <CardHeader className="pb-3">
+                                                        <div className="flex items-center justify-between">
+                                                            <div className="flex items-center gap-3">
+                                                                <CardTitle className="text-base text-white">
+                                                                    {t("admin.createProduct.variant")} {index + 1}
+                                                                </CardTitle>
+                                                                {variant.yvarprodid && (
+                                                                    <Badge
+                                                                        variant="secondary"
+                                                                        className={`${statusDisplay.bgColor} ${statusDisplay.color} ${statusDisplay.borderColor} flex items-center gap-1 text-xs`}
+                                                                    >
+                                                                        <StatusIcon className="h-3 w-3" />
+                                                                        {statusDisplay.label}
+                                                                    </Badge>
+                                                                )}
+                                                                {!canEdit && variant.yvarprodid && (
+                                                                    <Badge variant="secondary" className="bg-gray-500/20 text-gray-400 border-gray-500/30 text-xs">
+                                                                        {t("admin.createProduct.readOnly")}
+                                                                    </Badge>
+                                                                )}
+                                                            </div>
+                                                            {variants.length > 1 && canEdit && (
+                                                                <Button
+                                                                    onClick={() => handleRemoveVariant(variant.id)}
+                                                                    size="sm"
+                                                                    variant="outline"
+                                                                    className="border-red-600 text-red-400 hover:bg-red-900/50"
+                                                                >
+                                                                    <Trash2 className="h-3 w-3" />
+                                                                </Button>
+                                                            )}
+                                                        </div>
+                                                    </CardHeader>
+                                                    <CardContent className="space-y-4">
+                                                        <div className="grid grid-cols-1 gap-4">
+                                                            <div>
+                                                                <Label className="text-gray-300">
+                                                                    {t("admin.createProduct.variantName")} <span className="text-red-400">*</span>
+                                                                </Label>
+                                                                <Input
+                                                                    value={variant.name}
+                                                                    onChange={(e) =>
                                                                         handleVariantChange(
                                                                             variant.id,
-                                                                            "colorId",
-                                                                            value
+                                                                            "name",
+                                                                            e.target.value
                                                                         )
                                                                     }
-                                                                    options={colorOptions}
-                                                                    placeholder={t("admin.createProduct.selectColor")}
-                                                                    disabled={colorsLoading || !canEdit}
-                                                                    className="flex-1"
+                                                                    placeholder={t("admin.createProduct.enterVariantName")}
+                                                                    className="mt-1 bg-gray-600/50 border-gray-500 text-white"
+                                                                    disabled={!canEdit}
                                                                 />
-                                                                {canEdit && (
-                                                                    <Button
-                                                                        onClick={() => setShowColorForm(!showColorForm)}
-                                                                        size="sm"
-                                                                        variant="outline"
-                                                                        className="border-gray-600 text-gray-300 hover:bg-gray-700"
-                                                                    >
-                                                                        <Plus className="h-3 w-3" />
-                                                                    </Button>
-                                                                )}
                                                             </div>
-                                                        </div>
-
-                                                        {/* Size Selection */}
-                                                        <div>
-                                                            <Label className="text-gray-300 flex items-center gap-1">
-                                                                <Ruler className="h-3 w-3" />
-                                                                {t("admin.createProduct.size")} <span className="text-red-400">*</span>
-                                                            </Label>
-                                                            <div className="flex gap-2 mt-1">
-                                                                <SuperSelect
-                                                                    value={variant.sizeId}
-                                                                    onValueChange={(value) =>
-                                                                        handleVariantChange(variant.id, "sizeId", value)
-                                                                    }
-                                                                    options={sizeOptions}
-                                                                    placeholder={t("admin.createProduct.selectSize")}
-                                                                    disabled={sizesLoading || !canEdit}
-                                                                    className="flex-1"
-                                                                />
-                                                                {canEdit && (
-                                                                    <Button
-                                                                        onClick={() => setShowSizeForm(!showSizeForm)}
-                                                                        size="sm"
-                                                                        variant="outline"
-                                                                        className="border-gray-600 text-gray-300 hover:bg-gray-700"
-                                                                    >
-                                                                        <Plus className="h-3 w-3" />
-                                                                    </Button>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    {/* Pricing Section (Admin Only) */}
-                                                    {isAdmin && canEdit && (
-                                                        <div className="space-y-4 border-t border-gray-600/30 pt-4">
-                                                            <Label className="text-gray-300 flex items-center gap-2">
-                                                                <svg className="h-4 w-4 text-morpheus-gold-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-                                                                </svg>
-                                                                {t("admin.createProduct.pricingPromotion")}
-                                                            </Label>
-                                                            
-                                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                                                {/* Currency Selection */}
-                                                                <div>
-                                                                    <Label className="text-gray-300 text-sm">{t("admin.createProduct.currency")}</Label>
-                                                                    <SuperSelect
-                                                                        value={variant.currencyId}
-                                                                        onValueChange={(value) =>
-                                                                            handleVariantChange(variant.id, "currencyId", value)
-                                                                        }
-                                                                        options={currencyOptions}
-                                                                        placeholder={t("admin.createProduct.selectCurrency")}
-                                                                        disabled={currenciesLoading}
-                                                                        className="mt-1"
-                                                                    />
-                                                                </div>
-
-                                                                {/* Catalog Price */}
-                                                                <div>
-                                                                    <Label className="text-gray-300 text-sm">{t("admin.createProduct.catalogPrice")}</Label>
-                                                                    <Input
-                                                                        type="number"
-                                                                        min="0"
-                                                                        step="0.01"
-                                                                        value={variant.catalogPrice || ""}
-                                                                        onChange={(e) =>
-                                                                            handleVariantChange(
-                                                                                variant.id,
-                                                                                "catalogPrice",
-                                                                                parseFloat(e.target.value) || 0
-                                                                            )
-                                                                        }
-                                                                        placeholder="0.00"
-                                                                        className="mt-1 bg-gray-600/50 border-gray-500 text-white"
-                                                                    />
-                                                                </div>
-
-                                                                {/* Promotion Price */}
-                                                                <div>
-                                                                    <Label className="text-gray-300 text-sm">{t("admin.createProduct.promotionPriceOptional")}</Label>
-                                                                    <Input
-                                                                        type="number"
-                                                                        min="0"
-                                                                        step="0.01"
-                                                                        value={variant.promotionPrice || ""}
-                                                                        onChange={(e) =>
-                                                                            handleVariantChange(
-                                                                                variant.id,
-                                                                                "promotionPrice",
-                                                                                e.target.value ? parseFloat(e.target.value) : null
-                                                                            )
-                                                                        }
-                                                                        placeholder="0.00"
-                                                                        className="mt-1 bg-gray-600/50 border-gray-500 text-white"
-                                                                    />
-                                                                </div>
-
-                                                                {/* Promotion Start Date */}
-                                                                <div>
-                                                                    <Label className="text-gray-300 text-sm">{t("admin.createProduct.promotionStartDate")}</Label>
-                                                                    <Input
-                                                                        type="date"
-                                                                        value={variant.promotionStartDate || ""}
-                                                                        onChange={(e) =>
-                                                                            handleVariantChange(
-                                                                                variant.id,
-                                                                                "promotionStartDate",
-                                                                                e.target.value || null
-                                                                            )
-                                                                        }
-                                                                        className="mt-1 bg-gray-600/50 border-gray-500 text-white"
-                                                                    />
-                                                                </div>
-
-                                                                {/* Promotion End Date */}
-                                                                <div className="sm:col-span-2">
-                                                                    <Label className="text-gray-300 text-sm">{t("admin.createProduct.promotionEndDate")}</Label>
-                                                                    <Input
-                                                                        type="date"
-                                                                        value={variant.promotionEndDate || ""}
-                                                                        onChange={(e) =>
-                                                                            handleVariantChange(
-                                                                                variant.id,
-                                                                                "promotionEndDate",
-                                                                                e.target.value || null
-                                                                            )
-                                                                        }
-                                                                        className="mt-1 bg-gray-600/50 border-gray-500 text-white"
-                                                                    />
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    )}
-
-                                                    {/* Media Upload */}
-                                                    {canEdit && (
-                                                        <div className="space-y-3">
-                                                            <Label className="text-gray-300">{t("admin.createProduct.mediaFiles")}</Label>
-
-                                                        {/* Images */}
-                                                        <div>
-                                                            <div className="flex items-center gap-2 mb-2">
-                                                                <Image className="h-4 w-4 text-blue-400" />
-                                                                <span className="text-sm text-gray-300">{t("admin.createProduct.images")}</span>
-                                                                <input
-                                                                    type="file"
-                                                                    multiple
-                                                                    accept="image/*"
+                                                            <div>
+                                                                <Label className="text-gray-300">
+                                                                    {t("admin.createProduct.variantCode")}{" "}
+                                                                    <span className="text-gray-500 text-sm">
+                                                                        ({t("common.optional")})
+                                                                    </span>
+                                                                </Label>
+                                                                <Input
+                                                                    value={variant.code || ""}
                                                                     onChange={(e) =>
-                                                                        e.target.files &&
-                                                                        handleFileUpload(
+                                                                        handleVariantChange(
                                                                             variant.id,
-                                                                            "images",
-                                                                            e.target.files
+                                                                            "code",
+                                                                            e.target.value
                                                                         )
                                                                     }
-                                                                    className="hidden"
-                                                                    id={`images-${variant.id}`}
+                                                                    placeholder={t("admin.createProduct.autoGeneratedIfEmpty")}
+                                                                    className="mt-1 bg-gray-600/50 border-gray-500 text-white"
+                                                                    disabled={!canEdit}
                                                                 />
-                                                                <Button
-                                                                    onClick={() =>
-                                                                        document
-                                                                            .getElementById(`images-${variant.id}`)
-                                                                            ?.click()
-                                                                    }
-                                                                    size="sm"
-                                                                    variant="outline"
-                                                                    className="border-blue-600 text-blue-400 hover:bg-blue-900/50"
-                                                                >
-                                                                    <Upload className="h-3 w-3 mr-1" />
-                                                                    {t("admin.createProduct.upload")}
-                                                                </Button>
-                                                            </div>
-                                                            <div className="flex flex-wrap gap-2">
-                                                                {variant.images.map((file, fileIndex) => (
-                                                                    <Badge
-                                                                        key={fileIndex}
-                                                                        variant="secondary"
-                                                                        className="bg-blue-500/20 text-blue-300 border-blue-500/30"
-                                                                    >
-                                                                        {file instanceof File
-                                                                            ? file.name
-                                                                            : file.ymediaintitule}
-                                                                        <Button
-                                                                            onClick={() =>
-                                                                                handleRemoveFile(
-                                                                                    variant.id,
-                                                                                    "images",
-                                                                                    fileIndex
-                                                                                )
-                                                                            }
-                                                                            size="sm"
-                                                                            variant="ghost"
-                                                                            className="h-4 w-4 p-0 ml-1 hover:bg-red-500/20"
-                                                                        >
-                                                                            <Trash2 className="h-2 w-2" />
-                                                                        </Button>
-                                                                    </Badge>
-                                                                ))}
                                                             </div>
                                                         </div>
 
-                                                        {/* Videos */}
-                                                        <div>
-                                                            <div className="flex items-center gap-2 mb-2">
-                                                                <Video className="h-4 w-4 text-green-400" />
-                                                                <span className="text-sm text-gray-300">{t("admin.createProduct.videos")}</span>
-                                                                <input
-                                                                    type="file"
-                                                                    multiple
-                                                                    accept="video/*"
-                                                                    onChange={(e) =>
-                                                                        e.target.files &&
-                                                                        handleFileUpload(
-                                                                            variant.id,
-                                                                            "videos",
-                                                                            e.target.files
-                                                                        )
-                                                                    }
-                                                                    className="hidden"
-                                                                    id={`videos-${variant.id}`}
-                                                                />
-                                                                <Button
-                                                                    onClick={() =>
-                                                                        document
-                                                                            .getElementById(`videos-${variant.id}`)
-                                                                            ?.click()
-                                                                    }
-                                                                    size="sm"
-                                                                    variant="outline"
-                                                                    className="border-green-600 text-green-400 hover:bg-green-900/50"
-                                                                >
-                                                                    <Upload className="h-3 w-3 mr-1" />
-                                                                    {t("admin.createProduct.upload")}
-                                                                </Button>
-                                                            </div>
-                                                            <div className="flex flex-wrap gap-2">
-                                                                {variant.videos.map((file, fileIndex) => (
-                                                                    <Badge
-                                                                        key={fileIndex}
-                                                                        variant="secondary"
-                                                                        className="bg-green-500/20 text-green-300 border-green-500/30"
-                                                                    >
-                                                                        {file instanceof File
-                                                                            ? file.name
-                                                                            : file.ymediaintitule}
-                                                                        <Button
-                                                                            onClick={() =>
-                                                                                handleRemoveFile(
-                                                                                    variant.id,
-                                                                                    "videos",
-                                                                                    fileIndex
-                                                                                )
-                                                                            }
-                                                                            size="sm"
-                                                                            variant="ghost"
-                                                                            className="h-4 w-4 p-0 ml-1 hover:bg-red-500/20"
-                                                                        >
-                                                                            <Trash2 className="h-2 w-2" />
-                                                                        </Button>
-                                                                    </Badge>
-                                                                ))}
-                                                            </div>
-                                                        </div>
-
-                                                        {/* 3D Models */}
-                                                        <div>
-                                                            <div className="flex items-center gap-2 mb-2">
-                                                                <Box className="h-4 w-4 text-purple-400" />
-                                                                <span className="text-sm text-gray-300">{t("admin.createProduct.models3d")}</span>
-                                                                <input
-                                                                    type="file"
-                                                                    // Only allow one file for 3D models
-                                                                    multiple={false}
-                                                                    accept=".glb,.gltf,.obj,.fbx"
-                                                                    onChange={(e) =>
-                                                                        e.target.files &&
-                                                                        handleFileUpload(
-                                                                            variant.id,
-                                                                            "models3d",
-                                                                            e.target.files
-                                                                        )
-                                                                    }
-                                                                    className="hidden"
-                                                                    id={`models3d-${variant.id}`}
-                                                                />
-                                                                <Button
-                                                                    onClick={() =>
-                                                                        document
-                                                                            .getElementById(`models3d-${variant.id}`)
-                                                                            ?.click()
-                                                                    }
-                                                                    size="sm"
-                                                                    variant="outline"
-                                                                    className="border-purple-600 text-purple-400 hover:bg-purple-900/50"
-                                                                >
-                                                                    <Upload className="h-3 w-3 mr-1" />
-                                                                    {t("admin.createProduct.upload")}
-                                                                </Button>
-                                                            </div>
-                                                            
-                                                            {/* Background Color Input */}
-                                                            <div className="mb-3">
-                                                                <Label className="text-gray-300 text-sm flex items-center gap-1">
+                                                        <div className="grid grid-cols-2 gap-4">
+                                                            {/* Color Selection */}
+                                                            <div>
+                                                                <Label className="text-gray-300 flex items-center gap-1">
                                                                     <Palette className="h-3 w-3" />
                                                                     {t("admin.createProduct.3dBackgroundColor") || "3D Model Background Color"}
                                                                 </Label>
                                                                 <div className="flex gap-2 mt-1">
-                                                                    <input
-                                                                        type="color"
-                                                                        value={variant.backgroundColor || "#ffffff"}
-                                                                        onChange={(e) =>
+                                                                    <SuperSelect
+                                                                        value={variant.colorId}
+                                                                        onValueChange={(value) =>
                                                                             handleVariantChange(
                                                                                 variant.id,
-                                                                                "backgroundColor",
-                                                                                e.target.value
+                                                                                "colorId",
+                                                                                value
                                                                             )
                                                                         }
                                                                         className="w-12 h-8 bg-gray-700/50 border border-gray-600 rounded cursor-pointer"
-                                                                        title={t("admin.createProduct.selectBackgroundColor") || "Select background color for 3D model"}
+                                                                        options={colorOptions}
                                                                     />
                                                                     <Input
                                                                         value={variant.backgroundColor || "#ffffff"}
@@ -1429,49 +1166,179 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                                     {t("admin.createProduct.backgroundColorDescription") || "Background color for the 3D model viewer"}
                                                                 </div>
                                                             </div>
-                                                            
-                                                            <div className="flex flex-wrap gap-2">
-                                                                {variant.models3d.map((file, fileIndex) => (
-                                                                    <Badge
-                                                                        key={fileIndex}
-                                                                        variant="secondary"
-                                                                        className="bg-purple-500/20 text-purple-300 border-purple-500/30"
-                                                                    >
-                                                                        {file instanceof File
-                                                                            ? file.name
-                                                                            : `3D Model ${fileIndex + 1}`}
+
+                                                            {/* Size Selection */}
+                                                            <div>
+                                                                <Label className="text-gray-300 flex items-center gap-1">
+                                                                    <Ruler className="h-3 w-3" />
+                                                                    {t("admin.createProduct.size")} <span className="text-red-400">*</span>
+                                                                </Label>
+                                                                <div className="flex gap-2 mt-1">
+                                                                    <SuperSelect
+                                                                        value={variant.sizeId}
+                                                                        onValueChange={(value) =>
+                                                                            handleVariantChange(variant.id, "sizeId", value)
+                                                                        }
+                                                                        options={sizeOptions}
+                                                                        placeholder={t("admin.createProduct.selectSize")}
+                                                                        disabled={sizesLoading || !canEdit}
+                                                                        className="flex-1"
+                                                                    />
+                                                                    {canEdit && (
                                                                         <Button
-                                                                            onClick={() =>
-                                                                                handleRemoveFile(
-                                                                                    variant.id,
-                                                                                    "models3d",
-                                                                                    fileIndex
-                                                                                )
-                                                                            }
+                                                                            onClick={() => setShowSizeForm(!showSizeForm)}
                                                                             size="sm"
-                                                                            variant="ghost"
-                                                                            className="h-4 w-4 p-0 ml-1 hover:bg-red-500/20"
+                                                                            variant="outline"
+                                                                            className="border-gray-600 text-gray-300 hover:bg-gray-700"
                                                                         >
-                                                                            <Trash2 className="h-2 w-2" />
+                                                                            <Plus className="h-3 w-3" />
                                                                         </Button>
-                                                                    </Badge>
-                                                                ))}
+                                                                    )}
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                        </div>
-                                                    )}
-                                                    
-                                                    {/* Read-only media display for non-editable variants */}
-                                                    {!canEdit && variant.yvarprodid && (
-                                                        <div className="space-y-3">
-                                                            <Label className="text-gray-300">{t("admin.createProduct.mediaFilesReadOnly")}</Label>
-                                                            
-                                                            {/* Display existing images */}
-                                                            {variant.images.length > 0 && (
+
+                                                        {/* Pricing Section (Admin Only) */}
+                                                        {isAdmin && canEdit && (
+                                                            <div className="space-y-4 border-t border-gray-600/30 pt-4">
+                                                                <Label className="text-gray-300 flex items-center gap-2">
+                                                                    <svg className="h-4 w-4 text-morpheus-gold-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                                                                    </svg>
+                                                                    {t("admin.createProduct.pricingPromotion")}
+                                                                </Label>
+
+                                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                                    {/* Currency Selection */}
+                                                                    <div>
+                                                                        <Label className="text-gray-300 text-sm">{t("admin.createProduct.currency")}</Label>
+                                                                        <SuperSelect
+                                                                            value={variant.currencyId}
+                                                                            onValueChange={(value) =>
+                                                                                handleVariantChange(variant.id, "currencyId", value)
+                                                                            }
+                                                                            options={currencyOptions}
+                                                                            placeholder={t("admin.createProduct.selectCurrency")}
+                                                                            disabled={currenciesLoading}
+                                                                            className="mt-1"
+                                                                        />
+                                                                    </div>
+
+                                                                    {/* Catalog Price */}
+                                                                    <div>
+                                                                        <Label className="text-gray-300 text-sm">{t("admin.createProduct.catalogPrice")}</Label>
+                                                                        <Input
+                                                                            type="number"
+                                                                            min="0"
+                                                                            step="0.01"
+                                                                            value={variant.catalogPrice || ""}
+                                                                            onChange={(e) =>
+                                                                                handleVariantChange(
+                                                                                    variant.id,
+                                                                                    "catalogPrice",
+                                                                                    parseFloat(e.target.value) || 0
+                                                                                )
+                                                                            }
+                                                                            placeholder="0.00"
+                                                                            className="mt-1 bg-gray-600/50 border-gray-500 text-white"
+                                                                        />
+                                                                    </div>
+
+                                                                    {/* Promotion Price */}
+                                                                    <div>
+                                                                        <Label className="text-gray-300 text-sm">{t("admin.createProduct.promotionPriceOptional")}</Label>
+                                                                        <Input
+                                                                            type="number"
+                                                                            min="0"
+                                                                            step="0.01"
+                                                                            value={variant.promotionPrice || ""}
+                                                                            onChange={(e) =>
+                                                                                handleVariantChange(
+                                                                                    variant.id,
+                                                                                    "promotionPrice",
+                                                                                    e.target.value ? parseFloat(e.target.value) : null
+                                                                                )
+                                                                            }
+                                                                            placeholder="0.00"
+                                                                            className="mt-1 bg-gray-600/50 border-gray-500 text-white"
+                                                                        />
+                                                                    </div>
+
+                                                                    {/* Promotion Start Date */}
+                                                                    <div>
+                                                                        <Label className="text-gray-300 text-sm">{t("admin.createProduct.promotionStartDate")}</Label>
+                                                                        <Input
+                                                                            type="date"
+                                                                            value={variant.promotionStartDate || ""}
+                                                                            onChange={(e) =>
+                                                                                handleVariantChange(
+                                                                                    variant.id,
+                                                                                    "promotionStartDate",
+                                                                                    e.target.value || null
+                                                                                )
+                                                                            }
+                                                                            className="mt-1 bg-gray-600/50 border-gray-500 text-white"
+                                                                        />
+                                                                    </div>
+
+                                                                    {/* Promotion End Date */}
+                                                                    <div className="sm:col-span-2">
+                                                                        <Label className="text-gray-300 text-sm">{t("admin.createProduct.promotionEndDate")}</Label>
+                                                                        <Input
+                                                                            type="date"
+                                                                            value={variant.promotionEndDate || ""}
+                                                                            onChange={(e) =>
+                                                                                handleVariantChange(
+                                                                                    variant.id,
+                                                                                    "promotionEndDate",
+                                                                                    e.target.value || null
+                                                                                )
+                                                                            }
+                                                                            className="mt-1 bg-gray-600/50 border-gray-500 text-white"
+                                                                        />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        )}
+
+                                                        {/* Media Upload */}
+                                                        {canEdit && (
+                                                            <div className="space-y-3">
+                                                                <Label className="text-gray-300">{t("admin.createProduct.mediaFiles")}</Label>
+
+                                                                {/* Images */}
                                                                 <div>
                                                                     <div className="flex items-center gap-2 mb-2">
                                                                         <Image className="h-4 w-4 text-blue-400" />
                                                                         <span className="text-sm text-gray-300">{t("admin.createProduct.images")}</span>
+                                                                        <input
+                                                                            type="file"
+                                                                            multiple
+                                                                            accept="image/*"
+                                                                            onChange={(e) =>
+                                                                                e.target.files &&
+                                                                                handleFileUpload(
+                                                                                    variant.id,
+                                                                                    "images",
+                                                                                    e.target.files
+                                                                                )
+                                                                            }
+                                                                            className="hidden"
+                                                                            id={`images-${variant.id}`}
+                                                                        />
+                                                                        <Button
+                                                                            onClick={() =>
+                                                                                document
+                                                                                    .getElementById(`images-${variant.id}`)
+                                                                                    ?.click()
+                                                                            }
+                                                                            size="sm"
+                                                                            variant="outline"
+                                                                            className="border-blue-600 text-blue-400 hover:bg-blue-900/50"
+                                                                        >
+                                                                            <Upload className="h-3 w-3 mr-1" />
+                                                                            {t("admin.createProduct.upload")}
+                                                                        </Button>
                                                                     </div>
                                                                     <div className="flex flex-wrap gap-2">
                                                                         {variant.images.map((file, fileIndex) => (
@@ -1483,18 +1350,58 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                                                 {file instanceof File
                                                                                     ? file.name
                                                                                     : file.ymediaintitule}
+                                                                                <Button
+                                                                                    onClick={() =>
+                                                                                        handleRemoveFile(
+                                                                                            variant.id,
+                                                                                            "images",
+                                                                                            fileIndex
+                                                                                        )
+                                                                                    }
+                                                                                    size="sm"
+                                                                                    variant="ghost"
+                                                                                    className="h-4 w-4 p-0 ml-1 hover:bg-red-500/20"
+                                                                                >
+                                                                                    <Trash2 className="h-2 w-2" />
+                                                                                </Button>
                                                                             </Badge>
                                                                         ))}
                                                                     </div>
                                                                 </div>
-                                                            )}
-                                                            
-                                                            {/* Display existing videos */}
-                                                            {variant.videos.length > 0 && (
+
+                                                                {/* Videos */}
                                                                 <div>
                                                                     <div className="flex items-center gap-2 mb-2">
                                                                         <Video className="h-4 w-4 text-green-400" />
                                                                         <span className="text-sm text-gray-300">{t("admin.createProduct.videos")}</span>
+                                                                        <input
+                                                                            type="file"
+                                                                            multiple
+                                                                            accept="video/*"
+                                                                            onChange={(e) =>
+                                                                                e.target.files &&
+                                                                                handleFileUpload(
+                                                                                    variant.id,
+                                                                                    "videos",
+                                                                                    e.target.files
+                                                                                )
+                                                                            }
+                                                                            className="hidden"
+                                                                            id={`videos-${variant.id}`}
+                                                                        />
+                                                                        <Button
+                                                                            onClick={() =>
+                                                                                document
+                                                                                    .getElementById(`videos-${variant.id}`)
+                                                                                    ?.click()
+                                                                            }
+                                                                            size="sm"
+                                                                            variant="outline"
+                                                                            className="border-green-600 text-green-400 hover:bg-green-900/50"
+                                                                        >
+                                                                            <Upload className="h-3 w-3 mr-1" />
+                                                                            {t("admin.createProduct.upload")}
+                                                                        </Button>
                                                                     </div>
                                                                     <div className="flex flex-wrap gap-2">
                                                                         {variant.videos.map((file, fileIndex) => (
@@ -1506,19 +1413,100 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                                                 {file instanceof File
                                                                                     ? file.name
                                                                                     : file.ymediaintitule}
+                                                                                <Button
+                                                                                    onClick={() =>
+                                                                                        handleRemoveFile(
+                                                                                            variant.id,
+                                                                                            "videos",
+                                                                                            fileIndex
+                                                                                        )
+                                                                                    }
+                                                                                    size="sm"
+                                                                                    variant="ghost"
+                                                                                    className="h-4 w-4 p-0 ml-1 hover:bg-red-500/20"
+                                                                                >
+                                                                                    <Trash2 className="h-2 w-2" />
+                                                                                </Button>
                                                                             </Badge>
                                                                         ))}
                                                                     </div>
                                                                 </div>
-                                                            )}
-                                                            
-                                                            {/* Display existing 3D models */}
-                                                            {variant.models3d.length > 0 && (
+
+                                                                {/* 3D Models */}
                                                                 <div>
                                                                     <div className="flex items-center gap-2 mb-2">
                                                                         <Box className="h-4 w-4 text-purple-400" />
                                                                         <span className="text-sm text-gray-300">{t("admin.createProduct.models3d")}</span>
+                                                                        <input
+                                                                            type="file"
+                                                                            // Only allow one file for 3D models
+                                                                            multiple={false}
+                                                                            accept=".glb,.gltf,.obj,.fbx"
+                                                                            onChange={(e) =>
+                                                                                e.target.files &&
+                                                                                handleFileUpload(
+                                                                                    variant.id,
+                                                                                    "models3d",
+                                                                                    e.target.files
+                                                                                )
+                                                                            }
+                                                                            className="hidden"
+                                                                            id={`models3d-${variant.id}`}
+                                                                        />
+                                                                        <Button
+                                                                            onClick={() =>
+                                                                                document
+                                                                                    .getElementById(`models3d-${variant.id}`)
+                                                                                    ?.click()
+                                                                            }
+                                                                            size="sm"
+                                                                            variant="outline"
+                                                                            className="border-purple-600 text-purple-400 hover:bg-purple-900/50"
+                                                                        >
+                                                                            <Upload className="h-3 w-3 mr-1" />
+                                                                            {t("admin.createProduct.upload")}
+                                                                        </Button>
                                                                     </div>
+
+                                                                    {/* Background Color Input */}
+                                                                    <div className="mb-3">
+                                                                        <Label className="text-gray-300 text-sm flex items-center gap-1">
+                                                                            <Palette className="h-3 w-3" />
+                                                                            3D Model Background Color
+                                                                        </Label>
+                                                                        <div className="flex gap-2 mt-1">
+                                                                            <input
+                                                                                type="color"
+                                                                                value={variant.backgroundColor || "#ffffff"}
+                                                                                onChange={(e) =>
+                                                                                    handleVariantChange(
+                                                                                        variant.id,
+                                                                                        "backgroundColor",
+                                                                                        e.target.value
+                                                                                    )
+                                                                                }
+                                                                                className="w-12 h-8 bg-gray-700/50 border border-gray-600 rounded cursor-pointer"
+                                                                                title="Select background color for 3D model"
+                                                                            />
+                                                                            <Input
+                                                                                value={variant.backgroundColor || "#ffffff"}
+                                                                                onChange={(e) =>
+                                                                                    handleVariantChange(
+                                                                                        variant.id,
+                                                                                        "backgroundColor",
+                                                                                        e.target.value
+                                                                                    )
+                                                                                }
+                                                                                placeholder="#ffffff"
+                                                                                className="flex-1 bg-gray-600/50 border-gray-500 text-white text-sm"
+                                                                                maxLength={7}
+                                                                            />
+                                                                        </div>
+                                                                        <div className="text-xs text-gray-400 mt-1">
+                                                                            Background color for the 3D model viewer
+                                                                        </div>
+                                                                    </div>
+
                                                                     <div className="flex flex-wrap gap-2">
                                                                         {variant.models3d.map((file, fileIndex) => (
                                                                             <Badge
@@ -1529,21 +1517,131 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                                                 {file instanceof File
                                                                                     ? file.name
                                                                                     : `3D Model ${fileIndex + 1}`}
+                                                                                <Button
+                                                                                    onClick={() =>
+                                                                                        handleRemoveFile(
+                                                                                            variant.id,
+                                                                                            "models3d",
+                                                                                            fileIndex
+                                                                                        )
+                                                                                    }
+                                                                                    size="sm"
+                                                                                    variant="ghost"
+                                                                                    className="h-4 w-4 p-0 ml-1 hover:bg-red-500/20"
+                                                                                >
+                                                                                    <Trash2 className="h-2 w-2" />
+                                                                                </Button>
                                                                             </Badge>
                                                                         ))}
                                                                     </div>
                                                                 </div>
-                                                            )}
-                                                        </div>
-                                                    )}
-                                                </CardContent>
-                                            </Card>
-                                        )})}
+                                                            </div>
+                                                        )}
+
+                                                        {/* Read-only media display for non-editable variants */}
+                                                        {!canEdit && variant.yvarprodid && (
+                                                            <div className="space-y-3">
+                                                                <Label className="text-gray-300">{t("admin.createProduct.mediaFilesReadOnly")}</Label>
+
+                                                                {/* Display existing images */}
+                                                                {variant.images.length > 0 && (
+                                                                    <div>
+                                                                        <div className="flex items-center gap-2 mb-2">
+                                                                            <Image className="h-4 w-4 text-blue-400" />
+                                                                            <span className="text-sm text-gray-300">{t("admin.createProduct.images")}</span>
+                                                                        </div>
+                                                                        <div className="flex flex-wrap gap-2">
+                                                                            {variant.images.map((file, fileIndex) => (
+                                                                                <Badge
+                                                                                    key={fileIndex}
+                                                                                    variant="secondary"
+                                                                                    className="bg-blue-500/20 text-blue-300 border-blue-500/30"
+                                                                                >
+                                                                                    {file instanceof File
+                                                                                        ? file.name
+                                                                                        : file.ymediaintitule}
+                                                                                </Badge>
+                                                                            ))}
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+
+                                                                {/* Display existing videos */}
+                                                                {variant.videos.length > 0 && (
+                                                                    <div>
+                                                                        <div className="flex items-center gap-2 mb-2">
+                                                                            <Video className="h-4 w-4 text-green-400" />
+                                                                            <span className="text-sm text-gray-300">{t("admin.createProduct.videos")}</span>
+                                                                        </div>
+                                                                        <div className="flex flex-wrap gap-2">
+                                                                            {variant.videos.map((file, fileIndex) => (
+                                                                                <Badge
+                                                                                    key={fileIndex}
+                                                                                    variant="secondary"
+                                                                                    className="bg-green-500/20 text-green-300 border-green-500/30"
+                                                                                >
+                                                                                    {file instanceof File
+                                                                                        ? file.name
+                                                                                        : file.ymediaintitule}
+                                                                                </Badge>
+                                                                            ))}
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+
+                                                                {/* Display existing 3D models */}
+                                                                {variant.models3d.length > 0 && (
+                                                                    <div>
+                                                                        <div className="flex items-center gap-2 mb-2">
+                                                                            <Box className="h-4 w-4 text-purple-400" />
+                                                                            <span className="text-sm text-gray-300">{t("admin.createProduct.models3d")}</span>
+                                                                        </div>
+                                                                        <div className="flex flex-wrap gap-2">
+                                                                            {variant.models3d.map((file, fileIndex) => (
+                                                                                <Badge
+                                                                                    key={fileIndex}
+                                                                                    variant="secondary"
+                                                                                    className="bg-purple-500/20 text-purple-300 border-purple-500/30"
+                                                                                >
+                                                                                    {file instanceof File
+                                                                                        ? file.name
+                                                                                        : `3D Model ${fileIndex + 1}`}
+                                                                                </Badge>
+                                                                            ))}
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        )}
+                                                    </CardContent>
+                                                </Card>
+                                            )
+                                        })}
                                     </CardContent>
                                 </Card>
                             </div>
                         </div>
                     </ScrollArea>
+                )}
+
+                {/* Progress Bar */}
+                {isSubmitting && (
+                    <div className="px-6 pb-4">
+                        <div className="space-y-2">
+                            <div className="flex items-center justify-between text-sm">
+                                <span className="text-gray-300">
+                                    {isEditMode ? t("admin.createProduct.updatingProduct") : t("admin.createProduct.creatingProduct")}
+                                </span>
+                                <span className="text-morpheus-gold-light font-medium">
+                                    {Math.round(progress)}%
+                                </span>
+                            </div>
+                            <Progress
+                                value={progress}
+                                className="h-2 bg-gray-700"
+                            />
+                        </div>
+                    </div>
                 )}
 
                 {/* Dialog Footer */}
@@ -1552,13 +1650,14 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                         onClick={onClose}
                         variant="outline"
                         className="border-gray-600 text-gray-300 hover:bg-gray-700"
-                        disabled={(isEditMode && productDetailsLoading) || (isEditMode && productDetailsError)}
+                        disabled={isSubmitting || (isEditMode && productDetailsLoading) || (isEditMode && productDetailsError)}
                     >
                         {t("common.cancel")}
                     </Button>
                     <Button
                         onClick={handleSubmit}
                         disabled={
+                            isSubmitting ||
                             createProductMutation.isPending ||
                             updateProductMutation.isPending ||
                             designerLoading ||
@@ -1567,13 +1666,18 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                         }
                         className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-morpheus-gold-dark hover:to-morpheus-gold-light text-white font-semibold transition-all duration-300 hover:scale-105"
                     >
-                        {createProductMutation.isPending || updateProductMutation.isPending
-                            ? isEditMode
-                                ? t("admin.createProduct.updatingProduct")
-                                : t("admin.createProduct.creatingProduct")
-                            : isEditMode
-                            ? t("admin.createProduct.updateProduct")
-                            : t("admin.createProduct.createProduct")}
+                        {isSubmitting ? (
+                            <div className="flex items-center gap-2">
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                                {isEditMode
+                                    ? t("admin.createProduct.updatingProduct")
+                                    : t("admin.createProduct.creatingProduct")}
+                            </div>
+                        ) : (
+                            isEditMode
+                                ? t("admin.createProduct.updateProduct")
+                                : t("admin.createProduct.createProduct")
+                        )}
                     </Button>
                 </div>
             </DialogContent>

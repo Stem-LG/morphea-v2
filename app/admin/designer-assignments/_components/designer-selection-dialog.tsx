@@ -18,6 +18,7 @@ import { useDesignersPaginated, useDesignersSearch } from "../_hooks/use-designe
 import { useDesignerAssignment } from "../_hooks/use-designer-assignment";
 import { ColumnDef } from "@tanstack/react-table";
 import { User, Mail, MapPin, Palette, CheckCircle } from "lucide-react";
+import { useLanguage } from "@/hooks/useLanguage";
 
 interface DesignerSelectionDialogProps {
     eventId: number;
@@ -49,9 +50,10 @@ export function DesignerSelectionDialog({
     children,
     onAssignmentComplete
 }: DesignerSelectionDialogProps) {
+    const { t } = useLanguage();
     const [isOpen, setIsOpen] = useState(false);
     const [selectedDesigner, setSelectedDesigner] = useState<Designer | null>(null);
-    
+
     const { search, page, setPage, setSearch } = useDesignersSearch();
     const { assignDesigner, isAssigning } = useDesignerAssignment();
 
@@ -90,21 +92,19 @@ export function DesignerSelectionDialog({
                         checked={selectedDesigner?.ydesignid === row.original.ydesignid}
                         onChange={() => !row.original.isAssigned && setSelectedDesigner(row.original)}
                         disabled={row.original.isAssigned}
-                        className={`h-4 w-4 text-morpheus-gold-light focus:ring-morpheus-gold-light ${
-                            row.original.isAssigned ? 'opacity-50 cursor-not-allowed' : ''
-                        }`}
+                        className={`h-4 w-4 text-morpheus-gold-light focus:ring-morpheus-gold-light ${row.original.isAssigned ? 'opacity-50 cursor-not-allowed' : ''
+                            }`}
                     />
                 </div>
             ),
         },
         {
             accessorKey: "ydesignnom",
-            header: "Designer",
+            header: t("admin.designerAssignments.designer"),
             cell: ({ row }) => (
                 <div className={`flex items-center gap-3 ${row.original.isAssigned ? 'opacity-50' : ''}`}>
-                    <div className={`h-10 w-10 rounded-full bg-gradient-to-r from-morpheus-purple to-morpheus-blue flex items-center justify-center ${
-                        row.original.isAssigned ? 'opacity-60' : ''
-                    }`}>
+                    <div className={`h-10 w-10 rounded-full bg-gradient-to-r from-morpheus-purple to-morpheus-blue flex items-center justify-center ${row.original.isAssigned ? 'opacity-60' : ''
+                        }`}>
                         <User className="h-5 w-5 text-white" />
                     </div>
                     <div>
@@ -112,7 +112,7 @@ export function DesignerSelectionDialog({
                             {row.original.ydesignnom}
                             {row.original.isAssigned && (
                                 <span className="ml-2 text-xs bg-yellow-500/20 text-yellow-300 px-2 py-1 rounded">
-                                    Already Assigned
+                                    {t("admin.designerAssignments.alreadyAssigned")}
                                 </span>
                             )}
                         </div>
@@ -123,7 +123,7 @@ export function DesignerSelectionDialog({
         },
         {
             accessorKey: "ydesignmarque",
-            header: "Brand",
+            header: t("admin.designerAssignments.brand"),
             cell: ({ row }) => (
                 <div className={`flex flex-col ${row.original.isAssigned ? 'opacity-50' : ''}`}>
                     <span className={`font-medium ${row.original.isAssigned ? 'text-gray-400' : 'text-white'}`}>
@@ -135,7 +135,7 @@ export function DesignerSelectionDialog({
         },
         {
             accessorKey: "ydesignpays",
-            header: "Location",
+            header: t("admin.designerAssignments.location"),
             cell: ({ row }) => (
                 <div className={`flex items-center gap-2 ${row.original.isAssigned ? 'opacity-50' : ''}`}>
                     <MapPin className="h-4 w-4 text-gray-400" />
@@ -147,7 +147,7 @@ export function DesignerSelectionDialog({
         },
         {
             accessorKey: "ydesigncontactemail",
-            header: "Contact",
+            header: t("admin.designerAssignments.contact"),
             cell: ({ row }) => (
                 <div className={`flex flex-col gap-1 ${row.original.isAssigned ? 'opacity-50' : ''}`}>
                     <div className="flex items-center gap-2">
@@ -175,10 +175,10 @@ export function DesignerSelectionDialog({
                 <CredenzaHeader>
                     <CredenzaTitle className="text-white flex items-center gap-2">
                         <Palette className="h-5 w-5 text-morpheus-gold-light" />
-                        Select Designer for {boutiqueName}
+                        {t("admin.designerAssignments.selectDesignerFor")} {boutiqueName}
                     </CredenzaTitle>
                     <CredenzaDescription className="text-gray-300">
-                        Choose a designer to assign to this boutique. Only available designers are shown.
+                        {t("admin.designerAssignments.chooseDesignerToAssign")}
                     </CredenzaDescription>
                 </CredenzaHeader>
 
@@ -206,14 +206,14 @@ export function DesignerSelectionDialog({
                         {selectedDesigner && (
                             <Badge className="bg-morpheus-gold-light/20 text-morpheus-gold-light">
                                 <CheckCircle className="h-3 w-3 mr-1" />
-                                {selectedDesigner.ydesignnom} selected
+                                {selectedDesigner.ydesignnom} {t("admin.designerAssignments.selected")}
                             </Badge>
                         )}
                     </div>
                     <div className="flex gap-2">
                         <CredenzaClose asChild>
                             <Button variant="outline" className="border-gray-600 text-gray-300">
-                                Cancel
+                                {t("admin.designerAssignments.cancel")}
                             </Button>
                         </CredenzaClose>
                         <Button
@@ -221,7 +221,7 @@ export function DesignerSelectionDialog({
                             disabled={!selectedDesigner || isAssigning}
                             className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-morpheus-gold-dark hover:to-morpheus-gold-light text-white"
                         >
-                            {isAssigning ? "Assigning..." : "Assign Designer"}
+                            {isAssigning ? t("admin.designerAssignments.assigning") : t("admin.designerAssignments.assignDesignerButton")}
                         </Button>
                     </div>
                 </CredenzaFooter>

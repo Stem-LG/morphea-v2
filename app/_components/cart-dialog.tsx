@@ -2,6 +2,7 @@
 
 import { useLanguage } from "@/hooks/useLanguage";
 import { useCurrency } from "@/hooks/useCurrency";
+import { useAuth } from "@/hooks/useAuth";
 import { useCart } from "@/app/_hooks/cart/useCart";
 import { useUpdateCart } from "@/app/_hooks/cart/useUpdateCart";
 import { useDeleteFromCart } from "@/app/_hooks/cart/useDeleteFromCart";
@@ -26,6 +27,7 @@ interface CartDialogProps {
 export function CartDialog({ isOpen, onClose }: CartDialogProps) {
     const { t } = useLanguage();
     const router = useRouter();
+    const { data: currentUser } = useAuth();
     const { data: cartItems = [], isLoading } = useCart();
     const updateCartMutation = useUpdateCart();
     const deleteFromCartMutation = useDeleteFromCart();
@@ -46,14 +48,14 @@ export function CartDialog({ isOpen, onClose }: CartDialogProps) {
     const calculateTotal = () => {
         return cartItems.reduce((total, item) => {
             if (!item.yvarprod) return total;
-            
+
             // Find the product's base currency
             const productCurrency = currencies.find(c => c.xdeviseid === item.yvarprod?.xdeviseidfk);
             const price = item.yvarprod.yvarprodprixpromotion || item.yvarprod.yvarprodprixcatalogue || 0;
-            
+
             // Convert price from product currency to current currency
             const convertedPrice = convertPrice(price, productCurrency);
-            
+
             return total + convertedPrice * item.ypanierqte;
         }, 0);
     };
@@ -61,23 +63,31 @@ export function CartDialog({ isOpen, onClose }: CartDialogProps) {
     // Helper function to get formatted price for an item
     const getFormattedItemPrice = (item: any) => {
         if (!item.yvarprod) return '$0.00';
-        
+
         const productCurrency = currencies.find(c => c.xdeviseid === item.yvarprod?.xdeviseidfk);
         const price = item.yvarprod.yvarprodprixpromotion || item.yvarprod.yvarprodprixcatalogue || 0;
-        
+
         return formatPrice(price, productCurrency);
     };
 
     // Helper function to get formatted original price for an item
     const getFormattedOriginalPrice = (item: any) => {
         if (!item.yvarprod?.yvarprodprixpromotion || !item.yvarprod?.yvarprodprixcatalogue) return null;
-        
+
         const productCurrency = currencies.find(c => c.xdeviseid === item.yvarprod?.xdeviseidfk);
         return formatPrice(item.yvarprod.yvarprodprixcatalogue, productCurrency);
     };
 
     const handleCheckout = () => {
-        // Navigate to order page
+        // Check if user is anonymous
+        if (!currentUser || currentUser.is_anonymous) {
+            // Redirect to login page for anonymous users
+            onClose();
+            router.push("/auth/login");
+            return;
+        }
+
+        // Navigate to order page for authenticated users
         onClose();
         router.push("/order");
     };
