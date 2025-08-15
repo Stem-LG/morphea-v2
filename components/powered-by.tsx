@@ -20,7 +20,7 @@ export function PoweredBy() {
   }
 
   return (
-    <div className="fixed bottom-4 right-4 z-10">
+    <div className="fixed bottom-4 left-4 z-10">
       <div className="bg-black/20 backdrop-blur-sm rounded-lg px-3 py-2 border border-white/10">
         {mellimeUrl && !isLoadingMellimeUrl ? (
           <button
