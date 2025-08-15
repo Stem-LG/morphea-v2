@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
-import { Canvas } from "@react-three/fiber";
+import { Canvas, useThree } from "@react-three/fiber";
 import { OrbitControls, useGLTF, Html } from "@react-three/drei";
 import { Suspense } from "react";
 import { useLanguage } from "@/hooks/useLanguage";
@@ -132,14 +132,27 @@ function GLBModel({ url, name }: { url: string; name: string }) {
     }
 }
 
+// Background Color Manager Component
+function BackgroundColorManager({ backgroundColor }: { backgroundColor: string }) {
+    const { gl, scene } = useThree();
+    
+    useEffect(() => {
+        console.log("Setting 3D background color to:", backgroundColor);
+        gl.setClearColor(backgroundColor);
+        scene.background = new THREE.Color(backgroundColor);
+    }, [backgroundColor, gl, scene]);
+
+    return null; // This component doesn't render anything
+}
+
 // Product Model component
-function ProductModel({ url, name, backgroundColor }: { url: string; name: string; backgroundColor?: string }) {
+function ProductModel({ url, name }: { url: string; name: string }) {
     return (
-        <div style={{ backgroundColor: backgroundColor || "#f0f0f0" }}>
+        <group>
             <Suspense fallback={<LoadingSpinner />}>
                 <GLBModel url={url} name={name} />
             </Suspense>
-        </div>
+        </group>
     );
 }
 
@@ -542,8 +555,16 @@ export function ProductDetailsPage({ productData, onClose, extraTop = false }: P
                                                 toneMappingExposure: 1.2,
                                             }}
                                             style={{ width: "100%", height: "100%" }}
+                                            onCreated={({ gl, scene }) => {
+                                                const backgroundColor = selected3DModel?.ycouleurarriereplan || "#f0f0f0";
+                                                gl.setClearColor(backgroundColor);
+                                                scene.background = new THREE.Color(backgroundColor);
+                                            }}
                                         >
                                             <Suspense fallback={<LoadingSpinner />}>
+                                                <BackgroundColorManager 
+                                                    backgroundColor={selected3DModel?.ycouleurarriereplan || "#f0f0f0"} 
+                                                />
                                                 <fog
                                                     attach="fog"
                                                     args={[
@@ -626,7 +647,6 @@ export function ProductDetailsPage({ productData, onClose, extraTop = false }: P
                                                     <ProductModel
                                                         url={selected3DModel.yobjet3durl}
                                                         name={productData.yprodintitule}
-                                                        backgroundColor={selected3DModel?.ycouleurarriereplan || "#f0f0f0"}
                                                     />
                                                 )}
 
