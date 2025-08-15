@@ -1106,7 +1106,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                             <div>
                                                                 <Label className="text-gray-300 flex items-center gap-1">
                                                                     <Palette className="h-3 w-3" />
-                                                                    {t("admin.createProduct.3dBackgroundColor") || "3D Model Background Color"}
+                                                                    {t("admin.color") || "Color"} <span className="text-red-400">*</span>
                                                                 </Label>
                                                                 <div className="flex gap-2 mt-1">
                                                                     <SuperSelect
@@ -1118,52 +1118,21 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                                                 value
                                                                             )
                                                                         }
-                                                                        className="w-12 h-8 bg-gray-700/50 border border-gray-600 rounded cursor-pointer"
                                                                         options={colorOptions}
+                                                                        placeholder={t("admin.createProduct.selectColor") || "Select Color"}
+                                                                        disabled={!canEdit}
+                                                                        className="flex-1"
                                                                     />
-                                                                    <Input
-                                                                        value={variant.backgroundColor || "#ffffff"}
-                                                                        onChange={(e) => {
-                                                                            // Validate hex color format
-                                                                            const value = e.target.value;
-                                                                            if (value === "" || /^#([0-9A-Fa-f]{0,6})$/.test(value)) {
-                                                                                handleVariantChange(
-                                                                                    variant.id,
-                                                                                    "backgroundColor",
-                                                                                    value
-                                                                                );
-                                                                            }
-                                                                        }}
-                                                                        placeholder="#ffffff"
-                                                                        className="flex-1 bg-gray-600/50 border-gray-500 text-white text-sm"
-                                                                        maxLength={7}
-                                                                    />
-                                                                    {/* Quick color presets */}
-                                                                    <div className="flex gap-1">
-                                                                        {["#ffffff", "#f0f0f0", "#e0e0e0", "#d0d0d0", "#000000"].map((presetColor) => (
-                                                                            <button
-                                                                                key={presetColor}
-                                                                                type="button"
-                                                                                onClick={() =>
-                                                                                    handleVariantChange(
-                                                                                        variant.id,
-                                                                                        "backgroundColor",
-                                                                                        presetColor
-                                                                                    )
-                                                                                }
-                                                                                className={`w-6 h-6 rounded border-2 transition-all hover:scale-110 ${
-                                                                                    variant.backgroundColor === presetColor
-                                                                                        ? "border-morpheus-gold-light"
-                                                                                        : "border-gray-500"
-                                                                                }`}
-                                                                                style={{ backgroundColor: presetColor }}
-                                                                                title={`Set background to ${presetColor}`}
-                                                                            />
-                                                                        ))}
-                                                                    </div>
-                                                                </div>
-                                                                <div className="text-xs text-gray-400 mt-1">
-                                                                    {t("admin.createProduct.backgroundColorDescription") || "Background color for the 3D model viewer"}
+                                                                    {canEdit && (
+                                                                        <Button
+                                                                            onClick={() => setShowColorForm(!showColorForm)}
+                                                                            size="sm"
+                                                                            variant="outline"
+                                                                            className="border-gray-600 text-gray-300 hover:bg-gray-700"
+                                                                        >
+                                                                            <Plus className="h-3 w-3" />
+                                                                        </Button>
+                                                                    )}
                                                                 </div>
                                                             </div>
 
