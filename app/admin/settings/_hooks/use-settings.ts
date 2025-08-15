@@ -40,7 +40,9 @@ export function useSettings() {
 // Allowed setting keys - only these can be created/updated
 const ALLOWED_SETTING_KEYS = [
   'website_url',
-  'default_currency_id'
+  'default_currency_id',
+  'powered_by',
+  'mellime_url'
 ]
 
 export function useUpdateSetting() {

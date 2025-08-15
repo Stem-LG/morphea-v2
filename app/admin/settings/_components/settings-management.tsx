@@ -41,6 +41,22 @@ const getPredefinedSettings = (t: (key: string) => string): PredefinedSetting[] 
     type: 'currency_select' as const,
     defaultValue: '',
     required: false
+  },
+  {
+    key: 'powered_by',
+    label: t('admin.settings.poweredBy'),
+    description: t('admin.settings.poweredByDescription'),
+    type: 'text' as const,
+    defaultValue: '',
+    required: false
+  },
+  {
+    key: 'mellime_url',
+    label: t('admin.settings.mellimeUrl'),
+    description: t('admin.settings.mellimeUrlDescription'),
+    type: 'url' as const,
+    defaultValue: '',
+    required: false
   }
 ]
 

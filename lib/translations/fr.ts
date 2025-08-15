@@ -32,7 +32,8 @@ export const frTranslations = {
     "close": "Fermer",
     "retry": "Réessayer",
     "none": "Aucun",
-    "actions": "Actions"
+    "actions": "Actions",
+    "poweredBy": "Powered by"
   },
   "auth": {
     "name": "Nom",
@@ -865,6 +866,10 @@ export const frTranslations = {
       "websiteUrlDescription": "L'URL principale du site web pour votre application",
       "defaultCurrency": "Devise par Défaut",
       "defaultCurrencyDescription": "La devise par défaut pour les nouveaux utilisateurs et l'affichage des prix",
+      "poweredBy": "Powered by",
+      "poweredByDescription": "Texte à afficher dans le pied de page 'Powered by'",
+      "mellimeUrl": "URL Mellime",
+      "mellimeUrlDescription": "URL de base pour l'intégration Mellime",
       "selectDefaultCurrency": "Sélectionner la devise par défaut...",
       "pivotCurrency": "- Devise Pivot",
       "settingSet": "Configuré",
