@@ -207,7 +207,7 @@ function ShopContent() {
         });
     }, [setQueryState]);
 
-    const hasActiveFilters = boutiqueId || categoryId || search;
+    const hasActiveFilters = Boolean(boutiqueId || categoryId || search);
 
 
 
