@@ -964,7 +964,16 @@ export const enTranslations = {
       "color3": "Color 3",
       "contactInformation": "Contact Information",
       "assignmentStatus": "Assignment Status",
-      "assignmentLockedMessage": "This designer assignment is locked because products have been created for this boutique. The assignment cannot be changed."
+      "assignmentLockedMessage": "This designer assignment is locked because products have been created for this boutique. The assignment cannot be changed.",
+      "selectDesignerFor": "Select Designer for",
+      "chooseDesignerToAssign": "Choose a designer to assign to this boutique. Only available designers are shown.",
+      "designer": "Designer",
+      "contact": "Contact",
+      "alreadyAssigned": "Already Assigned",
+      "selected": "selected",
+      "cancel": "Cancel",
+      "assigning": "Assigning...",
+      "assignDesignerButton": "Assign Designer"
     },
     "tour": {
       "adminControls": "Admin Controls",

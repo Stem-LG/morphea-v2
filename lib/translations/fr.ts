@@ -845,7 +845,16 @@ export const frTranslations = {
       "color3": "Couleur 3",
       "contactInformation": "Informations de Contact",
       "assignmentStatus": "Statut de l'Attribution",
-      "assignmentLockedMessage": "Cette attribution de designer est verrouillée car des produits ont été créés pour cette boutique. L'attribution ne peut pas être modifiée."
+      "assignmentLockedMessage": "Cette attribution de designer est verrouillée car des produits ont été créés pour cette boutique. L'attribution ne peut pas être modifiée.",
+      "selectDesignerFor": "Sélectionner un Designer pour",
+      "chooseDesignerToAssign": "Choisissez un designer à attribuer à cette boutique. Seuls les designers disponibles sont affichés.",
+      "designer": "Designer",
+      "contact": "Contact",
+      "alreadyAssigned": "Déjà Attribué",
+      "selected": "sélectionné",
+      "cancel": "Annuler",
+      "assigning": "Attribution...",
+      "assignDesignerButton": "Attribuer le Designer"
     },
     "virtualTourAdmin": "Visite virtuelle",
     "loadingVirtualTourAdmin": "Chargement de l'administration de la visite virtuelle...",
