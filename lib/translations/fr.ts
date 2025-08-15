@@ -87,7 +87,7 @@ export const frTranslations = {
     "thankYouForSigningUp": "Merci pour votre inscription !",
     "checkEmailToConfirm": "Vérifiez votre email pour confirmer",
     "signUpSuccessMessage": "Veuillez confirmer votre compte en cliquant sur le lien envoyé à votre adresse e-mail avant de vous connecter.",
-    "termsAndConditions": "Conditions Générales",
+    "termsAndConditions": "Conditions générales d'utilisation et politique de confidentialité",
     "agreeToTerms": "J'accepte les",
     "termsAndConditionsRequired": "Vous devez accepter les conditions générales",
     "pleaseCompleteAllFields": "Veuillez compléter tous les champs requis et accepter les conditions générales",

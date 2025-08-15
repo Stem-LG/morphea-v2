@@ -14,21 +14,12 @@ export default function TermsAndConditionsPage() {
                         <h1 className="text-4xl font-bold text-white mb-4 font-parisienne">
                             {t("auth.termsAndConditions")}
                         </h1>
-                        <p className="text-lg text-gray-300">
-                            Morpheus Mall {t("auth.termsOfService")}
-                        </p>
                     </div>
 
                     <div className="prose prose-invert max-w-none">
                         <div className="text-gray-300 space-y-6">
-                            <p className="text-lg">
-                                {t("auth.welcomeToMorpheusMall")}
-                            </p>
-                            
                             <div className="bg-slate-800/50 p-6 rounded border border-slate-600">
-                                <p className="text-center text-gray-400 italic">
-                                    {t("auth.termsContentPlaceholder")}
-                                </p>
+                                <p className="text-center text-gray-400 italic">{t("auth.termsContentPlaceholder")}</p>
                                 <p className="text-center text-gray-400 italic mt-2">
                                     {t("auth.developmentPlaceholder")}
                                 </p>
