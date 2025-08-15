@@ -145,7 +145,7 @@ export default function NavBar() {
                             )}
 
                             {/* Cart, Wishlist, Notifications - Only show when logged in (not anonymous) */}
-                            {currentUser && !currentUser.is_anonymous && (
+                            {currentUser && (
                                 <>
                                     <div className="relative">
                                         <button
