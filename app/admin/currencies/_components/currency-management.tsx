@@ -206,8 +206,13 @@ export function CurrencyManagement() {
                             <Button
                                 variant="outline"
                                 size="sm"
-                                onClick={() => handleSetAsPivot(row.original)}
-                                className="border-yellow-600 text-yellow-400 hover:bg-yellow-600/10"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    handleSetAsPivot(row.original);
+                                }}
+                                disabled={pivotChangeHook.isLoading}
+                                className="border-yellow-600 text-yellow-400 hover:bg-yellow-600/10 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 <Star className="h-4 w-4 mr-1" />
                                 {t('admin.currencies.setAsPivot')}
@@ -273,6 +278,11 @@ export function CurrencyManagement() {
 
     const handleSetAsPivot = (currency: Currency) => {
         if (!currencies) return;
+        
+        // Prevent multiple clicks by checking if already loading
+        if (pivotChangeHook.isLoading) return;
+        
+        // Ensure we have fresh data
         openPivotChangeDialog(currency, currencies);
     };
 
@@ -538,15 +548,15 @@ export function CurrencyManagement() {
                                         <Label className="text-gray-300">Exchange Rate</Label>
                                         <Input
                                             type="number"
-                                            step="0.0001"
-                                            min="0.0001"
+                                            step="0.0000000001"
+                                            min="0.0000000001"
                                             value={formData.xtauxechange}
                                             onChange={(e) => setFormData(prev => ({
                                                 ...prev,
                                                 xtauxechange: parseFloat(e.target.value) || 1.0
                                             }))}
                                             className="bg-morpheus-blue-dark/30 border-slate-600 text-white"
-                                            placeholder="1.0000"
+                                            placeholder="1.0000000000"
                                             required
                                         />
                                     </div>
@@ -560,15 +570,15 @@ export function CurrencyManagement() {
                                         <TrendingUp className="h-4 w-4 text-blue-400" />
                                         <Input
                                             type="number"
-                                            step="0.0001"
-                                            min="0.0001"
+                                            step="0.0000000001"
+                                            min="0.0000000001"
                                             value={formData.xtauxechange}
                                             onChange={(e) => setFormData(prev => ({
                                                 ...prev,
                                                 xtauxechange: parseFloat(e.target.value) || 1.0
                                             }))}
                                             className="bg-morpheus-blue-dark/30 border-slate-600 text-white"
-                                            placeholder="1.0000"
+                                            placeholder="1.0000000000"
                                             required
                                         />
                                     </div>

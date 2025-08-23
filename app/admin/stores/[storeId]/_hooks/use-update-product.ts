@@ -308,7 +308,7 @@ export function useUpdateProduct() {
 
         for (const model of variant.models3d) {
             if (model instanceof File) {
-
+                // New 3D model file - upload and create record
                 mediaPromises.push(
                     uploadFile.mutateAsync({ file: model, type: "3dmodel" }).then(async (url) => {
                         await create3dModel.mutateAsync({
@@ -318,8 +318,27 @@ export function useUpdateProduct() {
                         });
                     })
                 );
+            } else {
+                // Existing 3D model - update background color if provided
+                if (variant.backgroundColor !== undefined) {
+                    mediaPromises.push(
+                        supabase
+                            .schema("morpheus")
+                            .from("yobjet3d")
+                            .update({
+                                ycouleurarriereplan: variant.backgroundColor
+                            })
+                            .eq("yobjet3did", model.yobjet3did)
+                            .then(({ error }) => {
+                                if (error) {
+                                    console.error(`Failed to update 3D model background color: ${error.message}`);
+                                    throw error;
+                                }
+                                console.log(`Successfully updated background color for 3D model ${model.yobjet3did} to ${variant.backgroundColor}`);
+                            })
+                    );
+                }
             }
-
         }
 
         await Promise.all(mediaPromises);
