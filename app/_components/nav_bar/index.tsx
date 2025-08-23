@@ -119,7 +119,7 @@ export default function NavBar() {
 
     return (
         <>
-            <nav className="fixed top-0 z-50 flex h-24 w-full bg-white/40 px-12">
+            <nav className="fixed top-0 z-50 flex h-18 w-full bg-white/40 px-6 md:px-12 md:h-24">
                 <div className="flex flex-1 items-center justify-start">
                     <NavBarIconButton
                         variant="leading"
@@ -136,7 +136,8 @@ export default function NavBar() {
                         width={228}
                     />
                 </div>
-                <div className="flex flex-1 items-center justify-end gap-4">
+                <div className="flex flex-1 md:hidden" />
+                <div className="hidden flex-1 items-center justify-end gap-4 md:flex">
                     <NavBarIconButton onClick={() => router.push('/admin')}>
                         <AdminIcon />
                     </NavBarIconButton>
@@ -249,7 +250,7 @@ function NavBarSheet({
     const navbarItems = [
         { name: 'Visite Virtuelle', href: '/main' },
         { name: 'Acceuil', href: '/' },
-        { name: 'Nouveauté', href:'/shop' },
+        { name: 'Nouveauté', href: '/shop' },
         { name: 'Categories', subItems: ['hh'] },
         { name: 'A Propos', href: '/about' },
         { name: 'Contactez-Nous', href: '/contact' },
@@ -258,7 +259,9 @@ function NavBarSheet({
     const navbarFooterItems = [
         { name: 'Mon Compte', href: '/profile' },
         { name: 'Favoris', onclick: () => {} },
+        { name: 'Panier', onclick: () => {} },
         { name: 'Mes Commandes', href: '/orders' },
+        { name: 'Administration', href: '/admin' },
     ]
 
     return (
@@ -294,7 +297,9 @@ function NavBarSheet({
                                         </Link>
                                     ) : (
                                         <>
-                                            <span className='ml-1'>{item.name}</span>
+                                            <span className="ml-1">
+                                                {item.name}
+                                            </span>
                                             {hasChildren && (
                                                 <ChevronRight className="size-6" />
                                             )}

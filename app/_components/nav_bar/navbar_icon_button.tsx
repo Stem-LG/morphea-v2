@@ -14,7 +14,7 @@ export function NavBarIconButton({
             onClick={onClick}
             className={cn(
                 'stroke-morpheus-blue-dark flex cursor-pointer items-center justify-center transition duration-300 hover:stroke-white',
-                variant === 'leading' ? 'size-9' : 'size-10'
+                variant === 'leading' ? 'size-8 md:size-9' : 'size-10'
             )}
         >
             {children}
