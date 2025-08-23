@@ -1,11 +1,10 @@
 "use client";
 
-import AnimatedBackground from "@/components/animated-background";
-import LandingPage from "@/components/landing-page";
-import { PoweredBy } from "@/components/powered-by";
 import { createClient } from "@/lib/client";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { PoweredBy } from "@/components/powered-by";
+import NavBar from "./_components/nav_bar";
 
 export default function Home() {
     const supabase = createClient();
@@ -20,12 +19,11 @@ export default function Home() {
     }, [router, supabase.auth]);
 
     return (
-        <section className="relative w-full">
-            <LandingPage />
-            {/* Animated 360° Background */}
-            <AnimatedBackground />
-            {/* Powered By Footer */}
+        <div className="relative w-full min-h-[calc(100svh)]">
+            <NavBar />
+            <div className="h-96 w-full bg-black/80"></div>
+
             <PoweredBy />
-        </section>
+        </div>
     );
 }

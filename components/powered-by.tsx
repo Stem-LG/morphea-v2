@@ -20,15 +20,15 @@ export function PoweredBy() {
   }
 
   return (
-    <div className="fixed bottom-4 left-4 z-10">
-      <div className="bg-black/20 backdrop-blur-sm rounded-lg px-3 py-2 border border-white/10">
+    <div className="fixed bottom-1 w-full flex justify-left z-20 ml-8 mb-2">
+      <div className="bg-black/40  rounded-lg px-3 py-2 border border-white/10">
         {mellimeUrl && !isLoadingMellimeUrl ? (
           <button
             onClick={handleClick}
-            className="text-sm text-white/70 hover:text-white transition-colors duration-200 cursor-pointer group"
+            className="text-sm text-white hover:text-white transition-colors duration-200 cursor-pointer group"
           >
             {t('common.poweredBy')}{' '}
-            <span className="text-morpheus-gold-light font-medium group-hover:text-morpheus-gold-dark transition-colors duration-200">
+            <span className="text-blue-500 font-medium group-hover:text-morpheus-gold-dark transition-colors duration-200">
               {poweredByText}
             </span>
           </button>
