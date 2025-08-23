@@ -45,10 +45,10 @@ export default function ExpandableCategories({ data }: ExpandableCategoriesProps
     };
 
     return (
-        <section className="relative z-20 bg-gray-50 py-20">
+        <section className="relative z-20 py-20 bg-white">
             <div className="max-w-7xl mx-auto px-8">
                 <div className="text-center mb-16">
-                    <h2 className="text-4xl md:text-5xl font-serif font-medium text-teal-700 mb-6">
+                    <h2 className="text-4xl md:text-5xl font-serif text-[#053340] mb-6 font-extrabold">
                         Nos Catégories
                     </h2>
                     <p className="text-lg text-gray-600 max-w-2xl mx-auto">

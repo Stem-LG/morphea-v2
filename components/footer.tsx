@@ -15,7 +15,7 @@ export default function Footer() {
     return (
         <footer className="relative z-[60] bg-white border-t border-gray-100 py-16" style={{ backgroundColor: 'white', position: 'relative' }}>
             <div className="relative z-[60] max-w-7xl mx-auto px-8">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
                     {/* Logo and Newsletter */}
                     <div className="md:col-span-2">
                         <div className="flex items-center mb-6">
@@ -99,7 +99,10 @@ export default function Footer() {
                             <li><a href="#" className="text-gray-600 hover:text-teal-600 transition-colors">CGV</a></li>
                             <li><a href="#" className="text-gray-600 hover:text-teal-600 transition-colors">politique de confidentialité</a></li>
                         </ul>
+                    {/* Services and Collections */}
+                    </div>
 
+                    <div>
                         <h4 className="text-lg font-semibold text-gray-800 mb-6">COLLECTIONS</h4>
                         <ul className="space-y-3">
                             <li><a href="#" className="text-gray-600 hover:text-teal-600 transition-colors">Nouveau collection</a></li>

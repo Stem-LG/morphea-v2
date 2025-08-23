@@ -157,7 +157,7 @@ export default function Home() {
             <section className="relative z-20 bg-white py-20">
                 <div className="max-w-7xl mx-auto px-8">
                     <div className="text-center mb-16">
-                        <h2 className="text-4xl md:text-5xl font-serif font-medium text-gray-900 mb-6">
+                        <h2 className="text-4xl md:text-5xl font-serif font-extrabold text-[#053340] mb-6 ">
                             Découvrez Nos Défilé
                         </h2>
                         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
@@ -175,7 +175,7 @@ export default function Home() {
                                 />
                                 <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors duration-300" />
                                 <div className="absolute bottom-8 left-8 text-white">
-                                    <h3 className="text-3xl font-serif font-medium mb-2">{collectionData.card1.title}</h3>
+                                    <h3 className="text-3xl font-serif font-extrabold mb-2">{collectionData.card1.title}</h3>
                                     <p className="text-lg opacity-90">{collectionData.card1.subtitle}</p>
                                 </div>
                             </div>
@@ -190,7 +190,7 @@ export default function Home() {
                                 />
                                 <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors duration-300" />
                                 <div className="absolute bottom-8 left-8 text-white">
-                                    <h3 className="text-3xl font-serif font-medium mb-2">{collectionData.card2.title}</h3>
+                                    <h3 className="text-3xl font-serif font-extrabold mb-2">{collectionData.card2.title}</h3>
                                     <p className="text-lg opacity-90">{collectionData.card2.subtitle}</p>
                                 </div>
                             </div>
@@ -206,7 +206,7 @@ export default function Home() {
             <section className="relative z-20 bg-white py-20">
                 <div className="max-w-7xl mx-auto px-8">
                     <div className="text-center mb-16">
-                        <h2 className="text-4xl md:text-5xl font-serif font-medium text-teal-700 mb-6">
+                        <h2 className="text-4xl md:text-5xl font-serif text-[#053340] font-extrabold mb-6">
                             Nos Créateurs
                         </h2>
                         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
