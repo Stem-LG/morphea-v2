@@ -3,7 +3,6 @@
 import { createClient } from "@/lib/client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { PoweredBy } from "@/components/powered-by";
 import Footer from "@/components/footer";
 import NavBar from "./_components/nav_bar";
 import ExpandableCategories from "@/components/expandable-categories";
@@ -70,22 +69,22 @@ export default function Home() {
             }
         };
 
-        const creatorsData = {
-            images: [
-                '/lg1.jpg',
-                '/lg2.png', 
-                '/lg3.jpg',
-                '/lg4.jpg',
-                '/lg1.jpg',
-                '/lg2.png',
-                '/lg3.jpg',
-                '/lg4.jpg',
-                '/lg1.jpg',
-                '/lg2.png',
-                '/lg3.jpg',
-                '/lg4.jpg'
-            ]
-        };
+        // const creatorsData = {
+        //     images: [
+        //         '/lg1.jpg',
+        //         '/lg2.png', 
+        //         '/lg3.jpg',
+        //         '/lg4.jpg',
+        //         '/lg1.jpg',
+        //         '/lg2.png',
+        //         '/lg3.jpg',
+        //         '/lg4.jpg',
+        //         '/lg1.jpg',
+        //         '/lg2.png',
+        //         '/lg3.jpg',
+        //         '/lg4.jpg'
+        //     ]
+        // };
     return (
         <div className="relative w-full min-h-[calc(100svh)]">
             {/* Fullscreen video background with fade animation */}
@@ -161,7 +160,7 @@ export default function Home() {
                             Découvrez Nos Défilé
                         </h2>
                         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                            Plongez dans l'univers exclusif de nos collections à travers des présentations exceptionnelles
+                            {"Plongez dans l'univers exclusif de nos collections à travers des présentations exceptionnelles"}
                         </p>
                     </div>
                     
@@ -210,7 +209,7 @@ export default function Home() {
                             Nos Créateurs
                         </h2>
                         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                            Découvrez nos espaces d'exception boutique en Tunisie
+                            {"Découvrez nos espaces d'exception boutique en Tunisie"}
                         </p>
                     </div>
                     <ThreeDPhotoCarousel 

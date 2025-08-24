@@ -52,7 +52,7 @@ export default function ExpandableCategories({ data }: ExpandableCategoriesProps
                         Nos Catégories
                     </h2>
                     <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                        Explorez notre univers à travers trois piliers de l'élégance
+                        {"Explorez notre univers à travers trois piliers de l'élégance"}
                     </p>
                 </div>
                 

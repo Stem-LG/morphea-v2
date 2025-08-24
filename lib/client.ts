@@ -1,8 +1,8 @@
 import { createBrowserClient } from '@supabase/ssr'
-import type { SupabaseClient } from '@supabase/supabase-js'
+import { Database } from './supabase'
 
 // Singleton instance of the Supabase client
-let supabaseInstance: SupabaseClient | null = null
+let supabaseInstance: ReturnType<typeof createBrowserClient<Database, "morpheus">> | null = null
 
 export function createClient() {
   // Return existing instance if it exists
@@ -11,7 +11,7 @@ export function createClient() {
   }
 
   // Create new instance and store it
-  supabaseInstance = createBrowserClient(
+  supabaseInstance = createBrowserClient<Database, "morpheus">(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   )
