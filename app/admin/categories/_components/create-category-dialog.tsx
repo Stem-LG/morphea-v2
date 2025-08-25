@@ -18,24 +18,32 @@ import {
     CredenzaFooter,
 } from "@/components/ui/credenza";
 import { useCreateCategory } from "@/hooks/useCategories";
+import { SuperSelect } from "@/components/super-select";
+import type { Database } from "@/lib/supabase";
+
+type Category = Database['morpheus']['Tables']['xcategprod']['Row'];
 
 interface CategoryFormData {
     xcategprodintitule: string;
     xcategprodcode: string;
     xcategprodinfobulle: string;
+    xcategparentid: number | null;
 }
 
 interface CreateCategoryDialogProps {
     children: React.ReactNode;
+    categories: (Category & { parent?: Pick<Category, 'xcategprodid' | 'xcategprodintitule' | 'xcategprodcode'> | null; yprod: { count: number }[] })[];
+    defaultParentId?: number | null;
 }
 
-export function CreateCategoryDialog({ children }: CreateCategoryDialogProps) {
+export function CreateCategoryDialog({ children, categories, defaultParentId = null }: CreateCategoryDialogProps) {
     const { t } = useLanguage();
     const [isOpen, setIsOpen] = useState(false);
     const [formData, setFormData] = useState<CategoryFormData>({
         xcategprodintitule: "",
         xcategprodcode: "",
-        xcategprodinfobulle: ""
+        xcategprodinfobulle: "",
+        xcategparentid: defaultParentId
     });
 
     const createCategoryMutation = useCreateCategory();
@@ -44,7 +52,8 @@ export function CreateCategoryDialog({ children }: CreateCategoryDialogProps) {
         setFormData({
             xcategprodintitule: "",
             xcategprodcode: "",
-            xcategprodinfobulle: ""
+            xcategprodinfobulle: "",
+            xcategparentid: defaultParentId
         });
     };
 
@@ -63,7 +72,11 @@ export function CreateCategoryDialog({ children }: CreateCategoryDialogProps) {
         }
 
         try {
-            await createCategoryMutation.mutateAsync(formData);
+            const { xcategparentid, ...restFormData } = formData;
+            await createCategoryMutation.mutateAsync({
+                ...restFormData,
+                xcategparentid: xcategparentid || null
+            });
             resetForm();
             setIsOpen(false);
             toast.success(t("admin.categories.categoryCreatedSuccess"));
@@ -77,6 +90,14 @@ export function CreateCategoryDialog({ children }: CreateCategoryDialogProps) {
     const handleDialogChange = (open: boolean) => {
         if (!open) {
             resetForm();
+        } else {
+            // Reset form when opening dialog to ensure defaultParentId is set
+            setFormData({
+                xcategprodintitule: "",
+                xcategprodcode: "",
+                xcategprodinfobulle: "",
+                xcategparentid: defaultParentId
+            });
         }
         setIsOpen(open);
     };
@@ -128,6 +149,25 @@ export function CreateCategoryDialog({ children }: CreateCategoryDialogProps) {
                                 placeholder={t("admin.categories.descriptionPlaceholder")}
                                 rows={3}
                                 required
+                                disabled={createCategoryMutation.isPending}
+                            />
+                        </div>
+                        
+                        <div className="space-y-2">
+                            <Label className="text-gray-300">{t("admin.categories.parentCategory")}</Label>
+                            <SuperSelect
+                                value={formData.xcategparentid?.toString() || ""}
+                                onValueChange={(value) => setFormData(prev => ({ ...prev, xcategparentid: value !== "" ? parseInt(value as string) : null }))}
+                                options={[
+                                    { value: "", label: t("admin.categories.noParent") },
+                                    ...categories
+                                        .filter(cat => cat.xcategparentid === null) // Only show top-level categories as parents
+                                        .map(cat => ({
+                                            value: cat.xcategprodid.toString(),
+                                            label: cat.xcategprodintitule
+                                        }))
+                                ]}
+                                placeholder={t("admin.categories.selectParentCategory")}
                                 disabled={createCategoryMutation.isPending}
                             />
                         </div>

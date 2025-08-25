@@ -413,7 +413,10 @@ export const enTranslations = {
       "creating": "Creating...",
       "createCategory": "Create Category",
       "updating": "Updating...",
-      "updateCategory": "Update Category"
+      "updateCategory": "Update Category",
+      "hierarchicalView": "Hierarchical View",
+      "addSubcategory": "Add Subcategory",
+      "parentCategory": "Parent Category"
     },
     "approvals": {
       "title": "Product Approvals",

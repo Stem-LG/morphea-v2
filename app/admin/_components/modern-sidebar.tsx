@@ -181,7 +181,7 @@ export function ModernSidebar({ isOpen, isCollapsed, onToggle, onCollapse, userR
             <div
                 className={`
                 fixed lg:sticky top-16 left-0 z-50
-                ${isCollapsed ? "w-16" : "w-64"} h-[calc(100vh-4rem)]
+                ${isCollapsed ? "w-16" : "w-64"} h-[calc(100vh-6rem)]
                 bg-gradient-to-b from-morpheus-blue-dark to-morpheus-blue-light
                 border-r border-slate-700/50 shadow-2xl
                 transform ${isOpen ? "translate-x-0" : "-translate-x-full"}

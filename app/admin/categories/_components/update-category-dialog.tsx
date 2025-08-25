@@ -18,11 +18,16 @@ import {
     CredenzaFooter,
 } from "@/components/ui/credenza";
 import { useUpdateCategory } from "@/hooks/useCategories";
+import { SuperSelect } from "@/components/super-select";
+import type { Database } from "@/lib/supabase";
+
+type Category = Database['morpheus']['Tables']['xcategprod']['Row'];
 
 interface CategoryFormData {
     xcategprodintitule: string;
     xcategprodcode: string;
     xcategprodinfobulle: string;
+    xcategparentid: number | null;
 }
 
 interface CategoryData {
@@ -30,20 +35,23 @@ interface CategoryData {
     xcategprodintitule: string;
     xcategprodcode: string;
     xcategprodinfobulle: string;
+    xcategparentid: number | null;
 }
 
 interface UpdateCategoryDialogProps {
     children: React.ReactNode;
     category: CategoryData;
+    categories: (Category & { parent?: Pick<Category, 'xcategprodid' | 'xcategprodintitule' | 'xcategprodcode'> | null; yprod: { count: number }[] })[];
 }
 
-export function UpdateCategoryDialog({ children, category }: UpdateCategoryDialogProps) {
+export function UpdateCategoryDialog({ children, category, categories }: UpdateCategoryDialogProps) {
     const { t } = useLanguage();
     const [isOpen, setIsOpen] = useState(false);
     const [formData, setFormData] = useState<CategoryFormData>({
         xcategprodintitule: "",
         xcategprodcode: "",
-        xcategprodinfobulle: ""
+        xcategprodinfobulle: "",
+        xcategparentid: null
     });
 
     const updateCategoryMutation = useUpdateCategory();
@@ -54,7 +62,8 @@ export function UpdateCategoryDialog({ children, category }: UpdateCategoryDialo
             setFormData({
                 xcategprodintitule: category.xcategprodintitule || "",
                 xcategprodcode: category.xcategprodcode || "",
-                xcategprodinfobulle: category.xcategprodinfobulle || ""
+                xcategprodinfobulle: category.xcategprodinfobulle || "",
+                xcategparentid: category.xcategparentid || null
             });
         }
     }, [category, isOpen]);
@@ -64,7 +73,8 @@ export function UpdateCategoryDialog({ children, category }: UpdateCategoryDialo
             setFormData({
                 xcategprodintitule: category.xcategprodintitule || "",
                 xcategprodcode: category.xcategprodcode || "",
-                xcategprodinfobulle: category.xcategprodinfobulle || ""
+                xcategprodinfobulle: category.xcategprodinfobulle || "",
+                xcategparentid: category.xcategparentid || null
             });
         }
     };
@@ -84,9 +94,13 @@ export function UpdateCategoryDialog({ children, category }: UpdateCategoryDialo
         }
 
         try {
+            const { xcategparentid, ...restFormData } = formData;
             await updateCategoryMutation.mutateAsync({
                 categoryId: category.xcategprodid,
-                updates: formData
+                updates: {
+                    ...restFormData,
+                    xcategparentid: xcategparentid || null
+                }
             });
             setIsOpen(false);
             toast.success(t("admin.categories.categoryUpdatedSuccess"));
@@ -151,6 +165,31 @@ export function UpdateCategoryDialog({ children, category }: UpdateCategoryDialo
                                 placeholder={t("admin.categories.descriptionPlaceholder")}
                                 rows={3}
                                 required
+                                disabled={updateCategoryMutation.isPending}
+                            />
+                        </div>
+                        
+                        <div className="space-y-2">
+                            <Label className="text-gray-300">{t("admin.categories.parentCategory")}</Label>
+                            <SuperSelect
+                                value={formData.xcategparentid?.toString() || ""}
+                                onValueChange={(value) => {
+                                    const selectedParentId = value !== "" ? parseInt(value as string) : null;
+                                    // Prevent circular references: a category cannot be its own parent
+                                    if (selectedParentId === null || selectedParentId !== category.xcategprodid) {
+                                        setFormData(prev => ({ ...prev, xcategparentid: selectedParentId }));
+                                    }
+                                }}
+                                options={[
+                                    { value: "", label: t("admin.categories.noParent") },
+                                    ...categories
+                                        .filter(cat => cat.xcategparentid === null && cat.xcategprodid !== category.xcategprodid) // Only show top-level categories as parents and exclude the current category
+                                        .map(cat => ({
+                                            value: cat.xcategprodid.toString(),
+                                            label: cat.xcategprodintitule
+                                        }))
+                                ]}
+                                placeholder={t("admin.categories.selectParentCategory")}
                                 disabled={updateCategoryMutation.isPending}
                             />
                         </div>

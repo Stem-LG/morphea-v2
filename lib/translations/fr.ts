@@ -434,7 +434,10 @@ export const frTranslations = {
       "creating": "Création...",
       "createCategory": "Créer la Catégorie",
       "updating": "Mise à jour...",
-      "updateCategory": "Mettre à jour la Catégorie"
+      "updateCategory": "Mettre à jour la Catégorie",
+      "hierarchicalView": "Vue Hiérarchique",
+      "addSubcategory": "Ajouter Sous-catégorie",
+      "parentCategory": "Catégorie Parente"
     },
     "approvals": {
       "title": "Approbations de Produits",

@@ -742,6 +742,7 @@ export type Database = {
           sysadresseip: string | null
           sysdate: string | null
           sysuser: string | null
+          xcategparentid: number | null
           xcategprodcode: string
           xcategprodid: number
           xcategprodinfobulle: string
@@ -752,6 +753,7 @@ export type Database = {
           sysadresseip?: string | null
           sysdate?: string | null
           sysuser?: string | null
+          xcategparentid?: number | null
           xcategprodcode: string
           xcategprodid?: number
           xcategprodinfobulle: string
@@ -762,12 +764,21 @@ export type Database = {
           sysadresseip?: string | null
           sysdate?: string | null
           sysuser?: string | null
+          xcategparentid?: number | null
           xcategprodcode?: string
           xcategprodid?: number
           xcategprodinfobulle?: string
           xcategprodintitule?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "xcategprod_xcategparentid_fkey"
+            columns: ["xcategparentid"]
+            isOneToOne: false
+            referencedRelation: "xcategprod"
+            referencedColumns: ["xcategprodid"]
+          },
+        ]
       }
       xcouleur: {
         Row: {
