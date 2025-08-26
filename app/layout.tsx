@@ -1,6 +1,7 @@
 import localFont from 'next/font/local'
 import './globals.css'
 import ClientProviders from './_components/client-providers'
+import { ConsentManagerProvider, CookieBanner, ConsentManagerDialog } from '@c15t/nextjs';
 
 const supreme = localFont({
     src: [
@@ -32,7 +33,18 @@ export default function RootLayout({
     return (
         <html lang="en" className={`${supreme.variable} ${recia.variable}`}>
             <body className="antialiased">
-                <ClientProviders>{children}</ClientProviders>
+                <ConsentManagerProvider
+                    options={{
+                        mode: 'c15t',
+                        backendURL: process.env.NEXT_PUBLIC_C15T_URL,
+                    }}
+                >
+                    <ClientProviders>{children}</ClientProviders>
+                    {/* Banner that shows at the bottom or top */}
+                    <CookieBanner />
+                    {/* Dialog for managing consent */}
+                    <ConsentManagerDialog />
+                </ConsentManagerProvider>
             </body>
         </html>
     )
