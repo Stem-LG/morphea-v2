@@ -202,7 +202,7 @@ export default function Home() {
                 <div className="absolute bottom-40 left-0 z-50 flex w-full justify-between px-14">
                     <button
                         onClick={togglePlayPause}
-                        className=" flex h-12 w-12 items-center justify-center"
+                        className="flex h-12 w-12 items-center justify-center"
                         aria-label={isPlaying ? 'Pause video' : 'Play video'}
                     >
                         {isPlaying ? (
@@ -213,7 +213,7 @@ export default function Home() {
                     </button>
                     <button
                         onClick={toggleMute}
-                        className=" flex h-12 w-12 items-center justify-center"
+                        className="flex h-12 w-12 items-center justify-center"
                         aria-label={isMuted ? 'Unmute video' : 'Mute video'}
                     >
                         {isMuted ? (
@@ -229,19 +229,19 @@ export default function Home() {
             <section className="relative z-20 bg-white py-20">
                 <div className="mx-auto max-w-7xl px-8">
                     <div className="mb-16 text-center">
-                        <h2 className="mb-6 font-serif text-4xl font-extrabold text-[#053340] md:text-5xl">
+                        <h2 className="font-recia mb-16 text-5xl font-extrabold text-[#053340] md:text-5xl">
                             Découvrez Nos Défilé
                         </h2>
-                        <p className="mx-auto max-w-2xl text-lg text-gray-600">
+                        <p className="font-supreme mx-auto max-w-4xl text-2xl text-gray-600">
                             {
                                 "Plongez dans l'univers exclusif de nos collections à travers des présentations exceptionnelles"
                             }
                         </p>
                     </div>
 
-                    <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+                    <div className="flex justify-center gap-16">
                         {collectionData.card1 && (
-                            <div className="group relative cursor-pointer overflow-hidden rounded-2xl">
+                            <div className="group relative w-[500px] cursor-pointer overflow-hidden rounded-2xl">
                                 <img
                                     src={collectionData.card1.image}
                                     alt={collectionData.card1.title}
@@ -249,10 +249,10 @@ export default function Home() {
                                 />
                                 <div className="absolute inset-0 bg-black/20 transition-colors duration-300 group-hover:bg-black/30" />
                                 <div className="absolute bottom-8 left-8 text-white">
-                                    <h3 className="mb-2 font-serif text-3xl font-extrabold">
+                                    <h3 className="font-recia mb-2 text-4xl font-extrabold">
                                         {collectionData.card1.title}
                                     </h3>
-                                    <p className="text-lg opacity-90">
+                                    <p className="font-supreme text-2xl font-semibold opacity-90">
                                         {collectionData.card1.subtitle}
                                     </p>
                                 </div>
@@ -260,7 +260,7 @@ export default function Home() {
                         )}
 
                         {collectionData.card2 && (
-                            <div className="group relative cursor-pointer overflow-hidden rounded-2xl">
+                            <div className="group relative w-[500px] cursor-pointer overflow-hidden rounded-2xl">
                                 <img
                                     src={collectionData.card2.image}
                                     alt={collectionData.card2.title}
@@ -268,10 +268,10 @@ export default function Home() {
                                 />
                                 <div className="absolute inset-0 bg-black/20 transition-colors duration-300 group-hover:bg-black/30" />
                                 <div className="absolute bottom-8 left-8 text-white">
-                                    <h3 className="mb-2 font-serif text-3xl font-extrabold">
+                                    <h3 className="font-recia mb-2 text-4xl font-extrabold">
                                         {collectionData.card2.title}
                                     </h3>
-                                    <p className="text-lg opacity-90">
+                                    <p className="font-supreme text-xl opacity-90">
                                         {collectionData.card2.subtitle}
                                     </p>
                                 </div>
