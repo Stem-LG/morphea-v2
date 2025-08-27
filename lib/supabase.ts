@@ -747,6 +747,7 @@ export type Database = {
           xcategprodid: number
           xcategprodinfobulle: string
           xcategprodintitule: string
+          xcategprodmediaid: number | null
         }
         Insert: {
           sysaction?: string | null
@@ -758,6 +759,7 @@ export type Database = {
           xcategprodid?: number
           xcategprodinfobulle: string
           xcategprodintitule: string
+          xcategprodmediaid?: number | null
         }
         Update: {
           sysaction?: string | null
@@ -769,6 +771,7 @@ export type Database = {
           xcategprodid?: number
           xcategprodinfobulle?: string
           xcategprodintitule?: string
+          xcategprodmediaid?: number | null
         }
         Relationships: [
           {
@@ -777,6 +780,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "xcategprod"
             referencedColumns: ["xcategprodid"]
+          },
+          {
+            foreignKeyName: "xcategprod_xcategprodmediaid_fkey"
+            columns: ["xcategprodmediaid"]
+            isOneToOne: false
+            referencedRelation: "ymedia"
+            referencedColumns: ["ymediaid"]
           },
         ]
       }

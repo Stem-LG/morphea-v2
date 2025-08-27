@@ -416,7 +416,9 @@ export const enTranslations = {
       "updateCategory": "Update Category",
       "hierarchicalView": "Hierarchical View",
       "addSubcategory": "Add Subcategory",
-      "parentCategory": "Parent Category"
+      "parentCategory": "Parent Category",
+      "categoryImage":"Category Image",
+      "noParent": "No Parent Category"
     },
     "approvals": {
       "title": "Product Approvals",

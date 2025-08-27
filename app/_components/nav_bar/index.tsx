@@ -42,6 +42,7 @@ import { Button } from '@/components/ui/button'
 import { useCategories } from '@/hooks/useCategories'
 import { organizeCategoriesIntoTree } from '@/app/admin/categories/_components/category-tree-utils'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { CategoryImageHeader } from './category-image-header'
 
 export default function NavBar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -248,12 +249,11 @@ export default function NavBar() {
 // Component for rendering category navigation with subcategories
 function CategoryNavigation({
     onCategoryClick,
+    onParentCategoryClick,
 }: {
     onCategoryClick?: () => void
+    onParentCategoryClick?: (category: any) => void
 }) {
-    const [expandedCategories, setExpandedCategories] = useState<Set<number>>(
-        new Set()
-    )
     const { data: categories, isLoading } = useCategories()
 
     if (isLoading) {
@@ -276,20 +276,8 @@ function CategoryNavigation({
         categories.map((cat) => ({ ...cat, yprod: [{ count: 0 }] }))
     )
 
-    const toggleCategory = (categoryId: number) => {
-        const newExpanded = new Set(expandedCategories)
-        if (newExpanded.has(categoryId)) {
-            newExpanded.delete(categoryId)
-        } else {
-            newExpanded.add(categoryId)
-        }
-        setExpandedCategories(newExpanded)
-    }
-
-    const renderCategory = (category: any, level: number = 0) => {
+    const renderCategory = (category: any) => {
         const hasChildren = category.children && category.children.length > 0
-        const isExpanded = expandedCategories.has(category.xcategprodid)
-        const paddingLeft = level * 16
 
         return (
             <div key={category.xcategprodid}>
@@ -297,24 +285,18 @@ function CategoryNavigation({
                     <Button
                         variant="ghost"
                         className="hover:text-morpheus-blue-dark h-12 w-full justify-between rounded-none text-lg text-neutral-600 hover:bg-gray-50"
-                        onClick={() => toggleCategory(category.xcategprodid)}
-                        style={{ paddingLeft: `${paddingLeft + 24}px` }}
+                        onClick={() => onParentCategoryClick?.(category)}
                     >
                         <span className="flex-1 text-left">
                             {category.xcategprodintitule}
                         </span>
-                        {isExpanded ? (
-                            <ChevronDown className="size-5" />
-                        ) : (
-                            <ChevronRight className="size-5" />
-                        )}
+                        <ChevronRight className="size-5" />
                     </Button>
                 ) : (
                     <Button
                         variant="ghost"
                         className="hover:text-morpheus-blue-dark h-12 w-full justify-start rounded-none text-lg text-neutral-600 hover:bg-gray-50"
                         asChild
-                        style={{ paddingLeft: `${paddingLeft + 24}px` }}
                     >
                         <Link
                             href={`/shop?category=${category.xcategprodid}`}
@@ -323,13 +305,6 @@ function CategoryNavigation({
                             {category.xcategprodintitule}
                         </Link>
                     </Button>
-                )}
-                {hasChildren && isExpanded && (
-                    <div className="bg-gray-50">
-                        {category.children.map((child: any) =>
-                            renderCategory(child, level + 1)
-                        )}
-                    </div>
                 )}
                 <Separator />
             </div>
@@ -358,6 +333,19 @@ function NavBarSheet({
     setIsMenuOpen: any
 }) {
     const [showCategories, setShowCategories] = useState(false)
+    const [selectedParentCategory, setSelectedParentCategory] =
+        useState<any>(null)
+    const [showSubcategories, setShowSubcategories] = useState(false)
+
+    const handleParentCategoryClick = (category: any) => {
+        setSelectedParentCategory(category)
+        setShowSubcategories(true)
+    }
+
+    const handleBackToCategories = () => {
+        setShowSubcategories(false)
+        setSelectedParentCategory(null)
+    }
 
     const navbarItems: NavbarItem[] = [
         { name: 'Visite Virtuelle', href: '/main' },
@@ -382,106 +370,179 @@ function NavBarSheet({
     return (
         <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
             <SheetTitle />
-            <SheetContent side="left" className="flex h-full flex-col bg-white">
+            <SheetContent
+                side="left"
+                className={`flex h-full bg-white transition-all duration-300 ${
+                    showSubcategories
+                        ? 'w-[min(400px,90vw)] sm:w-[min(800px,90vw)] sm:max-w-[90vw]'
+                        : 'w-[min(400px,90vw)] sm:max-w-[90vw]'
+                }`}
+            >
+                {/* Close button - positioned relative to the entire sheet */}
                 <SheetClose>
                     <div className="absolute top-10 right-7 z-10">
                         <XIcon className="size-5" />
                     </div>
                 </SheetClose>
 
-                {/* Fixed Header */}
-                <div className="flex-shrink-0">
-                    <div className="flex items-center justify-center py-4 text-3xl">
-                        <h1 className="font-recia font-medium">Menu</h1>
-                    </div>
-                    <Separator />
-                </div>
+                <div className="flex h-full w-full">
+                    {/* Main Navigation Column */}
+                    <div
+                        className={`flex h-full flex-col overflow-hidden ${
+                            showSubcategories
+                                ? 'hidden sm:flex sm:w-[min(400px,50%)] sm:border-r sm:border-gray-200'
+                                : 'w-full'
+                        }`}
+                    >
+                        {/* Fixed Header */}
+                        <div className="flex-shrink-0">
+                            <div className="flex items-center justify-center py-4 text-3xl">
+                                <h1 className="font-recia font-medium">Menu</h1>
+                            </div>
+                            <Separator />
+                        </div>
 
-                {/* Scrollable Content Area */}
-                <ScrollArea className="flex-1 overflow-hidden">
-                    <div className="flex flex-col px-6">
-                        {navbarItems.map((item) => {
-                            const hasHref = !!item.href
-                            const hasAction = !!item.action
-                            const isCategories = item.name === 'Categories'
+                        {/* Scrollable Content Area */}
+                        <ScrollArea className="flex-1 overflow-hidden">
+                            <div className="flex flex-col px-6">
+                                {navbarItems.map((item) => {
+                                    const hasHref = !!item.href
+                                    const hasAction = !!item.action
+                                    const isCategories =
+                                        item.name === 'Categories'
 
-                            return (
-                                <Fragment key={item.name}>
-                                    <Button
-                                        variant="ghost"
-                                        className="font-supreme hover:bg-morpheus-blue-lighter h-14 justify-between rounded-none text-xl text-neutral-400 hover:text-white"
-                                        asChild={hasHref}
-                                        onClick={
-                                            hasAction ? item.action : undefined
-                                        }
-                                    >
-                                        {hasHref ? (
-                                            <Link href={item.href!}>
-                                                {item.name}
-                                            </Link>
-                                        ) : (
-                                            <>
-                                                <span className="ml-1">
-                                                    {item.name}
-                                                </span>
-                                                {isCategories &&
-                                                    (showCategories ? (
-                                                        <ChevronDown className="size-6" />
-                                                    ) : (
-                                                        <ChevronRight className="size-6" />
-                                                    ))}
-                                            </>
-                                        )}
-                                    </Button>
-                                    <Separator />
-                                    {isCategories && showCategories && (
-                                        <div className="mb-4">
-                                            <CategoryNavigation
-                                                onCategoryClick={() =>
-                                                    setIsMenuOpen(false)
+                                    return (
+                                        <Fragment key={item.name}>
+                                            <Button
+                                                variant="ghost"
+                                                className="font-supreme hover:bg-morpheus-blue-lighter h-14 justify-between rounded-none text-xl text-neutral-400 hover:text-white"
+                                                asChild={hasHref}
+                                                onClick={
+                                                    hasAction
+                                                        ? item.action
+                                                        : undefined
                                                 }
-                                            />
-                                        </div>
-                                    )}
-                                </Fragment>
-                            )
-                        })}
-                    </div>
-
-                    {/* Footer Items within Scrollable Area */}
-                    <div className="mt-8 px-6 pb-4">
-                        <Separator className="mb-4" />
-                        <div className="flex flex-col px-2">
-                            {navbarFooterItems.map((item) => {
-                                const hasOnClick = !!item.onclick
-                                const hasHref = !!item.href
-
-                                return (
-                                    <Fragment key={item.name}>
-                                        <Button
-                                            variant="ghost"
-                                            className={cn(
-                                                'font-supreme h-12 justify-start rounded-none text-lg text-neutral-400',
-                                                hasOnClick && 'w-full text-left'
+                                            >
+                                                {hasHref ? (
+                                                    <Link href={item.href!}>
+                                                        {item.name}
+                                                    </Link>
+                                                ) : (
+                                                    <>
+                                                        <span className="ml-1">
+                                                            {item.name}
+                                                        </span>
+                                                        {isCategories &&
+                                                            (showCategories ? (
+                                                                <ChevronDown className="size-6" />
+                                                            ) : (
+                                                                <ChevronRight className="size-6" />
+                                                            ))}
+                                                    </>
+                                                )}
+                                            </Button>
+                                            <Separator />
+                                            {isCategories && showCategories && (
+                                                <div className="mb-4">
+                                                    <CategoryNavigation
+                                                        onCategoryClick={() =>
+                                                            setIsMenuOpen(false)
+                                                        }
+                                                        onParentCategoryClick={
+                                                            handleParentCategoryClick
+                                                        }
+                                                    />
+                                                </div>
                                             )}
-                                            onClick={item.onclick}
-                                            asChild={hasHref}
-                                        >
-                                            {hasHref ? (
-                                                <Link href={item.href!}>
-                                                    {item.name}
-                                                </Link>
-                                            ) : (
-                                                item.name
-                                            )}
-                                        </Button>
-                                        <Separator />
-                                    </Fragment>
-                                )
-                            })}
+                                        </Fragment>
+                                    )
+                                })}
+                            </div>
+                        </ScrollArea>
+
+                        {/* Footer Items within Scrollable Area */}
+                        <div className="mt-2 px-6 pb-4">
+                            <Separator className="mb-4" />
+                            <div className="flex flex-col px-2">
+                                {navbarFooterItems.map((item) => {
+                                    const hasOnClick = !!item.onclick
+                                    const hasHref = !!item.href
+
+                                    return (
+                                        <Fragment key={item.name}>
+                                            <Button
+                                                variant="ghost"
+                                                className={cn(
+                                                    'font-supreme h-12 justify-start rounded-none text-lg text-neutral-400',
+                                                    hasOnClick &&
+                                                        'w-full text-left'
+                                                )}
+                                                onClick={item.onclick}
+                                                asChild={hasHref}
+                                            >
+                                                {hasHref ? (
+                                                    <Link href={item.href!}>
+                                                        {item.name}
+                                                    </Link>
+                                                ) : (
+                                                    item.name
+                                                )}
+                                            </Button>
+                                            <Separator />
+                                        </Fragment>
+                                    )
+                                })}
+                            </div>
                         </div>
                     </div>
-                </ScrollArea>
+
+                    {/* Subcategory Column - Only visible when a parent category is selected */}
+                    {showSubcategories && selectedParentCategory && (
+                        <div className="-top-4 left-[1px] flex h-full w-full flex-col overflow-hidden relative sm:w-[min(400px,50%)]">
+                            {/* Category Image Header */}
+                            <div className="flex-shrink-0">
+                                <CategoryImageHeader
+                                    category={selectedParentCategory}
+                                    onBack={handleBackToCategories}
+                                />
+                            </div>
+
+                            {/* Scrollable Subcategories */}
+                            <ScrollArea className="flex-1 overflow-hidden">
+                                <div className="flex flex-col px-6 py-4">
+                                    {selectedParentCategory?.children?.map(
+                                        (subcategory: any) => (
+                                            <Fragment
+                                                key={subcategory.xcategprodid}
+                                            >
+                                                <Button
+                                                    variant="ghost"
+                                                    className="font-supreme hover:bg-morpheus-blue-lighter h-14 justify-start rounded-none text-xl text-neutral-400 hover:text-white"
+                                                    asChild
+                                                >
+                                                    <Link
+                                                        href={`/shop?category=${subcategory.xcategprodid}`}
+                                                        onClick={() => {
+                                                            setIsMenuOpen(false)
+                                                            setShowSubcategories(
+                                                                false
+                                                            )
+                                                        }}
+                                                    >
+                                                        {
+                                                            subcategory.xcategprodintitule
+                                                        }
+                                                    </Link>
+                                                </Button>
+                                                <Separator />
+                                            </Fragment>
+                                        )
+                                    )}
+                                </div>
+                            </ScrollArea>
+                        </div>
+                    )}
+                </div>
             </SheetContent>
         </Sheet>
     )

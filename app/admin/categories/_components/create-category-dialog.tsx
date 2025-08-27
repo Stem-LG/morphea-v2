@@ -1,13 +1,13 @@
-"use client";
+'use client'
 
-import { useState } from "react";
-import { useLanguage } from "@/hooks/useLanguage";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Tag, Save, X } from "lucide-react";
-import { toast } from "sonner";
+import { useState } from 'react'
+import { useLanguage } from '@/hooks/useLanguage'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { Tag, Save, X, Upload, Image as ImageIcon } from 'lucide-react'
+import { toast } from 'sonner'
 import {
     Credenza,
     CredenzaTrigger,
@@ -16,158 +16,303 @@ import {
     CredenzaTitle,
     CredenzaBody,
     CredenzaFooter,
-} from "@/components/ui/credenza";
-import { useCreateCategory } from "@/hooks/useCategories";
-import { SuperSelect } from "@/components/super-select";
-import type { Database } from "@/lib/supabase";
+} from '@/components/ui/credenza'
+import { useCreateCategory } from '@/hooks/useCategories'
+import { SuperSelect } from '@/components/super-select'
+import { Card, CardContent } from '@/components/ui/card'
+import type { Database } from '@/lib/supabase'
 
-type Category = Database['morpheus']['Tables']['xcategprod']['Row'];
+type Category = Database['morpheus']['Tables']['xcategprod']['Row']
 
 interface CategoryFormData {
-    xcategprodintitule: string;
-    xcategprodcode: string;
-    xcategprodinfobulle: string;
-    xcategparentid: number | null;
+    xcategprodintitule: string
+    xcategprodcode: string
+    xcategprodinfobulle: string
+    xcategparentid: number | null
+    imageFile?: File
 }
 
 interface CreateCategoryDialogProps {
-    children: React.ReactNode;
-    categories: (Category & { parent?: Pick<Category, 'xcategprodid' | 'xcategprodintitule' | 'xcategprodcode'> | null; yprod: { count: number }[] })[];
-    defaultParentId?: number | null;
+    children: React.ReactNode
+    categories: (Category & {
+        parent?: Pick<
+            Category,
+            'xcategprodid' | 'xcategprodintitule' | 'xcategprodcode'
+        > | null
+        yprod: { count: number }[]
+    })[]
+    defaultParentId?: number | null
 }
 
-export function CreateCategoryDialog({ children, categories, defaultParentId = null }: CreateCategoryDialogProps) {
-    const { t } = useLanguage();
-    const [isOpen, setIsOpen] = useState(false);
+export function CreateCategoryDialog({
+    children,
+    categories,
+    defaultParentId = null,
+}: CreateCategoryDialogProps) {
+    const { t } = useLanguage()
+    const [isOpen, setIsOpen] = useState(false)
     const [formData, setFormData] = useState<CategoryFormData>({
-        xcategprodintitule: "",
-        xcategprodcode: "",
-        xcategprodinfobulle: "",
-        xcategparentid: defaultParentId
-    });
+        xcategprodintitule: '',
+        xcategprodcode: '',
+        xcategprodinfobulle: '',
+        xcategparentid: defaultParentId,
+    })
+    const [imagePreview, setImagePreview] = useState<string | null>(null)
 
-    const createCategoryMutation = useCreateCategory();
+    const createCategoryMutation = useCreateCategory()
 
     const resetForm = () => {
         setFormData({
-            xcategprodintitule: "",
-            xcategprodcode: "",
-            xcategprodinfobulle: "",
-            xcategparentid: defaultParentId
-        });
-    };
+            xcategprodintitule: '',
+            xcategprodcode: '',
+            xcategprodinfobulle: '',
+            xcategparentid: defaultParentId,
+        })
+        setImagePreview(null)
+    }
+
+    const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0]
+        if (file) {
+            setFormData((prev) => ({ ...prev, imageFile: file }))
+
+            // Create preview URL
+            const reader = new FileReader()
+            reader.onload = (e) => {
+                setImagePreview(e.target?.result as string)
+            }
+            reader.readAsDataURL(file)
+        }
+    }
+
+    const removeImage = () => {
+        setFormData((prev) => ({ ...prev, imageFile: undefined }))
+        setImagePreview(null)
+    }
 
     const validateForm = () => {
-        return formData.xcategprodintitule.trim() !== "" &&
-               formData.xcategprodcode.trim() !== "" &&
-               formData.xcategprodinfobulle.trim() !== "";
-    };
+        return (
+            formData.xcategprodintitule.trim() !== '' &&
+            formData.xcategprodcode.trim() !== '' &&
+            formData.xcategprodinfobulle.trim() !== ''
+        )
+    }
 
     const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        
+        e.preventDefault()
+
         if (!validateForm()) {
-            toast.error(t("admin.categories.fillRequiredFields"));
-            return;
+            toast.error(t('admin.categories.fillRequiredFields'))
+            return
         }
 
         try {
-            const { xcategparentid, ...restFormData } = formData;
+            const { xcategparentid, ...restFormData } = formData
             await createCategoryMutation.mutateAsync({
                 ...restFormData,
-                xcategparentid: xcategparentid || null
-            });
-            resetForm();
-            setIsOpen(false);
-            toast.success(t("admin.categories.categoryCreatedSuccess"));
+                xcategparentid: xcategparentid || null,
+            })
+            resetForm()
+            setIsOpen(false)
+            toast.success(t('admin.categories.categoryCreatedSuccess'))
         } catch (error) {
-            console.error('Failed to create category:', error);
-            const errorMessage = error instanceof Error ? error.message : t("admin.categories.failedToCreateCategory");
-            toast.error(errorMessage);
+            console.error('Failed to create category:', error)
+            const errorMessage =
+                error instanceof Error
+                    ? error.message
+                    : t('admin.categories.failedToCreateCategory')
+            toast.error(errorMessage)
         }
-    };
+    }
 
     const handleDialogChange = (open: boolean) => {
         if (!open) {
-            resetForm();
+            resetForm()
         } else {
             // Reset form when opening dialog to ensure defaultParentId is set
             setFormData({
-                xcategprodintitule: "",
-                xcategprodcode: "",
-                xcategprodinfobulle: "",
-                xcategparentid: defaultParentId
-            });
+                xcategprodintitule: '',
+                xcategprodcode: '',
+                xcategprodinfobulle: '',
+                xcategparentid: defaultParentId,
+            })
         }
-        setIsOpen(open);
-    };
+        setIsOpen(open)
+    }
 
     return (
         <Credenza open={isOpen} onOpenChange={handleDialogChange}>
             <CredenzaTrigger asChild>{children}</CredenzaTrigger>
-            <CredenzaContent className="bg-gradient-to-br from-morpheus-blue-dark to-morpheus-blue-light border-slate-700/50 max-w-2xl">
+            <CredenzaContent className="from-morpheus-blue-dark to-morpheus-blue-light max-w-2xl border-slate-700/50 bg-gradient-to-br">
                 <CredenzaHeader>
-                    <CredenzaTitle className="text-white flex items-center gap-2">
-                        <Tag className="h-5 w-5 text-morpheus-gold-light" />
-                        {t("admin.categories.addNewCategory")}
+                    <CredenzaTitle className="flex items-center gap-2 text-white">
+                        <Tag className="text-morpheus-gold-light h-5 w-5" />
+                        {t('admin.categories.addNewCategory')}
                     </CredenzaTitle>
                 </CredenzaHeader>
 
                 <form onSubmit={handleSubmit}>
                     <CredenzaBody className="space-y-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                             <div className="space-y-2">
-                                <Label className="text-gray-300">{t("admin.categories.categoryName")} *</Label>
+                                <Label className="text-gray-300">
+                                    {t('admin.categories.categoryName')} *
+                                </Label>
                                 <Input
                                     value={formData.xcategprodintitule}
-                                    onChange={(e) => setFormData(prev => ({ ...prev, xcategprodintitule: e.target.value }))}
+                                    onChange={(e) =>
+                                        setFormData((prev) => ({
+                                            ...prev,
+                                            xcategprodintitule: e.target.value,
+                                        }))
+                                    }
                                     className="bg-morpheus-blue-dark/30 border-slate-600 text-white"
-                                    placeholder={t("admin.categories.categoryNamePlaceholder")}
+                                    placeholder={t(
+                                        'admin.categories.categoryNamePlaceholder'
+                                    )}
                                     required
                                     disabled={createCategoryMutation.isPending}
                                 />
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-gray-300">{t("admin.categories.categoryCode")} *</Label>
+                                <Label className="text-gray-300">
+                                    {t('admin.categories.categoryCode')} *
+                                </Label>
                                 <Input
                                     value={formData.xcategprodcode}
-                                    onChange={(e) => setFormData(prev => ({ ...prev, xcategprodcode: e.target.value.toUpperCase() }))}
+                                    onChange={(e) =>
+                                        setFormData((prev) => ({
+                                            ...prev,
+                                            xcategprodcode:
+                                                e.target.value.toUpperCase(),
+                                        }))
+                                    }
                                     className="bg-morpheus-blue-dark/30 border-slate-600 text-white"
-                                    placeholder={t("admin.categories.categoryCodePlaceholder")}
+                                    placeholder={t(
+                                        'admin.categories.categoryCodePlaceholder'
+                                    )}
                                     required
                                     disabled={createCategoryMutation.isPending}
                                 />
                             </div>
                         </div>
-                        
+
                         <div className="space-y-2">
-                            <Label className="text-gray-300">{t("admin.categories.description")} *</Label>
+                            <Label className="text-gray-300">
+                                {t('admin.categories.description')} *
+                            </Label>
                             <Textarea
                                 value={formData.xcategprodinfobulle}
-                                onChange={(e) => setFormData(prev => ({ ...prev, xcategprodinfobulle: e.target.value }))}
+                                onChange={(e) =>
+                                    setFormData((prev) => ({
+                                        ...prev,
+                                        xcategprodinfobulle: e.target.value,
+                                    }))
+                                }
                                 className="bg-morpheus-blue-dark/30 border-slate-600 text-white"
-                                placeholder={t("admin.categories.descriptionPlaceholder")}
+                                placeholder={t(
+                                    'admin.categories.descriptionPlaceholder'
+                                )}
                                 rows={3}
                                 required
                                 disabled={createCategoryMutation.isPending}
                             />
                         </div>
-                        
+
+                        {/* Category Image Upload */}
                         <div className="space-y-2">
-                            <Label className="text-gray-300">{t("admin.categories.parentCategory")}</Label>
+                            <Label className="text-gray-300">
+                                {t('admin.categories.categoryImage')}
+                            </Label>
+
+                            {imagePreview ? (
+                                <div className="space-y-2">
+                                    <div className="relative">
+                                        <img
+                                            src={imagePreview}
+                                            alt="Category preview"
+                                            className="h-32 w-full rounded-lg border border-slate-600 object-cover"
+                                        />
+                                        <Button
+                                            type="button"
+                                            variant="destructive"
+                                            size="sm"
+                                            onClick={removeImage}
+                                            className="absolute top-2 right-2"
+                                            disabled={
+                                                createCategoryMutation.isPending
+                                            }
+                                        >
+                                            <X className="h-4 w-4" />
+                                        </Button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <Card className="border-dashed border-gray-600 bg-gray-800/30">
+                                    <CardContent className="flex flex-col items-center justify-center py-6">
+                                        <Upload className="mb-2 h-8 w-8 text-gray-400" />
+                                        <div className="text-center">
+                                            <Label
+                                                htmlFor="category-image-upload"
+                                                className="text-morpheus-gold-light hover:text-morpheus-gold-dark cursor-pointer text-sm"
+                                            >
+                                                {t(
+                                                    'admin.categories.clickToUploadImage'
+                                                )}
+                                            </Label>
+                                            <p className="mt-1 text-xs text-gray-400">
+                                                PNG, JPG, JPEG up to 10MB
+                                            </p>
+                                        </div>
+                                        <Input
+                                            id="category-image-upload"
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={handleImageSelect}
+                                            className="hidden"
+                                            disabled={
+                                                createCategoryMutation.isPending
+                                            }
+                                        />
+                                    </CardContent>
+                                </Card>
+                            )}
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label className="text-gray-300">
+                                {t('admin.categories.parentCategory')}
+                            </Label>
                             <SuperSelect
-                                value={formData.xcategparentid?.toString() || ""}
-                                onValueChange={(value) => setFormData(prev => ({ ...prev, xcategparentid: value !== "" ? parseInt(value as string) : null }))}
+                                value={
+                                    formData.xcategparentid?.toString() || ''
+                                }
+                                onValueChange={(value) =>
+                                    setFormData((prev) => ({
+                                        ...prev,
+                                        xcategparentid:
+                                            value !== ''
+                                                ? parseInt(value as string)
+                                                : null,
+                                    }))
+                                }
                                 options={[
-                                    { value: "", label: t("admin.categories.noParent") },
+                                    {
+                                        value: '',
+                                        label: t('admin.categories.noParent'),
+                                    },
                                     ...categories
-                                        .filter(cat => cat.xcategparentid === null) // Only show top-level categories as parents
-                                        .map(cat => ({
+                                        .filter(
+                                            (cat) => cat.xcategparentid === null
+                                        ) // Only show top-level categories as parents
+                                        .map((cat) => ({
                                             value: cat.xcategprodid.toString(),
-                                            label: cat.xcategprodintitule
-                                        }))
+                                            label: cat.xcategprodintitule,
+                                        })),
                                 ]}
-                                placeholder={t("admin.categories.selectParentCategory")}
+                                placeholder={t(
+                                    'admin.categories.selectParentCategory'
+                                )}
                                 disabled={createCategoryMutation.isPending}
                             />
                         </div>
@@ -181,20 +326,25 @@ export function CreateCategoryDialog({ children, categories, defaultParentId = n
                             disabled={createCategoryMutation.isPending}
                             className="flex-1 border-slate-600 text-gray-300 hover:bg-slate-700/50"
                         >
-                            <X className="h-4 w-4 mr-2" />
-                            {t("common.cancel")}
+                            <X className="mr-2 h-4 w-4" />
+                            {t('common.cancel')}
                         </Button>
                         <Button
                             type="submit"
-                            disabled={!validateForm() || createCategoryMutation.isPending}
-                            className="flex-1 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white"
+                            disabled={
+                                !validateForm() ||
+                                createCategoryMutation.isPending
+                            }
+                            className="flex-1 bg-gradient-to-r from-green-600 to-green-500 text-white hover:from-green-700 hover:to-green-600"
                         >
-                            <Save className="h-4 w-4 mr-2" />
-                            {createCategoryMutation.isPending ? t("admin.categories.creating") : t("admin.categories.createCategory")}
+                            <Save className="mr-2 h-4 w-4" />
+                            {createCategoryMutation.isPending
+                                ? t('admin.categories.creating')
+                                : t('admin.categories.createCategory')}
                         </Button>
                     </CredenzaFooter>
                 </form>
             </CredenzaContent>
         </Credenza>
-    );
+    )
 }

@@ -437,7 +437,9 @@ export const frTranslations = {
       "updateCategory": "Mettre à jour la Catégorie",
       "hierarchicalView": "Vue Hiérarchique",
       "addSubcategory": "Ajouter Sous-catégorie",
-      "parentCategory": "Catégorie Parente"
+      "parentCategory": "Catégorie Parente",
+      "categoryImage": "Image de la Catégorie",
+      "noParent": "Aucune Catégorie Parente"
     },
     "approvals": {
       "title": "Approbations de Produits",

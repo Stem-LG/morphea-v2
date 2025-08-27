@@ -1,14 +1,14 @@
-"use client";
-import React, { useState } from "react";
-import { useLanguage } from "@/hooks/useLanguage";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+'use client'
+import React, { useState } from 'react'
+import { useLanguage } from '@/hooks/useLanguage'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 import {
     Collapsible,
     CollapsibleContent,
     CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+} from '@/components/ui/collapsible'
 import {
     ChevronRight,
     ChevronDown,
@@ -19,56 +19,62 @@ import {
     AlertTriangle,
     Folder,
     FolderOpen,
-    Plus
-} from "lucide-react";
-import {
-    useDeleteCategory
-} from "@/hooks/useCategories";
-import { CreateCategoryDialog } from "./create-category-dialog";
-import { UpdateCategoryDialog } from "./update-category-dialog";
-import { CategoryTreeNode, getTotalProductCount } from "./category-tree-utils";
+    Plus,
+    Image as ImageIcon,
+} from 'lucide-react'
+import { useDeleteCategory } from '@/hooks/useCategories'
+import { CreateCategoryDialog } from './create-category-dialog'
+import { UpdateCategoryDialog } from './update-category-dialog'
+import { CategoryTreeNode, getTotalProductCount } from './category-tree-utils'
 
 interface CategoryTreeItemProps {
-    category: CategoryTreeNode;
-    allCategories: any[]; // Flat array of original categories for dialogs
-    level?: number;
+    category: CategoryTreeNode
+    allCategories: any[] // Flat array of original categories for dialogs
+    level?: number
 }
 
-export function CategoryTreeItem({ category, allCategories, level = 0 }: CategoryTreeItemProps) {
-    const [isOpen, setIsOpen] = useState(false);
-    const { t } = useLanguage();
-    const deleteCategoryMutation = useDeleteCategory();
+export function CategoryTreeItem({
+    category,
+    allCategories,
+    level = 0,
+}: CategoryTreeItemProps) {
+    const [isOpen, setIsOpen] = useState(false)
+    const { t } = useLanguage()
+    const deleteCategoryMutation = useDeleteCategory()
 
-    const productCount = category.yprod?.[0]?.count || 0;
-    const totalProductCount = getTotalProductCount(category);
-    const isInUse = totalProductCount > 0;
-    const hasChildren = category.children.length > 0;
+    const productCount = category.yprod?.[0]?.count || 0
+    const totalProductCount = getTotalProductCount(category)
+    const isInUse = totalProductCount > 0
+    const hasChildren = category.children.length > 0
 
     const handleDelete = async (categoryId: number) => {
-        if (confirm(t("admin.categories.confirmDelete"))) {
+        if (confirm(t('admin.categories.confirmDelete'))) {
             try {
-                await deleteCategoryMutation.mutateAsync(categoryId);
+                await deleteCategoryMutation.mutateAsync(categoryId)
             } catch (error) {
-                console.error('Failed to delete category:', error);
-                const errorMessage = error instanceof Error ? error.message : t("admin.categories.deleteError");
-                alert(errorMessage);
+                console.error('Failed to delete category:', error)
+                const errorMessage =
+                    error instanceof Error
+                        ? error.message
+                        : t('admin.categories.deleteError')
+                alert(errorMessage)
             }
         }
-    };
+    }
 
     return (
         <div className={`ml-${level * 4}`}>
-            <Card className="bg-gradient-to-br from-morpheus-blue-dark/40 to-morpheus-blue-light/40 border-slate-700/50 shadow-xl hover:shadow-2xl transition-all duration-300 mb-2">
+            <Card className="from-morpheus-blue-dark/40 to-morpheus-blue-light/40 mb-2 border-slate-700/50 bg-gradient-to-br shadow-xl transition-all duration-300 hover:shadow-2xl">
                 <CardContent className="px-4">
                     <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2 flex-1 min-w-0">
+                        <div className="flex min-w-0 flex-1 items-center gap-2">
                             {/* Expand/Collapse button */}
                             {hasChildren ? (
                                 <Button
                                     variant="ghost"
                                     size="sm"
                                     onClick={() => setIsOpen(!isOpen)}
-                                    className="p-0 h-6 w-6 hover:bg-slate-700/50 flex-shrink-0"
+                                    className="h-6 w-6 flex-shrink-0 p-0 hover:bg-slate-700/50"
                                 >
                                     {isOpen ? (
                                         <ChevronDown className="h-4 w-4 text-gray-300" />
@@ -77,96 +83,145 @@ export function CategoryTreeItem({ category, allCategories, level = 0 }: Categor
                                     )}
                                 </Button>
                             ) : (
-                                <div className="w-6 h-6 flex items-center justify-center flex-shrink-0">
+                                <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center">
                                     <Tag className="h-3 w-3 text-gray-400" />
                                 </div>
                             )}
-                            
-                            {/* Category icon */}
+
+                            {/* Category image or icon */}
                             <div className="flex-shrink-0">
-                                {hasChildren ? (
+                                {(category as any).media?.ymediaurl ? (
+                                    <div className="relative">
+                                        <img
+                                            src={
+                                                (category as any).media
+                                                    .ymediaurl
+                                            }
+                                            alt={category.xcategprodintitule}
+                                            className="h-8 w-8 rounded border border-slate-600 object-cover"
+                                        />
+                                        <div className="absolute -top-1 -right-1 rounded-full bg-green-500 p-0.5">
+                                            <ImageIcon className="h-2 w-2 text-white" />
+                                        </div>
+                                    </div>
+                                ) : hasChildren ? (
                                     isOpen ? (
-                                        <FolderOpen className="h-4 w-4 text-morpheus-gold-light" />
+                                        <FolderOpen className="text-morpheus-gold-light h-4 w-4" />
                                     ) : (
-                                        <Folder className="h-4 w-4 text-morpheus-gold-light" />
+                                        <Folder className="text-morpheus-gold-light h-4 w-4" />
                                     )
                                 ) : (
                                     <Tag className="h-4 w-4 text-blue-400" />
                                 )}
                             </div>
-                            
+
                             {/* Category info - name, code, and description in one line */}
-                            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 flex-1 min-w-0">
-                                <h3 className="text-white text-sm font-medium truncate">
+                            <div className="flex min-w-0 flex-1 flex-col gap-1 sm:flex-row sm:items-center sm:gap-3">
+                                <h3 className="truncate text-sm font-medium text-white">
                                     {category.xcategprodintitule}
                                 </h3>
                                 <div className="flex items-center gap-3 text-xs text-gray-400">
                                     <span className="flex-shrink-0">
-                                        <span className="font-medium">{t("admin.categories.code")}:</span>
-                                        <span className="text-white ml-1">{category.xcategprodcode}</span>
+                                        <span className="font-medium">
+                                            {t('admin.categories.code')}:
+                                        </span>
+                                        <span className="ml-1 text-white">
+                                            {category.xcategprodcode}
+                                        </span>
                                     </span>
                                     {category.xcategprodinfobulle && (
                                         <span className="truncate">
-                                            <span className="font-medium">{t("admin.categories.description")}:</span>
-                                            <span className="text-white ml-1">{category.xcategprodinfobulle}</span>
+                                            <span className="font-medium">
+                                                {t(
+                                                    'admin.categories.description'
+                                                )}
+                                                :
+                                            </span>
+                                            <span className="ml-1 text-white">
+                                                {category.xcategprodinfobulle}
+                                            </span>
                                         </span>
                                     )}
                                 </div>
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-2 flex-shrink-0">
+                        <div className="flex flex-shrink-0 items-center gap-2">
                             {/* Product count badge */}
                             {totalProductCount > 0 && (
-                                <Badge className="px-2 py-1 text-xs font-medium flex items-center gap-1 border text-green-400 bg-green-400/10 border-green-400/20">
+                                <Badge className="flex items-center gap-1 border border-green-400/20 bg-green-400/10 px-2 py-1 text-xs font-medium text-green-400">
                                     <Package className="h-3 w-3" />
                                     {totalProductCount}
-                                    {hasChildren && productCount !== totalProductCount && (
-                                        <span className="text-gray-400">({productCount})</span>
-                                    )}
+                                    {hasChildren &&
+                                        productCount !== totalProductCount && (
+                                            <span className="text-gray-400">
+                                                ({productCount})
+                                            </span>
+                                        )}
                                 </Badge>
                             )}
 
                             {/* Action buttons */}
                             <div className="flex gap-1">
                                 {/* Add subcategory */}
-                                <CreateCategoryDialog categories={allCategories} defaultParentId={category.xcategprodid}>
+                                <CreateCategoryDialog
+                                    categories={allCategories}
+                                    defaultParentId={category.xcategprodid}
+                                >
                                     <Button
                                         variant="ghost"
                                         size="sm"
-                                        className="p-1 h-6 w-6 text-gray-400 hover:text-morpheus-gold-light hover:bg-morpheus-gold-light/10"
-                                        title={t("admin.categories.addSubcategory")}
+                                        className="hover:text-morpheus-gold-light hover:bg-morpheus-gold-light/10 h-6 w-6 p-1 text-gray-400"
+                                        title={t(
+                                            'admin.categories.addSubcategory'
+                                        )}
                                     >
                                         <Plus className="h-3 w-3" />
                                     </Button>
                                 </CreateCategoryDialog>
 
                                 {/* Edit category */}
-                                <UpdateCategoryDialog category={category} categories={allCategories}>
+                                <UpdateCategoryDialog
+                                    category={category}
+                                    categories={allCategories}
+                                >
                                     <Button
                                         variant="ghost"
                                         size="sm"
-                                        className="p-1 h-6 w-6 text-gray-400 hover:text-blue-400 hover:bg-blue-400/10"
-                                        title={t("common.edit")}
+                                        className="h-6 w-6 p-1 text-gray-400 hover:bg-blue-400/10 hover:text-blue-400"
+                                        title={t('common.edit')}
                                     >
                                         <Edit className="h-3 w-3" />
                                     </Button>
                                 </UpdateCategoryDialog>
 
                                 {/* Delete category */}
-                                <span className={isInUse ? "cursor-not-allowed" : ""}>
+                                <span
+                                    className={
+                                        isInUse ? 'cursor-not-allowed' : ''
+                                    }
+                                >
                                     <Button
                                         variant="ghost"
                                         size="sm"
-                                        onClick={() => handleDelete(category.xcategprodid)}
-                                        disabled={deleteCategoryMutation.isPending || isInUse}
-                                        className={`p-1 h-6 w-6 ${isInUse
-                                            ? "text-gray-500 cursor-not-allowed"
-                                            : "text-gray-400 hover:text-red-400 hover:bg-red-400/10"
+                                        onClick={() =>
+                                            handleDelete(category.xcategprodid)
+                                        }
+                                        disabled={
+                                            deleteCategoryMutation.isPending ||
+                                            isInUse
+                                        }
+                                        className={`h-6 w-6 p-1 ${
+                                            isInUse
+                                                ? 'cursor-not-allowed text-gray-500'
+                                                : 'text-gray-400 hover:bg-red-400/10 hover:text-red-400'
                                         }`}
-                                        title={isInUse
-                                            ? `${t("admin.categories.cannotDelete")}: ${t("admin.categories.categoryUsedBy")} ${totalProductCount} ${t("admin.categories.product")}${totalProductCount !== 1 ? 's' : ''}`
-                                            : t("admin.categories.deleteCategory")
+                                        title={
+                                            isInUse
+                                                ? `${t('admin.categories.cannotDelete')}: ${t('admin.categories.categoryUsedBy')} ${totalProductCount} ${t('admin.categories.product')}${totalProductCount !== 1 ? 's' : ''}`
+                                                : t(
+                                                      'admin.categories.deleteCategory'
+                                                  )
                                         }
                                     >
                                         {isInUse ? (
@@ -200,5 +255,5 @@ export function CategoryTreeItem({ category, allCategories, level = 0 }: Categor
                 </CardContent>
             </Card>
         </div>
-    );
+    )
 }

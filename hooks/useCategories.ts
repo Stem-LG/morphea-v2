@@ -1,6 +1,8 @@
 import { createClient } from "@/lib/client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Database } from "@/lib/supabase";
+import { uploadFile } from "@/app/_hooks/use-upload-file";
+import { useCreateMedia } from "@/app/_hooks/use-create-media";
 
 type Category = Database['morpheus']['Tables']['xcategprod']['Row'];
 type CategoryInsert = Database['morpheus']['Tables']['xcategprod']['Insert'];
@@ -16,7 +18,15 @@ export function useCategories() {
             const { data, error } = await supabase
                 .schema("morpheus")
                 .from("xcategprod")
-                .select("*")
+                .select(`
+                    *,
+                    media:xcategprodmediaid(
+                        ymediaid,
+                        ymediaurl,
+                        ymediaintitule,
+                        ymediacode
+                    )
+                `)
                 .order("xcategprodintitule", { ascending: true });
 
             if (error) {
@@ -24,7 +34,7 @@ export function useCategories() {
                 throw error;
             }
 
-            return data as Category[];
+            return data as (Category & { media?: any })[];
         },
     });
 }
@@ -62,14 +72,53 @@ export function useCreateCategory() {
     const supabase = createClient();
 
     return useMutation({
-        mutationFn: async (categoryData: Omit<CategoryInsert, 'xcategprodid' | 'sysdate' | 'sysaction' | 'sysuser' | 'sysadresseip'>) => {
+        mutationFn: async (categoryData: Omit<CategoryInsert, 'xcategprodid' | 'sysdate' | 'sysaction' | 'sysuser' | 'sysadresseip'> & { imageFile?: File }) => {
             const currentTime = new Date().toISOString();
-            
+            let mediaId: number | null = null;
+
+            // Handle image upload if provided
+            if (categoryData.imageFile) {
+                try {
+                    // Upload file to storage
+                    const fileUrl = await uploadFile({ file: categoryData.imageFile, type: "image" });
+
+                    // Create media record
+                    const { data: mediaData, error: mediaError } = await supabase
+                        .schema("morpheus")
+                        .from("ymedia")
+                        .insert({
+                            ymediacode: `category_${Date.now()}`,
+                            ymediaboolphotoevent: "0",
+                            ymediaboolphotoprod: "0",
+                            ymediaboolvideocapsule: "0",
+                            ymediaboolphotoeditoriale: false,
+                            ymediaboolvideo: false,
+                            ymediaintitule: `${categoryData.xcategprodintitule} Image`,
+                            ymediaurl: fileUrl,
+                        })
+                        .select("ymediaid")
+                        .single();
+
+                    if (mediaError) {
+                        throw new Error(`Failed to create media record: ${mediaError.message}`);
+                    }
+
+                    mediaId = mediaData?.ymediaid || null;
+                } catch (error) {
+                    console.error("Error uploading category image:", error);
+                    throw error;
+                }
+            }
+
+            // Remove imageFile from categoryData before inserting
+            const { imageFile, ...insertData } = categoryData;
+
             const { data, error } = await supabase
                 .schema("morpheus")
                 .from("xcategprod")
                 .insert({
-                    ...categoryData,
+                    ...insertData,
+                    xcategprodmediaid: mediaId,
                     sysdate: currentTime,
                     sysaction: 'insert',
                     sysuser: 'admin', // This should be replaced with actual user
@@ -98,14 +147,50 @@ export function useUpdateCategory() {
     const supabase = createClient();
 
     return useMutation({
-        mutationFn: async ({ categoryId, updates }: { categoryId: number; updates: Partial<CategoryUpdate> }) => {
+        mutationFn: async ({ categoryId, updates, imageFile }: { categoryId: number; updates: Partial<CategoryUpdate>; imageFile?: File }) => {
             const currentTime = new Date().toISOString();
-            
+            let mediaId: number | null = updates.xcategprodmediaid || null;
+
+            // Handle image upload if provided
+            if (imageFile) {
+                try {
+                    // Upload file to storage
+                    const fileUrl = await uploadFile({ file: imageFile, type: "image" });
+
+                    // Create media record
+                    const { data: mediaData, error: mediaError } = await supabase
+                        .schema("morpheus")
+                        .from("ymedia")
+                        .insert({
+                            ymediacode: `category_${categoryId}_${Date.now()}`,
+                            ymediaboolphotoevent: "0",
+                            ymediaboolphotoprod: "0",
+                            ymediaboolvideocapsule: "0",
+                            ymediaboolphotoeditoriale: false,
+                            ymediaboolvideo: false,
+                            ymediaintitule: `Category ${categoryId} Image`,
+                            ymediaurl: fileUrl,
+                        })
+                        .select("ymediaid")
+                        .single();
+
+                    if (mediaError) {
+                        throw new Error(`Failed to create media record: ${mediaError.message}`);
+                    }
+
+                    mediaId = mediaData?.ymediaid || null;
+                } catch (error) {
+                    console.error("Error uploading category image:", error);
+                    throw error;
+                }
+            }
+
             const { data, error } = await supabase
                 .schema("morpheus")
                 .from("xcategprod")
                 .update({
                     ...updates,
+                    xcategprodmediaid: mediaId,
                     sysdate: currentTime,
                     sysaction: 'update',
                     sysuser: 'admin', // This should be replaced with actual user
@@ -185,7 +270,13 @@ export function useCategoriesWithStats() {
                 .from("xcategprod")
                 .select(`
                     *,
-                    yprod(count)
+                    yprod(count),
+                    media:xcategprodmediaid(
+                        ymediaid,
+                        ymediaurl,
+                        ymediaintitule,
+                        ymediacode
+                    )
                 `)
                 .order("xcategprodintitule", { ascending: true });
 
