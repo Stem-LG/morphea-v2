@@ -1,119 +1,187 @@
-"use client";
+'use client'
 
-import { useState } from "react";
-import Image from "next/image";
-import { ShoppingCart, Heart, Eye } from "lucide-react";
-import { useCurrency } from "@/hooks/useCurrency";
-import { useLanguage } from "@/hooks/useLanguage";
-import { useAddToWishlist } from "@/app/_hooks/wishlist/useAddToWishlist";
-import { useRemoveFromWishlist } from "@/app/_hooks/wishlist/useRemoveFromWishlist";
-import { useIsInWishlist } from "@/app/_hooks/wishlist/useIsInWishlist";
-import { cn } from "@/lib/utils";
+import { useState } from 'react'
+import Image from 'next/image'
+import { ShoppingCart, Star, Eye } from 'lucide-react'
+import { useCurrency } from '@/hooks/useCurrency'
+import { useLanguage } from '@/hooks/useLanguage'
+
+// Custom Wishlist Icon
+const WishlistIcon = ({
+    className,
+    filled = false,
+}: {
+    className?: string
+    filled?: boolean
+}) => (
+    <svg
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className={className}
+    >
+        <g clipPath="url(#clip0_96_453)">
+            <path
+                d="M1.18037 10.564C0.829719 10.2394 1.02019 9.65262 1.49448 9.59633L8.21491 8.79842C8.40821 8.77548 8.57611 8.65397 8.65764 8.47704L11.4922 2.32564C11.6923 1.89151 12.3088 1.89143 12.5089 2.32555L15.3435 8.47691C15.425 8.65384 15.5918 8.77568 15.7851 8.79862L22.5059 9.59633C22.9802 9.65262 23.1701 10.2396 22.8195 10.5642L17.8514 15.1639C17.7085 15.2962 17.6449 15.4931 17.6828 15.6842L19.0013 22.3285C19.0944 22.7975 18.5959 23.1608 18.1791 22.9273L12.2739 19.6176C12.104 19.5225 11.8977 19.5229 11.7278 19.6181L5.82196 22.9264C5.4052 23.1599 4.90573 22.7974 4.99881 22.3285L6.31752 15.6846C6.35546 15.4935 6.29199 15.2962 6.14908 15.1639L1.18037 10.564Z"
+                stroke={filled ? '#E8D07A' : '#DDDDDD'}
+                fill={filled ? '#E8D07A' : 'none'}
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
+        </g>
+        <defs>
+            <clipPath id="clip0_96_453">
+                <rect width="24" height="24" fill="white" />
+            </clipPath>
+        </defs>
+    </svg>
+)
+import { useAddToWishlist } from '@/app/_hooks/wishlist/useAddToWishlist'
+import { useRemoveFromWishlist } from '@/app/_hooks/wishlist/useRemoveFromWishlist'
+import { useIsInWishlist } from '@/app/_hooks/wishlist/useIsInWishlist'
+import { cn } from '@/lib/utils'
 
 interface ProductCardProps {
     product: {
-        yprodid: number;
-        yprodintitule: string;
-        yproddetailstech: string;
+        yprodid: number
+        yprodintitule: string
+        yproddetailstech: string
         ydesign?: {
-            ydesignnom: string;
-            ydesignmarque: string;
-        };
+            ydesignnom: string
+            ydesignmarque: string
+        }
         yvarprod?: Array<{
-            yvarprodid: number;
-            yvarprodprixcatalogue: number;
-            yvarprodprixpromotion: number | null;
-            xdeviseidfk: number | null;
+            yvarprodid: number
+            yvarprodprixcatalogue: number
+            yvarprodprixpromotion: number | null
+            xdeviseidfk: number | null
             xcouleur: {
-                xcouleurhexa: string;
-                xcouleurintitule: string;
-            };
+                xcouleurhexa: string
+                xcouleurintitule: string
+            }
             yvarprodmedia?: Array<{
                 ymedia: {
-                    ymediaurl: string;
-                    ymediaboolvideo: boolean;
-                };
-            }>;
-        }>;
-    };
-    viewMode: 'grid' | 'list';
-    onViewDetails: () => void;
+                    ymediaurl: string
+                    ymediaboolvideo: boolean
+                }
+            }>
+        }>
+    }
+    viewMode: 'grid' | 'list'
+    onViewDetails: () => void
 }
 
-export function ProductCard({ product, viewMode, onViewDetails }: ProductCardProps) {
-    const { formatPrice, currencies } = useCurrency();
-    const { t } = useLanguage();
-    const [imageError, setImageError] = useState(false);
-    const [hoveredColor, setHoveredColor] = useState<string | null>(null);
-    
+export function ProductCard({
+    product,
+    viewMode,
+    onViewDetails,
+}: ProductCardProps) {
+    const { formatPrice, currencies } = useCurrency()
+    const { t } = useLanguage()
+    const [imageError, setImageError] = useState(false)
+    const [hoveredColor, setHoveredColor] = useState<string | null>(null)
+    const [isImageHovered, setIsImageHovered] = useState(false)
+
     // Wishlist hooks
-    const addToWishlistMutation = useAddToWishlist();
-    const removeFromWishlistMutation = useRemoveFromWishlist();
+    const addToWishlistMutation = useAddToWishlist()
+    const removeFromWishlistMutation = useRemoveFromWishlist()
 
     // Get the first variant for pricing and media
-    const firstVariant = product.yvarprod?.[0];
+    const firstVariant = product.yvarprod?.[0]
     const activeVariant = hoveredColor
-        ? product.yvarprod?.find(v => v.xcouleur.xcouleurhexa === hoveredColor) || firstVariant
-        : firstVariant;
+        ? product.yvarprod?.find(
+              (v) => v.xcouleur.xcouleurhexa === hoveredColor
+          ) || firstVariant
+        : firstVariant
 
     // Check if current variant is in wishlist
-    const { data: isInWishlist = false } = useIsInWishlist(activeVariant?.yvarprodid || 0);
+    const { data: isInWishlist = false } = useIsInWishlist(
+        activeVariant?.yvarprodid || 0
+    )
 
-    // Get the first image from the active variant
-    const firstImage = activeVariant?.yvarprodmedia?.find(
-        media => media.ymedia && !media.ymedia.ymediaboolvideo
-    )?.ymedia?.ymediaurl;
+    // Get images from the active variant
+    const images =
+        activeVariant?.yvarprodmedia
+            ?.filter((media) => media.ymedia && !media.ymedia.ymediaboolvideo)
+            .map((media) => media.ymedia?.ymediaurl)
+            .filter(Boolean) || []
+
+    const firstImage = images[0]
+    const secondImage = images[1]
 
     // Get pricing info
-    const pricing = activeVariant ? {
-        catalogPrice: activeVariant.yvarprodprixcatalogue,
-        promotionPrice: activeVariant.yvarprodprixpromotion,
-        productCurrency: currencies.find(c => c.xdeviseid === activeVariant.xdeviseidfk),
-        formattedCatalogPrice: formatPrice(
-            activeVariant.yvarprodprixcatalogue, 
-            currencies.find(c => c.xdeviseid === activeVariant.xdeviseidfk)
-        ),
-        formattedPromotionPrice: activeVariant.yvarprodprixpromotion 
-            ? formatPrice(
-                activeVariant.yvarprodprixpromotion, 
-                currencies.find(c => c.xdeviseid === activeVariant.xdeviseidfk)
-            ) 
-            : null,
-        hasDiscount: !!activeVariant.yvarprodprixpromotion,
-        discountPercentage: activeVariant.yvarprodprixpromotion 
-            ? Math.round(((activeVariant.yvarprodprixcatalogue - activeVariant.yvarprodprixpromotion) / activeVariant.yvarprodprixcatalogue) * 100)
-            : 0
-    } : null;
+    const pricing = activeVariant
+        ? {
+              catalogPrice: activeVariant.yvarprodprixcatalogue,
+              promotionPrice: activeVariant.yvarprodprixpromotion,
+              productCurrency: currencies.find(
+                  (c) => c.xdeviseid === activeVariant.xdeviseidfk
+              ),
+              formattedCatalogPrice: formatPrice(
+                  activeVariant.yvarprodprixcatalogue,
+                  currencies.find(
+                      (c) => c.xdeviseid === activeVariant.xdeviseidfk
+                  )
+              ),
+              formattedPromotionPrice: activeVariant.yvarprodprixpromotion
+                  ? formatPrice(
+                        activeVariant.yvarprodprixpromotion,
+                        currencies.find(
+                            (c) => c.xdeviseid === activeVariant.xdeviseidfk
+                        )
+                    )
+                  : null,
+              hasDiscount: !!activeVariant.yvarprodprixpromotion,
+              discountPercentage: activeVariant.yvarprodprixpromotion
+                  ? Math.round(
+                        ((activeVariant.yvarprodprixcatalogue -
+                            activeVariant.yvarprodprixpromotion) /
+                            activeVariant.yvarprodprixcatalogue) *
+                            100
+                    )
+                  : 0,
+          }
+        : null
 
     // Get unique colors
-    const uniqueColors = product.yvarprod?.reduce((acc, variant) => {
-        const colorHex = variant.xcouleur.xcouleurhexa;
-        if (!acc.some(c => c.hex === colorHex)) {
-            acc.push({
-                hex: colorHex,
-                name: variant.xcouleur.xcouleurintitule
-            });
-        }
-        return acc;
-    }, [] as Array<{ hex: string; name: string }>);
+    const uniqueColors = product.yvarprod?.reduce(
+        (acc, variant) => {
+            const colorHex = variant.xcouleur.xcouleurhexa
+            if (!acc.some((c) => c.hex === colorHex)) {
+                acc.push({
+                    hex: colorHex,
+                    name: variant.xcouleur.xcouleurintitule,
+                })
+            }
+            return acc
+        },
+        [] as Array<{ hex: string; name: string }>
+    )
 
     // Handle wishlist actions
     const handleWishlistClick = () => {
-        if (!activeVariant) return;
-        
+        if (!activeVariant) return
+
         if (isInWishlist) {
-            removeFromWishlistMutation.mutate({ yvarprodidfk: activeVariant.yvarprodid });
+            removeFromWishlistMutation.mutate({
+                yvarprodidfk: activeVariant.yvarprodid,
+            })
         } else {
-            addToWishlistMutation.mutate({ yvarprodidfk: activeVariant.yvarprodid });
+            addToWishlistMutation.mutate({
+                yvarprodidfk: activeVariant.yvarprodid,
+            })
         }
-    };
+    }
 
     if (viewMode === 'list') {
         return (
-            <div className="bg-gradient-to-br from-morpheus-blue-dark/40 to-morpheus-blue-light/40 backdrop-blur-md border border-morpheus-gold-dark/20 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 p-6">
+            <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:shadow-md">
                 <div className="flex gap-6">
                     {/* Image */}
-                    <div className="relative w-32 h-32 flex-shrink-0 bg-morpheus-blue-dark/20 rounded-lg overflow-hidden border border-morpheus-gold-dark/20">
+                    <div className="relative h-32 w-32 flex-shrink-0 overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
                         {firstImage && !imageError ? (
                             <Image
                                 src={firstImage}
@@ -123,40 +191,53 @@ export function ProductCard({ product, viewMode, onViewDetails }: ProductCardPro
                                 onError={() => setImageError(true)}
                             />
                         ) : (
-                            <div className="w-full h-full flex items-center justify-center text-morpheus-gold-light/60">
-                                <ShoppingCart className="w-8 h-8" />
+                            <div className="flex h-full w-full items-center justify-center text-gray-400">
+                                <ShoppingCart className="h-8 w-8" />
                             </div>
                         )}
                         {pricing?.hasDiscount && (
-                            <div className="absolute top-2 left-2 bg-gradient-to-r from-red-500 to-red-600 text-white text-xs px-2 py-1 rounded-md font-medium">
+                            <div className="absolute top-2 left-2 rounded-md bg-gradient-to-r from-red-500 to-red-600 px-2 py-1 text-xs font-medium text-white">
                                 -{pricing.discountPercentage}%
                             </div>
                         )}
                     </div>
 
                     {/* Content */}
-                    <div className="flex-1 min-w-0">
-                        <div className="flex justify-between items-start">
-                            <div className="flex-1 min-w-0 pr-4">
+                    <div className="min-w-0 flex-1">
+                        <div className="flex items-start justify-between">
+                            <div className="min-w-0 flex-1 pr-4">
                                 {product.ydesign && (
-                                    <p className="text-xs text-morpheus-gold-light/80 mb-1 font-medium">{product.ydesign.ydesignmarque}</p>
+                                    <p className="text-morpheus-gold-light mb-1 text-xs font-medium">
+                                        {product.ydesign.ydesignmarque}
+                                    </p>
                                 )}
-                                <h3 className="font-semibold text-white truncate text-lg">{product.yprodintitule}</h3>
-                                <p className="text-sm text-gray-300 line-clamp-2 mt-2">{product.yproddetailstech}</p>
-                                
+                                <h3 className="truncate text-lg font-semibold text-gray-900">
+                                    {product.yprodintitule}
+                                </h3>
+                                <p className="mt-2 line-clamp-2 text-sm text-gray-600">
+                                    {product.yproddetailstech}
+                                </p>
+
                                 {/* Colors */}
                                 {uniqueColors && uniqueColors.length > 0 && (
-                                    <div className="flex gap-2 mt-3">
-                                        {uniqueColors.slice(0, 5).map((color, idx) => (
-                                            <div
-                                                key={idx}
-                                                className="w-6 h-6 rounded-full border-2 border-morpheus-gold-dark/40 shadow-sm"
-                                                style={{ backgroundColor: color.hex }}
-                                                title={color.name}
-                                            />
-                                        ))}
+                                    <div className="mt-3 flex gap-2">
+                                        {uniqueColors
+                                            .slice(0, 5)
+                                            .map((color, idx) => (
+                                                <div
+                                                    key={idx}
+                                                    className="border-morpheus-gold-dark/40 h-6 w-6 rounded-full border-2 shadow-sm"
+                                                    style={{
+                                                        backgroundColor:
+                                                            color.hex,
+                                                    }}
+                                                    title={color.name}
+                                                />
+                                            ))}
                                         {uniqueColors.length > 5 && (
-                                            <span className="text-xs text-morpheus-gold-light/70 ml-1 self-center">+{uniqueColors.length - 5}</span>
+                                            <span className="text-morpheus-gold-light/70 ml-1 self-center text-xs">
+                                                +{uniqueColors.length - 5}
+                                            </span>
                                         )}
                                     </div>
                                 )}
@@ -168,15 +249,19 @@ export function ProductCard({ product, viewMode, onViewDetails }: ProductCardPro
                                     <>
                                         {pricing.hasDiscount ? (
                                             <div>
-                                                <p className="text-xl font-bold bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light bg-clip-text text-transparent">
-                                                    {pricing.formattedPromotionPrice}
+                                                <p className="from-morpheus-gold-dark to-morpheus-gold-light bg-gradient-to-r bg-clip-text text-xl font-bold text-transparent">
+                                                    {
+                                                        pricing.formattedPromotionPrice
+                                                    }
                                                 </p>
                                                 <p className="text-sm text-gray-400 line-through">
-                                                    {pricing.formattedCatalogPrice}
+                                                    {
+                                                        pricing.formattedCatalogPrice
+                                                    }
                                                 </p>
                                             </div>
                                         ) : (
-                                            <p className="text-xl font-bold bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light bg-clip-text text-transparent">
+                                            <p className="from-morpheus-gold-dark to-morpheus-gold-light bg-gradient-to-r bg-clip-text text-xl font-bold text-transparent">
                                                 {pricing.formattedCatalogPrice}
                                             </p>
                                         )}
@@ -186,150 +271,148 @@ export function ProductCard({ product, viewMode, onViewDetails }: ProductCardPro
                         </div>
 
                         {/* Actions */}
-                        <div className="flex gap-3 mt-4">
+                        <div className="mt-4 flex gap-3">
                             <button
                                 onClick={onViewDetails}
-                                className="flex-1 bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light text-white px-4 py-2 rounded-lg text-sm font-medium hover:from-morpheus-gold-light hover:to-morpheus-gold-dark transition-all duration-300 shadow-md"
+                                className="from-morpheus-gold-dark to-morpheus-gold-light hover:from-morpheus-gold-light hover:to-morpheus-gold-dark flex-1 rounded-lg bg-gradient-to-r px-4 py-2 text-sm font-medium text-white shadow-md transition-all duration-300"
                             >
-                                {t("shop.viewDetails")}
+                                {t('shop.viewDetails')}
                             </button>
                             <button
                                 onClick={handleWishlistClick}
-                                disabled={addToWishlistMutation.isPending || removeFromWishlistMutation.isPending}
+                                disabled={
+                                    addToWishlistMutation.isPending ||
+                                    removeFromWishlistMutation.isPending
+                                }
                                 className={cn(
-                                    "p-2 border rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed",
+                                    'rounded-lg border p-2 transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50',
                                     isInWishlist
-                                        ? "bg-red-500/80 border-red-500/60 text-white hover:bg-red-500"
-                                        : "bg-morpheus-blue-dark/40 border-morpheus-gold-dark/30 text-morpheus-gold-light hover:bg-morpheus-blue-dark/60 hover:text-white"
+                                        ? 'border-red-500/60 bg-red-500/80 text-white hover:bg-red-500'
+                                        : 'bg-morpheus-blue-dark/40 border-morpheus-gold-dark/30 text-morpheus-gold-light hover:bg-morpheus-blue-dark/60 hover:text-white'
                                 )}
-                                title={isInWishlist ? t("shop.removeFromWishlist") : t("shop.addToWishlist")}
+                                title={
+                                    isInWishlist
+                                        ? t('shop.removeFromWishlist')
+                                        : t('shop.addToWishlist')
+                                }
                             >
-                                <Heart className={cn("w-5 h-5", isInWishlist && "fill-current")} />
+                                <WishlistIcon
+                                    className="h-5 w-5"
+                                    filled={isInWishlist}
+                                />
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
-        );
+        )
     }
 
-    // Grid view
+    // Always use the new minimal grid design
     return (
-        <div className="bg-gradient-to-br from-morpheus-blue-dark/40 to-morpheus-blue-light/40 backdrop-blur-md border border-morpheus-gold-dark/20 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group">
+        <div className="group relative bg-white">
             {/* Image */}
-            <div className="relative aspect-square bg-morpheus-blue-dark/20 overflow-hidden">
+            <div
+                className="relative aspect-[3/4] cursor-pointer overflow-hidden bg-gray-100"
+                onClick={onViewDetails}
+                onMouseEnter={() => setIsImageHovered(true)}
+                onMouseLeave={() => setIsImageHovered(false)}
+            >
                 {firstImage && !imageError ? (
-                    <Image
-                        src={firstImage}
-                        alt={product.yprodintitule}
-                        fill
-                        className="object-contain p-4 group-hover:scale-105 transition-transform duration-300"
-                        onError={() => setImageError(true)}
-                    />
+                    <>
+                        {/* First Image */}
+                        <Image
+                            src={firstImage}
+                            alt={product.yprodintitule}
+                            fill
+                            className={cn(
+                                'object-cover transition-all duration-500',
+                                secondImage && isImageHovered
+                                    ? 'scale-105 opacity-0'
+                                    : 'opacity-100 group-hover:scale-105'
+                            )}
+                            onError={() => setImageError(true)}
+                        />
+
+                        {/* Second Image (if available) */}
+                        {secondImage && (
+                            <Image
+                                src={secondImage}
+                                alt={`${product.yprodintitule} - Image 2`}
+                                fill
+                                className={cn(
+                                    'object-cover transition-all duration-500',
+                                    isImageHovered
+                                        ? 'scale-105 opacity-100'
+                                        : 'scale-100 opacity-0'
+                                )}
+                                onError={() => setImageError(true)}
+                            />
+                        )}
+                    </>
                 ) : (
-                    <div className="w-full h-full flex items-center justify-center text-morpheus-gold-light/60">
-                        <ShoppingCart className="w-12 h-12" />
-                    </div>
-                )}
-                
-                {/* Discount Badge */}
-                {pricing?.hasDiscount && (
-                    <div className="absolute top-3 left-3 bg-gradient-to-r from-red-500 to-red-600 text-white text-xs px-3 py-1 rounded-md font-medium shadow-lg">
-                        -{pricing.discountPercentage}%
+                    <div className="flex h-full w-full items-center justify-center text-gray-400">
+                        <ShoppingCart className="h-12 w-12" />
                     </div>
                 )}
 
-                {/* Quick Actions */}
-                <div className="absolute inset-0 bg-morpheus-blue-dark/60 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center gap-3">
+                {/* Wishlist Button */}
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation()
+                        handleWishlistClick()
+                    }}
+                    disabled={
+                        addToWishlistMutation.isPending ||
+                        removeFromWishlistMutation.isPending
+                    }
+                    className={cn(
+                        'absolute top-4 right-4 z-10 rounded-full p-2 shadow-lg transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50',
+                        isInWishlist
+                            ? 'bg-yellow-400 text-white'
+                            : 'bg-white text-gray-600 hover:bg-gray-50'
+                    )}
+                >
+                    <WishlistIcon className="h-5 w-5" filled={isInWishlist} />
+                </button>
+
+                {/* Quick View on Hover */}
+                <div className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                     <button
                         onClick={onViewDetails}
-                        className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light text-white p-3 rounded-full hover:from-morpheus-gold-light hover:to-morpheus-gold-dark transition-all duration-300 shadow-lg"
-                        title={t("shop.quickView")}
+                        className="rounded-full bg-white px-6 py-2 text-sm font-medium text-gray-900 shadow-lg transition-all duration-300 hover:bg-gray-50"
                     >
-                        <Eye className="w-5 h-5" />
-                    </button>
-                    <button
-                        onClick={handleWishlistClick}
-                        disabled={addToWishlistMutation.isPending || removeFromWishlistMutation.isPending}
-                        className={cn(
-                            "border p-3 rounded-full transition-all duration-300 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed",
-                            isInWishlist
-                                ? "bg-red-500/80 border-red-500/60 text-white hover:bg-red-500"
-                                : "bg-morpheus-blue-dark/60 border-morpheus-gold-dark/40 text-morpheus-gold-light hover:bg-morpheus-blue-dark/80 hover:text-white"
-                        )}
-                        title={isInWishlist ? t("shop.removeFromWishlist") : t("shop.addToWishlist")}
-                    >
-                        <Heart className={cn("w-5 h-5", isInWishlist && "fill-current")} />
+                        Quick View
                     </button>
                 </div>
             </div>
 
-            {/* Content */}
-            <div className="p-5">
-                {/* Brand */}
-                {product.ydesign && (
-                    <p className="text-xs text-morpheus-gold-light/80 mb-2 font-medium">{product.ydesign.ydesignmarque}</p>
-                )}
-
-                {/* Title */}
-                <h3 className="font-semibold text-white line-clamp-2 min-h-[2.5rem] text-lg">
+            {/* Product Info */}
+            <div className="mt-4 text-center">
+                <h3 className="line-clamp-2 text-sm font-medium text-gray-900">
                     {product.yprodintitule}
                 </h3>
 
-                {/* Colors */}
-                {uniqueColors && uniqueColors.length > 0 && (
-                    <div className="flex gap-2 mt-3 mb-4">
-                        {uniqueColors.slice(0, 5).map((color, idx) => (
-                            <button
-                                key={idx}
-                                className={cn(
-                                    "w-7 h-7 rounded-full border-2 transition-all duration-300 shadow-sm",
-                                    hoveredColor === color.hex
-                                        ? "border-morpheus-gold-light scale-110 shadow-md"
-                                        : "border-morpheus-gold-dark/40"
-                                )}
-                                style={{ backgroundColor: color.hex }}
-                                title={color.name}
-                                onMouseEnter={() => setHoveredColor(color.hex)}
-                                onMouseLeave={() => setHoveredColor(null)}
-                            />
-                        ))}
-                        {uniqueColors.length > 5 && (
-                            <span className="text-xs text-morpheus-gold-light/70 ml-1 self-center font-medium">
-                                +{uniqueColors.length - 5}
-                            </span>
-                        )}
-                    </div>
-                )}
-
                 {/* Price */}
                 {pricing && (
-                    <div className="mb-4">
+                    <div className="mt-2">
                         {pricing.hasDiscount ? (
-                            <div className="flex items-center gap-2">
-                                <span className="text-xl font-bold bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light bg-clip-text text-transparent">
+                            <div className="flex items-center justify-center gap-2">
+                                <span className="text-sm font-medium text-gray-900">
                                     {pricing.formattedPromotionPrice}
                                 </span>
-                                <span className="text-sm text-gray-400 line-through">
+                                <span className="text-sm text-gray-500 line-through">
                                     {pricing.formattedCatalogPrice}
                                 </span>
                             </div>
                         ) : (
-                            <span className="text-xl font-bold bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light bg-clip-text text-transparent">
+                            <span className="text-sm font-medium text-gray-900">
                                 {pricing.formattedCatalogPrice}
                             </span>
                         )}
                     </div>
                 )}
-
-                {/* View Details Button */}
-                <button
-                    onClick={onViewDetails}
-                    className="w-full bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light text-white py-3 rounded-lg font-medium hover:from-morpheus-gold-light hover:to-morpheus-gold-dark transition-all duration-300 shadow-md"
-                >
-                    {t("shop.viewDetails")}
-                </button>
             </div>
         </div>
-    );
+    )
 }

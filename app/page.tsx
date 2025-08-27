@@ -7,6 +7,7 @@ import Footer from '@/components/footer'
 import NavBar from './_components/nav_bar'
 import ExpandableCategories from '@/components/expandable-categories'
 import { ThreeDPhotoCarousel } from '@/components/three-d-photo-carousel'
+import VideoAnimation from '@/components/video-animation'
 import { Play, Pause, Volume2, VolumeX } from 'lucide-react'
 import { useLanguage } from '@/hooks/useLanguage'
 import { useHomeSettings } from '@/hooks/use-home-settings'
@@ -281,6 +282,9 @@ export default function Home() {
                     </button>
                 </div>
             </div>
+
+            {/* VideoAnimation Section - Right after hero */}
+            <VideoAnimation />
 
             {/* Second Section - Collection Cards - Mobile Responsive */}
             <section className="relative z-20 bg-white pt-12 md:pt-20">

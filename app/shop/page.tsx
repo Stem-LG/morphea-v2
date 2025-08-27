@@ -1,463 +1,1011 @@
-"use client";
+'use client'
 
-import { Suspense, useState, useCallback } from "react";
-import { Grid, List, ChevronLeft, ChevronRight, Filter, X, Search, Store, Tag, Check } from "lucide-react";
-import { useQueryStates, parseAsInteger, parseAsString, parseAsStringEnum } from "nuqs";
-import { useLanguage } from "@/hooks/useLanguage";
-import { useShopProducts } from "./_hooks/use-shop-products";
-import { useShopBoutiques, useShopCategories } from "./_hooks/use-shop-filters";
-import { ProductCard } from "./_components/product-card";
-import { ProductDetailsPage } from "@/app/main/_components/product-details-page";
-import { cn } from "@/lib/utils";
+import { Suspense, useState, useCallback, useEffect } from 'react'
+import { X, ChevronDown } from 'lucide-react'
+import { useQueryStates, parseAsInteger, parseAsString } from 'nuqs'
+import { useLanguage } from '@/hooks/useLanguage'
+import { useShopProductsInfinite } from './_hooks/use-shop-products'
+import {
+    useShopBoutiques,
+    useShopCategories,
+    useShopColors,
+    useShopSizes,
+} from './_hooks/use-shop-filters'
+import { ProductCard } from './_components/product-card'
+import { ProductDetailsPage } from '@/app/main/_components/product-details-page'
+import { cn } from '@/lib/utils'
+import Footer from '@/components/footer'
+import {
+    Sheet,
+    SheetClose,
+    SheetContent,
+    SheetTitle,
+} from '@/components/ui/sheet'
 
-interface FilterSidebarProps {
-    isMobile?: boolean;
-    search: string;
-    boutiqueId: number | null;
-    categoryId: number | null;
-    boutiques: any[];
-    categories: any[];
-    hasActiveFilters: boolean;
-    t: (key: string) => string;
-    onFilterChange: (key: string) => (value: any) => void;
-    onClearFilters: () => void;
-}
+// Custom SVG Components
+const ThreeColumnIcon = ({
+    className,
+    isActive,
+}: {
+    className?: string
+    isActive?: boolean
+}) => (
+    <svg
+        width="37"
+        height="31"
+        viewBox="0 0 37 31"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className={className}
+    >
+        <rect
+            x="24.829"
+            y="10.4019"
+            width="12.1711"
+            height="10.1982"
+            rx="2"
+            fill={isActive ? '#E8D07A' : '#D9D9D9'}
+        />
+        <rect
+            x="24.829"
+            y="10.4019"
+            width="12.1711"
+            height="10.1982"
+            rx="2"
+            fill={isActive ? '#E8D07A' : '#D9D9D9'}
+        />
+        <rect
+            x="12.4144"
+            y="10.4019"
+            width="12.1711"
+            height="10.1982"
+            rx="2"
+            fill={isActive ? '#E8D07A' : '#D9D9D9'}
+        />
+        <rect
+            width="12.1711"
+            height="10.1982"
+            rx="2"
+            fill={isActive ? '#E8D07A' : '#D9D9D9'}
+        />
+        <rect
+            y="10.4014"
+            width="12.1711"
+            height="10.1982"
+            rx="2"
+            fill={isActive ? '#E8D07A' : '#D9D9D9'}
+        />
+        <rect
+            y="20.8027"
+            width="12.1711"
+            height="10.1982"
+            rx="2"
+            fill={isActive ? '#E8D07A' : '#D9D9D9'}
+        />
+        <rect
+            x="24.829"
+            y="20.8027"
+            width="12.1711"
+            height="10.1982"
+            rx="2"
+            fill={isActive ? '#E8D07A' : '#D9D9D9'}
+        />
+        <rect
+            x="12.4144"
+            y="20.8027"
+            width="12.1711"
+            height="10.1982"
+            rx="2"
+            fill={isActive ? '#E8D07A' : '#D9D9D9'}
+        />
+        <rect
+            x="12.4144"
+            width="12.1711"
+            height="10.1982"
+            rx="2"
+            fill={isActive ? '#E8D07A' : '#D9D9D9'}
+        />
+        <rect
+            x="24.829"
+            width="12.1711"
+            height="10.1982"
+            rx="2"
+            fill={isActive ? '#E8D07A' : '#D9D9D9'}
+        />
+    </svg>
+)
 
-const FilterSidebar = ({
-    isMobile = false,
-    search,
-    boutiqueId,
-    categoryId,
-    boutiques,
-    categories,
-    hasActiveFilters,
-    t,
-    onFilterChange,
-    onClearFilters,
-}: FilterSidebarProps) => (
-    <div className={cn("space-y-8", isMobile ? "p-4" : "")}>
-        {/* Search */}
-        <div className="space-y-3">
-            <div className="flex items-center gap-2 mb-4">
-                <Search className="w-5 h-5 text-morpheus-gold-light" />
-                <h3 className="font-semibold text-white text-lg">{t("shop.search")}</h3>
-            </div>
-            <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                    type="text"
-                    placeholder={t("shop.searchPlaceholder")}
-                    value={search}
-                    onChange={(e) => onFilterChange("search")(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 bg-morpheus-blue-dark/40 border border-morpheus-gold-dark/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-morpheus-gold-light focus:border-morpheus-gold-light text-white placeholder-gray-400 backdrop-blur-sm transition-all duration-300"
-                />
-            </div>
-        </div>
+const FourColumnIcon = ({
+    className,
+    isActive,
+}: {
+    className?: string
+    isActive?: boolean
+}) => (
+    <svg
+        width="50"
+        height="31"
+        viewBox="0 0 50 31"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className={className}
+    >
+        <rect
+            x="12.5172"
+            y="10.4019"
+            width="12.2718"
+            height="10.1974"
+            rx="2"
+            fill={isActive ? '#E8D07A' : '#D9D9D9'}
+        />
+        <rect
+            width="12.2718"
+            height="10.1974"
+            rx="2"
+            fill={isActive ? '#E8D07A' : '#D9D9D9'}
+        />
+        <rect
+            y="10.4014"
+            width="12.2718"
+            height="10.1974"
+            rx="2"
+            fill={isActive ? '#E8D07A' : '#D9D9D9'}
+        />
+        <rect
+            y="20.8027"
+            width="12.2718"
+            height="10.1974"
+            rx="2"
+            fill={isActive ? '#E8D07A' : '#D9D9D9'}
+        />
+        <rect
+            x="12.5172"
+            y="20.8027"
+            width="12.2718"
+            height="10.1974"
+            rx="2"
+            fill={isActive ? '#E8D07A' : '#D9D9D9'}
+        />
+        <rect
+            x="12.5172"
+            width="12.2718"
+            height="10.1974"
+            rx="2"
+            fill={isActive ? '#E8D07A' : '#D9D9D9'}
+        />
+        <rect
+            x="25.0344"
+            y="10.4019"
+            width="12.2718"
+            height="10.1974"
+            rx="2"
+            fill={isActive ? '#E8D07A' : '#D9D9D9'}
+        />
+        <rect
+            x="25.0344"
+            y="10.4019"
+            width="12.2718"
+            height="10.1974"
+            rx="2"
+            fill={isActive ? '#E8D07A' : '#D9D9D9'}
+        />
+        <rect
+            x="25.0344"
+            y="20.8027"
+            width="12.2718"
+            height="10.1974"
+            rx="2"
+            fill={isActive ? '#E8D07A' : '#D9D9D9'}
+        />
+        <rect
+            x="25.0344"
+            width="12.2718"
+            height="10.1974"
+            rx="2"
+            fill={isActive ? '#E8D07A' : '#D9D9D9'}
+        />
+        <rect
+            x="37.5518"
+            y="10.4019"
+            width="12.2718"
+            height="10.1974"
+            rx="2"
+            fill={isActive ? '#E8D07A' : '#D9D9D9'}
+        />
+        <rect
+            x="37.5518"
+            y="10.4019"
+            width="12.2718"
+            height="10.1974"
+            rx="2"
+            fill={isActive ? '#E8D07A' : '#D9D9D9'}
+        />
+        <rect
+            x="37.5518"
+            y="20.8027"
+            width="12.2718"
+            height="10.1974"
+            rx="2"
+            fill={isActive ? '#E8D07A' : '#D9D9D9'}
+        />
+        <rect
+            x="37.5518"
+            width="12.2718"
+            height="10.1974"
+            rx="2"
+            fill={isActive ? '#E8D07A' : '#D9D9D9'}
+        />
+    </svg>
+)
 
-        {/* Boutique Filter */}
-        {boutiques.length > 0 && (
-            <div className="space-y-4">
-                <div className="flex items-center gap-2 mb-4">
-                    <Store className="w-5 h-5 text-morpheus-gold-light" />
-                    <h3 className="font-semibold text-white text-lg">{t("shop.boutique")}</h3>
-                </div>
-                <div className="space-y-2">
-                    <button
-                        onClick={() => onFilterChange("boutiqueId")(null)}
-                        className={cn(
-                            "w-full flex items-center justify-between p-3 rounded-xl transition-all duration-300 group",
-                            !boutiqueId
-                                ? "bg-gradient-to-r from-morpheus-gold-dark/30 to-morpheus-gold-light/30 border border-morpheus-gold-light/50 text-white shadow-lg"
-                                : "bg-morpheus-blue-dark/30 border border-morpheus-gold-dark/20 text-gray-300 hover:bg-morpheus-blue-dark/50 hover:border-morpheus-gold-dark/40 hover:text-white"
-                        )}
-                    >
-                        <span className="font-medium">{t("shop.allBoutiques")}</span>
-                        {!boutiqueId && <Check className="w-4 h-4 text-morpheus-gold-light" />}
-                    </button>
-                    {boutiques.map((boutique) => (
-                        <button
-                            key={boutique.yboutiqueid}
-                            onClick={() => onFilterChange("boutiqueId")(boutique.yboutiqueid)}
-                            className={cn(
-                                "w-full flex items-center justify-between p-3 rounded-xl transition-all duration-300 group",
-                                boutiqueId === boutique.yboutiqueid
-                                    ? "bg-gradient-to-r from-morpheus-gold-dark/30 to-morpheus-gold-light/30 border border-morpheus-gold-light/50 text-white shadow-lg"
-                                    : "bg-morpheus-blue-dark/30 border border-morpheus-gold-dark/20 text-gray-300 hover:bg-morpheus-blue-dark/50 hover:border-morpheus-gold-dark/40 hover:text-white"
-                            )}
-                        >
-                            <span className="font-medium text-left">
-                                {boutique.yboutiqueintitule || boutique.yboutiquecode}
-                            </span>
-                            {boutiqueId === boutique.yboutiqueid && (
-                                <Check className="w-4 h-4 text-morpheus-gold-light flex-shrink-0" />
-                            )}
-                        </button>
-                    ))}
-                </div>
-            </div>
-        )}
+// Filter and Sort Icons
+const FilterIcon = ({ className }: { className?: string }) => (
+    <svg
+        width="28"
+        height="28"
+        viewBox="0 0 28 28"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className={className}
+    >
+        <path
+            d="M14 8.1665L23.3333 8.1665"
+            stroke="#B27C64"
+            strokeLinecap="round"
+        />
+        <path
+            d="M4.66663 8.1665L9.33329 8.1665"
+            stroke="#B27C64"
+            strokeLinecap="round"
+        />
+        <path
+            d="M19.8333 19.8335L23.3333 19.8335"
+            stroke="#B27C64"
+            strokeLinecap="round"
+        />
+        <path
+            d="M4.66663 19.8335L14 19.8335"
+            stroke="#B27C64"
+            strokeLinecap="round"
+        />
+        <circle
+            cx="11.6667"
+            cy="8.16683"
+            r="2.33333"
+            transform="rotate(90 11.6667 8.16683)"
+            stroke="#B27C64"
+            strokeLinecap="round"
+        />
+        <circle
+            cx="17.5"
+            cy="19.8333"
+            r="2.33333"
+            transform="rotate(90 17.5 19.8333)"
+            stroke="#B27C64"
+            strokeLinecap="round"
+        />
+    </svg>
+)
 
-        {/* Category Filter */}
-        {categories.length > 0 && (
-            <div className="space-y-4">
-                <div className="flex items-center gap-2 mb-4">
-                    <Tag className="w-5 h-5 text-morpheus-gold-light" />
-                    <h3 className="font-semibold text-white text-lg">{t("shop.category")}</h3>
-                </div>
-                <div className="space-y-2">
-                    <button
-                        onClick={() => onFilterChange("categoryId")(null)}
-                        className={cn(
-                            "w-full flex items-center justify-between p-3 rounded-xl transition-all duration-300 group",
-                            !categoryId
-                                ? "bg-gradient-to-r from-morpheus-gold-dark/30 to-morpheus-gold-light/30 border border-morpheus-gold-light/50 text-white shadow-lg"
-                                : "bg-morpheus-blue-dark/30 border border-morpheus-gold-dark/20 text-gray-300 hover:bg-morpheus-blue-dark/50 hover:border-morpheus-gold-dark/40 hover:text-white"
-                        )}
-                    >
-                        <span className="font-medium">{t("shop.allCategories")}</span>
-                        {!categoryId && <Check className="w-4 h-4 text-morpheus-gold-light" />}
-                    </button>
-                    {categories.map((category) => (
-                        <button
-                            key={category.xcategprodid}
-                            onClick={() => onFilterChange("categoryId")(category.xcategprodid)}
-                            className={cn(
-                                "w-full flex items-center justify-between p-3 rounded-xl transition-all duration-300 group",
-                                categoryId === category.xcategprodid
-                                    ? "bg-gradient-to-r from-morpheus-gold-dark/30 to-morpheus-gold-light/30 border border-morpheus-gold-light/50 text-white shadow-lg"
-                                    : "bg-morpheus-blue-dark/30 border border-morpheus-gold-dark/20 text-gray-300 hover:bg-morpheus-blue-dark/50 hover:border-morpheus-gold-dark/40 hover:text-white"
-                            )}
-                        >
-                            <span className="font-medium text-left">{category.xcategprodintitule}</span>
-                            {categoryId === category.xcategprodid && (
-                                <Check className="w-4 h-4 text-morpheus-gold-light flex-shrink-0" />
-                            )}
-                        </button>
-                    ))}
-                </div>
-            </div>
-        )}
-
-        {/* Clear Filters */}
-        {hasActiveFilters && (
-            <div className="pt-4 border-t border-morpheus-gold-dark/20">
-                <button
-                    onClick={onClearFilters}
-                    className="w-full py-3 px-4 bg-gradient-to-r from-red-500/20 to-red-600/20 border border-red-500/30 text-red-300 rounded-xl hover:from-red-500/30 hover:to-red-600/30 hover:border-red-400/50 hover:text-red-200 transition-all duration-300 font-medium flex items-center justify-center gap-2"
-                >
-                    <X className="w-4 h-4" />
-                    {t("shop.clearFilters")}
-                </button>
-            </div>
-        )}
-    </div>
-);
+const SortIcon = ({ className }: { className?: string }) => (
+    <svg
+        width="28"
+        height="28"
+        viewBox="0 0 28 28"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className={className}
+    >
+        <path
+            d="M9.33335 2.3335L8.9798 1.97994L9.33335 1.62639L9.68691 1.97994L9.33335 2.3335ZM9.83335 19.8335C9.83335 20.1096 9.6095 20.3335 9.33335 20.3335C9.05721 20.3335 8.83335 20.1096 8.83335 19.8335L9.33335 19.8335L9.83335 19.8335ZM4.66669 7.00016L4.31313 6.64661L8.9798 1.97994L9.33335 2.3335L9.68691 2.68705L5.02024 7.35372L4.66669 7.00016ZM9.33335 2.3335L9.68691 1.97994L14.3536 6.64661L14 7.00016L13.6465 7.35372L8.9798 2.68705L9.33335 2.3335ZM9.33335 2.3335L9.83335 2.3335L9.83335 19.8335L9.33335 19.8335L8.83335 19.8335L8.83335 2.3335L9.33335 2.3335Z"
+            fill="#B27C64"
+        />
+        <path
+            d="M18.6667 25.6665L18.3131 26.0201L18.6667 26.3736L19.0202 26.0201L18.6667 25.6665ZM19.1667 8.1665C19.1667 7.89036 18.9428 7.6665 18.6667 7.6665C18.3905 7.6665 18.1667 7.89036 18.1667 8.1665L18.6667 8.1665L19.1667 8.1665ZM14 20.9998L13.6464 21.3534L18.3131 26.0201L18.6667 25.6665L19.0202 25.313L14.3536 20.6463L14 20.9998ZM18.6667 25.6665L19.0202 26.0201L23.6869 21.3534L23.3333 20.9998L22.9798 20.6463L18.3131 25.313L18.6667 25.6665ZM18.6667 25.6665L19.1667 25.6665L19.1667 8.1665L18.6667 8.1665L18.1667 8.1665L18.1667 25.6665L18.6667 25.6665Z"
+            fill="#B27C64"
+        />
+    </svg>
+)
 
 function ShopContent() {
-    const { t } = useLanguage();
+    const { t } = useLanguage()
 
     // URL state management for filters and view mode
-    const [{ boutiqueId, categoryId, search, viewMode, page }, setQueryState] = useQueryStates({
+    const [
+        {
+            boutiqueId,
+            categoryId,
+            search,
+            sortBy,
+            columns,
+            colorId,
+            sizeId,
+            minPrice,
+            maxPrice,
+        },
+        setQueryState,
+    ] = useQueryStates({
         boutiqueId: parseAsInteger,
         categoryId: parseAsInteger,
-        search: parseAsString.withDefault(""),
-        viewMode: parseAsStringEnum(["grid", "list"]).withDefault("list"),
-        page: parseAsInteger.withDefault(1),
-    });
+        search: parseAsString.withDefault(''),
+        sortBy: parseAsString.withDefault('newest'),
+        columns: parseAsInteger.withDefault(3),
+        colorId: parseAsInteger,
+        sizeId: parseAsInteger,
+        minPrice: parseAsInteger,
+        maxPrice: parseAsInteger,
+    })
 
-    const [showMobileFilters, setShowMobileFilters] = useState(false);
+    const [showFilterSheet, setShowFilterSheet] = useState(false)
+
+    // Collapsible filter sections state
+    const [expandedSections, setExpandedSections] = useState({
+        sort: true,
+        categories: false,
+        creators: false,
+        colors: false,
+        sizes: false,
+        priceRange: false,
+    })
 
     // State for product details modal
-    const [selectedProduct, setSelectedProduct] = useState<any>(null);
-    const [showProductDetails, setShowProductDetails] = useState(false);
+    const [selectedProduct, setSelectedProduct] = useState<any>(null)
+    const [showProductDetails, setShowProductDetails] = useState(false)
 
-    const perPage = 12;
+    const perPage = 12
 
-    // Fetch products with filters
-    const { data: productsData, isLoading: isLoadingProducts } = useShopProducts({
-        page,
+    // Fetch products with infinite scroll
+    const {
+        data: infiniteData,
+        isLoading: isLoadingProducts,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+    } = useShopProductsInfinite({
         perPage,
         boutiqueId,
         categoryId,
         searchQuery: search,
-    });
+        sortBy,
+        colorId,
+        sizeId,
+        minPrice,
+        maxPrice,
+    })
 
-    const { products = [], totalCount = 0, currentEvent } = productsData || {};
+    // Flatten all pages into a single products array
+    const products =
+        infiniteData?.pages.flatMap((page: any) => page.products) || []
+    const totalCount = (infiniteData?.pages[0] as any)?.totalCount || 0
+    const currentEvent = (infiniteData?.pages[0] as any)?.currentEvent
 
     // Fetch filter options
-    const { data: boutiques = [] } = useShopBoutiques(currentEvent?.yeventid || null, null);
-    const { data: categories = [] } = useShopCategories(currentEvent?.yeventid || null);
+    const { data: boutiques = [] } = useShopBoutiques(
+        currentEvent?.yeventid || null,
+        null
+    )
+    const { data: categories = [] } = useShopCategories(
+        currentEvent?.yeventid || null
+    )
+    const { data: colors = [] } = useShopColors()
+    const { data: sizes = [] } = useShopSizes()
 
-    // Calculate pagination
-    const totalPages = Math.ceil(totalCount / perPage);
-    const hasNextPage = page < totalPages;
-    const hasPrevPage = page > 1;
+    // Handle filter changes (no pagination needed)
+    const handleFilterChange = useCallback(
+        (key: string) => (value: any) => {
+            setQueryState({ [key]: value })
+        },
+        [setQueryState]
+    )
 
-    // Reset page when filters change
-    const handleFilterChange = useCallback((key: string) => (value: any) => {
-        setQueryState({ [key]: value, page: 1 });
-    }, [setQueryState]);
+    const hasActiveFilters = Boolean(boutiqueId || categoryId || search)
 
-    const clearFilters = useCallback(() => {
-        setQueryState({
-            boutiqueId: null,
-            categoryId: null,
-            search: "",
-            page: 1,
-        });
-    }, [setQueryState]);
+    // Infinite scroll detection
+    useEffect(() => {
+        const handleScroll = () => {
+            if (
+                window.innerHeight + document.documentElement.scrollTop >=
+                    document.documentElement.offsetHeight - 1000 &&
+                hasNextPage &&
+                !isFetchingNextPage
+            ) {
+                fetchNextPage()
+            }
+        }
 
-    const hasActiveFilters = Boolean(boutiqueId || categoryId || search);
-
-
+        window.addEventListener('scroll', handleScroll)
+        return () => window.removeEventListener('scroll', handleScroll)
+    }, [hasNextPage, isFetchingNextPage, fetchNextPage])
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-morpheus-blue-dark via-morpheus-blue-dark/95 to-morpheus-blue-light/90">
-            {/* Header */}
-            <div className="bg-gradient-to-r from-morpheus-blue-dark/80 to-morpheus-blue-light/80 backdrop-blur-md border-b border-morpheus-gold-dark/20 shadow-lg">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <h1 className="text-3xl font-bold bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light bg-clip-text text-transparent drop-shadow-lg">
-                                {t("shop.title")}
-                            </h1>
-                            {currentEvent && (
-                                <p className="text-sm text-gray-300 mt-2 font-medium">{currentEvent.yeventintitule}</p>
-                            )}
-                        </div>
-
-                        {/* View Mode Toggle */}
-                        <div className="flex items-center gap-3">
-                            <button
-                                onClick={() => setShowMobileFilters(true)}
-                                className="lg:hidden p-3 bg-morpheus-blue-dark/40 border border-morpheus-gold-dark/30 rounded-lg hover:bg-morpheus-blue-dark/60 text-white transition-all duration-300"
-                            >
-                                <Filter className="w-5 h-5" />
-                            </button>
-                            <button
-                                onClick={() => setQueryState({ viewMode: "grid" })}
-                                className={cn(
-                                    "p-3 rounded-lg transition-all duration-300",
-                                    viewMode === "grid"
-                                        ? "bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light text-white shadow-lg"
-                                        : "bg-morpheus-blue-dark/40 border border-morpheus-gold-dark/30 text-gray-300 hover:bg-morpheus-blue-dark/60 hover:text-white"
-                                )}
-                            >
-                                <Grid className="w-5 h-5" />
-                            </button>
-                            <button
-                                onClick={() => setQueryState({ viewMode: "list" })}
-                                className={cn(
-                                    "p-3 rounded-lg transition-all duration-300",
-                                    viewMode === "list"
-                                        ? "bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light text-white shadow-lg"
-                                        : "bg-morpheus-blue-dark/40 border border-morpheus-gold-dark/30 text-gray-300 hover:bg-morpheus-blue-dark/60 hover:text-white"
-                                )}
-                            >
-                                <List className="w-5 h-5" />
-                            </button>
-                        </div>
+        <div className="min-h-[100svh] bg-white">
+            <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+                {/* Header with Results Count and Column Toggle */}
+                <div className="mb-8 flex items-center justify-between">
+                    <div></div>
+                    <div className="text-center">
+                        <p className="text-gray-500">
+                            +{totalCount} {t('shop.results') || 'resultats'}
+                        </p>
+                    </div>
+                    {/* Grid toggle buttons - Hidden on mobile and small screens */}
+                    <div className="hidden items-center gap-2 lg:flex">
+                        <button
+                            onClick={() => setQueryState({ columns: 3 })}
+                            className="rounded-lg p-2 transition-opacity hover:opacity-70"
+                            title="3 colonnes"
+                        >
+                            <ThreeColumnIcon
+                                className="h-6 w-8"
+                                isActive={columns === 3}
+                            />
+                        </button>
+                        <button
+                            onClick={() => setQueryState({ columns: 4 })}
+                            className="rounded-lg p-2 transition-opacity hover:opacity-70"
+                            title="4 colonnes"
+                        >
+                            <FourColumnIcon
+                                className="h-6 w-10"
+                                isActive={columns === 4}
+                            />
+                        </button>
                     </div>
                 </div>
+
+                {/* Main Content */}
+                <main>
+                    {/* Products Grid */}
+                    {isLoadingProducts ? (
+                        <div className="flex h-64 items-center justify-center">
+                            <div className="border-t-morpheus-gold-light h-16 w-16 animate-spin rounded-full border-4 border-gray-300"></div>
+                        </div>
+                    ) : products.length > 0 ? (
+                        <>
+                            <div
+                                className={cn(
+                                    'grid grid-cols-1 gap-8 sm:grid-cols-2',
+                                    columns === 3
+                                        ? 'lg:grid-cols-3'
+                                        : 'lg:grid-cols-4'
+                                )}
+                            >
+                                {products.map((product) => (
+                                    <ProductCard
+                                        key={product.yprodid}
+                                        product={product}
+                                        viewMode="grid"
+                                        onViewDetails={() => {
+                                            setSelectedProduct(product)
+                                            setShowProductDetails(true)
+                                        }}
+                                    />
+                                ))}
+                            </div>
+
+                            {/* Infinite Scroll Loading Indicator */}
+                            {isFetchingNextPage && (
+                                <div className="mt-8 flex justify-center">
+                                    <div className="border-t-morpheus-gold-light h-8 w-8 animate-spin rounded-full border-4 border-gray-300"></div>
+                                </div>
+                            )}
+                        </>
+                    ) : (
+                        <div className="py-16 text-center">
+                            <div className="mx-auto max-w-md rounded-xl border border-gray-200 bg-white p-8 shadow-sm">
+                                <p className="mb-4 text-lg text-gray-600">
+                                    {t('shop.noProductsFound')}
+                                </p>
+                                {hasActiveFilters && (
+                                    <button
+                                        onClick={() => {
+                                            setQueryState({
+                                                boutiqueId: null,
+                                                categoryId: null,
+                                                search: '',
+                                                sortBy: 'newest',
+                                            })
+                                        }}
+                                        className="from-morpheus-gold-dark to-morpheus-gold-light hover:from-morpheus-gold-light hover:to-morpheus-gold-dark rounded-lg bg-gradient-to-r px-6 py-3 font-medium text-white transition-all duration-300"
+                                    >
+                                        {t('shop.clearFilters')}
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    )}
+                </main>
             </div>
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div className="flex gap-8">
-                    {/* Desktop Sidebar */}
-                    <aside className="hidden lg:block w-80 flex-shrink-0">
-                        <div className="bg-gradient-to-br from-morpheus-blue-dark/40 to-morpheus-blue-light/40 backdrop-blur-md border border-morpheus-gold-dark/20 rounded-xl p-6 sticky top-4 shadow-xl">
-                            <FilterSidebar
-                                search={search}
-                                boutiqueId={boutiqueId}
-                                categoryId={categoryId}
-                                boutiques={boutiques}
-                                categories={categories}
-                                hasActiveFilters={hasActiveFilters}
-                                t={t}
-                                onFilterChange={handleFilterChange}
-                                onClearFilters={clearFilters}
-                            />
-                        </div>
-                    </aside>
+            {/* Fixed Bottom Filter Button */}
+            <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 transform">
+                <button
+                    onClick={() => setShowFilterSheet(true)}
+                    className="flex items-center gap-3 rounded-full border border-gray-200 bg-white px-8 py-4 text-gray-600 shadow-lg transition-all hover:bg-gray-50 hover:shadow-xl"
+                >
+                    <FilterIcon className="h-6 w-6" />
+                    <span className="font-medium text-gray-700">Filtrer</span>
+                    <SortIcon className="h-6 w-6" />
+                    <span className="font-medium text-gray-700">Trier</span>
+                </button>
+            </div>
 
-                    {/* Main Content */}
-                    <main className="flex-1">
-                        {/* Results Count */}
-                        <div className="mb-6 text-gray-300 font-medium">
-                            {totalCount > 0 ? (
-                                <>
-                                    {t("shop.showing")} {(page - 1) * perPage + 1}-
-                                    {Math.min(page * perPage, totalCount)} {t("shop.of")} {totalCount}{" "}
-                                    {t("shop.products")}
-                                </>
-                            ) : (
-                                t("shop.noProductsFound")
-                            )}
-                        </div>
-
-                        {/* Products Grid/List */}
-                        {isLoadingProducts ? (
-                            <div className="flex items-center justify-center h-64">
-                                <div className="animate-spin rounded-full h-16 w-16 border-4 border-morpheus-gold-dark/30 border-t-morpheus-gold-light"></div>
+            {/* Filter Sheet */}
+            <Sheet open={showFilterSheet} onOpenChange={setShowFilterSheet}>
+                <SheetTitle />
+                <SheetContent side="right" className="bg-white">
+                    {/* Header */}
+                    <div className="flex items-center justify-between border-b border-gray-200 p-6">
+                        <h2 className="text-xl font-medium text-gray-900">
+                            Filtrer & Trier
+                        </h2>
+                        <SheetClose>
+                            <div className="rounded-full p-2 transition-colors hover:bg-gray-100">
+                                <X className="h-5 w-5" />
                             </div>
-                        ) : products.length > 0 ? (
-                            <>
-                                <div
-                                    className={cn(
-                                        viewMode === "grid"
-                                            ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-                                            : "space-y-6"
-                                    )}
+                        </SheetClose>
+                    </div>
+
+                    {/* Content */}
+                    <div className="flex-1 overflow-y-auto">
+                        <div className="space-y-1 p-6">
+                            {/* Sort Options */}
+                            <div className="mb-6">
+                                <button
+                                    onClick={() =>
+                                        setExpandedSections((prev) => ({
+                                            ...prev,
+                                            sort: !prev.sort,
+                                        }))
+                                    }
+                                    className="flex w-full items-center justify-between py-3 text-left"
                                 >
-                                    {products.map((product) => (
-                                        <ProductCard
-                                            key={product.yprodid}
-                                            product={product}
-                                            viewMode={viewMode}
-                                            onViewDetails={() => {
-                                                setSelectedProduct(product);
-                                                setShowProductDetails(true);
-                                            }}
-                                        />
-                                    ))}
-                                </div>
-
-                                {/* Pagination */}
-                                {totalPages > 1 && (
-                                    <div className="mt-12 flex items-center justify-center gap-3">
+                                    <h3 className="text-lg font-medium text-gray-900">
+                                        Trier Par
+                                    </h3>
+                                    <ChevronDown
+                                        className={cn(
+                                            'h-5 w-5 text-gray-400 transition-transform',
+                                            expandedSections.sort
+                                                ? 'rotate-180'
+                                                : ''
+                                        )}
+                                    />
+                                </button>
+                                {expandedSections.sort && (
+                                    <div className="mt-2 space-y-2">
                                         <button
-                                            onClick={() => setQueryState({ page: Math.max(1, page - 1) })}
-                                            disabled={!hasPrevPage}
+                                            onClick={() =>
+                                                handleFilterChange('sortBy')(
+                                                    'newest'
+                                                )
+                                            }
                                             className={cn(
-                                                "p-3 rounded-lg transition-all duration-300",
-                                                hasPrevPage
-                                                    ? "bg-morpheus-blue-dark/40 border border-morpheus-gold-dark/30 text-white hover:bg-morpheus-blue-dark/60"
-                                                    : "bg-morpheus-blue-dark/20 border border-morpheus-gold-dark/10 text-gray-500 cursor-not-allowed"
+                                                'w-full rounded-lg px-4 py-3 text-left transition-colors',
+                                                sortBy === 'newest'
+                                                    ? 'bg-black text-white'
+                                                    : 'text-gray-700 hover:bg-gray-50'
                                             )}
                                         >
-                                            <ChevronLeft className="w-5 h-5" />
+                                            <span>Plus récent</span>
                                         </button>
-
-                                        <div className="flex gap-2">
-                                            {Array.from({ length: totalPages }, (_, i) => i + 1)
-                                                .filter((pageNum) => {
-                                                    if (totalPages <= 7) return true;
-                                                    if (pageNum === 1 || pageNum === totalPages) return true;
-                                                    if (Math.abs(pageNum - page) <= 2) return true;
-                                                    return false;
-                                                })
-                                                .map((pageNum, index, array) => (
-                                                    <div key={pageNum} className="flex items-center">
-                                                        {index > 0 && array[index - 1] !== pageNum - 1 && (
-                                                            <span className="px-2 text-morpheus-gold-light/70">
-                                                                ...
-                                                            </span>
-                                                        )}
-                                                        <button
-                                                            onClick={() => setQueryState({ page: pageNum })}
-                                                            className={cn(
-                                                                "px-4 py-2 rounded-lg font-medium transition-all duration-300",
-                                                                page === pageNum
-                                                                    ? "bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light text-white shadow-lg"
-                                                                    : "bg-morpheus-blue-dark/40 border border-morpheus-gold-dark/30 text-gray-300 hover:bg-morpheus-blue-dark/60 hover:text-white"
-                                                            )}
-                                                        >
-                                                            {pageNum}
-                                                        </button>
-                                                    </div>
-                                                ))}
-                                        </div>
-
                                         <button
-                                            onClick={() => setQueryState({ page: Math.min(totalPages, page + 1) })}
-                                            disabled={!hasNextPage}
+                                            onClick={() =>
+                                                handleFilterChange('sortBy')(
+                                                    'price_asc'
+                                                )
+                                            }
                                             className={cn(
-                                                "p-3 rounded-lg transition-all duration-300",
-                                                hasNextPage
-                                                    ? "bg-morpheus-blue-dark/40 border border-morpheus-gold-dark/30 text-white hover:bg-morpheus-blue-dark/60"
-                                                    : "bg-morpheus-blue-dark/20 border border-morpheus-gold-dark/10 text-gray-500 cursor-not-allowed"
+                                                'w-full rounded-lg px-4 py-3 text-left transition-colors',
+                                                sortBy === 'price_asc'
+                                                    ? 'bg-black text-white'
+                                                    : 'text-gray-700 hover:bg-gray-50'
                                             )}
                                         >
-                                            <ChevronRight className="w-5 h-5" />
+                                            <span>Prix croissant</span>
+                                        </button>
+                                        <button
+                                            onClick={() =>
+                                                handleFilterChange('sortBy')(
+                                                    'price_desc'
+                                                )
+                                            }
+                                            className={cn(
+                                                'w-full rounded-lg px-4 py-3 text-left transition-colors',
+                                                sortBy === 'price_desc'
+                                                    ? 'bg-black text-white'
+                                                    : 'text-gray-700 hover:bg-gray-50'
+                                            )}
+                                        >
+                                            <span>Prix décroissant</span>
+                                        </button>
+                                        <button
+                                            onClick={() =>
+                                                handleFilterChange('sortBy')(
+                                                    'alphabetical'
+                                                )
+                                            }
+                                            className={cn(
+                                                'w-full rounded-lg px-4 py-3 text-left transition-colors',
+                                                sortBy === 'alphabetical'
+                                                    ? 'bg-black text-white'
+                                                    : 'text-gray-700 hover:bg-gray-50'
+                                            )}
+                                        >
+                                            <span>Alphabétique</span>
                                         </button>
                                     </div>
                                 )}
-                            </>
-                        ) : (
-                            <div className="text-center py-16">
-                                <div className="bg-gradient-to-br from-morpheus-blue-dark/40 to-morpheus-blue-light/40 backdrop-blur-md border border-morpheus-gold-dark/20 rounded-xl p-8 max-w-md mx-auto">
-                                    <p className="text-gray-300 text-lg mb-4">{t("shop.noProductsFound")}</p>
-                                    {hasActiveFilters && (
+                            </div>
+
+                            {/* Filter Categories */}
+                            <div className="space-y-4">
+                                {/* Categories */}
+                                {categories.length > 0 && (
+                                    <div>
                                         <button
-                                            onClick={clearFilters}
-                                            className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light text-white px-6 py-3 rounded-lg hover:from-morpheus-gold-light hover:to-morpheus-gold-dark transition-all duration-300 font-medium"
+                                            onClick={() =>
+                                                setExpandedSections((prev) => ({
+                                                    ...prev,
+                                                    categories:
+                                                        !prev.categories,
+                                                }))
+                                            }
+                                            className="flex w-full items-center justify-between py-3 text-left"
                                         >
-                                            {t("shop.clearFilters")}
+                                            <h3 className="text-lg font-medium text-gray-900">
+                                                Catégories
+                                            </h3>
+                                            <ChevronDown
+                                                className={cn(
+                                                    'h-5 w-5 text-gray-400 transition-transform',
+                                                    expandedSections.categories
+                                                        ? 'rotate-180'
+                                                        : ''
+                                                )}
+                                            />
                                         </button>
+                                        {expandedSections.categories && (
+                                            <div className="mt-2 space-y-2">
+                                                {categories.map((category) => (
+                                                    <button
+                                                        key={
+                                                            category.xcategprodid
+                                                        }
+                                                        onClick={() =>
+                                                            handleFilterChange(
+                                                                'categoryId'
+                                                            )(
+                                                                category.xcategprodid
+                                                            )
+                                                        }
+                                                        className={cn(
+                                                            'w-full rounded-lg px-4 py-3 text-left transition-colors',
+                                                            categoryId ===
+                                                                category.xcategprodid
+                                                                ? 'bg-black text-white'
+                                                                : 'text-gray-700 hover:bg-gray-50'
+                                                        )}
+                                                    >
+                                                        {
+                                                            category.xcategprodintitule
+                                                        }
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
+                                {/* Boutiques */}
+                                {boutiques.length > 0 && (
+                                    <div>
+                                        <button
+                                            onClick={() =>
+                                                setExpandedSections((prev) => ({
+                                                    ...prev,
+                                                    creators: !prev.creators,
+                                                }))
+                                            }
+                                            className="flex w-full items-center justify-between py-3 text-left"
+                                        >
+                                            <h3 className="text-lg font-medium text-gray-900">
+                                                Créateurs
+                                            </h3>
+                                            <ChevronDown
+                                                className={cn(
+                                                    'h-5 w-5 text-gray-400 transition-transform',
+                                                    expandedSections.creators
+                                                        ? 'rotate-180'
+                                                        : ''
+                                                )}
+                                            />
+                                        </button>
+                                        {expandedSections.creators && (
+                                            <div className="mt-2 space-y-2">
+                                                {boutiques.map((boutique) => (
+                                                    <button
+                                                        key={
+                                                            boutique.yboutiqueid
+                                                        }
+                                                        onClick={() =>
+                                                            handleFilterChange(
+                                                                'boutiqueId'
+                                                            )(
+                                                                boutique.yboutiqueid
+                                                            )
+                                                        }
+                                                        className={cn(
+                                                            'w-full rounded-lg px-4 py-3 text-left transition-colors',
+                                                            boutiqueId ===
+                                                                boutique.yboutiqueid
+                                                                ? 'bg-black text-white'
+                                                                : 'text-gray-700 hover:bg-gray-50'
+                                                        )}
+                                                    >
+                                                        {boutique.yboutiqueintitule ||
+                                                            boutique.yboutiquecode}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
+                                {/* Colors */}
+                                {colors.length > 0 && (
+                                    <div>
+                                        <button
+                                            onClick={() =>
+                                                setExpandedSections((prev) => ({
+                                                    ...prev,
+                                                    colors: !prev.colors,
+                                                }))
+                                            }
+                                            className="flex w-full items-center justify-between py-3 text-left"
+                                        >
+                                            <h3 className="text-lg font-medium text-gray-900">
+                                                Couleurs
+                                            </h3>
+                                            <ChevronDown
+                                                className={cn(
+                                                    'h-5 w-5 text-gray-400 transition-transform',
+                                                    expandedSections.colors
+                                                        ? 'rotate-180'
+                                                        : ''
+                                                )}
+                                            />
+                                        </button>
+                                        {expandedSections.colors && (
+                                            <div className="mt-2 space-y-2">
+                                                {colors.map((color) => (
+                                                    <button
+                                                        key={color.xcouleurid}
+                                                        onClick={() =>
+                                                            handleFilterChange(
+                                                                'colorId'
+                                                            )(color.xcouleurid)
+                                                        }
+                                                        className={cn(
+                                                            'flex w-full items-center gap-3 rounded-lg px-4 py-3 text-left transition-colors',
+                                                            colorId ===
+                                                                color.xcouleurid
+                                                                ? 'bg-black text-white'
+                                                                : 'text-gray-700 hover:bg-gray-50'
+                                                        )}
+                                                    >
+                                                        <div
+                                                            className="h-4 w-4 rounded-full border border-gray-300"
+                                                            style={{
+                                                                backgroundColor:
+                                                                    color.xcouleurhexa,
+                                                            }}
+                                                        />
+                                                        <span>
+                                                            {
+                                                                color.xcouleurintitule
+                                                            }
+                                                        </span>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
+                                {/* Sizes */}
+                                {sizes.length > 0 && (
+                                    <div>
+                                        <button
+                                            onClick={() =>
+                                                setExpandedSections((prev) => ({
+                                                    ...prev,
+                                                    sizes: !prev.sizes,
+                                                }))
+                                            }
+                                            className="flex w-full items-center justify-between py-3 text-left"
+                                        >
+                                            <h3 className="text-lg font-medium text-gray-900">
+                                                Tailles
+                                            </h3>
+                                            <ChevronDown
+                                                className={cn(
+                                                    'h-5 w-5 text-gray-400 transition-transform',
+                                                    expandedSections.sizes
+                                                        ? 'rotate-180'
+                                                        : ''
+                                                )}
+                                            />
+                                        </button>
+                                        {expandedSections.sizes && (
+                                            <div className="mt-2 space-y-2">
+                                                {sizes.map((size) => (
+                                                    <button
+                                                        key={size.xtailleid}
+                                                        onClick={() =>
+                                                            handleFilterChange(
+                                                                'sizeId'
+                                                            )(size.xtailleid)
+                                                        }
+                                                        className={cn(
+                                                            'w-full rounded-lg px-4 py-3 text-left transition-colors',
+                                                            sizeId ===
+                                                                size.xtailleid
+                                                                ? 'bg-black text-white'
+                                                                : 'text-gray-700 hover:bg-gray-50'
+                                                        )}
+                                                    >
+                                                        <span>
+                                                            {
+                                                                size.xtailleintitule
+                                                            }
+                                                        </span>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
+                                {/* Price Range */}
+                                <div>
+                                    <button
+                                        onClick={() =>
+                                            setExpandedSections((prev) => ({
+                                                ...prev,
+                                                priceRange: !prev.priceRange,
+                                            }))
+                                        }
+                                        className="flex w-full items-center justify-between py-3 text-left"
+                                    >
+                                        <h3 className="text-lg font-medium text-gray-900">
+                                            Prix
+                                        </h3>
+                                        <ChevronDown
+                                            className={cn(
+                                                'h-5 w-5 text-gray-400 transition-transform',
+                                                expandedSections.priceRange
+                                                    ? 'rotate-180'
+                                                    : ''
+                                            )}
+                                        />
+                                    </button>
+                                    {expandedSections.priceRange && (
+                                        <div className="mt-2 space-y-3">
+                                            <div className="grid grid-cols-2 gap-3">
+                                                <div>
+                                                    <label className="mb-1 block text-sm font-medium text-gray-700">
+                                                        Prix min
+                                                    </label>
+                                                    <input
+                                                        type="number"
+                                                        placeholder="0"
+                                                        value={minPrice || ''}
+                                                        onChange={(e) => {
+                                                            const value = e
+                                                                .target.value
+                                                                ? parseInt(
+                                                                      e.target
+                                                                          .value
+                                                                  )
+                                                                : null
+                                                            setQueryState({
+                                                                minPrice: value,
+                                                            })
+                                                        }}
+                                                        className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-400 focus:outline-none"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="mb-1 block text-sm font-medium text-gray-700">
+                                                        Prix max
+                                                    </label>
+                                                    <input
+                                                        type="number"
+                                                        placeholder="1000"
+                                                        value={maxPrice || ''}
+                                                        onChange={(e) => {
+                                                            const value = e
+                                                                .target.value
+                                                                ? parseInt(
+                                                                      e.target
+                                                                          .value
+                                                                  )
+                                                                : null
+                                                            setQueryState({
+                                                                maxPrice: value,
+                                                            })
+                                                        }}
+                                                        className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-400 focus:outline-none"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
                                     )}
                                 </div>
                             </div>
-                        )}
-                    </main>
-                </div>
-            </div>
+                        </div>
+                    </div>
 
-            {/* Mobile Filters Modal */}
-            {showMobileFilters && (
-                <div className="fixed inset-0 z-50 lg:hidden">
-                    <div
-                        className="fixed inset-0 bg-black/70 backdrop-blur-sm"
-                        onClick={() => setShowMobileFilters(false)}
-                    />
-                    <div className="fixed right-0 top-0 h-full w-80 bg-gradient-to-br from-morpheus-blue-dark/95 to-morpheus-blue-light/95 backdrop-blur-md border-l border-morpheus-gold-dark/20 shadow-2xl overflow-y-auto">
-                        <div className="sticky top-0 bg-gradient-to-r from-morpheus-blue-dark/80 to-morpheus-blue-light/80 backdrop-blur-md border-b border-morpheus-gold-dark/20 p-4 flex items-center justify-between">
-                            <h2 className="font-semibold text-xl text-white">{t("shop.filters")}</h2>
+                    {/* Footer */}
+                    <div className="border-t border-gray-200 p-6">
+                        <div className="flex gap-3">
                             <button
-                                onClick={() => setShowMobileFilters(false)}
-                                className="p-2 hover:bg-morpheus-blue-dark/40 rounded-lg text-gray-300 hover:text-white transition-all duration-300"
+                                onClick={() => {
+                                    setQueryState({
+                                        boutiqueId: null,
+                                        categoryId: null,
+                                        search: '',
+                                        sortBy: 'newest',
+                                        colorId: null,
+                                        sizeId: null,
+                                        minPrice: null,
+                                        maxPrice: null,
+                                    })
+                                }}
+                                className="flex-1 rounded-lg border border-gray-300 px-4 py-3 text-gray-700 transition-colors hover:bg-gray-50"
                             >
-                                <X className="w-6 h-6" />
+                                Effacer tout
+                            </button>
+                            <button
+                                onClick={() => setShowFilterSheet(false)}
+                                className="flex-1 rounded-lg bg-black px-4 py-3 text-white transition-colors hover:bg-gray-800"
+                            >
+                                Appliquer
                             </button>
                         </div>
-                        <FilterSidebar
-                            isMobile
-                            search={search}
-                            boutiqueId={boutiqueId}
-                            categoryId={categoryId}
-                            boutiques={boutiques}
-                            categories={categories}
-                            hasActiveFilters={hasActiveFilters}
-                            t={t}
-                            onFilterChange={handleFilterChange}
-                            onClearFilters={clearFilters}
-                        />
                     </div>
-                </div>
-            )}
+                </SheetContent>
+            </Sheet>
 
             {/* Product Details Modal */}
             {showProductDetails && selectedProduct && (
                 <ProductDetailsPage
                     productData={selectedProduct}
                     onClose={() => {
-                        setShowProductDetails(false);
-                        setSelectedProduct(null);
+                        setShowProductDetails(false)
+                        setSelectedProduct(null)
                     }}
                     extraTop
                 />
             )}
+
+            {/* Footer */}
+            <Footer />
         </div>
-    );
+    )
 }
 
 export default function ShopPage() {
     return (
-        <Suspense fallback={
-            <div className="min-h-screen bg-gradient-to-br from-morpheus-blue-dark via-morpheus-blue-dark/95 to-morpheus-blue-light/90 flex items-center justify-center">
-                <div className="animate-spin rounded-full h-16 w-16 border-4 border-morpheus-gold-dark/30 border-t-morpheus-gold-light"></div>
-            </div>
-        }>
+        <Suspense
+            fallback={
+                <div className="flex min-h-screen items-center justify-center bg-white">
+                    <div className="border-t-morpheus-gold-light h-16 w-16 animate-spin rounded-full border-4 border-gray-300"></div>
+                </div>
+            }
+        >
             <ShopContent />
         </Suspense>
-    );
+    )
 }

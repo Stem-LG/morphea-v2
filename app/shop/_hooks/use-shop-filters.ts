@@ -194,3 +194,160 @@ export function useShopCategories(eventId: number | null) {
         placeholderData: keepPreviousData,
     });
 }
+
+// Hook to get unique colors from current event products
+export function useShopColors() {
+    const supabase = createClient();
+
+    return useQuery({
+        queryKey: ['shop-colors'],
+        queryFn: async () => {
+            // Get current active event
+            const currentDate = new Date().toISOString().split('T')[0];
+
+            const { data: currentEvent, error: eventError } = await supabase
+                .schema("morpheus")
+                .from("yevent")
+                .select("*")
+                .lte("yeventdatedeb", currentDate)
+                .gte("yeventdatefin", currentDate)
+                .order("yeventdatedeb", { ascending: false })
+                .limit(1)
+                .single();
+
+            if (eventError || !currentEvent) {
+                console.error("No active event found:", eventError);
+                return [];
+            }
+
+            // Get product IDs from current event
+            const { data: eventDetails, error: detailsError } = await supabase
+                .schema("morpheus")
+                .from("ydetailsevent")
+                .select("yprodidfk")
+                .eq("yeventidfk", currentEvent.yeventid)
+                .not("yprodidfk", "is", null);
+
+            if (detailsError || !eventDetails) {
+                console.error("Error fetching event details:", detailsError);
+                return [];
+            }
+
+            const productIds = [...new Set(eventDetails.map(d => d.yprodidfk))];
+
+            if (productIds.length === 0) {
+                return [];
+            }
+
+            // Get unique colors from variants of these products
+            const { data: variants, error: variantsError } = await supabase
+                .schema("morpheus")
+                .from("yvarprod")
+                .select(`
+                    xcouleur:xcouleuridfk (
+                        xcouleurid,
+                        xcouleurintitule,
+                        xcouleurhexa
+                    )
+                `)
+                .in("yprodidfk", productIds)
+                .eq("yvarprodstatut", "approved");
+
+            if (variantsError) {
+                console.error("Error fetching colors:", variantsError);
+                return [];
+            }
+
+            // Extract unique colors
+            const uniqueColors = variants?.reduce((acc: any[], variant: any) => {
+                const color = variant.xcouleur;
+                if (color && !acc.some(c => c.xcouleurid === color.xcouleurid)) {
+                    acc.push(color);
+                }
+                return acc;
+            }, []) || [];
+
+            return uniqueColors.sort((a, b) => a.xcouleurintitule.localeCompare(b.xcouleurintitule));
+        },
+        staleTime: 5 * 60 * 1000, // 5 minutes
+        gcTime: 10 * 60 * 1000, // 10 minutes
+    });
+}
+
+// Hook to get unique sizes from current event products
+export function useShopSizes() {
+    const supabase = createClient();
+
+    return useQuery({
+        queryKey: ['shop-sizes'],
+        queryFn: async () => {
+            // Get current active event
+            const currentDate = new Date().toISOString().split('T')[0];
+
+            const { data: currentEvent, error: eventError } = await supabase
+                .schema("morpheus")
+                .from("yevent")
+                .select("*")
+                .lte("yeventdatedeb", currentDate)
+                .gte("yeventdatefin", currentDate)
+                .order("yeventdatedeb", { ascending: false })
+                .limit(1)
+                .single();
+
+            if (eventError || !currentEvent) {
+                console.error("No active event found:", eventError);
+                return [];
+            }
+
+            // Get product IDs from current event
+            const { data: eventDetails, error: detailsError } = await supabase
+                .schema("morpheus")
+                .from("ydetailsevent")
+                .select("yprodidfk")
+                .eq("yeventidfk", currentEvent.yeventid)
+                .not("yprodidfk", "is", null);
+
+            if (detailsError || !eventDetails) {
+                console.error("Error fetching event details:", detailsError);
+                return [];
+            }
+
+            const productIds = [...new Set(eventDetails.map(d => d.yprodidfk))];
+
+            if (productIds.length === 0) {
+                return [];
+            }
+
+            // Get unique sizes from variants of these products
+            const { data: variants, error: variantsError } = await supabase
+                .schema("morpheus")
+                .from("yvarprod")
+                .select(`
+                    xtaille:xtailleidfk (
+                        xtailleid,
+                        xtailleintitule
+                    )
+                `)
+                .in("yprodidfk", productIds)
+                .eq("yvarprodstatut", "approved");
+
+            if (variantsError) {
+                console.error("Error fetching sizes:", variantsError);
+                return [];
+            }
+
+            // Extract unique sizes
+            const uniqueSizes = variants?.reduce((acc: any[], variant: any) => {
+                const size = variant.xtaille;
+                if (size && !acc.some(s => s.xtailleid === size.xtailleid)) {
+                    acc.push(size);
+                }
+                return acc;
+            }, []) || [];
+
+            return uniqueSizes.sort((a, b) => a.xtailleintitule.localeCompare(b.xtailleintitule));
+        },
+        staleTime: 5 * 60 * 1000, // 5 minutes
+        gcTime: 10 * 60 * 1000, // 10 minutes
+    });
+}
