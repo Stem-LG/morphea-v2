@@ -9,11 +9,14 @@ import ExpandableCategories from '@/components/expandable-categories'
 import { ThreeDPhotoCarousel } from '@/components/three-d-photo-carousel'
 import { Play, Pause, Volume2, VolumeX } from 'lucide-react'
 import { useLanguage } from '@/hooks/useLanguage'
+import { useHomeSettings } from '@/hooks/use-home-settings'
 
 export default function Home() {
     const supabase = createClient()
     const router = useRouter()
-    const { t } = useLanguage()
+    const { t, language } = useLanguage()
+    const { data: homeSettings, isLoading: isLoadingSettings } =
+        useHomeSettings()
 
     useEffect(() => {
         supabase.auth.onAuthStateChange(async (event) => {
@@ -53,70 +56,112 @@ export default function Home() {
         setIsMuted(!isMuted)
     }
 
-    // Video and overlay data in JSON format for future API integration
+    // Video and overlay data - now dynamic from settings
     const videoData = {
         side1: {
-            src: '/v1.mp4',
-            topText: t('homepage.hero.mode'),
-            mainText: t('homepage.hero.preCollection'),
+            src: homeSettings?.hero.video1.url || '/v1.mp4',
+            topText:
+                homeSettings?.hero.video1.topText[language] ||
+                t('homepage.hero.mode'),
+            mainText:
+                homeSettings?.hero.video1.mainText[language] ||
+                t('homepage.hero.preCollection'),
+            discoverLink: homeSettings?.hero.video1.discoverLink || '#',
         },
         side2: {
-            src: '/v2.mp4',
-            topText: t('homepage.hero.preCollection'),
-            mainText: t('homepage.hero.summerCollection'),
+            src: homeSettings?.hero.video2.url || '/v2.mp4',
+            topText:
+                homeSettings?.hero.video2.topText[language] ||
+                t('homepage.hero.preCollection'),
+            mainText:
+                homeSettings?.hero.video2.mainText[language] ||
+                t('homepage.hero.summerCollection'),
+            discoverLink: homeSettings?.hero.video2.discoverLink || '#',
         },
     }
 
     const collectionData = {
+        title:
+            homeSettings?.collections.title[language] ||
+            t('homepage.collections.title'),
+        subtitle:
+            homeSettings?.collections.subtitle[language] ||
+            t('homepage.collections.subtitle'),
         card1: {
-            image: '/p1.jpg',
+            image: homeSettings?.collections.image1Url || '/p1.jpg',
             title: t('homepage.collections.autumnCollection'),
             subtitle: t('homepage.collections.autumnSubtitle'),
         },
         card2: {
-            image: '/p2.jpg',
+            image: homeSettings?.collections.image2Url || '/p2.jpg',
             title: t('homepage.collections.autumnCollection'),
             subtitle: t('homepage.collections.autumnSubtitle'),
         },
     }
 
     const categoriesData = {
+        title:
+            homeSettings?.categories.title[language] ||
+            t('homepage.categories.title'),
+        subtitle: homeSettings?.categories.title[language]
+            ? undefined
+            : t('homepage.categories.subtitle'), // Only use fallback if no dynamic title
         category1: {
-            image: '/pp1.jpg',
-            title: t('homepage.categories.hauteCouture'),
-            subtitle: '',
-            link: '#',
+            image: homeSettings?.categories.category1.imageUrl || '/pp1.jpg',
+            title:
+                homeSettings?.categories.category1.name ||
+                t('homepage.categories.hauteCouture'),
+            subtitle:
+                homeSettings?.categories.category1.subtitle[language] || '',
+            link: homeSettings?.categories.category1.link || '#',
         },
         category2: {
-            image: '/pp2.jpg',
-            title: t('homepage.categories.jewelry'),
-            subtitle: t('homepage.categories.jewelrySubtitle'),
-            link: '#',
+            image: homeSettings?.categories.category2.imageUrl || '/pp2.jpg',
+            title:
+                homeSettings?.categories.category2.name ||
+                t('homepage.categories.jewelry'),
+            subtitle:
+                homeSettings?.categories.category2.subtitle[language] ||
+                t('homepage.categories.jewelrySubtitle'),
+            link: homeSettings?.categories.category2.link || '#',
         },
         category3: {
-            image: '/pp3.jpg',
-            title: t('homepage.categories.accessories'),
-            subtitle: '',
-            link: '#',
+            image: homeSettings?.categories.category3.imageUrl || '/pp3.jpg',
+            title:
+                homeSettings?.categories.category3.name ||
+                t('homepage.categories.accessories'),
+            subtitle:
+                homeSettings?.categories.category3.subtitle[language] || '',
+            link: homeSettings?.categories.category3.link || '#',
         },
     }
 
-    // const creatorsData = {
-    //     images: [
-    //         '/lg1.jpg',
-    //         '/lg2.png',
-    //         '/lg3.jpg',
-    //         '/lg4.jpg',
-    //         '/lg1.jpg',
-    //         '/lg2.png',
-    //         '/lg3.jpg',
-    //         '/lg4.jpg',
-    //         '/lg1.jpg',
-    //         '/lg2.png',
-    //         '/lg3.jpg',
-    //         '/lg4.jpg'
-    //     ]
-    // };
+    const creatorsData = {
+        title:
+            homeSettings?.creators.title[language] ||
+            t('homepage.creators.title'),
+        subtitle:
+            homeSettings?.creators.subtitle[language] ||
+            t('homepage.creators.subtitle'),
+        images:
+            homeSettings?.creators.images &&
+            homeSettings.creators.images.length > 0
+                ? homeSettings.creators.images
+                : [
+                      '/lg1.jpg',
+                      '/lg2.png',
+                      '/lg3.jpg',
+                      '/lg4.jpg',
+                      '/lg1.jpg',
+                      '/lg2.png',
+                      '/lg3.jpg',
+                      '/lg4.jpg',
+                      '/lg1.jpg',
+                      '/lg2.png',
+                      '/lg3.jpg',
+                      '/lg4.jpg',
+                  ],
+    }
     return (
         <div className="relative min-h-[calc(100svh)] w-full">
             {/* Fullscreen video background with fade animation */}
@@ -155,7 +200,7 @@ export default function Home() {
                                 {videoData.side1.mainText}
                             </div>
                             <a
-                                href="#"
+                                href={videoData.side1.discoverLink}
                                 className="font-supreme pointer-events-auto text-lg font-bold tracking-widest text-white underline transition-colors hover:text-gray-200 md:text-2xl"
                             >
                                 {t('homepage.hero.discover')}
@@ -177,7 +222,7 @@ export default function Home() {
                                 {videoData.side2.mainText}
                             </div>
                             <a
-                                href="#"
+                                href={videoData.side2.discoverLink}
                                 className="font-supreme pointer-events-auto text-lg font-bold tracking-widest text-white underline transition-colors hover:text-gray-200 md:text-2xl"
                             >
                                 {t('homepage.hero.discover')}
@@ -242,10 +287,10 @@ export default function Home() {
                 <div className="mx-auto max-w-7xl px-4 md:px-8">
                     <div className="mb-12 text-center md:mb-16">
                         <h2 className="font-recia mb-8 text-3xl leading-tight font-extrabold text-[#053340] md:mb-14 md:text-5xl">
-                            {t('homepage.collections.title')}
+                            {collectionData.title}
                         </h2>
                         <p className="font-supreme mx-auto max-w-4xl px-4 text-lg text-gray-600 md:px-0 md:text-2xl">
-                            {t('homepage.collections.subtitle')}
+                            {collectionData.subtitle}
                         </p>
                     </div>
 
@@ -299,27 +344,14 @@ export default function Home() {
                 <div className="mx-auto max-w-7xl px-4 md:px-8">
                     <div className="mb-8 text-center md:mb-10">
                         <h2 className="font-recia mb-6 text-3xl leading-tight font-extrabold text-[#053340] md:mb-11 md:text-5xl">
-                            {t('homepage.creators.title')}
+                            {creatorsData.title}
                         </h2>
                         <p className="font-supreme mx-auto max-w-2xl px-4 text-lg text-gray-600 md:px-0 md:text-2xl">
-                            {t('homepage.creators.subtitle')}
+                            {creatorsData.subtitle}
                         </p>
                     </div>
                     <ThreeDPhotoCarousel
-                        images={[
-                            '/lg1.jpg',
-                            '/lg2.png',
-                            '/lg3.jpg',
-                            '/lg4.jpg',
-                            '/lg1.jpg',
-                            '/lg2.png',
-                            '/lg3.jpg',
-                            '/lg4.jpg',
-                            '/lg1.jpg',
-                            '/lg2.png',
-                            '/lg3.jpg',
-                            '/lg4.jpg',
-                        ]}
+                        images={creatorsData.images}
                         autoRotateSpeed={0.05}
                         height={300}
                         cylinderWidth={2000}

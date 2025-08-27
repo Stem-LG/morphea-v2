@@ -11,6 +11,8 @@ interface CategoryData {
 }
 
 interface CategoriesData {
+    title?: string
+    subtitle?: string
     category1: CategoryData
     category2: CategoryData
     category3: CategoryData
@@ -75,10 +77,10 @@ export default function ExpandableCategories({
             <div className="mx-auto max-w-7xl px-4 md:px-8">
                 <div className="mb-8 text-center md:mb-12">
                     <h2 className="font-recia mb-6 text-3xl leading-tight font-extrabold text-[#053340] md:mb-10 md:text-5xl">
-                        {t('homepage.categories.title')}
+                        {data.title || t('homepage.categories.title')}
                     </h2>
                     <p className="font-supreme mx-auto max-w-2xl px-4 text-lg text-gray-600 md:px-0 md:text-2xl">
-                        {t('homepage.categories.subtitle')}
+                        {data.subtitle || t('homepage.categories.subtitle')}
                     </p>
                 </div>
 

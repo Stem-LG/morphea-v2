@@ -42,7 +42,57 @@ const ALLOWED_SETTING_KEYS = [
   'website_url',
   'default_currency_id',
   'powered_by',
-  'mellime_url'
+  'mellime_url',
+  // Homepage Hero Section
+  'homepage_hero_video1_url',
+  'homepage_hero_video1_top_text_en',
+  'homepage_hero_video1_top_text_fr',
+  'homepage_hero_video1_main_text_en',
+  'homepage_hero_video1_main_text_fr',
+  'homepage_hero_video1_discover_link',
+  'homepage_hero_video2_url',
+  'homepage_hero_video2_top_text_en',
+  'homepage_hero_video2_top_text_fr',
+  'homepage_hero_video2_main_text_en',
+  'homepage_hero_video2_main_text_fr',
+  'homepage_hero_video2_discover_link',
+  // Homepage Collections Section
+  'homepage_collections_title_en',
+  'homepage_collections_title_fr',
+  'homepage_collections_subtitle_en',
+  'homepage_collections_subtitle_fr',
+  'homepage_collections_image1_url',
+  'homepage_collections_image2_url',
+  // Homepage Categories Section
+  'homepage_categories_title_en',
+  'homepage_categories_title_fr',
+  'homepage_categories_category1_id',
+  'homepage_categories_category1_subtitle_en',
+  'homepage_categories_category1_subtitle_fr',
+  'homepage_categories_category1_link',
+  'homepage_categories_category1_image_url',
+  'homepage_categories_category2_id',
+  'homepage_categories_category2_subtitle_en',
+  'homepage_categories_category2_subtitle_fr',
+  'homepage_categories_category2_link',
+  'homepage_categories_category2_image_url',
+  'homepage_categories_category3_id',
+  'homepage_categories_category3_subtitle_en',
+  'homepage_categories_category3_subtitle_fr',
+  'homepage_categories_category3_link',
+  'homepage_categories_category3_image_url',
+  // Homepage Creators Section
+  'homepage_creators_title_en',
+  'homepage_creators_title_fr',
+  'homepage_creators_subtitle_en',
+  'homepage_creators_subtitle_fr',
+  'homepage_creators_images', // JSON array of image URLs
+  // Footer Settings
+  'footer_social_facebook_url',
+  'footer_social_instagram_url',
+  'footer_social_twitter_url',
+  'footer_social_linkedin_url',
+  'footer_categories_ids' // JSON array of category IDs to display
 ]
 
 export function useUpdateSetting() {
@@ -91,7 +141,9 @@ export function useUpdateSetting() {
       }
     },
     onSuccess: () => {
+      // Invalidate both settings queries to ensure UI updates
       queryClient.invalidateQueries({ queryKey: ['settings'] })
+      queryClient.invalidateQueries({ queryKey: ['home-settings'] })
       toast.success(t('admin.settings.settingUpdatedSuccessfully'))
     },
     onError: (error: Error) => {
@@ -127,7 +179,9 @@ export function useDeleteSetting() {
       if (error) throw new Error(error.message)
     },
     onSuccess: () => {
+      // Invalidate both settings queries to ensure UI updates
       queryClient.invalidateQueries({ queryKey: ['settings'] })
+      queryClient.invalidateQueries({ queryKey: ['home-settings'] })
       toast.success(t('admin.settings.settingDeletedSuccessfully'))
     },
     onError: (error: Error) => {

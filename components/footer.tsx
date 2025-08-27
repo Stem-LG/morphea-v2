@@ -6,6 +6,8 @@ import { useState, type FormEvent, useEffect, useRef } from 'react'
 import { useLanguage } from '@/hooks/useLanguage'
 import { createClient } from '@/lib/client'
 import { toast } from 'sonner'
+import { useHomeSettings } from '@/hooks/use-home-settings'
+import { useCategories } from '@/hooks/useCategories'
 
 export default function Footer() {
     const [email, setEmail] = useState('')
@@ -14,6 +16,8 @@ export default function Footer() {
     const { language, setLanguage, t } = useLanguage()
     const dropdownRef = useRef<HTMLDivElement>(null)
     const supabase = createClient()
+    const { data: homeSettings } = useHomeSettings()
+    const { data: categories = [] } = useCategories()
 
     // Email validation function
     const isValidEmail = (email: string) => {
@@ -239,38 +243,84 @@ export default function Footer() {
                                 {t('footer.categories.title')}
                             </h3>
                             <ul className="space-y-2 md:space-y-3">
-                                <li>
-                                    <a
-                                        href="#"
-                                        className="block touch-manipulation py-1 text-base text-neutral-700 transition-colors hover:text-black md:text-lg"
-                                    >
-                                        {t('footer.categories.newCollection')}
-                                    </a>
-                                </li>
-                                <li>
-                                    <a
-                                        href="#"
-                                        className="block touch-manipulation py-1 text-base text-neutral-700 transition-colors hover:text-black md:text-lg"
-                                    >
-                                        {t('footer.categories.clothing')}
-                                    </a>
-                                </li>
-                                <li>
-                                    <a
-                                        href="#"
-                                        className="block touch-manipulation py-1 text-base text-neutral-700 transition-colors hover:text-black md:text-lg"
-                                    >
-                                        {t('footer.categories.jewelry')}
-                                    </a>
-                                </li>
-                                <li>
-                                    <a
-                                        href="#"
-                                        className="block touch-manipulation py-1 text-base text-neutral-700 transition-colors hover:text-black md:text-lg"
-                                    >
-                                        {t('footer.categories.accessories')}
-                                    </a>
-                                </li>
+                                {(() => {
+                                    // Get selected category IDs from settings
+                                    const selectedCategoryIds =
+                                        homeSettings?.footer.categoryIds || []
+
+                                    // If no dynamic categories are selected, show fallback static categories
+                                    if (selectedCategoryIds.length === 0) {
+                                        return (
+                                            <>
+                                                <li>
+                                                    <a
+                                                        href="#"
+                                                        className="block touch-manipulation py-1 text-base text-neutral-700 transition-colors hover:text-black md:text-lg"
+                                                    >
+                                                        {t(
+                                                            'footer.categories.newCollection'
+                                                        )}
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a
+                                                        href="#"
+                                                        className="block touch-manipulation py-1 text-base text-neutral-700 transition-colors hover:text-black md:text-lg"
+                                                    >
+                                                        {t(
+                                                            'footer.categories.clothing'
+                                                        )}
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a
+                                                        href="#"
+                                                        className="block touch-manipulation py-1 text-base text-neutral-700 transition-colors hover:text-black md:text-lg"
+                                                    >
+                                                        {t(
+                                                            'footer.categories.jewelry'
+                                                        )}
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a
+                                                        href="#"
+                                                        className="block touch-manipulation py-1 text-base text-neutral-700 transition-colors hover:text-black md:text-lg"
+                                                    >
+                                                        {t(
+                                                            'footer.categories.accessories'
+                                                        )}
+                                                    </a>
+                                                </li>
+                                            </>
+                                        )
+                                    }
+
+                                    // Show dynamic categories in the order they were configured
+                                    return selectedCategoryIds.map(
+                                        (categoryId) => {
+                                            const category = categories.find(
+                                                (cat) =>
+                                                    cat.xcategprodid ===
+                                                    categoryId
+                                            )
+                                            if (!category) return null
+
+                                            return (
+                                                <li key={categoryId}>
+                                                    <a
+                                                        href={`/categories/${categoryId}`}
+                                                        className="block touch-manipulation py-1 text-base text-neutral-700 transition-colors hover:text-black md:text-lg"
+                                                    >
+                                                        {
+                                                            category.xcategprodintitule
+                                                        }
+                                                    </a>
+                                                </li>
+                                            )
+                                        }
+                                    )
+                                })()}
                             </ul>
                         </div>
                     </div>
@@ -285,7 +335,9 @@ export default function Footer() {
                         <div className="flex items-center gap-5 text-gray-700 md:gap-7">
                             <a
                                 aria-label="Facebook"
-                                href="#"
+                                href={
+                                    homeSettings?.footer.social.facebook || '#'
+                                }
                                 className="-m-2 touch-manipulation p-2 transition-colors hover:text-black"
                             >
                                 <svg
@@ -304,7 +356,9 @@ export default function Footer() {
                             </a>
                             <a
                                 aria-label="Instagram"
-                                href="#"
+                                href={
+                                    homeSettings?.footer.social.instagram || '#'
+                                }
                                 className="-m-2 touch-manipulation p-2 transition-colors hover:text-black"
                             >
                                 <svg
@@ -331,7 +385,9 @@ export default function Footer() {
                             </a>
                             <a
                                 aria-label="LinkedIn"
-                                href="#"
+                                href={
+                                    homeSettings?.footer.social.linkedin || '#'
+                                }
                                 className="-m-2 touch-manipulation p-2 transition-colors hover:text-black"
                             >
                                 <svg
@@ -358,7 +414,9 @@ export default function Footer() {
                             </a>
                             <a
                                 aria-label="X"
-                                href="#"
+                                href={
+                                    homeSettings?.footer.social.twitter || '#'
+                                }
                                 className="-m-2 touch-manipulation p-2 transition-colors hover:text-black"
                             >
                                 <svg
