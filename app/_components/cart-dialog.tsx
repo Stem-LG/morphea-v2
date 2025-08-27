@@ -1,11 +1,11 @@
-"use client";
+'use client'
 
-import { useLanguage } from "@/hooks/useLanguage";
-import { useCurrency } from "@/hooks/useCurrency";
-import { useAuth } from "@/hooks/useAuth";
-import { useCart } from "@/app/_hooks/cart/useCart";
-import { useUpdateCart } from "@/app/_hooks/cart/useUpdateCart";
-import { useDeleteFromCart } from "@/app/_hooks/cart/useDeleteFromCart";
+import { useLanguage } from '@/hooks/useLanguage'
+import { useCurrency } from '@/hooks/useCurrency'
+import { useAuth } from '@/hooks/useAuth'
+import { useCart } from '@/app/_hooks/cart/useCart'
+import { useUpdateCart } from '@/app/_hooks/cart/useUpdateCart'
+import { useDeleteFromCart } from '@/app/_hooks/cart/useDeleteFromCart'
 import {
     Credenza,
     CredenzaContent,
@@ -13,164 +13,222 @@ import {
     CredenzaTitle,
     CredenzaBody,
     CredenzaFooter,
-} from "@/components/ui/credenza";
-import { Button } from "@/components/ui/button";
-import Image from "next/image";
-import { Minus, Plus, Trash2, ShoppingCart } from "lucide-react";
-import { useRouter } from "next/navigation";
+} from '@/components/ui/credenza'
+import { Button } from '@/components/ui/button'
+import Image from 'next/image'
+import { Minus, Plus, Trash2, ShoppingCart } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 
 interface CartDialogProps {
-    isOpen: boolean;
-    onClose: () => void;
+    isOpen: boolean
+    onClose: () => void
 }
 
 export function CartDialog({ isOpen, onClose }: CartDialogProps) {
-    const { t } = useLanguage();
-    const router = useRouter();
-    const { data: currentUser } = useAuth();
-    const { data: cartItems = [], isLoading } = useCart();
-    const updateCartMutation = useUpdateCart();
-    const deleteFromCartMutation = useDeleteFromCart();
-    const { formatPrice, currencies, convertPrice } = useCurrency();
+    const { t } = useLanguage()
+    const router = useRouter()
+    const { data: currentUser } = useAuth()
+    const { data: cartItems = [], isLoading } = useCart()
+    const updateCartMutation = useUpdateCart()
+    const deleteFromCartMutation = useDeleteFromCart()
+    const { formatPrice, currencies, convertPrice } = useCurrency()
 
     const handleQuantityChange = (ypanierid: number, newQuantity: number) => {
         if (newQuantity <= 0) {
-            deleteFromCartMutation.mutate({ ypanierid });
+            deleteFromCartMutation.mutate({ ypanierid })
         } else {
-            updateCartMutation.mutate({ ypanierid, ypanierqte: newQuantity });
+            updateCartMutation.mutate({ ypanierid, ypanierqte: newQuantity })
         }
-    };
+    }
 
     const handleRemoveItem = (ypanierid: number) => {
-        deleteFromCartMutation.mutate({ ypanierid });
-    };
+        deleteFromCartMutation.mutate({ ypanierid })
+    }
 
     const calculateTotal = () => {
         return cartItems.reduce((total, item) => {
-            if (!item.yvarprod) return total;
+            if (!item.yvarprod) return total
 
             // Find the product's base currency
-            const productCurrency = currencies.find(c => c.xdeviseid === item.yvarprod?.xdeviseidfk);
-            const price = item.yvarprod.yvarprodprixpromotion || item.yvarprod.yvarprodprixcatalogue || 0;
+            const productCurrency = currencies.find(
+                (c) => c.xdeviseid === item.yvarprod?.xdeviseidfk
+            )
+            const price =
+                item.yvarprod.yvarprodprixpromotion ||
+                item.yvarprod.yvarprodprixcatalogue ||
+                0
 
             // Convert price from product currency to current currency
-            const convertedPrice = convertPrice(price, productCurrency);
+            const convertedPrice = convertPrice(price, productCurrency)
 
-            return total + convertedPrice * item.ypanierqte;
-        }, 0);
-    };
+            return total + convertedPrice * item.ypanierqte
+        }, 0)
+    }
 
     // Helper function to get formatted price for an item
     const getFormattedItemPrice = (item: any) => {
-        if (!item.yvarprod) return '$0.00';
+        if (!item.yvarprod) return '$0.00'
 
-        const productCurrency = currencies.find(c => c.xdeviseid === item.yvarprod?.xdeviseidfk);
-        const price = item.yvarprod.yvarprodprixpromotion || item.yvarprod.yvarprodprixcatalogue || 0;
+        const productCurrency = currencies.find(
+            (c) => c.xdeviseid === item.yvarprod?.xdeviseidfk
+        )
+        const price =
+            item.yvarprod.yvarprodprixpromotion ||
+            item.yvarprod.yvarprodprixcatalogue ||
+            0
 
-        return formatPrice(price, productCurrency);
-    };
+        return formatPrice(price, productCurrency)
+    }
 
     // Helper function to get formatted original price for an item
     const getFormattedOriginalPrice = (item: any) => {
-        if (!item.yvarprod?.yvarprodprixpromotion || !item.yvarprod?.yvarprodprixcatalogue) return null;
+        if (
+            !item.yvarprod?.yvarprodprixpromotion ||
+            !item.yvarprod?.yvarprodprixcatalogue
+        )
+            return null
 
-        const productCurrency = currencies.find(c => c.xdeviseid === item.yvarprod?.xdeviseidfk);
-        return formatPrice(item.yvarprod.yvarprodprixcatalogue, productCurrency);
-    };
+        const productCurrency = currencies.find(
+            (c) => c.xdeviseid === item.yvarprod?.xdeviseidfk
+        )
+        return formatPrice(item.yvarprod.yvarprodprixcatalogue, productCurrency)
+    }
 
     const handleCheckout = () => {
         // Check if user is anonymous
         if (!currentUser || currentUser.is_anonymous) {
             // Redirect to login page for anonymous users
-            onClose();
-            router.push("/auth/login");
-            return;
+            onClose()
+            router.push('/auth/login')
+            return
         }
 
         // Navigate to order page for authenticated users
-        onClose();
-        router.push("/order");
-    };
+        onClose()
+        router.push('/order')
+    }
 
     return (
         <Credenza open={isOpen} onOpenChange={onClose}>
-            <CredenzaContent className="max-w-2xl max-h-[80vh] bg-gradient-to-br from-morpheus-blue-dark via-morpheus-blue-dark/95 to-morpheus-blue-light/90 backdrop-blur-md border border-morpheus-gold-dark/20">
-                <CredenzaHeader>
-                    <CredenzaTitle className="flex items-center gap-2 text-white">
-                        <ShoppingCart className="w-5 h-5 text-morpheus-gold-light" />
-                        {t("cart.title") || "Shopping Cart"}
-                        {cartItems.length > 0 && (
-                            <span className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light text-white text-xs px-2 py-1 rounded-full">
-                                {cartItems.length}
+            <CredenzaContent className="max-h-[80vh] max-w-2xl border border-gray-200 bg-white shadow-2xl">
+                <CredenzaHeader className="border-b border-gray-100 pb-4">
+                    <CredenzaTitle className="flex items-center gap-3 text-[#053340]">
+                        <div className="rounded-lg bg-gray-50 p-2">
+                            <ShoppingCart className="h-5 w-5 text-[#053340]" />
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <span className="font-recia text-2xl font-extrabold">
+                                {t('cart.title') || 'Shopping Cart'}
                             </span>
-                        )}
+                            {cartItems.length > 0 && (
+                                <span className="font-supreme rounded-full bg-[#053340] px-3 py-1 text-sm font-medium text-white">
+                                    {cartItems.length}
+                                </span>
+                            )}
+                        </div>
                     </CredenzaTitle>
                 </CredenzaHeader>
 
-                <CredenzaBody className="max-h-96 overflow-y-auto bg-transparent">
+                <CredenzaBody className="max-h-96 overflow-y-auto bg-transparent pt-6">
                     {isLoading ? (
-                        <div className="flex items-center justify-center py-8">
-                            <div className="w-8 h-8 border-2 border-morpheus-gold-dark border-t-transparent animate-spin rounded-full"></div>
+                        <div className="flex items-center justify-center py-12">
+                            <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#053340] border-t-transparent"></div>
                         </div>
                     ) : cartItems.length === 0 ? (
-                        <div className="text-center py-8">
-                            <ShoppingCart className="w-16 h-16 mx-auto text-morpheus-gold-light/50 mb-4" />
-                            <h3 className="text-lg font-medium text-white mb-2">
-                                {t("cart.empty") || "Your cart is empty"}
+                        <div className="py-12 text-center">
+                            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gray-50 p-4">
+                                <ShoppingCart className="h-10 w-10 text-gray-400" />
+                            </div>
+                            <h3 className="font-recia mb-3 text-xl font-extrabold text-[#053340]">
+                                {t('cart.empty') || 'Your cart is empty'}
                             </h3>
-                            <p className="text-gray-300">{t("cart.emptyMessage") || "Add some items to get started"}</p>
+                            <p className="font-supreme text-lg text-gray-600">
+                                {t('cart.emptyMessage') ||
+                                    'Add some items to get started'}
+                            </p>
                         </div>
                     ) : (
                         <div className="space-y-4">
                             {cartItems.map((item) => (
                                 <div
                                     key={item.ypanierid}
-                                    className="flex items-center gap-4 p-4 border border-morpheus-gold-dark/20 rounded-lg bg-white/5 backdrop-blur-sm"
+                                    className="flex items-center gap-4 rounded-xl border border-gray-200 bg-gray-50/50 p-4 transition-colors hover:bg-gray-50"
                                 >
                                     {/* Product Image */}
-                                    <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                                        {(item.yvarprod as any)?.yvarprodmedia?.[0]?.ymedia?.ymediaurl ? (
+                                    <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
+                                        {(item.yvarprod as any)
+                                            ?.yvarprodmedia?.[0]?.ymedia
+                                            ?.ymediaurl ? (
                                             <Image
-                                                src={(item.yvarprod as any).yvarprodmedia[0].ymedia.ymediaurl}
-                                                alt={item.yvarprod?.yvarprodintitule || "Product"}
+                                                src={
+                                                    (item.yvarprod as any)
+                                                        .yvarprodmedia[0].ymedia
+                                                        .ymediaurl
+                                                }
+                                                alt={
+                                                    item.yvarprod
+                                                        ?.yvarprodintitule ||
+                                                    'Product'
+                                                }
                                                 width={64}
                                                 height={64}
-                                                className="w-full h-full object-cover"
+                                                className="h-full w-full object-cover"
                                             />
                                         ) : (
-                                            <div className="w-full h-full flex items-center justify-center text-gray-400">
-                                                <ShoppingCart className="w-6 h-6" />
+                                            <div className="flex h-full w-full items-center justify-center text-gray-400">
+                                                <ShoppingCart className="h-6 w-6" />
                                             </div>
                                         )}
                                     </div>
 
                                     {/* Product Details */}
-                                    <div className="flex-1 min-w-0">
-                                        <h4 className="font-medium text-white truncate">
-                                            {item.yvarprod?.yvarprodintitule || "Unknown Product"}
+                                    <div className="min-w-0 flex-1">
+                                        <h4 className="font-supreme truncate text-lg font-semibold text-[#053340]">
+                                            {item.yvarprod?.yvarprodintitule ||
+                                                'Unknown Product'}
                                         </h4>
-                                        <div className="flex items-center gap-2 text-sm text-gray-300">
+                                        <div className="mt-1 flex items-center gap-2 text-sm text-gray-500">
                                             {item.yvarprod?.xcouleur && (
                                                 <span className="flex items-center gap-1">
                                                     <div
-                                                        className="w-3 h-3 rounded-full border"
-                                                        style={{ backgroundColor: item.yvarprod.xcouleur.xcouleurhexa }}
+                                                        className="h-3 w-3 rounded-full border"
+                                                        style={{
+                                                            backgroundColor:
+                                                                item.yvarprod
+                                                                    .xcouleur
+                                                                    .xcouleurhexa,
+                                                        }}
                                                     />
-                                                    {item.yvarprod.xcouleur.xcouleurintitule}
+                                                    {
+                                                        item.yvarprod.xcouleur
+                                                            .xcouleurintitule
+                                                    }
                                                 </span>
                                             )}
                                             {item.yvarprod?.xtaille && (
-                                                <span>• {item.yvarprod.xtaille.xtailleintitule}</span>
+                                                <span>
+                                                    •{' '}
+                                                    {
+                                                        item.yvarprod.xtaille
+                                                            .xtailleintitule
+                                                    }
+                                                </span>
                                             )}
                                         </div>
-                                        <div className="flex items-center justify-between mt-2">
+                                        <div className="mt-3 flex items-center justify-between">
                                             <div className="flex items-center gap-2">
-                                                <span className="font-semibold text-morpheus-gold-dark">
-                                                    {getFormattedItemPrice(item)}
+                                                <span className="font-supreme text-lg font-bold text-[#053340]">
+                                                    {getFormattedItemPrice(
+                                                        item
+                                                    )}
                                                 </span>
-                                                {getFormattedOriginalPrice(item) && (
-                                                    <span className="text-sm text-gray-300 line-through">
-                                                        {getFormattedOriginalPrice(item)}
+                                                {getFormattedOriginalPrice(
+                                                    item
+                                                ) && (
+                                                    <span className="text-sm text-gray-400 line-through">
+                                                        {getFormattedOriginalPrice(
+                                                            item
+                                                        )}
                                                     </span>
                                                 )}
                                             </div>
@@ -182,23 +240,39 @@ export function CartDialog({ isOpen, onClose }: CartDialogProps) {
                                         <Button
                                             variant="outline"
                                             size="sm"
-                                            onClick={() => handleQuantityChange(item.ypanierid, item.ypanierqte - 1)}
-                                            disabled={updateCartMutation.isPending || deleteFromCartMutation.isPending}
-                                            className="w-8 h-8 p-0 border-morpheus-gold-dark/30 text-white hover:bg-morpheus-gold-dark/20"
+                                            onClick={() =>
+                                                handleQuantityChange(
+                                                    item.ypanierid,
+                                                    item.ypanierqte - 1
+                                                )
+                                            }
+                                            disabled={
+                                                updateCartMutation.isPending ||
+                                                deleteFromCartMutation.isPending
+                                            }
+                                            className="h-8 w-8 border-gray-300 p-0 text-[#053340] hover:border-[#053340] hover:bg-gray-100 bg-white"
                                         >
-                                            <Minus className="w-3 h-3" />
+                                            <Minus className="h-3 w-3" />
                                         </Button>
-                                        <span className="w-8 text-center font-medium text-white">
+                                        <span className="font-supreme w-8 text-center font-semibold text-[#053340]">
                                             {item.ypanierqte}
                                         </span>
                                         <Button
                                             variant="outline"
                                             size="sm"
-                                            onClick={() => handleQuantityChange(item.ypanierid, item.ypanierqte + 1)}
-                                            disabled={updateCartMutation.isPending || deleteFromCartMutation.isPending}
-                                            className="w-8 h-8 p-0 border-morpheus-gold-dark/30 text-white hover:bg-morpheus-gold-dark/20"
+                                            onClick={() =>
+                                                handleQuantityChange(
+                                                    item.ypanierid,
+                                                    item.ypanierqte + 1
+                                                )
+                                            }
+                                            disabled={
+                                                updateCartMutation.isPending ||
+                                                deleteFromCartMutation.isPending
+                                            }
+                                            className="h-8 w-8 border-gray-300 p-0 text-[#053340] hover:border-[#053340] hover:bg-gray-100 bg-white"
                                         >
-                                            <Plus className="w-3 h-3" />
+                                            <Plus className="h-3 w-3" />
                                         </Button>
                                     </div>
 
@@ -206,11 +280,15 @@ export function CartDialog({ isOpen, onClose }: CartDialogProps) {
                                     <Button
                                         variant="ghost"
                                         size="sm"
-                                        onClick={() => handleRemoveItem(item.ypanierid)}
-                                        disabled={deleteFromCartMutation.isPending}
-                                        className="text-red-400 hover:text-red-300 hover:bg-red-500/20 p-2"
+                                        onClick={() =>
+                                            handleRemoveItem(item.ypanierid)
+                                        }
+                                        disabled={
+                                            deleteFromCartMutation.isPending
+                                        }
+                                        className="p-2 text-red-500 hover:bg-red-50 hover:text-red-600"
                                     >
-                                        <Trash2 className="w-4 h-4" />
+                                        <Trash2 className="h-4 w-4" />
                                     </Button>
                                 </div>
                             ))}
@@ -219,31 +297,34 @@ export function CartDialog({ isOpen, onClose }: CartDialogProps) {
                 </CredenzaBody>
 
                 {cartItems.length > 0 && (
-                    <CredenzaFooter className="flex gap-4 bg-transparent">
-                        <div className="flex flex-1 gap-2 items-center text-lg font-semibold">
-                            <span className="text-white">{t("cart.total") || "Total"}</span>
-                            <span className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light bg-clip-text text-transparent">
+                    <CredenzaFooter className="flex flex-col gap-4 border-t border-gray-100 bg-transparent pt-6">
+                        <div className="flex flex-1 items-center gap-2">
+                            <span className="font-supreme text-lg font-semibold text-gray-600">
+                                {t('cart.total') || 'Total'}
+                            </span>
+                            <span className="font-supreme text-lg font-extrabold text-[#053340]">
                                 {formatPrice(calculateTotal())}
                             </span>
                         </div>
-                        <div className="flex gap-2">
+                        <div className="flex gap-3">
                             <Button
                                 variant="outline"
                                 onClick={onClose}
-                                className="flex-1 border-morpheus-gold-dark/30 text-white hover:bg-morpheus-gold-dark/20"
+                                className="font-supreme flex-1 border-gray-300 font-medium text-[#053340] hover:border-[#053340] hover:bg-gray-50 bg-white"
                             >
-                                {t("cart.continueShopping") || "Continue Shopping"}
+                                {t('cart.continueShopping') ||
+                                    'Continue Shopping'}
                             </Button>
                             <Button
                                 onClick={handleCheckout}
-                                className="flex-1 bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-morpheus-gold-light hover:to-morpheus-gold-dark text-white"
+                                className="font-supreme flex-1 bg-[#053340] font-semibold text-white shadow-lg transition-all hover:bg-[#053340]/90 hover:shadow-xl"
                             >
-                                {t("cart.checkout") || "Proceed to Payment"}
+                                {t('cart.checkout') || 'Proceed to Payment'}
                             </Button>
                         </div>
                     </CredenzaFooter>
                 )}
             </CredenzaContent>
         </Credenza>
-    );
+    )
 }

@@ -443,7 +443,7 @@ export const enTranslations = {
       "hierarchicalView": "Hierarchical View",
       "addSubcategory": "Add Subcategory",
       "parentCategory": "Parent Category",
-      "categoryImage":"Category Image",
+      "categoryImage": "Category Image",
       "noParent": "No Parent Category"
     },
     "approvals": {
@@ -1305,6 +1305,8 @@ export const enTranslations = {
     "failedToDeleteAccount": "Failed to delete account",
     "profileUpdatedSuccessfully": "Profile updated successfully!",
     "fullName": "Full Name",
+    "firstName": "First Name",
+    "lastName": "Last Name",
     "emailAddress": "Email Address",
     "phoneNumber": "Phone Number",
     "address": "Address",
@@ -1434,6 +1436,24 @@ export const enTranslations = {
     "discount": "Discount",
     "processing": "Processing...",
     "placeOrder": "Place Order",
+    "steps": {
+      "confirmCart": "Confirm Cart",
+      "shippingAddress": "Shipping Address",
+      "paymentInfo": "Payment Info",
+      "reviewOrder": "Review Order"
+    },
+    "stepDescriptions": {
+      "confirmCart": "Review your selected items",
+      "shippingAddress": "Enter your delivery address",
+      "paymentInfo": "Enter payment details",
+      "reviewOrder": "Confirm your order"
+    },
+    "continueToShipping": "Continue to Shipping",
+    "continueToPayment": "Continue to Payment",
+    "continueToReview": "Continue to Review",
+    "backToCart": "Back to Cart",
+    "backToShipping": "Back to Shipping",
+    "backToPayment": "Back to Payment",
     "pleaseCompleteAddressFields": "Please fill in all address fields",
     "pleaseCompletePaymentFields": "Please fill in all payment fields",
     "invalidCardNumber": "Invalid card number",
@@ -1441,6 +1461,8 @@ export const enTranslations = {
     "failedToPlaceOrder": "Failed to place order",
     "addItemsToCheckout": "Add some items to proceed with checkout",
     "fullNamePlaceholder": "John Doe",
+    "firstNamePlaceholder": "Enter your first name",
+    "lastNamePlaceholder": "Enter your last name",
     "phonePlaceholder": "+1 234 567 8900",
     "addressPlaceholder": "123 Main Street",
     "city": "City",

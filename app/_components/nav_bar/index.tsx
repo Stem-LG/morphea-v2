@@ -1,6 +1,6 @@
 'use client'
 
-import { useAuth } from '@/hooks/useAuth'
+import { useAuth, useLogout, useUserRoles } from '@/hooks/useAuth'
 import { useLanguage } from '@/hooks/useLanguage'
 import { CurrencySwitcher } from '@/app/_components/nav_bar/currency-switcher'
 import { CartDialog } from '@/app/_components/cart-dialog'
@@ -9,7 +9,7 @@ import { WishlistDialog } from '@/app/_components/wishlist-dialog'
 // import { useWishlist } from '@/app/_hooks/wishlist/useWishlist'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useState, Fragment } from 'react'
+import { useState, Fragment, useMemo } from 'react'
 // import { useNotifications } from '@/app/_hooks/use-notifications'
 import { ProductDetailsPage } from '../../main/_components/product-details-page'
 import Image from 'next/image'
@@ -58,12 +58,10 @@ export default function NavBar() {
         data: currentUser,
         //  isLoading
     } = useAuth()
+    const { logout } = useLogout()
+    const { hasAdminAccess } = useUserRoles()
     // const { data: cartItems = [] } = useCart()
     // const { data: wishlistItems = [] } = useWishlist()
-
-    // const userRoles = useMemo(() => {
-    //     return currentUser?.app_metadata?.roles || []
-    // }, [currentUser])
 
     // const cartItemCount = cartItems.length
     // const wishlistItemCount = wishlistItems.length
@@ -135,18 +133,24 @@ export default function NavBar() {
                     </NavBarIconButton>
                 </div>
                 <div className="flex flex-1 items-center justify-center">
-                    <Image
-                        src="/images/morph_logo.webp"
-                        alt="Morph Logo"
-                        height={77}
-                        width={228}
-                    />
+                    <Link href={{
+                        href:"/"
+                    }}>
+                        <Image
+                            src="/images/morph_logo.webp"
+                            alt="Morph Logo"
+                            height={77}
+                            width={228}
+                        />
+                    </Link>
                 </div>
                 <div className="flex flex-1 md:hidden" />
                 <div className="hidden flex-1 items-center justify-end gap-4 md:flex">
-                    <NavBarIconButton onClick={() => router.push('/admin')}>
-                        <AdminIcon />
-                    </NavBarIconButton>
+                    {hasAdminAccess && (
+                        <NavBarIconButton onClick={() => router.push('/admin')}>
+                            <AdminIcon />
+                        </NavBarIconButton>
+                    )}
                     <NavBarIconButton onClick={() => setIsWishlistOpen(true)}>
                         <WishlistIcon />
                     </NavBarIconButton>
@@ -195,9 +199,12 @@ export default function NavBar() {
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem>
-                                        <Link href="/auth/logout">
+                                        <button
+                                            onClick={logout}
+                                            className="w-full text-left"
+                                        >
                                             {t('logout')}
-                                        </Link>
+                                        </button>
                                     </DropdownMenuItem>
                                 </>
                             ) : (
@@ -239,6 +246,12 @@ export default function NavBar() {
             <NavBarSheet
                 isMenuOpen={isMenuOpen}
                 setIsMenuOpen={setIsMenuOpen}
+                hasAdminAccess={hasAdminAccess}
+                currentUser={currentUser}
+                logout={logout}
+                t={t}
+                setIsCartOpen={setIsCartOpen}
+                setIsWishlistOpen={setIsWishlistOpen}
             />
 
             <div className="h-24" />
@@ -328,9 +341,21 @@ type NavbarItem = {
 function NavBarSheet({
     isMenuOpen,
     setIsMenuOpen,
+    hasAdminAccess,
+    currentUser,
+    logout,
+    t,
+    setIsCartOpen,
+    setIsWishlistOpen,
 }: {
     isMenuOpen: boolean
     setIsMenuOpen: any
+    hasAdminAccess: boolean
+    currentUser: any
+    logout: () => void
+    t: (key: string) => string
+    setIsCartOpen: (open: boolean) => void
+    setIsWishlistOpen: (open: boolean) => void
 }) {
     const [showCategories, setShowCategories] = useState(false)
     const [selectedParentCategory, setSelectedParentCategory] =
@@ -359,13 +384,29 @@ function NavBarSheet({
         { name: 'Contactez-Nous', href: '/contact' },
     ]
 
-    const navbarFooterItems = [
-        { name: 'Mon Compte', href: '/profile' },
-        { name: 'Favoris', onclick: () => {} },
-        { name: 'Panier', onclick: () => {} },
-        { name: 'Mes Commandes', href: '/orders' },
-        { name: 'Administration', href: '/admin' },
-    ]
+    const navbarFooterItems = useMemo(() => {
+        const isAuthenticated = currentUser && !currentUser.is_anonymous
+
+        if (!isAuthenticated) {
+            // For anonymous users: show cart, favourites, login and register
+            return [
+                { name: 'Favoris', onclick: () => { setIsWishlistOpen(true); setIsMenuOpen(false); } },
+                { name: 'Panier', onclick: () => { setIsCartOpen(true); setIsMenuOpen(false); } },
+                { name: t('login'), href: '/auth/login' },
+                { name: t('register'), href: '/auth/sign-up' },
+            ]
+        } else {
+            // For authenticated users: show all account-related items
+            return [
+                { name: 'Mon Compte', href: '/profile' },
+                { name: 'Favoris', onclick: () => { setIsWishlistOpen(true); setIsMenuOpen(false); } },
+                { name: 'Panier', onclick: () => { setIsCartOpen(true); setIsMenuOpen(false); } },
+                { name: 'Mes Commandes', href: '/orders' },
+                ...(hasAdminAccess ? [{ name: 'Administration', href: '/admin' }] : []),
+                { name: t('logout'), onclick: () => { logout(); setIsMenuOpen(false); } },
+            ]
+        }
+    }, [currentUser, hasAdminAccess, t])
 
     return (
         <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
@@ -498,7 +539,7 @@ function NavBarSheet({
 
                     {/* Subcategory Column - Only visible when a parent category is selected */}
                     {showSubcategories && selectedParentCategory && (
-                        <div className="-top-4 left-[1px] flex h-full w-full flex-col overflow-hidden relative sm:w-[min(400px,50%)]">
+                        <div className="relative -top-4 left-[1px] flex h-full w-full flex-col overflow-hidden sm:w-[min(400px,50%)]">
                             {/* Category Image Header */}
                             <div className="flex-shrink-0">
                                 <CategoryImageHeader

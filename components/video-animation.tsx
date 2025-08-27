@@ -4,6 +4,7 @@ import { useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { useLanguage } from '@/hooks/useLanguage'
 import { useIsMobile } from '@/hooks/use-mobile'
+import Link from 'next/link'
 
 export default function VideoAnimation() {
     const containerRef = useRef(null)
@@ -102,11 +103,16 @@ export default function VideoAnimation() {
                                     : 'At the origin of Morphea, this space dedicated to luxury fashion, there is Morpheus the Creator of unique experiences where fashion, lifestyle and luxury meet and reveal exceptional talents and know-how that combine heritage and innovation.'}
                             </p>
                             <div className="mt-3 flex justify-center md:mt-6">
-                                <button className="font-supreme w-fit rounded-[30px] bg-gradient-to-r from-[#053340] to-[#0E4D66] px-5 py-2.5 text-base font-semibold text-white transition-all duration-300 hover:from-[#042a35] hover:to-[#0a3d52] md:px-6 md:py-3 md:text-lg lg:text-xl">
+                                <Link
+                                    href="https://morpheus-sa.com/"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="font-supreme w-fit rounded-[30px] bg-gradient-to-r from-[#053340] to-[#0E4D66] px-5 py-2.5 text-base font-semibold text-white transition-all duration-300 hover:from-[#042a35] hover:to-[#0a3d52] md:px-6 md:py-3 md:text-lg lg:text-xl"
+                                >
                                     {language === 'fr'
                                         ? 'En savoir plus'
                                         : 'Learn more'}
-                                </button>
+                                </Link>
                             </div>
                         </div>
                     </motion.div>
