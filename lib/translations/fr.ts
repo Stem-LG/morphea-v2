@@ -1480,5 +1480,78 @@ export const frTranslations = {
     "allCaughtUp": "Vous êtes à jour !",
     "noNewNotifications": "Aucune nouvelle notification à afficher",
     "defaultTitle": "Notification"
+  },
+  "homepage": {
+    "hero": {
+      "mode": "MODE",
+      "preCollection": "PRÉ-COLLECTION 2026/27",
+      "summerCollection": "COLLECTION ÉTÉ 2026",
+      "discover": "Découvrir"
+    },
+    "controls": {
+      "playVideo": "Lire la vidéo",
+      "pauseVideo": "Mettre en pause",
+      "muteVideo": "Couper le son",
+      "unmuteVideo": "Activer le son"
+    },
+    "collections": {
+      "title": "Découvrez Nos Défilé",
+      "subtitle": "Plongez dans l'univers exclusif de nos collections à travers des présentations exceptionnelles",
+      "autumnCollection": "Collection Automne 2025",
+      "autumnSubtitle": "Une symphonie de couleurs automnales"
+    },
+    "categories": {
+      "title": "Nos Catégories",
+      "subtitle": "Explorez notre univers à travers trois piliers de l'élégance",
+      "hauteCouture": "Haute Couture",
+      "jewelry": "Bijoux",
+      "jewelrySubtitle": "Créations artisanales et pièces d'exception",
+      "accessories": "Accessoires",
+      "discover": "Découvrir"
+    },
+    "creators": {
+      "title": "Nos Créateurs",
+      "subtitle": "Découvrez nos espaces d'exception boutique en Tunisie"
+    },
+    "carousel": {
+      "noImages": "Aucune image à afficher",
+      "imageAlt": "Image du carrousel",
+      "selectedImage": "Image sélectionnée"
+    }
+  },
+  "footer": {
+    "newsletter": {
+      "description": "Recevez En Avant-Première Nos Nouvelles Collections Et Événements Exclusifs",
+      "emailPlaceholder": "person@email.com",
+      "subscribe": "S'abonner",
+      "emailRequired": "Veuillez entrer votre adresse email",
+      "emailInvalid": "Veuillez entrer une adresse email valide",
+      "success": "Merci pour votre inscription à notre newsletter!"
+    },
+    "about": {
+      "title": "À propos",
+      "origin": "A l'origine de Morphea",
+      "plan": "Plan de Morphea",
+      "events": "Nos événements",
+      "socialMedia": "Réseaux sociaux"
+    },
+    "customerService": {
+      "title": "Service client",
+      "myAccount": "Mon compte",
+      "ordersDelivery": "Commandes et livraison",
+      "cookiesPrivacy": "Cookies et confidentialité",
+      "faq": "FAQ",
+      "terms": "CGV"
+    },
+    "categories": {
+      "title": "Catégorie",
+      "newCollection": "Nouvelle collection",
+      "clothing": "Habillement",
+      "jewelry": "Bijoux",
+      "accessories": "Accessoires"
+    },
+    "social": {
+      "followUs": "Suivez-nous"
+    }
   }
 };

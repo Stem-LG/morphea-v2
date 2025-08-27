@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { motion, useMotionValue, useTransform } from 'framer-motion'
+import { useLanguage } from '@/hooks/useLanguage'
 
 interface ThreeDPhotoCarouselProps {
     images?: string[]
@@ -16,6 +17,7 @@ function ThreeDPhotoCarousel({
     height = 500,
     cylinderWidth = 1400,
 }: ThreeDPhotoCarouselProps) {
+    const { t } = useLanguage()
     const [selectedImage, setSelectedImage] = useState<string | null>(null)
     const [isHovered, setIsHovered] = useState<boolean>(false)
     const [isMobile, setIsMobile] = useState<boolean>(false)
@@ -38,7 +40,10 @@ function ThreeDPhotoCarousel({
         ? Math.min(window.innerWidth * 2, 1200) // 98% of screen width, max 1200px on mobile
         : cylinderWidth // Use provided width on desktop
 
-    const faceWidth = Math.min(responsiveCylinderWidth / faceCount, isMobile ? 300 : 500) // Much larger faces on mobile
+    const faceWidth = Math.min(
+        responsiveCylinderWidth / faceCount,
+        isMobile ? 300 : 500
+    ) // Much larger faces on mobile
     const actualCylinderWidth = faceWidth * faceCount * 1.2 // Add 20% spacing
     const radius = actualCylinderWidth / (2 * Math.PI)
     const rotation = useMotionValue(0)
@@ -68,7 +73,7 @@ function ThreeDPhotoCarousel({
     if (!images || images.length === 0) {
         return (
             <div className="flex h-96 items-center justify-center text-gray-500">
-                No images to display
+                {t('homepage.carousel.noImages')}
             </div>
         )
     }
@@ -123,7 +128,7 @@ function ThreeDPhotoCarousel({
                         >
                             <img
                                 src={image}
-                                alt={`Carousel image ${index + 1}`}
+                                alt={`${t('homepage.carousel.imageAlt')} ${index + 1}`}
                                 className="h-full w-full rounded-lg border-2 border-white/20 object-cover shadow-lg transition-transform duration-300 group-hover:scale-110"
                                 style={{
                                     aspectRatio: '1/1',
@@ -153,7 +158,7 @@ function ThreeDPhotoCarousel({
                     >
                         <img
                             src={selectedImage}
-                            alt="Selected image"
+                            alt={t('homepage.carousel.selectedImage')}
                             className="h-full w-full rounded-lg object-contain"
                         />
                         <button

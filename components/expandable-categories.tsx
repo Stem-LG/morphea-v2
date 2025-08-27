@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useLanguage } from '@/hooks/useLanguage'
 
 interface CategoryData {
     image: string
@@ -22,6 +23,7 @@ interface ExpandableCategoriesProps {
 export default function ExpandableCategories({
     data,
 }: ExpandableCategoriesProps) {
+    const { t } = useLanguage()
     const [isExpanded, setIsExpanded] = useState<boolean>(false)
     const [isMobile, setIsMobile] = useState<boolean>(false)
 
@@ -73,12 +75,10 @@ export default function ExpandableCategories({
             <div className="mx-auto max-w-7xl px-4 md:px-8">
                 <div className="mb-8 text-center md:mb-12">
                     <h2 className="font-recia mb-6 text-3xl leading-tight font-extrabold text-[#053340] md:mb-10 md:text-5xl">
-                        Nos Catégories
+                        {t('homepage.categories.title')}
                     </h2>
                     <p className="font-supreme mx-auto max-w-2xl px-4 text-lg text-gray-600 md:px-0 md:text-2xl">
-                        {
-                            "Explorez notre univers à travers trois piliers de l'élégance"
-                        }
+                        {t('homepage.categories.subtitle')}
                     </p>
                 </div>
 
@@ -111,7 +111,9 @@ export default function ExpandableCategories({
                                                 href={category.link}
                                                 className="font-recia text-lg text-white underline transition-all duration-300 hover:no-underline"
                                             >
-                                                Découvrir
+                                                {t(
+                                                    'homepage.categories.discover'
+                                                )}
                                             </a>
                                         </div>
                                     )}
@@ -149,12 +151,21 @@ export default function ExpandableCategories({
                                             </p>
                                         )}
                                         {category.link && (
-                                            <div className={"text-center transition-opacity duration-300 group-hover:opacity-100 "+ (index == 1 ? "opacity-100" : "opacity-0")}>
+                                            <div
+                                                className={
+                                                    'text-center transition-opacity duration-300 group-hover:opacity-100 ' +
+                                                    (index == 1
+                                                        ? 'opacity-100'
+                                                        : 'opacity-0')
+                                                }
+                                            >
                                                 <a
                                                     href={category.link}
                                                     className="font-recia font-xl text-white underline transition-all duration-300 hover:no-underline"
                                                 >
-                                                    Découvrir
+                                                    {t(
+                                                        'homepage.categories.discover'
+                                                    )}
                                                 </a>
                                             </div>
                                         )}

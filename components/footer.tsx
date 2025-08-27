@@ -11,7 +11,7 @@ export default function Footer() {
     const [email, setEmail] = useState('')
     const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false)
-    const { language, setLanguage } = useLanguage()
+    const { language, setLanguage, t } = useLanguage()
     const dropdownRef = useRef<HTMLDivElement>(null)
     const supabase = createClient()
 
@@ -25,12 +25,12 @@ export default function Footer() {
         e.preventDefault()
 
         if (!email.trim()) {
-            toast.error('Veuillez entrer votre adresse email')
+            toast.error(t('footer.newsletter.emailRequired'))
             return
         }
 
         if (!isValidEmail(email)) {
-            toast.error('Veuillez entrer une adresse email valide')
+            toast.error(t('footer.newsletter.emailInvalid'))
             return
         }
 
@@ -45,11 +45,11 @@ export default function Footer() {
 
             // Always show success message regardless of the response
             // (as requested - even if email already exists due to unique constraint)
-            toast.success('Merci pour votre inscription à notre newsletter!')
+            toast.success(t('footer.newsletter.success'))
             setEmail('')
         } catch (error) {
             // Still show success message as requested
-            toast.success('Merci pour votre inscription à notre newsletter!')
+            toast.success(t('footer.newsletter.success'))
             setEmail('')
         } finally {
             setIsSubmitting(false)
@@ -108,10 +108,7 @@ export default function Footer() {
                             />
                         </div>
                         <p className="mb-4 px-2 text-lg leading-6 text-neutral-700 md:px-0 md:text-xl">
-                            Recevez En Avant-Première Nos Nouvelles
-                            <br className="hidden md:block" />
-                            <span className="md:hidden"> </span>
-                            Collections Et Événements Exclusifs
+                            {t('footer.newsletter.description')}
                         </p>
                         <form
                             onSubmit={onSubmit}
@@ -122,12 +119,14 @@ export default function Footer() {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
-                                placeholder="person@email.com"
+                                placeholder={t(
+                                    'footer.newsletter.emailPlaceholder'
+                                )}
                                 disabled={isSubmitting}
                                 className="font-supreme h-12 w-full rounded-full border border-gray-300 pr-12 pl-4 text-base transition outline-none focus:border-gray-400 disabled:cursor-not-allowed disabled:opacity-50 md:h-12"
                             />
                             <button
-                                aria-label="S'abonner"
+                                aria-label={t('footer.newsletter.subscribe')}
                                 type="submit"
                                 disabled={isSubmitting}
                                 className="absolute top-1/2 right-1 flex size-10 -translate-y-1/2 touch-manipulation items-center justify-center rounded-full bg-gradient-to-b from-slate-900 via-sky-900 to-cyan-950 text-white transition-opacity disabled:cursor-not-allowed disabled:opacity-50"
@@ -145,7 +144,7 @@ export default function Footer() {
                     <div className="grid grid-cols-1 gap-6 md:col-span-7 md:grid-cols-3 md:gap-8">
                         <div>
                             <h3 className="font-recia mb-3 text-base text-neutral-400 uppercase md:mb-4 md:text-lg">
-                                À propos
+                                {t('footer.about.title')}
                             </h3>
                             <ul className="space-y-2 md:space-y-3">
                                 <li>
@@ -153,7 +152,7 @@ export default function Footer() {
                                         href="#"
                                         className="block touch-manipulation py-1 text-base text-neutral-700 transition-colors hover:text-black md:text-lg"
                                     >
-                                        A l'origine de Morphea
+                                        {t('footer.about.origin')}
                                     </a>
                                 </li>
                                 <li>
@@ -161,7 +160,7 @@ export default function Footer() {
                                         href="#"
                                         className="block touch-manipulation py-1 text-base text-neutral-700 transition-colors hover:text-black md:text-lg"
                                     >
-                                        Plan de Morphea
+                                        {t('footer.about.plan')}
                                     </a>
                                 </li>
                                 <li>
@@ -169,7 +168,7 @@ export default function Footer() {
                                         href="#"
                                         className="block touch-manipulation py-1 text-base text-neutral-700 transition-colors hover:text-black md:text-lg"
                                     >
-                                        Nos événements
+                                        {t('footer.about.events')}
                                     </a>
                                 </li>
                                 <li>
@@ -177,7 +176,7 @@ export default function Footer() {
                                         href="#"
                                         className="block touch-manipulation py-1 text-base text-neutral-700 transition-colors hover:text-black md:text-lg"
                                     >
-                                        Réseaux sociaux
+                                        {t('footer.about.socialMedia')}
                                     </a>
                                 </li>
                             </ul>
@@ -185,7 +184,7 @@ export default function Footer() {
 
                         <div>
                             <h3 className="font-recia mb-3 text-base text-neutral-400 uppercase md:mb-4 md:text-lg">
-                                Service client
+                                {t('footer.customerService.title')}
                             </h3>
                             <ul className="space-y-2 md:space-y-3">
                                 <li>
@@ -193,7 +192,7 @@ export default function Footer() {
                                         href="#"
                                         className="block touch-manipulation py-1 text-base text-neutral-700 transition-colors hover:text-black md:text-lg"
                                     >
-                                        Mon compte
+                                        {t('footer.customerService.myAccount')}
                                     </a>
                                 </li>
                                 <li>
@@ -201,7 +200,9 @@ export default function Footer() {
                                         href="#"
                                         className="block touch-manipulation py-1 text-base text-neutral-700 transition-colors hover:text-black md:text-lg"
                                     >
-                                        Commandes et livraison
+                                        {t(
+                                            'footer.customerService.ordersDelivery'
+                                        )}
                                     </a>
                                 </li>
                                 <li>
@@ -209,7 +210,9 @@ export default function Footer() {
                                         href="#"
                                         className="block touch-manipulation py-1 text-base text-neutral-700 transition-colors hover:text-black md:text-lg"
                                     >
-                                        Cookies et confidentialité
+                                        {t(
+                                            'footer.customerService.cookiesPrivacy'
+                                        )}
                                     </a>
                                 </li>
                                 <li>
@@ -217,7 +220,7 @@ export default function Footer() {
                                         href="#"
                                         className="block touch-manipulation py-1 text-base text-neutral-700 transition-colors hover:text-black md:text-lg"
                                     >
-                                        FAQ
+                                        {t('footer.customerService.faq')}
                                     </a>
                                 </li>
                                 <li>
@@ -225,7 +228,7 @@ export default function Footer() {
                                         href="#"
                                         className="block touch-manipulation py-1 text-base text-neutral-700 transition-colors hover:text-black md:text-lg"
                                     >
-                                        CGV
+                                        {t('footer.customerService.terms')}
                                     </a>
                                 </li>
                             </ul>
@@ -233,7 +236,7 @@ export default function Footer() {
 
                         <div>
                             <h3 className="font-recia mb-3 text-base text-neutral-400 uppercase md:mb-4 md:text-lg">
-                                Catégorie
+                                {t('footer.categories.title')}
                             </h3>
                             <ul className="space-y-2 md:space-y-3">
                                 <li>
@@ -241,7 +244,7 @@ export default function Footer() {
                                         href="#"
                                         className="block touch-manipulation py-1 text-base text-neutral-700 transition-colors hover:text-black md:text-lg"
                                     >
-                                        Nouvelle collection
+                                        {t('footer.categories.newCollection')}
                                     </a>
                                 </li>
                                 <li>
@@ -249,7 +252,7 @@ export default function Footer() {
                                         href="#"
                                         className="block touch-manipulation py-1 text-base text-neutral-700 transition-colors hover:text-black md:text-lg"
                                     >
-                                        Habillement
+                                        {t('footer.categories.clothing')}
                                     </a>
                                 </li>
                                 <li>
@@ -257,7 +260,7 @@ export default function Footer() {
                                         href="#"
                                         className="block touch-manipulation py-1 text-base text-neutral-700 transition-colors hover:text-black md:text-lg"
                                     >
-                                        Bijoux
+                                        {t('footer.categories.jewelry')}
                                     </a>
                                 </li>
                                 <li>
@@ -265,7 +268,7 @@ export default function Footer() {
                                         href="#"
                                         className="block touch-manipulation py-1 text-base text-neutral-700 transition-colors hover:text-black md:text-lg"
                                     >
-                                        Accessoires
+                                        {t('footer.categories.accessories')}
                                     </a>
                                 </li>
                             </ul>
@@ -277,7 +280,7 @@ export default function Footer() {
                 <div className="border-y border-gray-200 pt-3 pb-8 md:pt-4 md:pb-11">
                     <div className="flex flex-col items-center justify-center gap-4 md:gap-6">
                         <span className="font-recia text-lg font-semibold text-neutral-700 md:text-xl">
-                            Suivez-nous
+                            {t('footer.social.followUs')}
                         </span>
                         <div className="flex items-center gap-5 text-gray-700 md:gap-7">
                             <a

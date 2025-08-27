@@ -8,10 +8,12 @@ import NavBar from './_components/nav_bar'
 import ExpandableCategories from '@/components/expandable-categories'
 import { ThreeDPhotoCarousel } from '@/components/three-d-photo-carousel'
 import { Play, Pause, Volume2, VolumeX } from 'lucide-react'
+import { useLanguage } from '@/hooks/useLanguage'
 
 export default function Home() {
     const supabase = createClient()
     const router = useRouter()
+    const { t } = useLanguage()
 
     useEffect(() => {
         supabase.auth.onAuthStateChange(async (event) => {
@@ -55,45 +57,45 @@ export default function Home() {
     const videoData = {
         side1: {
             src: '/v1.mp4',
-            topText: 'MODE',
-            mainText: 'PRÉ-COLLECTION 2026/27',
+            topText: t('homepage.hero.mode'),
+            mainText: t('homepage.hero.preCollection'),
         },
         side2: {
             src: '/v2.mp4',
-            topText: 'PRÉ-COLLECTION 2026/27',
-            mainText: 'COLLECTION ÉTÉ 2026',
+            topText: t('homepage.hero.preCollection'),
+            mainText: t('homepage.hero.summerCollection'),
         },
     }
 
     const collectionData = {
         card1: {
             image: '/p1.jpg',
-            title: 'Collection Automne 2025',
-            subtitle: 'Une symphonie de couleurs automnales',
+            title: t('homepage.collections.autumnCollection'),
+            subtitle: t('homepage.collections.autumnSubtitle'),
         },
         card2: {
             image: '/p2.jpg',
-            title: 'Collection Automne 2025',
-            subtitle: 'Une symphonie de couleurs automnales',
+            title: t('homepage.collections.autumnCollection'),
+            subtitle: t('homepage.collections.autumnSubtitle'),
         },
     }
 
     const categoriesData = {
         category1: {
             image: '/pp1.jpg',
-            title: 'Haute Couture',
+            title: t('homepage.categories.hauteCouture'),
             subtitle: '',
             link: '#',
         },
         category2: {
             image: '/pp2.jpg',
-            title: 'Bijoux',
-            subtitle: "Créations artisanales et pièces d'exception",
+            title: t('homepage.categories.jewelry'),
+            subtitle: t('homepage.categories.jewelrySubtitle'),
             link: '#',
         },
         category3: {
             image: '/pp3.jpg',
-            title: 'Accessoires',
+            title: t('homepage.categories.accessories'),
             subtitle: '',
             link: '#',
         },
@@ -156,7 +158,7 @@ export default function Home() {
                                 href="#"
                                 className="font-supreme pointer-events-auto text-lg font-bold tracking-widest text-white underline transition-colors hover:text-gray-200 md:text-2xl"
                             >
-                                Découvrir
+                                {t('homepage.hero.discover')}
                             </a>
                         </div>
                         <div className="m-auto mt-8 flex max-w-20 flex-row items-center justify-center gap-2 md:mt-14 md:max-w-24">
@@ -178,7 +180,7 @@ export default function Home() {
                                 href="#"
                                 className="font-supreme pointer-events-auto text-lg font-bold tracking-widest text-white underline transition-colors hover:text-gray-200 md:text-2xl"
                             >
-                                Découvrir
+                                {t('homepage.hero.discover')}
                             </a>
                         </div>
                         <div className="m-auto mt-8 flex max-w-20 flex-row items-center justify-center gap-2 md:mt-14 md:max-w-24">
@@ -205,7 +207,11 @@ export default function Home() {
                     <button
                         onClick={togglePlayPause}
                         className="flex h-12 w-12 touch-manipulation items-center justify-center rounded-full bg-black/20 backdrop-blur-sm transition-colors hover:bg-black/40 md:h-12 md:w-12"
-                        aria-label={isPlaying ? 'Pause video' : 'Play video'}
+                        aria-label={
+                            isPlaying
+                                ? t('homepage.controls.pauseVideo')
+                                : t('homepage.controls.playVideo')
+                        }
                     >
                         {isPlaying ? (
                             <Pause className="size-6 text-white md:size-7" />
@@ -216,7 +222,11 @@ export default function Home() {
                     <button
                         onClick={toggleMute}
                         className="flex h-12 w-12 touch-manipulation items-center justify-center rounded-full bg-black/20 backdrop-blur-sm transition-colors hover:bg-black/40 md:h-12 md:w-12"
-                        aria-label={isMuted ? 'Unmute video' : 'Mute video'}
+                        aria-label={
+                            isMuted
+                                ? t('homepage.controls.unmuteVideo')
+                                : t('homepage.controls.muteVideo')
+                        }
                     >
                         {isMuted ? (
                             <VolumeX className="size-6 text-white md:size-7" />
@@ -232,12 +242,10 @@ export default function Home() {
                 <div className="mx-auto max-w-7xl px-4 md:px-8">
                     <div className="mb-12 text-center md:mb-16">
                         <h2 className="font-recia mb-8 text-3xl leading-tight font-extrabold text-[#053340] md:mb-14 md:text-5xl">
-                            Découvrez Nos Défilé
+                            {t('homepage.collections.title')}
                         </h2>
                         <p className="font-supreme mx-auto max-w-4xl px-4 text-lg text-gray-600 md:px-0 md:text-2xl">
-                            {
-                                "Plongez dans l'univers exclusif de nos collections à travers des présentations exceptionnelles"
-                            }
+                            {t('homepage.collections.subtitle')}
                         </p>
                     </div>
 
@@ -291,12 +299,10 @@ export default function Home() {
                 <div className="mx-auto max-w-7xl px-4 md:px-8">
                     <div className="mb-8 text-center md:mb-10">
                         <h2 className="font-recia mb-6 text-3xl leading-tight font-extrabold text-[#053340] md:mb-11 md:text-5xl">
-                            Nos Créateurs
+                            {t('homepage.creators.title')}
                         </h2>
                         <p className="font-supreme mx-auto max-w-2xl px-4 text-lg text-gray-600 md:px-0 md:text-2xl">
-                            {
-                                "Découvrez nos espaces d'exception boutique en Tunisie"
-                            }
+                            {t('homepage.creators.subtitle')}
                         </p>
                     </div>
                     <ThreeDPhotoCarousel
