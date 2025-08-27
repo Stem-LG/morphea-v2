@@ -4,16 +4,56 @@ import { ChevronRight, ChevronDown } from 'lucide-react'
 import Image from 'next/image'
 import { useState, type FormEvent, useEffect, useRef } from 'react'
 import { useLanguage } from '@/hooks/useLanguage'
+import { createClient } from '@/lib/client'
+import { toast } from 'sonner'
 
 export default function Footer() {
     const [email, setEmail] = useState('')
     const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false)
+    const [isSubmitting, setIsSubmitting] = useState(false)
     const { language, setLanguage } = useLanguage()
     const dropdownRef = useRef<HTMLDivElement>(null)
+    const supabase = createClient()
 
-    const onSubmit = (e: FormEvent) => {
+    // Email validation function
+    const isValidEmail = (email: string) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+        return emailRegex.test(email)
+    }
+
+    const onSubmit = async (e: FormEvent) => {
         e.preventDefault()
-        setEmail('')
+
+        if (!email.trim()) {
+            toast.error('Veuillez entrer votre adresse email')
+            return
+        }
+
+        if (!isValidEmail(email)) {
+            toast.error('Veuillez entrer une adresse email valide')
+            return
+        }
+
+        setIsSubmitting(true)
+
+        try {
+            // Insert into xnewsletter table in morpheus schema
+            await supabase.schema('morpheus').from('xnewsletter').insert({
+                email: email.trim().toLowerCase(),
+                subscribed: true,
+            })
+
+            // Always show success message regardless of the response
+            // (as requested - even if email already exists due to unique constraint)
+            toast.success('Merci pour votre inscription à notre newsletter!')
+            setEmail('')
+        } catch (error) {
+            // Still show success message as requested
+            toast.success('Merci pour votre inscription à notre newsletter!')
+            setEmail('')
+        } finally {
+            setIsSubmitting(false)
+        }
     }
 
     // Close dropdown when clicking outside
@@ -83,14 +123,20 @@ export default function Footer() {
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
                                 placeholder="person@email.com"
-                                className="font-supreme h-12 w-full rounded-full border border-gray-300 pr-12 pl-4 text-base transition outline-none focus:border-gray-400 md:h-12"
+                                disabled={isSubmitting}
+                                className="font-supreme h-12 w-full rounded-full border border-gray-300 pr-12 pl-4 text-base transition outline-none focus:border-gray-400 disabled:cursor-not-allowed disabled:opacity-50 md:h-12"
                             />
                             <button
                                 aria-label="S'abonner"
                                 type="submit"
-                                className="absolute top-1/2 right-1 flex size-10 -translate-y-1/2 touch-manipulation items-center justify-center rounded-full bg-gradient-to-b from-slate-900 via-sky-900 to-cyan-950 text-white"
+                                disabled={isSubmitting}
+                                className="absolute top-1/2 right-1 flex size-10 -translate-y-1/2 touch-manipulation items-center justify-center rounded-full bg-gradient-to-b from-slate-900 via-sky-900 to-cyan-950 text-white transition-opacity disabled:cursor-not-allowed disabled:opacity-50"
                             >
-                                <ChevronRight className="size-5 md:size-6" />
+                                {isSubmitting ? (
+                                    <div className="size-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                                ) : (
+                                    <ChevronRight className="size-5 md:size-6" />
+                                )}
                             </button>
                         </form>
                     </div>

@@ -915,6 +915,27 @@ export type Database = {
         }
         Relationships: []
       }
+      xnewsletter: {
+        Row: {
+          created_at: string
+          email: string
+          id: number
+          subscribed: boolean
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: number
+          subscribed?: boolean
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: number
+          subscribed?: boolean
+        }
+        Relationships: []
+      }
       xtaille: {
         Row: {
           sysaction: string | null
@@ -1697,6 +1718,7 @@ export type Database = {
           sysuser: string | null
           xcategprodidfk: number | null
           ydesignidfk: number
+          yestvisible: boolean
           yinfospotactionsidfk: number | null
           yprodcode: string
           yproddetailstech: string
@@ -1712,6 +1734,7 @@ export type Database = {
           sysuser?: string | null
           xcategprodidfk?: number | null
           ydesignidfk: number
+          yestvisible?: boolean
           yinfospotactionsidfk?: number | null
           yprodcode: string
           yproddetailstech: string
@@ -1727,6 +1750,7 @@ export type Database = {
           sysuser?: string | null
           xcategprodidfk?: number | null
           ydesignidfk?: number
+          yestvisible?: boolean
           yinfospotactionsidfk?: number | null
           yprodcode?: string
           yproddetailstech?: string
@@ -1875,6 +1899,7 @@ export type Database = {
           xcouleuridfk: number
           xdeviseidfk: number | null
           xtailleidfk: number
+          yestvisible: boolean | null
           yprodidfk: number | null
           yvarprodcode: string
           yvarprodgenre: string
@@ -1895,6 +1920,7 @@ export type Database = {
           xcouleuridfk: number
           xdeviseidfk?: number | null
           xtailleidfk: number
+          yestvisible?: boolean | null
           yprodidfk?: number | null
           yvarprodcode: string
           yvarprodgenre: string
@@ -1915,6 +1941,7 @@ export type Database = {
           xcouleuridfk?: number
           xdeviseidfk?: number | null
           xtailleidfk?: number
+          yestvisible?: boolean | null
           yprodidfk?: number | null
           yvarprodcode?: string
           yvarprodgenre?: string
