@@ -102,6 +102,23 @@ export function ProductFilters({ filters, onFiltersChange, onReset }: ProductFil
                 />
             </div>
 
+            {/* Visibility Filter */}
+            <div className="min-w-[180px]">
+                <label className="block text-sm font-medium text-gray-300 mb-1">
+                    {t('admin.visibility') || 'Visibilité'}
+                </label>
+                <SuperSelect
+                    options={[
+                        { value: '', label: t('admin.allVisibility') || 'Toute Visibilité' },
+                        { value: 'true', label: t('admin.visible') || 'Visible' },
+                        { value: 'false', label: t('admin.invisible') || 'Invisible' }
+                    ]}
+                    value={filters.visibility || ''}
+                    onValueChange={(value) => onFiltersChange({ visibility: value === "" ? null : (value as string) })}
+                    placeholder={t('admin.selectVisibility') || 'Sélectionner la Visibilité'}
+                />
+            </div>
+
             {/* Reset Button - Only show if onReset is provided */}
             {onReset && (
                 <div className="flex items-end">

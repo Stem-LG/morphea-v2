@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Store, Package, TrendingUp, ShoppingBag, Loader2, AlertCircle } from "lucide-react";
+import { Store, Package, TrendingUp, ShoppingBag, Loader2, AlertCircle, Eye, EyeOff, Users, BarChart3, X } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/hooks/useAuth";
 import { useDashboardStats } from "./_hooks/use-dashboard-stats";
@@ -10,7 +10,7 @@ import { SceneAnalyticsChart } from "./_components/scene-analytics-chart";
 export default function DashboardContent() {
     const { t } = useLanguage();
     const { data: user } = useAuth();
-    const { totalStores, totalProducts, pendingApprovals, totalVisitors, isLoading, error } = useDashboardStats();
+    const { totalStores, totalProducts, pendingApprovals, rejectedProducts, approvedVisibleProducts, approvedInvisibleProducts, totalVisitors, totalViews, totalScenes, averageViews, isLoading, error } = useDashboardStats();
 
     const userMetadata = user?.app_metadata as { roles?: string[]; assigned_stores?: number[] };
     const roles = userMetadata?.roles || [];
@@ -48,8 +48,8 @@ export default function DashboardContent() {
 
     return (
         <div className="p-6 space-y-6">
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+            {/* First Row - Store/Product Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 lg:gap-6">
                 <Card className="bg-gradient-to-br from-morpheus-blue-dark/40 to-morpheus-blue-light/40 border-slate-700/50 shadow-xl">
                     <CardHeader className="pb-3">
                         <CardTitle className="flex items-center justify-between text-white">
@@ -74,29 +74,102 @@ export default function DashboardContent() {
                     </CardContent>
                 </Card>
 
-                {isAdmin && (
-                    <Card className="bg-gradient-to-br from-morpheus-blue-dark/40 to-morpheus-blue-light/40 border-slate-700/50 shadow-xl">
-                        <CardHeader className="pb-3">
-                            <CardTitle className="flex items-center justify-between text-white">
-                                <span className="text-sm font-medium">{t("admin.productsPendingApproval")}</span>
-                                <ShoppingBag className="h-5 w-5 text-orange-400" />
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <StatValue value={pendingApprovals} isLoading={isLoading} error={error} />
-                        </CardContent>
-                    </Card>
-                )}
+                <Card className="bg-gradient-to-br from-morpheus-blue-dark/40 to-morpheus-blue-light/40 border-slate-700/50 shadow-xl">
+                    <CardHeader className="pb-3">
+                        <CardTitle className="flex items-center justify-between text-white">
+                            <span className="text-sm font-medium">{t("admin.productsPendingApproval")}</span>
+                            <ShoppingBag className="h-5 w-5 text-orange-400" />
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <StatValue value={pendingApprovals} isLoading={isLoading} error={error} />
+                    </CardContent>
+                </Card>
 
                 <Card className="bg-gradient-to-br from-morpheus-blue-dark/40 to-morpheus-blue-light/40 border-slate-700/50 shadow-xl">
                     <CardHeader className="pb-3">
                         <CardTitle className="flex items-center justify-between text-white">
+                            <span className="text-sm font-medium">{t("admin.rejectedProducts")}</span>
+                            <X className="h-5 w-5 text-red-400" />
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <StatValue value={rejectedProducts} isLoading={isLoading} error={error} />
+                    </CardContent>
+                </Card>
+
+                <Card className="bg-gradient-to-br from-morpheus-blue-dark/40 to-morpheus-blue-light/40 border-slate-700/50 shadow-xl">
+                    <CardHeader className="pb-3">
+                        <CardTitle className="flex items-center justify-between text-white">
+                            <span className="text-sm font-medium">{t("admin.approvedVisibleProducts")}</span>
+                            <Eye className="h-5 w-5 text-green-400" />
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <StatValue value={approvedVisibleProducts} isLoading={isLoading} error={error} />
+                    </CardContent>
+                </Card>
+
+                <Card className="bg-gradient-to-br from-morpheus-blue-dark/40 to-morpheus-blue-light/40 border-slate-700/50 shadow-xl">
+                    <CardHeader className="pb-3">
+                        <CardTitle className="flex items-center justify-between text-white">
+                            <span className="text-sm font-medium">{t("admin.approvedInvisibleProducts")}</span>
+                            <EyeOff className="h-5 w-5 text-gray-400" />
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <StatValue value={approvedInvisibleProducts} isLoading={isLoading} error={error} />
+                    </CardContent>
+                </Card>
+            </div>
+
+            {/* Second Row - Visitor/View Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+                <Card className="bg-gradient-to-br from-morpheus-blue-dark/40 to-morpheus-blue-light/40 border-slate-700/50 shadow-xl">
+                    <CardHeader className="pb-3">
+                        <CardTitle className="flex items-center justify-between text-white">
                             <span className="text-sm font-medium">{t("admin.totalVisitors")}</span>
-                            <TrendingUp className="h-5 w-5 text-green-400" />
+                            <Users className="h-5 w-5 text-blue-400" />
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
                         <StatValue value={totalVisitors} isLoading={isLoading} error={error} />
+                    </CardContent>
+                </Card>
+
+                <Card className="bg-gradient-to-br from-morpheus-blue-dark/40 to-morpheus-blue-light/40 border-slate-700/50 shadow-xl">
+                    <CardHeader className="pb-3">
+                        <CardTitle className="flex items-center justify-between text-white">
+                            <span className="text-sm font-medium">{t("admin.totalViews")}</span>
+                            <TrendingUp className="h-5 w-5 text-purple-400" />
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <StatValue value={totalViews} isLoading={isLoading} error={error} />
+                    </CardContent>
+                </Card>
+
+                <Card className="bg-gradient-to-br from-morpheus-blue-dark/40 to-morpheus-blue-light/40 border-slate-700/50 shadow-xl">
+                    <CardHeader className="pb-3">
+                        <CardTitle className="flex items-center justify-between text-white">
+                            <span className="text-sm font-medium">{t("admin.totalScenes")}</span>
+                            <BarChart3 className="h-5 w-5 text-indigo-400" />
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <StatValue value={totalScenes} isLoading={isLoading} error={error} />
+                    </CardContent>
+                </Card>
+
+                <Card className="bg-gradient-to-br from-morpheus-blue-dark/40 to-morpheus-blue-light/40 border-slate-700/50 shadow-xl">
+                    <CardHeader className="pb-3">
+                        <CardTitle className="flex items-center justify-between text-white">
+                            <span className="text-sm font-medium">{t("admin.averageViews")}</span>
+                            <TrendingUp className="h-5 w-5 text-yellow-400" />
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <StatValue value={averageViews} isLoading={isLoading} error={error} />
                     </CardContent>
                 </Card>
             </div>

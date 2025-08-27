@@ -9,6 +9,7 @@ export interface ProductFilters {
     boutique?: string | null;
     category?: string | null;
     search?: string | null;
+    visibility?: string | null;
 }
 
 export interface ProductPagination {
@@ -23,6 +24,7 @@ export function useProductFilters() {
     const [boutique, setBoutique] = useQueryState('boutique', parseAsString);
     const [category, setCategory] = useQueryState('category', parseAsString);
     const [search, setSearch] = useQueryState('search', parseAsString);
+    const [visibility, setVisibility] = useQueryState('visibility', parseAsString);
 
     // Pagination state
     const [page, setPage] = useQueryState('page', parseAsInteger.withDefault(1));
@@ -34,6 +36,7 @@ export function useProductFilters() {
         boutique: boutique || undefined,
         category: category || undefined,
         search: search || undefined,
+        visibility: visibility || undefined,
     };
 
     const pagination: ProductPagination = {
@@ -47,10 +50,11 @@ export function useProductFilters() {
         if (newFilters.boutique !== undefined) setBoutique(newFilters.boutique);
         if (newFilters.category !== undefined) setCategory(newFilters.category);
         if (newFilters.search !== undefined) setSearch(newFilters.search);
+        if (newFilters.visibility !== undefined) setVisibility(newFilters.visibility);
         
         // Reset to first page when filters change
         setPage(1);
-    }, [setEvent, setMall, setBoutique, setCategory, setSearch, setPage]);
+    }, [setEvent, setMall, setBoutique, setCategory, setSearch, setVisibility, setPage]);
 
     const resetFilters = useCallback(() => {
         setEvent(null);
@@ -58,8 +62,9 @@ export function useProductFilters() {
         setBoutique(null);
         setCategory(null);
         setSearch(null);
+        setVisibility(null);
         setPage(1);
-    }, [setEvent, setMall, setBoutique, setCategory, setSearch, setPage]);
+    }, [setEvent, setMall, setBoutique, setCategory, setSearch, setVisibility, setPage]);
 
     const updatePagination = useCallback((newPagination: Partial<ProductPagination>) => {
         if (newPagination.page !== undefined) setPage(newPagination.page);

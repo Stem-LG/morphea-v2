@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { RowSelectionState } from "@tanstack/react-table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -37,6 +37,24 @@ export default function AdminApprovedProductsPage() {
     const products = result?.data || [];
     const paginationData = result?.pagination;
 
+    // Clean up invalid selections when products change
+    useEffect(() => {
+        const currentProductIds = new Set(products.map(p => p.yprodid.toString()));
+        const selectedIds = Object.keys(rowSelection);
+        const validSelections: RowSelectionState = {};
+        
+        selectedIds.forEach(id => {
+            if (currentProductIds.has(id)) {
+                validSelections[id] = rowSelection[id];
+            }
+        });
+        
+        // Only update if there are invalid selections to remove
+        if (Object.keys(validSelections).length !== selectedIds.length) {
+            setRowSelection(validSelections);
+        }
+    }, [products, rowSelection]);
+
     const handleViewProduct = (product: any) => {
         setViewingProductId(product.yprodid);
         setIsProductViewDialogOpen(true);
@@ -48,8 +66,8 @@ export default function AdminApprovedProductsPage() {
     };
 
     const handleBulkMakeVisible = () => {
-        const selectedRowIds = Object.keys(rowSelection);
-        if (selectedRowIds.length === 0) {
+        const selectedProductIds = Object.keys(rowSelection);
+        if (selectedProductIds.length === 0) {
             // No rows selected, apply to all
             const productIds = products.map(product => product.yprodid);
             updateBulkVisibility.mutate({
@@ -57,9 +75,8 @@ export default function AdminApprovedProductsPage() {
                 yestvisible: true,
             });
         } else {
-            // Apply to selected rows only
-            const selectedProducts = selectedRowIds.map(rowId => products[parseInt(rowId)]);
-            const productIds = selectedProducts.map(product => product.yprodid);
+            // Apply to selected products by their actual IDs
+            const productIds = selectedProductIds.map(id => parseInt(id));
             updateBulkVisibility.mutate({
                 productIds,
                 yestvisible: true,
@@ -68,8 +85,8 @@ export default function AdminApprovedProductsPage() {
     };
 
     const handleBulkMakeInvisible = () => {
-        const selectedRowIds = Object.keys(rowSelection);
-        if (selectedRowIds.length === 0) {
+        const selectedProductIds = Object.keys(rowSelection);
+        if (selectedProductIds.length === 0) {
             // No rows selected, apply to all
             const productIds = products.map(product => product.yprodid);
             updateBulkVisibility.mutate({
@@ -77,9 +94,8 @@ export default function AdminApprovedProductsPage() {
                 yestvisible: false,
             });
         } else {
-            // Apply to selected rows only
-            const selectedProducts = selectedRowIds.map(rowId => products[parseInt(rowId)]);
-            const productIds = selectedProducts.map(product => product.yprodid);
+            // Apply to selected products by their actual IDs
+            const productIds = selectedProductIds.map(id => parseInt(id));
             updateBulkVisibility.mutate({
                 productIds,
                 yestvisible: false,
@@ -196,7 +212,7 @@ export default function AdminApprovedProductsPage() {
                             enableRowSelection={true}
                             rowSelection={rowSelection}
                             onRowSelectionChange={setRowSelection}
-                            getRowId={(row) => products.indexOf(row).toString()}
+                            getRowId={(row) => row.yprodid.toString()}
                             filters={<ProductFilters filters={filters} onFiltersChange={updateFilters} />}
                             pagination={{
                                 total: paginationData?.total || 0,
@@ -266,6 +282,17 @@ export default function AdminApprovedProductsPage() {
                                         }))
                                     ]}
                                     placeholder={t("admin.selectCategory") || "Select Category"}
+                                    className="w-40 md:w-44 lg:w-48"
+                                />
+                                <SuperSelect
+                                    value={filters.visibility || ""}
+                                    onValueChange={(value) => updateFilters({ visibility: value === "" ? null : (value as string) })}
+                                    options={[
+                                        { value: "", label: t("admin.allVisibility") || "Toute Visibilité" },
+                                        { value: "true", label: t("admin.visible") || "Visible" },
+                                        { value: "false", label: t("admin.invisible") || "Invisible" }
+                                    ]}
+                                    placeholder={t("admin.selectVisibility") || "Sélectionner la Visibilité"}
                                     className="w-40 md:w-44 lg:w-48"
                                 />
                             </div>

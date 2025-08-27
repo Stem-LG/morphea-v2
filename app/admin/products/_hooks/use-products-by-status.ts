@@ -56,6 +56,10 @@ export function useProductsByStatus(
     return useQuery({
         queryKey: ['products-by-status', status, filters, pagination],
         queryFn: async (): Promise<{ data: ProductWithDetails[]; pagination: PaginationData }> => {
+            // Debug logging
+            console.log('Filters received:', filters);
+            console.log('Visibility filter value:', filters.visibility, typeof filters.visibility);
+            
             // Build the main query for products using schema
             let query = supabase
                 .schema('morpheus')
@@ -90,12 +94,31 @@ export function useProductsByStatus(
                 query = query.eq('xcategprodidfk', parseInt(filters.category) as any);
             }
 
+            // Apply visibility filter
+            if (filters.visibility) {
+                console.log('Applying visibility filter:', filters.visibility, '-> boolean:', filters.visibility === 'true');
+                query = query.eq('yestvisible', filters.visibility === 'true');
+            }
+
             // Get total count for pagination
-            const { count } = await supabase
+            let countQuery = supabase
                 .schema('morpheus')
                 .from('yprod')
                 .select('*', { count: 'exact', head: true })
                 .eq('yprodstatut', status as any);
+
+            // Apply same filters to count query
+            if (filters.search) {
+                countQuery = countQuery.or(`yprodintitule.ilike.%${filters.search}%,yprodcode.ilike.%${filters.search}%`);
+            }
+            if (filters.category) {
+                countQuery = countQuery.eq('xcategprodidfk', parseInt(filters.category) as any);
+            }
+            if (filters.visibility) {
+                countQuery = countQuery.eq('yestvisible', filters.visibility === 'true');
+            }
+
+            const { count } = await countQuery;
 
             // Apply pagination
             const from = (pagination.page - 1) * pagination.perPage;
