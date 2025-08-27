@@ -9,7 +9,7 @@ import { WishlistDialog } from '@/app/_components/wishlist-dialog'
 // import { useWishlist } from '@/app/_hooks/wishlist/useWishlist'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import {  useState, Fragment } from 'react'
+import { useState, Fragment } from 'react'
 // import { useNotifications } from '@/app/_hooks/use-notifications'
 import { ProductDetailsPage } from '../../main/_components/product-details-page'
 import Image from 'next/image'
@@ -24,7 +24,6 @@ import {
     Sheet,
     SheetClose,
     SheetContent,
-    SheetFooter,
     SheetTitle,
 } from '@/components/ui/sheet'
 import {
@@ -38,8 +37,11 @@ import {
 import { LanguageSwitcher } from './language-switcher'
 import { NavBarIconButton } from './navbar_icon_button'
 import { Separator } from '@/components/ui/separator'
-import { ChevronRight, XIcon } from 'lucide-react'
+import { ChevronRight, XIcon, ChevronDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useCategories } from '@/hooks/useCategories'
+import { organizeCategoriesIntoTree } from '@/app/admin/categories/_components/category-tree-utils'
+import { ScrollArea } from '@/components/ui/scroll-area'
 
 export default function NavBar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -122,7 +124,7 @@ export default function NavBar() {
 
     return (
         <>
-            <nav className="fixed top-0 z-50 flex h-18 w-full bg-white/40 px-6 md:h-24 md:px-12">
+            <nav className="fixed top-0 z-50 flex h-18 w-full bg-white/40 px-4 md:h-24 md:px-6 lg:px-12">
                 <div className="flex flex-1 items-center justify-start">
                     <NavBarIconButton
                         variant="leading"
@@ -243,6 +245,111 @@ export default function NavBar() {
     )
 }
 
+// Component for rendering category navigation with subcategories
+function CategoryNavigation({
+    onCategoryClick,
+}: {
+    onCategoryClick?: () => void
+}) {
+    const [expandedCategories, setExpandedCategories] = useState<Set<number>>(
+        new Set()
+    )
+    const { data: categories, isLoading } = useCategories()
+
+    if (isLoading) {
+        return (
+            <div className="py-4">
+                <div className="animate-pulse space-y-2">
+                    {[1, 2, 3].map((i) => (
+                        <div key={i} className="h-12 rounded bg-gray-200" />
+                    ))}
+                </div>
+            </div>
+        )
+    }
+
+    if (!categories || categories.length === 0) {
+        return null
+    }
+
+    const categoryTree = organizeCategoriesIntoTree(
+        categories.map((cat) => ({ ...cat, yprod: [{ count: 0 }] }))
+    )
+
+    const toggleCategory = (categoryId: number) => {
+        const newExpanded = new Set(expandedCategories)
+        if (newExpanded.has(categoryId)) {
+            newExpanded.delete(categoryId)
+        } else {
+            newExpanded.add(categoryId)
+        }
+        setExpandedCategories(newExpanded)
+    }
+
+    const renderCategory = (category: any, level: number = 0) => {
+        const hasChildren = category.children && category.children.length > 0
+        const isExpanded = expandedCategories.has(category.xcategprodid)
+        const paddingLeft = level * 16
+
+        return (
+            <div key={category.xcategprodid}>
+                {hasChildren ? (
+                    <Button
+                        variant="ghost"
+                        className="hover:text-morpheus-blue-dark h-12 w-full justify-between rounded-none text-lg text-neutral-600 hover:bg-gray-50"
+                        onClick={() => toggleCategory(category.xcategprodid)}
+                        style={{ paddingLeft: `${paddingLeft + 24}px` }}
+                    >
+                        <span className="flex-1 text-left">
+                            {category.xcategprodintitule}
+                        </span>
+                        {isExpanded ? (
+                            <ChevronDown className="size-5" />
+                        ) : (
+                            <ChevronRight className="size-5" />
+                        )}
+                    </Button>
+                ) : (
+                    <Button
+                        variant="ghost"
+                        className="hover:text-morpheus-blue-dark h-12 w-full justify-start rounded-none text-lg text-neutral-600 hover:bg-gray-50"
+                        asChild
+                        style={{ paddingLeft: `${paddingLeft + 24}px` }}
+                    >
+                        <Link
+                            href={`/shop?category=${category.xcategprodid}`}
+                            onClick={onCategoryClick}
+                        >
+                            {category.xcategprodintitule}
+                        </Link>
+                    </Button>
+                )}
+                {hasChildren && isExpanded && (
+                    <div className="bg-gray-50">
+                        {category.children.map((child: any) =>
+                            renderCategory(child, level + 1)
+                        )}
+                    </div>
+                )}
+                <Separator />
+            </div>
+        )
+    }
+
+    return (
+        <div>
+            {/* Category Tree */}
+            {categoryTree.map((category) => renderCategory(category))}
+        </div>
+    )
+}
+
+type NavbarItem = {
+    name: string
+    href?: string
+    action?: () => void
+}
+
 function NavBarSheet({
     isMenuOpen,
     setIsMenuOpen,
@@ -250,11 +357,16 @@ function NavBarSheet({
     isMenuOpen: boolean
     setIsMenuOpen: any
 }) {
-    const navbarItems = [
+    const [showCategories, setShowCategories] = useState(false)
+
+    const navbarItems: NavbarItem[] = [
         { name: 'Visite Virtuelle', href: '/main' },
         { name: 'Acceuil', href: '/' },
         { name: 'Nouveauté', href: '/shop' },
-        { name: 'Categories', subItems: ['hh'] },
+        {
+            name: 'Categories',
+            action: () => setShowCategories(!showCategories),
+        },
         { name: 'A Propos', href: '/about' },
         { name: 'Contactez-Nous', href: '/contact' },
     ]
@@ -270,81 +382,106 @@ function NavBarSheet({
     return (
         <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
             <SheetTitle />
-            <SheetContent side="left" className="bg-white">
+            <SheetContent side="left" className="flex h-full flex-col bg-white">
                 <SheetClose>
-                    <div className="absolute top-10 right-7">
+                    <div className="absolute top-10 right-7 z-10">
                         <XIcon className="size-5" />
                     </div>
                 </SheetClose>
-                <div className="flex items-center justify-center py-4 text-3xl">
-                    <h1 className="font-recia font-medium">Menu</h1>
-                </div>
-                <Separator />
-                <div className="flex flex-col px-6">
-                    {navbarItems.map((item) => {
-                        const hasChildren =
-                            item.subItems && item.subItems.length > 0
 
-                        const hasHref = !!item.href
-
-                        return (
-                            <Fragment key={item.name}>
-                                <Button
-                                    variant="ghost"
-                                    className="font-supreme hover:bg-morpheus-blue-lighter h-14 justify-between rounded-none text-xl text-neutral-400 hover:text-white"
-                                    asChild={hasHref}
-                                >
-                                    {hasHref ? (
-                                        <Link href={item.href!}>
-                                            {item.name}
-                                        </Link>
-                                    ) : (
-                                        <>
-                                            <span className="ml-1">
-                                                {item.name}
-                                            </span>
-                                            {hasChildren && (
-                                                <ChevronRight className="size-6" />
-                                            )}
-                                        </>
-                                    )}
-                                </Button>
-                                <Separator />
-                            </Fragment>
-                        )
-                    })}
+                {/* Fixed Header */}
+                <div className="flex-shrink-0">
+                    <div className="flex items-center justify-center py-4 text-3xl">
+                        <h1 className="font-recia font-medium">Menu</h1>
+                    </div>
+                    <Separator />
                 </div>
-                <SheetFooter className="">
-                    <div className="flex flex-col px-2">
-                        {navbarFooterItems.map((item) => {
-                            const hasOnClick = !!item.onclick
+
+                {/* Scrollable Content Area */}
+                <ScrollArea className="flex-1 overflow-hidden">
+                    <div className="flex flex-col px-6">
+                        {navbarItems.map((item) => {
                             const hasHref = !!item.href
+                            const hasAction = !!item.action
+                            const isCategories = item.name === 'Categories'
 
                             return (
                                 <Fragment key={item.name}>
                                     <Button
                                         variant="ghost"
-                                        className={cn(
-                                            'font-supreme h-12 justify-start rounded-none text-lg text-neutral-400',
-                                            hasOnClick && 'w-full text-left'
-                                        )}
-                                        onClick={item.onclick}
+                                        className="font-supreme hover:bg-morpheus-blue-lighter h-14 justify-between rounded-none text-xl text-neutral-400 hover:text-white"
                                         asChild={hasHref}
+                                        onClick={
+                                            hasAction ? item.action : undefined
+                                        }
                                     >
                                         {hasHref ? (
                                             <Link href={item.href!}>
                                                 {item.name}
                                             </Link>
                                         ) : (
-                                            item.name
+                                            <>
+                                                <span className="ml-1">
+                                                    {item.name}
+                                                </span>
+                                                {isCategories &&
+                                                    (showCategories ? (
+                                                        <ChevronDown className="size-6" />
+                                                    ) : (
+                                                        <ChevronRight className="size-6" />
+                                                    ))}
+                                            </>
                                         )}
                                     </Button>
                                     <Separator />
+                                    {isCategories && showCategories && (
+                                        <div className="mb-4">
+                                            <CategoryNavigation
+                                                onCategoryClick={() =>
+                                                    setIsMenuOpen(false)
+                                                }
+                                            />
+                                        </div>
+                                    )}
                                 </Fragment>
                             )
                         })}
                     </div>
-                </SheetFooter>
+
+                    {/* Footer Items within Scrollable Area */}
+                    <div className="mt-8 px-6 pb-4">
+                        <Separator className="mb-4" />
+                        <div className="flex flex-col px-2">
+                            {navbarFooterItems.map((item) => {
+                                const hasOnClick = !!item.onclick
+                                const hasHref = !!item.href
+
+                                return (
+                                    <Fragment key={item.name}>
+                                        <Button
+                                            variant="ghost"
+                                            className={cn(
+                                                'font-supreme h-12 justify-start rounded-none text-lg text-neutral-400',
+                                                hasOnClick && 'w-full text-left'
+                                            )}
+                                            onClick={item.onclick}
+                                            asChild={hasHref}
+                                        >
+                                            {hasHref ? (
+                                                <Link href={item.href!}>
+                                                    {item.name}
+                                                </Link>
+                                            ) : (
+                                                item.name
+                                            )}
+                                        </Button>
+                                        <Separator />
+                                    </Fragment>
+                                )
+                            })}
+                        </div>
+                    </div>
+                </ScrollArea>
             </SheetContent>
         </Sheet>
     )

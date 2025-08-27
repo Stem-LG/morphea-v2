@@ -437,7 +437,10 @@ export const enTranslations = {
       "creating": "Creating...",
       "createCategory": "Create Category",
       "updating": "Updating...",
-      "updateCategory": "Update Category"
+      "updateCategory": "Update Category",
+      "hierarchicalView": "Hierarchical View",
+      "addSubcategory": "Add Subcategory",
+      "parentCategory": "Parent Category"
     },
     "approvals": {
       "title": "Product Approvals",
@@ -1473,5 +1476,78 @@ export const enTranslations = {
     "allCaughtUp": "You're all caught up!",
     "noNewNotifications": "No new notifications to show",
     "defaultTitle": "Notification"
+  },
+  "homepage": {
+    "hero": {
+      "mode": "MODE",
+      "preCollection": "PRE-COLLECTION 2026/27",
+      "summerCollection": "SUMMER COLLECTION 2026",
+      "discover": "Discover"
+    },
+    "controls": {
+      "playVideo": "Play video",
+      "pauseVideo": "Pause video",
+      "muteVideo": "Mute video",
+      "unmuteVideo": "Unmute video"
+    },
+    "collections": {
+      "title": "Discover Our Shows",
+      "subtitle": "Dive into the exclusive universe of our collections through exceptional presentations",
+      "autumnCollection": "Autumn Collection 2025",
+      "autumnSubtitle": "A symphony of autumn colors"
+    },
+    "categories": {
+      "title": "Our Categories",
+      "subtitle": "Explore our universe through three pillars of elegance",
+      "hauteCouture": "Haute Couture",
+      "jewelry": "Jewelry",
+      "jewelrySubtitle": "Artisanal creations and exceptional pieces",
+      "accessories": "Accessories",
+      "discover": "Discover"
+    },
+    "creators": {
+      "title": "Our Creators",
+      "subtitle": "Discover our exceptional boutique spaces in Tunisia"
+    },
+    "carousel": {
+      "noImages": "No images to display",
+      "imageAlt": "Carousel image",
+      "selectedImage": "Selected image"
+    }
+  },
+  "footer": {
+    "newsletter": {
+      "description": "Receive Our New Collections And Exclusive Events In Preview",
+      "emailPlaceholder": "person@email.com",
+      "subscribe": "Subscribe",
+      "emailRequired": "Please enter your email address",
+      "emailInvalid": "Please enter a valid email address",
+      "success": "Thank you for subscribing to our newsletter!"
+    },
+    "about": {
+      "title": "About",
+      "origin": "The Origin of Morphea",
+      "plan": "Morphea Plan",
+      "events": "Our Events",
+      "socialMedia": "Social Media"
+    },
+    "customerService": {
+      "title": "Customer Service",
+      "myAccount": "My Account",
+      "ordersDelivery": "Orders and Delivery",
+      "cookiesPrivacy": "Cookies and Privacy",
+      "faq": "FAQ",
+      "terms": "Terms & Conditions"
+    },
+    "categories": {
+      "title": "Category",
+      "newCollection": "New Collection",
+      "clothing": "Clothing",
+      "jewelry": "Jewelry",
+      "accessories": "Accessories"
+    },
+    "social": {
+      "followUs": "Follow Us"
+    }
   }
 };

@@ -194,7 +194,52 @@ export function useCategoriesWithStats() {
                 throw error;
             }
 
-            return data as (Category & { yprod: { count: number }[] })[];
+            // Fetch parent category information separately
+            const categoryIdsWithParent = data
+                .filter(category => category.xcategparentid !== null)
+                .map(category => category.xcategparentid);
+
+            if (categoryIdsWithParent.length > 0) {
+                const { data: parentCategories, error: parentError } = await supabase
+                    .schema("morpheus")
+                    .from("xcategprod")
+                    .select("xcategprodid, xcategprodintitule, xcategprodcode")
+                    .in("xcategprodid", categoryIdsWithParent);
+
+                if (parentError) {
+                    console.error("Error fetching parent categories:", parentError);
+                    throw parentError;
+                }
+
+                // Create a map of parent categories for quick lookup
+                const parentCategoryMap = new Map(
+                    parentCategories.map(parent => [parent.xcategprodid, parent])
+                );
+
+                // Add parent information to each category
+                const categoriesWithParent = data.map(category => {
+                    if (category.xcategparentid !== null) {
+                        return {
+                            ...category,
+                            parent: parentCategoryMap.get(category.xcategparentid) || null
+                        };
+                    }
+                    return {
+                        ...category,
+                        parent: null
+                    };
+                });
+
+                return categoriesWithParent as (Category & { parent?: Pick<Category, 'xcategprodid' | 'xcategprodintitule' | 'xcategprodcode'> | null; yprod: { count: number }[] })[];
+            }
+
+            // If no categories have parents, just return the data with null parent
+            const categoriesWithNullParent = data.map(category => ({
+                ...category,
+                parent: null
+            }));
+
+            return categoriesWithNullParent as (Category & { parent?: Pick<Category, 'xcategprodid' | 'xcategprodintitule' | 'xcategprodcode'> | null; yprod: { count: number }[] })[];
         },
     });
 }

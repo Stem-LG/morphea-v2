@@ -31,7 +31,7 @@ export default function AdminV2Layout({ children }: AdminV2LayoutProps) {
     }
 
     return (
-        <div className="bg-gradient-to-br from-morpheus-blue-dark to-morpheus-blue-light flex min-h-[calc(100svh-4rem)] w-full">
+        <div className="bg-gradient-to-br from-morpheus-blue-dark to-morpheus-blue-light flex min-h-[calc(100svh-6rem)] w-full">
             {/* Modern Sidebar - Account for existing navbar */}
             <ModernSidebar
                 isOpen={sidebarOpen}
@@ -45,7 +45,7 @@ export default function AdminV2Layout({ children }: AdminV2LayoutProps) {
             <div className={`flex-1 w-full transition-all duration-300`}>
                 {/* Page Content - No duplicate top navigation */}
                 <main className="w-full">
-                    <div className="w-full bg-gradient-to-br from-morpheus-blue-dark/20 to-morpheus-blue-light/20 border border-slate-700/50 shadow-2xl min-h-[calc(100vh-4rem)]">
+                    <div className="w-full bg-gradient-to-br from-morpheus-blue-dark/20 to-morpheus-blue-light/20 border border-slate-700/50 shadow-2xl min-h-[calc(100vh-6rem)]">
                         {children}
                     </div>
                 </main>

@@ -1,59 +1,75 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useLanguage } from "@/hooks/useLanguage";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import {
     Plus,
-    Edit,
-    Trash2,
     Tag,
     Search,
     Package,
-    AlertTriangle
+    TreePine
 } from "lucide-react";
 import {
-    useDeleteCategory,
     useCategoriesWithStats
 } from "@/hooks/useCategories";
 import { CreateCategoryDialog } from "./create-category-dialog";
-import { UpdateCategoryDialog } from "./update-category-dialog";
+import { CategoryTree } from "./category-tree";
+import {
+    organizeCategoriesIntoTree,
+    filterCategoriesTree,
+    getTotalProductCount
+} from "./category-tree-utils";
 
 export function CategoryManagement() {
     const [searchTerm, setSearchTerm] = useState("");
-
-    const { data: categories, isLoading } = useCategoriesWithStats();
-    const deleteCategoryMutation = useDeleteCategory();
-
-    // Filter categories based on search term
-    const filteredCategories = categories?.filter(category =>
-        category.xcategprodintitule?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        category.xcategprodcode?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        category.xcategprodinfobulle?.toLowerCase().includes(searchTerm.toLowerCase())
-    ) || [];
-
-
     const { t } = useLanguage();
+    const { data: categories, isLoading } = useCategoriesWithStats();
 
-    const handleDelete = async (categoryId: number) => {
-        if (confirm(t("admin.categories.confirmDelete"))) {
-            try {
-                await deleteCategoryMutation.mutateAsync(categoryId);
-            } catch (error) {
-                console.error('Failed to delete category:', error);
-                const errorMessage = error instanceof Error ? error.message : t("admin.categories.deleteError");
-                alert(errorMessage);
-            }
+    // Organize categories into tree structure and apply filtering
+    const { categoryTree, stats } = useMemo(() => {
+        if (!categories) {
+            return {
+                categoryTree: [],
+                stats: {
+                    totalCategories: 0,
+                    categoriesInUse: 0,
+                    searchResults: 0
+                }
+            };
         }
-    };
 
+        // Convert flat list to tree structure
+        const tree = organizeCategoriesIntoTree(categories);
+        
+        // Apply search filter
+        const filteredTree = filterCategoriesTree(tree, searchTerm);
+        
+        // Calculate stats
+        const totalCategories = categories.length;
+        const categoriesInUse = categories.filter(cat =>
+            (cat.yprod?.[0]?.count || 0) > 0
+        ).length;
+        
+        // Count filtered results (flattened)
+        const countFilteredCategories = (nodes: typeof tree): number => {
+            return nodes.reduce((count, node) => {
+                return count + 1 + countFilteredCategories(node.children);
+            }, 0);
+        };
+        const searchResults = countFilteredCategories(filteredTree);
 
-    const getProductCount = (category: any) => {
-        return category.yprod?.[0]?.count || 0;
-    };
+        return {
+            categoryTree: filteredTree,
+            stats: {
+                totalCategories,
+                categoriesInUse,
+                searchResults
+            }
+        };
+    }, [categories, searchTerm]);
 
     if (isLoading) {
         return (
@@ -69,7 +85,8 @@ export function CategoryManagement() {
     }
 
     return (
-        <div className="p-6 space-y-6">
+        <TooltipProvider>
+            <div className="p-6 space-y-6">
             {/* Header */}
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                 <div>
@@ -80,7 +97,7 @@ export function CategoryManagement() {
                         {t("admin.categories.subtitle")}
                     </p>
                 </div>
-                <CreateCategoryDialog>
+                <CreateCategoryDialog categories={categories || []}>
                     <Button className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-morpheus-gold-light hover:to-morpheus-gold-dark text-white shadow-lg">
                         <Plus className="h-4 w-4 mr-2" />
                         {t("admin.categories.addCategory")}
@@ -98,7 +115,7 @@ export function CategoryManagement() {
                             </div>
                             <div>
                                 <p className="text-sm text-gray-400">{t("admin.categories.totalCategories")}</p>
-                                <p className="text-2xl font-bold text-white">{categories?.length || 0}</p>
+                                <p className="text-2xl font-bold text-white">{stats.totalCategories}</p>
                             </div>
                         </div>
                     </CardContent>
@@ -113,7 +130,7 @@ export function CategoryManagement() {
                             <div>
                                 <p className="text-sm text-gray-400">{t("admin.categories.categoriesInUse")}</p>
                                 <p className="text-2xl font-bold text-white">
-                                    {categories?.filter(cat => getProductCount(cat) > 0).length || 0}
+                                    {stats.categoriesInUse}
                                 </p>
                             </div>
                         </div>
@@ -128,7 +145,7 @@ export function CategoryManagement() {
                             </div>
                             <div>
                                 <p className="text-sm text-gray-400">{t("admin.categories.searchResults")}</p>
-                                <p className="text-2xl font-bold text-white">{filteredCategories.length}</p>
+                                <p className="text-2xl font-bold text-white">{stats.searchResults}</p>
                             </div>
                         </div>
                     </CardContent>
@@ -147,109 +164,21 @@ export function CategoryManagement() {
             </div>
 
 
-            {/* Categories List */}
-            {filteredCategories.length === 0 ? (
-                <div className="text-center py-12">
-                    <Tag className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-xl font-medium text-white mb-2">
-                        {searchTerm ? t("admin.categories.noMatchingCategories") : t("admin.categories.noCategoriesFound")}
-                    </h3>
-                    <p className="text-gray-300">
-                        {searchTerm
-                            ? t("admin.categories.adjustSearchCriteria")
-                            : t("admin.categories.addFirstCategory")
-                        }
-                    </p>
+            {/* Categories Tree */}
+            <div className="bg-gradient-to-br from-morpheus-blue-dark/20 to-morpheus-blue-light/20 border border-slate-700/50 rounded-lg p-6">
+                <div className="flex items-center gap-2 mb-4">
+                    <TreePine className="h-5 w-5 text-morpheus-gold-light" />
+                    <h2 className="text-lg font-semibold text-white">
+                        {t("admin.categories.hierarchicalView")}
+                    </h2>
                 </div>
-            ) : (
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                    {filteredCategories.map((category) => {
-                        const productCount = getProductCount(category);
-                        const isInUse = productCount > 0;
-                        
-                        return (
-                            <Card
-                                key={category.xcategprodid}
-                                className="bg-gradient-to-br from-morpheus-blue-dark/40 to-morpheus-blue-light/40 border-slate-700/50 shadow-xl hover:shadow-2xl transition-all duration-300"
-                            >
-                                <CardHeader className="pb-3">
-                                    <div className="flex items-start justify-between">
-                                        <CardTitle className="text-white text-lg">
-                                            {category.xcategprodintitule}
-                                        </CardTitle>
-                                        <div className="flex items-center gap-2">
-                                            {isInUse && (
-                                                <Badge className="px-2 py-1 text-xs font-medium flex items-center gap-1 border text-green-400 bg-green-400/10 border-green-400/20">
-                                                    <Package className="h-3 w-3" />
-                                                    {productCount} {t("admin.categories.products")}
-                                                </Badge>
-                                            )}
-                                        </div>
-                                    </div>
-                                </CardHeader>
-                                
-                                <CardContent className="space-y-3">
-                                    <div className="space-y-2 text-sm">
-                                        <div>
-                                            <span className="text-gray-400">{t("admin.categories.code")}:</span>
-                                            <p className="text-white font-medium">{category.xcategprodcode}</p>
-                                        </div>
-                                        <div>
-                                            <span className="text-gray-400">{t("admin.categories.description")}:</span>
-                                            <p className="text-white text-sm leading-relaxed">
-                                                {category.xcategprodinfobulle}
-                                            </p>
-                                        </div>
-                                        <div>
-                                            <span className="text-gray-400">{t("admin.categories.status")}:</span>
-                                            <p className={`font-medium ${isInUse ? "text-green-400" : "text-gray-400"}`}>
-                                                {isInUse ? `${t("admin.categories.active")} (${productCount} ${t("admin.categories.products")})` : t("admin.categories.unused")}
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex gap-2 pt-2">
-                                        <UpdateCategoryDialog category={category}>
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                className="flex-1 border-slate-600 text-white hover:bg-slate-700/50"
-                                            >
-                                                <Edit className="h-4 w-4 mr-1" />
-                                                {t("common.edit")}
-                                            </Button>
-                                        </UpdateCategoryDialog>
-                                        <Tooltip>
-                                            <TooltipTrigger asChild>
-                                                <span className={isInUse ? "cursor-not-allowed" : ""}>
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        onClick={() => handleDelete(category.xcategprodid)}
-                                                        disabled={deleteCategoryMutation.isPending || isInUse}
-                                                        className={`px-3 ${isInUse 
-                                                            ? "border-gray-600 text-gray-500 cursor-not-allowed" 
-                                                            : "border-red-600 text-red-400 hover:bg-red-600/10"
-                                                        }`}
-                                                    >
-                                                        {isInUse ? <AlertTriangle className="h-4 w-4" /> : <Trash2 className="h-4 w-4" />}
-                                                    </Button>
-                                                </span>
-                                            </TooltipTrigger>
-                                            <TooltipContent>
-                                                <p>{isInUse
-                                                    ? `${t("admin.categories.cannotDelete")}: ${t("admin.categories.categoryUsedBy")} ${productCount} ${t("admin.categories.product")}${productCount !== 1 ? 's' : ''}`
-                                                    : t("admin.categories.deleteCategory")
-                                                }</p>
-                                            </TooltipContent>
-                                        </Tooltip>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        );
-                    })}
-                </div>
-            )}
+                <CategoryTree
+                    categories={categoryTree}
+                    searchTerm={searchTerm}
+                    originalCategories={categories || []}
+                />
+            </div>
         </div>
+        </TooltipProvider>
     );
 }
