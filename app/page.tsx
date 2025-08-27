@@ -226,10 +226,10 @@ export default function Home() {
             </div>
 
             {/* Second Section - Collection Cards */}
-            <section className="relative z-20 bg-white py-20">
+            <section className="relative z-20 bg-white pt-20">
                 <div className="mx-auto max-w-7xl px-8">
                     <div className="mb-16 text-center">
-                        <h2 className="font-recia mb-16 text-5xl font-extrabold text-[#053340] md:text-5xl">
+                        <h2 className="font-recia mb-14 text-5xl font-extrabold text-[#053340] md:text-5xl">
                             Découvrez Nos Défilé
                         </h2>
                         <p className="font-supreme mx-auto max-w-4xl text-2xl text-gray-600">
@@ -285,13 +285,13 @@ export default function Home() {
             <ExpandableCategories data={categoriesData} />
 
             {/* Fourth Section - 3D Photo Carousel */}
-            <section className="relative z-20 bg-white py-20">
+            <section className="relative z-20 bg-white pt-16 pb-44">
                 <div className="mx-auto max-w-7xl px-8">
-                    <div className="mb-16 text-center">
-                        <h2 className="mb-6 font-serif text-4xl font-extrabold text-[#053340] md:text-5xl">
+                    <div className="mb-10 text-center">
+                        <h2 className="mb-11 font-recia text-5xl font-extrabold text-[#053340]">
                             Nos Créateurs
                         </h2>
-                        <p className="mx-auto max-w-2xl text-lg text-gray-600">
+                        <p className="mx-auto font-supreme max-w-2xl text-2xl text-gray-600">
                             {
                                 "Découvrez nos espaces d'exception boutique en Tunisie"
                             }
@@ -313,7 +313,7 @@ export default function Home() {
                             '/lg4.jpg',
                         ]}
                         autoRotateSpeed={0.05}
-                        height={600}
+                        height={300}
                         cylinderWidth={2000}
                     />
                 </div>

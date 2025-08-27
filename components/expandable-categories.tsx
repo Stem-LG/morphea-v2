@@ -1,93 +1,98 @@
-"use client";
+'use client'
 
-import { useState } from 'react';
+import { useState } from 'react'
 
 interface CategoryData {
-    image: string;
-    title: string;
-    subtitle?: string;
-    link?: string;
+    image: string
+    title: string
+    subtitle?: string
+    link?: string
 }
 
 interface CategoriesData {
-    category1: CategoryData;
-    category2: CategoryData;
-    category3: CategoryData;
+    category1: CategoryData
+    category2: CategoryData
+    category3: CategoryData
 }
 
 interface ExpandableCategoriesProps {
-    data: CategoriesData;
+    data: CategoriesData
 }
 
-export default function ExpandableCategories({ data }: ExpandableCategoriesProps) {
-    const [isExpanded, setIsExpanded] = useState<boolean>(false);
+export default function ExpandableCategories({
+    data,
+}: ExpandableCategoriesProps) {
+    const [isExpanded, setIsExpanded] = useState<boolean>(false)
 
-    const categories = [data.category1, data.category2, data.category3];
+    const categories = [data.category1, data.category2, data.category3]
 
     const getCardStyles = (index: number) => {
         // Base rotation and position for stacked cards
-        const baseRotations = [-3, 0, 3]; // degrees for natural stacking
-        const baseTranslations = [-30, 0, 30]; // slight offset when not expanded
-        
+        const baseRotations = [-5.67, 0, 5.67] // degrees for natural stacking
+        const baseTranslations = [-30, 0, 30] // slight offset when not expanded
+
         if (!isExpanded) {
             return {
                 transform: `translateX(${baseTranslations[index]}px) rotate(${baseRotations[index]}deg) translateZ(${index * 10}px)`,
-                zIndex: index === 1 ? 30 : 20 - index,
-            };
+                zIndex: index === 1 ? 30 : 10 - index,
+            }
         }
-        
+
         // When expanded, spread all cards out
-        const expandedTranslations = [-400, 0, 400]; // much wider spread
+        const expandedTranslations = [-460, 0, 460] // nice translations
         return {
             transform: `translateX(${expandedTranslations[index]}px) rotate(${baseRotations[index]}deg) translateZ(${index * 10}px)`,
             zIndex: 20 + index,
-        };
-    };
+            scale: index == 1 ? 1 : 0.9,
+        }
+    }
 
     return (
-        <section className="relative z-20 py-20 bg-white">
-            <div className="max-w-7xl mx-auto px-8">
-                <div className="text-center mb-16">
-                    <h2 className="text-4xl md:text-5xl font-serif text-[#053340] mb-6 font-extrabold">
+        <section className="relative z-20 bg-white pt-24">
+            <div className="mx-auto max-w-7xl px-8">
+                <div className="mb-12 text-center">
+                    <h2 className="font-recia mb-10 text-5xl font-extrabold text-[#053340]">
                         Nos Catégories
                     </h2>
-                    <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                        {"Explorez notre univers à travers trois piliers de l'élégance"}
+                    <p className="font-supreme mx-auto max-w-2xl text-2xl text-gray-600">
+                        {
+                            "Explorez notre univers à travers trois piliers de l'élégance"
+                        }
                     </p>
                 </div>
-                
-                <div 
-                    className="relative flex justify-center items-center h-[800px] perspective-1000"
+
+                <div
+                    className="relative flex h-[560px] items-start justify-center"
                     onMouseEnter={() => setIsExpanded(true)}
                     onMouseLeave={() => setIsExpanded(false)}
                 >
                     {categories.map((category, index) => (
                         <div
                             key={index}
-                            className="absolute w-96 h-[500px] cursor-pointer transition-all duration-700 ease-in-out preserve-3d"
+                            className="group preserve-3d absolute h-[500px] w-96 cursor-pointer transition-all duration-700 ease-in-out"
                             style={getCardStyles(index)}
                         >
-                            <div className="relative w-full h-full overflow-hidden rounded-2xl shadow-2xl">
-                                <img 
-                                    src={category.image} 
+                            <div className="relative h-full w-full overflow-hidden rounded-2xl shadow-2xl">
+                                <img
+                                    src={category.image}
                                     alt={category.title}
-                                    className="w-full h-full object-cover"
+                                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
                                 />
-                                <div className="absolute inset-0 bg-black/20 hover:bg-black/30 transition-colors duration-300" />
+                                <div className="absolute inset-0 bg-black/10 transition-colors duration-300 hover:bg-black/30" />
                                 <div className="absolute inset-0 flex flex-col justify-end p-6">
-                                    <h3 className="text-2xl md:text-3xl font-serif font-medium text-white mb-2">
+                                    <h3 className="font-recia mb-2 text-center text-4xl font-medium text-white md:text-3xl">
                                         {category.title}
                                     </h3>
                                     {category.subtitle && (
-                                        <p className="text-sm text-white/90 mb-4">
+                                        <p className="font-supreme mb-4 text-center text-xl text-white/90">
                                             {category.subtitle}
                                         </p>
                                     )}
                                     {category.link && isExpanded && (
-                                        <div className="opacity-0 animate-[fadeIn_0.5s_0.3s_both]">
-                                            <a 
-                                                href={category.link} 
-                                                className="text-white underline font-medium hover:no-underline transition-all duration-300"
+                                        <div className="text-center opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                                            <a
+                                                href={category.link}
+                                                className="font-recia font-xl text-white underline transition-all duration-300 hover:no-underline"
                                             >
                                                 Découvrir
                                             </a>
@@ -100,5 +105,5 @@ export default function ExpandableCategories({ data }: ExpandableCategoriesProps
                 </div>
             </div>
         </section>
-    );
+    )
 }
