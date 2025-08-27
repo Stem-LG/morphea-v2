@@ -135,12 +135,16 @@ export default function NavBar() {
                     </NavBarIconButton>
                 </div>
                 <div className="flex flex-1 items-center justify-center">
-                    <Image
-                        src="/images/morph_logo.webp"
-                        alt="Morph Logo"
-                        height={77}
-                        width={228}
-                    />
+                    <Link href={{
+                        href:"/"
+                    }}>
+                        <Image
+                            src="/images/morph_logo.webp"
+                            alt="Morph Logo"
+                            height={77}
+                            width={228}
+                        />
+                    </Link>
                 </div>
                 <div className="flex flex-1 md:hidden" />
                 <div className="hidden flex-1 items-center justify-end gap-4 md:flex">
@@ -498,7 +502,7 @@ function NavBarSheet({
 
                     {/* Subcategory Column - Only visible when a parent category is selected */}
                     {showSubcategories && selectedParentCategory && (
-                        <div className="-top-4 left-[1px] flex h-full w-full flex-col overflow-hidden relative sm:w-[min(400px,50%)]">
+                        <div className="relative -top-4 left-[1px] flex h-full w-full flex-col overflow-hidden sm:w-[min(400px,50%)]">
                             {/* Category Image Header */}
                             <div className="flex-shrink-0">
                                 <CategoryImageHeader
