@@ -742,6 +742,7 @@ export type Database = {
           sysadresseip: string | null
           sysdate: string | null
           sysuser: string | null
+          xcategparentid: number | null
           xcategprodcode: string
           xcategprodid: number
           xcategprodinfobulle: string
@@ -752,6 +753,7 @@ export type Database = {
           sysadresseip?: string | null
           sysdate?: string | null
           sysuser?: string | null
+          xcategparentid?: number | null
           xcategprodcode: string
           xcategprodid?: number
           xcategprodinfobulle: string
@@ -762,12 +764,21 @@ export type Database = {
           sysadresseip?: string | null
           sysdate?: string | null
           sysuser?: string | null
+          xcategparentid?: number | null
           xcategprodcode?: string
           xcategprodid?: number
           xcategprodinfobulle?: string
           xcategprodintitule?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "xcategprod_xcategparentid_fkey"
+            columns: ["xcategparentid"]
+            isOneToOne: false
+            referencedRelation: "xcategprod"
+            referencedColumns: ["xcategprodid"]
+          },
+        ]
       }
       xcouleur: {
         Row: {
@@ -901,6 +912,27 @@ export type Database = {
           xdevisenbrdec?: string | null
           xispivot?: boolean | null
           xtauxechange?: number | null
+        }
+        Relationships: []
+      }
+      xnewsletter: {
+        Row: {
+          created_at: string
+          email: string
+          id: number
+          subscribed: boolean
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: number
+          subscribed?: boolean
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: number
+          subscribed?: boolean
         }
         Relationships: []
       }
@@ -1686,6 +1718,7 @@ export type Database = {
           sysuser: string | null
           xcategprodidfk: number | null
           ydesignidfk: number
+          yestvisible: boolean
           yinfospotactionsidfk: number | null
           yprodcode: string
           yproddetailstech: string
@@ -1701,6 +1734,7 @@ export type Database = {
           sysuser?: string | null
           xcategprodidfk?: number | null
           ydesignidfk: number
+          yestvisible?: boolean
           yinfospotactionsidfk?: number | null
           yprodcode: string
           yproddetailstech: string
@@ -1716,6 +1750,7 @@ export type Database = {
           sysuser?: string | null
           xcategprodidfk?: number | null
           ydesignidfk?: number
+          yestvisible?: boolean
           yinfospotactionsidfk?: number | null
           yprodcode?: string
           yproddetailstech?: string
@@ -1864,6 +1899,7 @@ export type Database = {
           xcouleuridfk: number
           xdeviseidfk: number | null
           xtailleidfk: number
+          yestvisible: boolean | null
           yprodidfk: number | null
           yvarprodcode: string
           yvarprodgenre: string
@@ -1884,6 +1920,7 @@ export type Database = {
           xcouleuridfk: number
           xdeviseidfk?: number | null
           xtailleidfk: number
+          yestvisible?: boolean | null
           yprodidfk?: number | null
           yvarprodcode: string
           yvarprodgenre: string
@@ -1904,6 +1941,7 @@ export type Database = {
           xcouleuridfk?: number
           xdeviseidfk?: number | null
           xtailleidfk?: number
+          yestvisible?: boolean | null
           yprodidfk?: number | null
           yvarprodcode?: string
           yvarprodgenre?: string

@@ -7,6 +7,7 @@ import {
     SortingState,
     ColumnDef,
     flexRender,
+    RowSelectionState,
 } from "@tanstack/react-table";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Delete, Loader, Search } from "lucide-react";
@@ -45,6 +46,10 @@ interface DataTableProps<T> {
         onPageChange: (page: number) => void;
         maxVisiblePages?: number;
     };
+    enableRowSelection?: boolean;
+    rowSelection?: RowSelectionState;
+    onRowSelectionChange?: (selection: RowSelectionState) => void;
+    getRowId?: (row: T) => string;
 }
 
 export function DataTable<T extends object>({
@@ -59,6 +64,10 @@ export function DataTable<T extends object>({
     filters,
     onRowClick,
     pagination,
+    enableRowSelection = false,
+    rowSelection,
+    onRowSelectionChange,
+    getRowId,
 }: DataTableProps<T>) {
     const [sorting, setSorting] = useState<SortingState>([]);
     const [internalGlobalFilter, setInternalGlobalFilter] = useState<string>("");
@@ -83,9 +92,13 @@ export function DataTable<T extends object>({
         manualFiltering: serverFilters,
         manualSorting: !!manualSorting,
         enableGlobalFilter: !serverFilters,
+        enableRowSelection: enableRowSelection,
+        onRowSelectionChange: onRowSelectionChange,
+        getRowId: getRowId,
         state: {
             sorting: manualSorting?.sorting ?? sorting,
             globalFilter,
+            rowSelection: rowSelection || {},
             pagination: pagination
                 ? {
                       pageIndex: pagination.currentPage,
