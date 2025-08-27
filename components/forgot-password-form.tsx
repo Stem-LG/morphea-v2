@@ -9,6 +9,7 @@ import { useLanguage } from "@/hooks/useLanguage";
 import { useWebsiteUrl } from "@/hooks/use-website-url";
 import Link from "next/link";
 import { useState } from "react";
+import { Loader2 } from "lucide-react";
 
 export function ForgotPasswordForm({ className, ...props }: React.ComponentPropsWithoutRef<"div">) {
     const [email, setEmail] = useState("");
@@ -43,48 +44,53 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
     };
 
     return (
-        <div className={cn("flex flex-col gap-8", className)} {...props}>
-            {success ? (
-                <>
-                    {/* Header */}
-                    <div className="text-center">
-                        <h2 className="text-3xl font-bold text-white mb-2 font-parisienne">
-                            {t("auth.checkYourEmail")}
-                        </h2>
-                        <p className="text-lg text-gray-300">{t("auth.passwordResetSent")}</p>
-                    </div>
+        <div className={cn("flex flex-col gap-8 w-full max-w-2xl mx-auto", className)} {...props}>
+            {/* Welcome header */}
+            <div className="text-center mb-8">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-[#05141D] to-[#063846] rounded-full mb-6">
+                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                </div>
+                <h1 className="font-recia text-4xl md:text-5xl font-extrabold text-[#05141D] mb-4 leading-tight">
+                    {success ? t("auth.checkYourEmail") : t("auth.resetPassword")}
+                </h1>
+                <p className="font-supreme text-lg text-[#063846] max-w-md mx-auto">
+                    {success ? t("auth.passwordResetSent") : t("auth.resetPasswordSubtitle")}
+                </p>
+            </div>
 
-                    {/* Success Card */}
-                    <div className="bg-gradient-to-br from-morpheus-blue-dark to-morpheus-blue-light border border-slate-700 p-8 shadow-2xl">
-                        <div className="text-center space-y-4">
-                            <p className="text-gray-300 text-lg">{t("auth.passwordResetInstructions")}</p>
-                            <div className="mt-8">
+            {/* Form Card */}
+            <div className="bg-white/90 backdrop-blur-sm border border-slate-200 shadow-xl overflow-hidden rounded-lg transform transition-all duration-300 hover:shadow-2xl">
+                {success ? (
+                    <div className="p-8">
+                        <div className="text-center space-y-6">
+                            <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
+                                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                </svg>
+                            </div>
+                            <p className="text-slate-600 text-lg">{t("auth.passwordResetInstructions")}</p>
+                            <div className="pt-4">
                                 <Link
                                     href="/auth/login"
-                                    className="text-morpheus-gold-light hover:text-[#d4c066] font-semibold underline underline-offset-4 transition-colors"
+                                    className="inline-flex items-center gap-2 bg-[#063846] hover:bg-[#05141D] text-white px-6 py-3 rounded-md font-semibold transition-colors"
                                 >
-                                    {t("auth.signIn")}
+                                    <span>{t("auth.signIn")}</span>
+                                    <svg className="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                    </svg>
                                 </Link>
                             </div>
                         </div>
                     </div>
-                </>
-            ) : (
-                <>
-                    {/* Header */}
-                    <div className="text-center">
-                        <h2 className="text-3xl font-bold text-white mb-2 font-parisienne">
-                            {t("auth.resetPassword")}
-                        </h2>
-                        <p className="text-lg text-gray-300">{t("auth.resetPasswordSubtitle")}</p>
-                    </div>
-
-                    {/* Form Card */}
-                    <div className="bg-gradient-to-br from-morpheus-blue-dark to-morpheus-blue-light border border-slate-700 p-8 shadow-2xl">
-                        <form onSubmit={handleForgotPassword} className="space-y-6">
+                ) : (
+                    <form onSubmit={handleForgotPassword} className="p-8">
+                        <div className="space-y-6">
                             <div className="space-y-2">
-                                <Label htmlFor="email" className="text-white text-lg font-medium">
+                                <Label htmlFor="email" className="text-[#05141D] text-sm font-medium">
                                     {t("auth.email")}
+                                    {email.trim() && email.includes('@') && <span className="text-green-500 ml-1">✓</span>}
                                 </Label>
                                 <Input
                                     id="email"
@@ -93,54 +99,61 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
                                     required
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="bg-slate-700 border-slate-600 text-white placeholder:text-gray-400 h-12 text-lg focus:border-morpheus-gold-light focus:ring-morpheus-gold-light rounded-none"
+                                    className={`bg-white border-slate-300 text-[#05141D] placeholder:text-slate-400 h-11 text-base focus:border-[#063846] focus:ring-[#063846] rounded-md transition-colors ${email.trim() && email.includes('@') ? 'border-green-300 focus:border-green-500' : ''
+                                        }`}
                                 />
                             </div>
 
                             {error && (
-                                <div className="bg-red-500/20 border border-red-400 text-red-200 px-4 py-3">
-                                    {error}
-                                </div>
+                                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">{error}</div>
                             )}
 
                             <Button
                                 type="submit"
                                 disabled={isLoading}
-                                className="w-full bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-[#695029] hover:to-[#d4c066] text-white h-12 text-lg font-semibold shadow-2xl transition-all duration-300 hover:scale-105 rounded-none disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:scale-100"
+                                className="w-full bg-gradient-to-r from-[#05141D] to-[#063846] hover:from-[#04111a] hover:to-[#052d37] text-white h-11 text-base font-semibold shadow-lg transition-all duration-300 hover:shadow-xl rounded-md disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-lg transform hover:scale-[1.02] active:scale-[0.98]"
                             >
                                 {isLoading ? (
                                     <div className="flex items-center gap-2">
-                                        <img src="/loading.gif" alt="Loading" className="h-5 w-5" />
-                                        {t("auth.sending")}
+                                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                        <span>{t("auth.sending")}</span>
                                     </div>
                                 ) : (
-                                    t("auth.sendResetEmail")
+                                    <div className="flex items-center justify-center gap-2">
+                                        <span>{t("auth.sendResetEmail")}</span>
+                                        <svg className="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                                        </svg>
+                                    </div>
                                 )}
                             </Button>
-                        </form>
 
-                        <div className="mt-8 text-center">
-                            <p className="text-gray-300">
-                                {t("auth.alreadyHaveAccount")}{" "}
-                                <Link
-                                    href="/auth/login"
-                                    className="text-morpheus-gold-light hover:text-[#d4c066] font-semibold underline underline-offset-4 transition-colors"
-                                >
-                                    {t("auth.signIn")}
-                                </Link>
-                            </p>
+                            <div className="text-center">
+                                <p className="text-slate-600">
+                                    {t("auth.alreadyHaveAccount")}{" "}
+                                    <Link
+                                        href="/auth/login"
+                                        className="text-[#063846] hover:text-[#05141D] font-semibold underline underline-offset-2 transition-colors"
+                                    >
+                                        {t("auth.signIn")}
+                                    </Link>
+                                </p>
+                            </div>
                         </div>
-                    </div>
-                </>
-            )}
+                    </form>
+                )}
+            </div>
 
             {/* Back to home */}
             <div className="text-center">
                 <Link
                     href="/"
-                    className="text-gray-400 hover:text-white transition-colors inline-flex items-center gap-2"
+                    className="text-slate-500 hover:text-[#05141D] transition-colors inline-flex items-center gap-2"
                 >
-                    {t("auth.backToMorpheusMall")}
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    <span>{t("auth.backToMorpheusMall")}</span>
                 </Link>
             </div>
         </div>
