@@ -59,6 +59,7 @@ export function useAuth() {
                         const { data: anonData, error: anonError } = await supabase.auth.signInAnonymously();
 
 
+
                         if (anonError) {
                             console.error("Error creating anonymous user:", anonError);
                             return null;
@@ -80,4 +81,56 @@ export function useAuth() {
 
 
     return result;
+}
+
+export function useLogout() {
+    const supabase = createClient();
+
+    const logout = async () => {
+        try {
+            const { error } = await supabase.auth.signOut();
+            if (error) {
+                console.error("Error logging out:", error);
+                throw error;
+            }
+            // The useAuth query will automatically refetch and create a new anonymous user
+            window.location.href = '/'; // Redirect to home page
+        } catch (error) {
+            console.error("Logout failed:", error);
+            throw error;
+        }
+    };
+
+    return { logout };
+}
+
+export function useUserRoles() {
+    const { data: currentUser } = useAuth();
+
+    const userRoles = useMemo(() => {
+        if (!currentUser || currentUser.is_anonymous) return []
+
+        // Check role field first
+        if (currentUser.role === 'admin' || currentUser.role === 'store_admin') {
+            return [currentUser.role]
+        }
+
+        // Check app_metadata for roles (fallback)
+        try {
+            const appMetadata = currentUser.app_metadata
+            if (appMetadata && typeof appMetadata === 'object' && 'roles' in appMetadata) {
+                return Array.isArray(appMetadata.roles) ? appMetadata.roles : []
+            }
+        } catch (error) {
+            console.warn('Error parsing user roles:', error)
+        }
+
+        return []
+    }, [currentUser])
+
+    const hasAdminAccess = useMemo(() => {
+        return currentUser && !currentUser.is_anonymous && (userRoles.includes('admin') || userRoles.includes('store_admin'))
+    }, [currentUser, userRoles])
+
+    return { userRoles, hasAdminAccess }
 }
