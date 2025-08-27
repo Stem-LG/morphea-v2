@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useLanguage } from "@/hooks/useLanguage";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 import {
     CheckCircle,
     X,
@@ -12,7 +13,9 @@ import {
     Box,
     Eye,
     Edit,
+    EyeOff,
 } from "lucide-react";
+import { useProductVisibility } from "../_hooks/use-product-visibility";
 
 interface ProductCardProps {
     product: any;
@@ -30,6 +33,7 @@ export function ProductCard({
     status
 }: ProductCardProps) {
     const { t } = useLanguage();
+    const { updateSingleVisibility, isUpdatingSingle } = useProductVisibility();
     
     // Get category name
     const category = categories.find(cat => cat.xcategprodid === product.xcategprodidfk);
@@ -160,6 +164,34 @@ export function ProductCard({
 
                 {/* Product Info */}
                 <div className="space-y-2">
+                    {/* Visibility Toggle */}
+                    <div className="flex items-center justify-between text-xs bg-gray-800/50 p-2 rounded">
+                        <span className="text-gray-400 flex items-center gap-1">
+                            {product.yestvisible ? (
+                                <Eye className="h-3 w-3 text-green-400" />
+                            ) : (
+                                <EyeOff className="h-3 w-3 text-gray-400" />
+                            )}
+                            {t("admin.visibility") || "Visibility"}:
+                        </span>
+                        <div className="flex items-center gap-2">
+                            <span className={`text-xs ${product.yestvisible ? 'text-green-400' : 'text-gray-400'}`}>
+                                {product.yestvisible ? (t("admin.visible") || "Visible") : (t("admin.hidden") || "Hidden")}
+                            </span>
+                            <Switch
+                                checked={product.yestvisible}
+                                disabled={isUpdatingSingle}
+                                onCheckedChange={(checked) => {
+                                    updateSingleVisibility.mutate({
+                                        productId: product.yprodid,
+                                        yestvisible: checked,
+                                    });
+                                }}
+                                className="data-[state=checked]:bg-green-500 data-[state=unchecked]:bg-gray-600"
+                            />
+                        </div>
+                    </div>
+
                     <div className="flex items-center justify-between text-xs">
                         <span className="text-gray-400">{t("admin.approvals.category")}:</span>
                         <Badge variant="secondary" className="bg-blue-500/20 text-blue-300 border-blue-500/30 text-xs">

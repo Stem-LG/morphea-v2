@@ -17,6 +17,7 @@ export interface ProductWithDetails {
     yprodstatut: string;
     yproddetailstech: string;
     yprodinfobulle: string;
+    yestvisible: boolean;
     designer: {
         ydesignid: number;
         ydesignnom: string;
@@ -62,6 +63,7 @@ export function useApprovedProducts(filters: ProductFilters, pagination: Product
                     yprodstatut,
                     yproddetailstech,
                     yprodinfobulle,
+                    yestvisible,
                     designer:ydesign!yprod_ydesignidfk_fkey(
                         ydesignid,
                         ydesignnom,
@@ -160,6 +162,7 @@ export function useApprovedProducts(filters: ProductFilters, pagination: Product
                         yprodstatut: product.yprodstatut,
                         yproddetailstech: product.yproddetailstech,
                         yprodinfobulle: product.yprodinfobulle,
+                        yestvisible: product.yestvisible,
                         designer: product.designer,
                         category: product.category,
                         events: (eventDetails || []).map((detail: any) => ({

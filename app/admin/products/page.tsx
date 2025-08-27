@@ -1,10 +1,11 @@
 "use client";
 
 import React, { useState } from "react";
+import { RowSelectionState } from "@tanstack/react-table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { SuperSelect } from "@/components/super-select";
-import { CheckCircle, Filter } from "lucide-react";
+import { CheckCircle, Filter, Eye, EyeOff } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
 import { DataTable } from "@/components/data-table";
 import { useProductsByStatus } from "./_hooks/use-products-by-status";
@@ -14,11 +15,14 @@ import { ProductFilters } from "./_components/product-filters";
 import { ProductCard } from "./_components/product-card";
 import { useFilterOptions } from "./_hooks/use-filter-options";
 import { ProductViewDialog } from "../stores/[storeId]/_components/product-view-dialog";
+import { useProductVisibility } from "./_hooks/use-product-visibility";
 
 export default function AdminApprovedProductsPage() {
     const { t } = useLanguage();
     const [viewMode, setViewMode] = useState<'table' | 'cards'>('table');
+    const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
     const { filters, updateFilters, pagination, updatePagination } = useProductFilters();
+    const { updateBulkVisibility, isBulkUpdating } = useProductVisibility();
 
     // Dialog state for product view
     const [isProductViewDialogOpen, setIsProductViewDialogOpen] = useState(false);
@@ -41,6 +45,46 @@ export default function AdminApprovedProductsPage() {
     const handleCloseViewDialog = () => {
         setIsProductViewDialogOpen(false);
         setViewingProductId(null);
+    };
+
+    const handleBulkMakeVisible = () => {
+        const selectedRowIds = Object.keys(rowSelection);
+        if (selectedRowIds.length === 0) {
+            // No rows selected, apply to all
+            const productIds = products.map(product => product.yprodid);
+            updateBulkVisibility.mutate({
+                productIds,
+                yestvisible: true,
+            });
+        } else {
+            // Apply to selected rows only
+            const selectedProducts = selectedRowIds.map(rowId => products[parseInt(rowId)]);
+            const productIds = selectedProducts.map(product => product.yprodid);
+            updateBulkVisibility.mutate({
+                productIds,
+                yestvisible: true,
+            });
+        }
+    };
+
+    const handleBulkMakeInvisible = () => {
+        const selectedRowIds = Object.keys(rowSelection);
+        if (selectedRowIds.length === 0) {
+            // No rows selected, apply to all
+            const productIds = products.map(product => product.yprodid);
+            updateBulkVisibility.mutate({
+                productIds,
+                yestvisible: false,
+            });
+        } else {
+            // Apply to selected rows only
+            const selectedProducts = selectedRowIds.map(rowId => products[parseInt(rowId)]);
+            const productIds = selectedProducts.map(product => product.yprodid);
+            updateBulkVisibility.mutate({
+                productIds,
+                yestvisible: false,
+            });
+        }
     };
 
     // const handleEditProduct = (product: any) => {
@@ -76,22 +120,57 @@ export default function AdminApprovedProductsPage() {
                     </p>
                 </div>
                 <div className="flex items-center gap-2">
+                    {/* Bulk visibility actions */}
+                    {Object.keys(rowSelection).length > 0 && (
+                        <span className="text-sm text-gray-300 mr-2">
+                            {Object.keys(rowSelection).length} {t("admin.selectedItems") || "selected"}
+                        </span>
+                    )}
                     <Button
-                        variant={viewMode === 'table' ? 'default' : 'outline'}
+                        variant="outline"
                         size="sm"
-                        onClick={() => setViewMode('table')}
-                        className="border-gray-600"
+                        onClick={handleBulkMakeVisible}
+                        disabled={isBulkUpdating || !products.length}
+                        className="border-green-600 text-green-400 hover:bg-green-600/20"
                     >
-                        {t("admin.approvals.table") || "Table"}
+                        <Eye className="h-4 w-4 mr-2" />
+                        {Object.keys(rowSelection).length > 0 
+                            ? t("admin.makeSelectedVisible") || "Make Selected Visible"
+                            : t("admin.makeAllVisible") || "Make All Visible"
+                        }
                     </Button>
                     <Button
-                        variant={viewMode === 'cards' ? 'default' : 'outline'}
+                        variant="outline"
                         size="sm"
-                        onClick={() => setViewMode('cards')}
-                        className="border-gray-600"
+                        onClick={handleBulkMakeInvisible}
+                        disabled={isBulkUpdating || !products.length}
+                        className="border-gray-600 text-gray-400 hover:bg-gray-600/20"
                     >
-                        {t("admin.approvals.cards") || "Cards"}
+                        <EyeOff className="h-4 w-4 mr-2" />
+                        {Object.keys(rowSelection).length > 0 
+                            ? t("admin.makeSelectedInvisible") || "Make Selected Invisible"
+                            : t("admin.makeAllInvisible") || "Make All Invisible"
+                        }
                     </Button>
+                    {/* View mode toggle */}
+                    <div className="border-l border-gray-600 pl-2 ml-2">
+                        <Button
+                            variant={viewMode === 'table' ? 'default' : 'outline'}
+                            size="sm"
+                            onClick={() => setViewMode('table')}
+                            className="border-gray-600"
+                        >
+                            {t("admin.approvals.table") || "Table"}
+                        </Button>
+                        <Button
+                            variant={viewMode === 'cards' ? 'default' : 'outline'}
+                            size="sm"
+                            onClick={() => setViewMode('cards')}
+                            className="border-gray-600 ml-1"
+                        >
+                            {t("admin.approvals.cards") || "Cards"}
+                        </Button>
+                    </div>
                 </div>
             </div>
 
@@ -114,6 +193,10 @@ export default function AdminApprovedProductsPage() {
                             data={products}
                             columns={columns}
                             isLoading={isLoading}
+                            enableRowSelection={true}
+                            rowSelection={rowSelection}
+                            onRowSelectionChange={setRowSelection}
+                            getRowId={(row) => products.indexOf(row).toString()}
                             filters={<ProductFilters filters={filters} onFiltersChange={updateFilters} />}
                             pagination={{
                                 total: paginationData?.total || 0,

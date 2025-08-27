@@ -3,14 +3,45 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Eye, Package } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Eye, Package, EyeOff } from "lucide-react";
 import { ProductWithDetails } from "../_hooks/use-approved-products";
 import { useLanguage } from "@/hooks/useLanguage";
+import { useProductVisibility } from "../_hooks/use-product-visibility";
 
 export const useProductColumns = (onViewProduct?: (product: ProductWithDetails) => void): ColumnDef<ProductWithDetails>[] => {
     const { t } = useLanguage();
+    const { updateSingleVisibility, isUpdatingSingle } = useProductVisibility();
 
     return [
+        {
+            id: "select",
+            header: ({ table }) => (
+                <Checkbox
+                    checked={
+                        table.getIsAllPageRowsSelected()
+                            ? true
+                            : table.getIsSomePageRowsSelected()
+                            ? "indeterminate"
+                            : false
+                    }
+                    onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+                    aria-label={t("admin.selectAll") || "Select all"}
+                    className="border-gray-400 data-[state=checked]:bg-morpheus-gold-light data-[state=checked]:border-morpheus-gold-light"
+                />
+            ),
+            cell: ({ row }) => (
+                <Checkbox
+                    checked={row.getIsSelected()}
+                    onCheckedChange={(value) => row.toggleSelected(!!value)}
+                    aria-label={t("admin.selectRow") || "Select row"}
+                    className="border-gray-400 data-[state=checked]:bg-morpheus-gold-light data-[state=checked]:border-morpheus-gold-light"
+                />
+            ),
+            enableSorting: false,
+            enableHiding: false,
+        },
         {
             accessorKey: "yprodcode",
             header: t("admin.productCode") || "Product Code",
@@ -102,6 +133,43 @@ export const useProductColumns = (onViewProduct?: (product: ProductWithDetails) 
                     <Badge className={`${getStatusColor(status)}`}>
                         {getStatusLabel(status)}
                     </Badge>
+                );
+            },
+        },
+        {
+            accessorKey: "yestvisible",
+            header: t("admin.visibility") || "Visibility",
+            cell: ({ row }) => {
+                const isVisible = row.getValue("yestvisible") as boolean;
+                const productId = row.original.yprodid;
+                
+                return (
+                    <div className="flex items-center gap-2">
+                        <Switch
+                            checked={isVisible}
+                            disabled={isUpdatingSingle}
+                            onCheckedChange={(checked) => {
+                                updateSingleVisibility.mutate({
+                                    productId,
+                                    yestvisible: checked,
+                                });
+                            }}
+                            className="data-[state=checked]:bg-green-500 data-[state=unchecked]:bg-gray-600"
+                        />
+                        <div className="flex items-center gap-1">
+                            {isVisible ? (
+                                <>
+                                    <Eye className="h-4 w-4 text-green-400" />
+                                    <span className="text-sm text-green-400">{t("admin.visible") || "Visible"}</span>
+                                </>
+                            ) : (
+                                <>
+                                    <EyeOff className="h-4 w-4 text-gray-400" />
+                                    <span className="text-sm text-gray-400">{t("admin.hidden") || "Hidden"}</span>
+                                </>
+                            )}
+                        </div>
+                    </div>
                 );
             },
         },

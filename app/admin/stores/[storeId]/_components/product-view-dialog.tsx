@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Switch } from "@/components/ui/switch";
 import {
     CheckCircle,
     X,
@@ -16,12 +17,15 @@ import {
     Store,
     User,
     MapPin,
+    Eye,
+    EyeOff,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { createClient } from "@/lib/client";
 import { useCategories } from "../_hooks/use-categories";
 import { Model3DViewer } from "../../../approvals/_components/three-d-viewer";
 import { useLanguage } from "@/hooks/useLanguage";
+import { useVariantVisibility } from "../_hooks/use-variant-visibility";
 
 interface ProductViewDialogProps {
     isOpen: boolean;
@@ -33,6 +37,7 @@ export function ProductViewDialog({ isOpen, onClose, productId }: ProductViewDia
     const { data: categories } = useCategories();
     const supabase = createClient();
     const { t } = useLanguage();
+    const { updateBulkVisibility, isBulkUpdating } = useVariantVisibility();
 
     // Fetch product details (same query as approval form but read-only)
     const { data: product, isLoading: productLoading } = useQuery({
@@ -88,6 +93,25 @@ export function ProductViewDialog({ isOpen, onClose, productId }: ProductViewDia
     const pendingVariants = product?.yvarprod?.filter((v: any) => v.yvarprodstatut === "not_approved") || [];
     const approvedVariants = product?.yvarprod?.filter((v: any) => v.yvarprodstatut === "approved") || [];
     const rejectedVariants = product?.yvarprod?.filter((v: any) => v.yvarprodstatut === "rejected") || [];
+
+    // Handle bulk visibility actions for variants
+    const handleBulkMakeVariantsVisible = () => {
+        if (!product?.yvarprod?.length) return;
+        const variantIds = product.yvarprod.map((v: any) => v.yvarprodid);
+        updateBulkVisibility.mutate({
+            variantIds,
+            yestvisible: true,
+        });
+    };
+
+    const handleBulkMakeVariantsInvisible = () => {
+        if (!product?.yvarprod?.length) return;
+        const variantIds = product.yvarprod.map((v: any) => v.yvarprodid);
+        updateBulkVisibility.mutate({
+            variantIds,
+            yestvisible: false,
+        });
+    };
 
     const getProductStatusBadge = () => {
         switch (product?.yprodstatut) {
@@ -284,9 +308,37 @@ export function ProductViewDialog({ isOpen, onClose, productId }: ProductViewDia
                     {/* Right Panel - Variant Cards (Read-only) */}
                     <div className="w-1/2">
                         <div className="p-6">
-                            <h3 className="text-lg font-semibold text-white mb-4">
-                                {t("admin.productView.productVariants")} ({product.yvarprod?.length || 0})
-                            </h3>
+                            <div className="flex items-center justify-between mb-4">
+                                <h3 className="text-lg font-semibold text-white">
+                                    {t("admin.productView.productVariants")} ({product.yvarprod?.length || 0})
+                                </h3>
+                                
+                                {/* Bulk Visibility Actions for Variants */}
+                                {product.yvarprod?.length > 0 && (
+                                    <div className="flex items-center gap-2">
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={handleBulkMakeVariantsVisible}
+                                            disabled={isBulkUpdating}
+                                            className="border-green-600 text-green-400 hover:bg-green-600/20 text-xs"
+                                        >
+                                            <Eye className="h-3 w-3 mr-1" />
+                                            {t("admin.makeAllVariantsVisible") || "Show All"}
+                                        </Button>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={handleBulkMakeVariantsInvisible}
+                                            disabled={isBulkUpdating}
+                                            className="border-gray-600 text-gray-400 hover:bg-gray-600/20 text-xs"
+                                        >
+                                            <EyeOff className="h-3 w-3 mr-1" />
+                                            {t("admin.makeAllVariantsInvisible") || "Hide All"}
+                                        </Button>
+                                    </div>
+                                )}
+                            </div>
 
                             <ScrollArea className="h-[calc(95vh-200px)]">
                                 <div className="space-y-4 pr-4">
@@ -316,6 +368,7 @@ export function ProductViewDialog({ isOpen, onClose, productId }: ProductViewDia
 
 // Read-only variant card component
 function VariantViewCard({ variant, t }: { variant: any; t: (key: string) => string }) {
+    const { updateSingleVisibility, isUpdatingSingle } = useVariantVisibility();
     // Extract media data directly from the variant object
     const models3d = variant.yobjet3d?.map((obj: any) => obj.yobjet3durl) || [];
     const allMedia = variant.yvarprodmedia?.map((media: any) => media.ymedia).filter(Boolean) || [];
@@ -472,6 +525,34 @@ function VariantViewCard({ variant, t }: { variant: any; t: (key: string) => str
             </CardHeader>
 
             <CardContent className="space-y-3">
+                {/* Visibility Toggle */}
+                <div className="flex items-center justify-between text-xs bg-gray-700/30 p-2 rounded">
+                    <span className="text-gray-400 flex items-center gap-1">
+                        {variant.yestvisible ? (
+                            <Eye className="h-3 w-3 text-green-400" />
+                        ) : (
+                            <EyeOff className="h-3 w-3 text-gray-400" />
+                        )}
+                        {t("admin.visibility") || "Visibility"}:
+                    </span>
+                    <div className="flex items-center gap-2">
+                        <span className={`text-xs ${variant.yestvisible ? 'text-green-400' : 'text-gray-400'}`}>
+                            {variant.yestvisible ? (t("admin.visible") || "Visible") : (t("admin.hidden") || "Hidden")}
+                        </span>
+                        <Switch
+                            checked={variant.yestvisible || false}
+                            disabled={isUpdatingSingle}
+                            onCheckedChange={(checked) => {
+                                updateSingleVisibility.mutate({
+                                    variantId: variant.yvarprodid,
+                                    yestvisible: checked,
+                                });
+                            }}
+                            className="data-[state=checked]:bg-green-500 data-[state=unchecked]:bg-gray-600 scale-75"
+                        />
+                    </div>
+                </div>
+
                 {/* Media Preview */}
                 {renderMediaPreview()}
 

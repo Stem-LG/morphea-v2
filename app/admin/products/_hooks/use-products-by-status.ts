@@ -17,6 +17,7 @@ export interface ProductWithDetails {
     yprodstatut: string;
     yproddetailstech: string;
     yprodinfobulle: string;
+    yestvisible: boolean;
     designer: {
         ydesignid: number;
         ydesignnom: string;
@@ -66,6 +67,7 @@ export function useProductsByStatus(
                     yprodstatut,
                     yproddetailstech,
                     yprodinfobulle,
+                    yestvisible,
                     designer:ydesign!yprod_ydesignidfk_fkey(
                         ydesignid,
                         ydesignnom,
@@ -164,6 +166,7 @@ export function useProductsByStatus(
                         yprodstatut: product.yprodstatut,
                         yproddetailstech: product.yproddetailstech,
                         yprodinfobulle: product.yprodinfobulle,
+                        yestvisible: product.yestvisible,
                         designer: product.designer,
                         category: product.category,
                         events: (eventDetails || []).map((detail: any) => ({
