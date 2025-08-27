@@ -53,23 +53,24 @@ export default function Footer() {
 
     return (
         <footer className="font-supreme relative border-t border-gray-200 bg-white">
-            <div className="mx-auto px-6 md:px-10">
-                {/* Top grid */}
-                <div className="grid grid-cols-1 gap-10 py-12 md:grid-cols-12">
+            <div className="mx-auto px-4 md:px-6 lg:px-10">
+                {/* Top grid - Mobile Responsive */}
+                <div className="grid grid-cols-1 gap-8 py-8 md:grid-cols-12 md:gap-10 md:py-12">
                     {/* Brand + Newsletter */}
                     <div className="flex flex-col items-center text-center md:col-span-5">
-                        <div className="mb-6 w-fit">
+                        <div className="mb-4 w-fit md:mb-6">
                             <Image
                                 src="/images/morph_logo.webp"
                                 alt="Morphea"
                                 width={160}
                                 height={54}
-                                className="h-16 w-44 object-cover"
+                                className="h-12 w-36 object-cover md:h-16 md:w-44"
                             />
                         </div>
-                        <p className="mb-4 text-xl leading-6 text-neutral-700">
+                        <p className="mb-4 px-2 text-lg leading-6 text-neutral-700 md:px-0 md:text-xl">
                             Recevez En Avant-Première Nos Nouvelles
-                            <br />
+                            <br className="hidden md:block" />
+                            <span className="md:hidden"> </span>
                             Collections Et Événements Exclusifs
                         </p>
                         <form
@@ -82,166 +83,169 @@ export default function Footer() {
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
                                 placeholder="person@email.com"
-                                className="font-supreme h-12 w-full rounded-full border border-gray-300 pr-12 pl-4 transition outline-none focus:border-gray-400"
+                                className="font-supreme h-12 w-full rounded-full border border-gray-300 pr-12 pl-4 text-base transition outline-none focus:border-gray-400 md:h-12"
                             />
                             <button
                                 aria-label="S'abonner"
                                 type="submit"
-                                className="absolute top-1/2 right-1 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-gradient-to-b from-slate-900 via-sky-900 to-cyan-950 text-white"
+                                className="absolute top-1/2 right-1 flex size-10 -translate-y-1/2 touch-manipulation items-center justify-center rounded-full bg-gradient-to-b from-slate-900 via-sky-900 to-cyan-950 text-white"
                             >
-                                <ChevronRight className="size-6" />
+                                <ChevronRight className="size-5 md:size-6" />
                             </button>
                         </form>
                     </div>
 
-                    {/* Columns */}
-                    <div className="md:col-span-2">
-                        <h3 className="font-recia text-lg text-neutral-400 uppercase">
-                            À propos
-                        </h3>
-                        <ul className="mt-4 space-y-3 text-sm">
-                            <li>
-                                <a
-                                    href="#"
-                                    className="text-lg text-neutral-700 hover:text-black"
-                                >
-                                    A l'origine de Morphea
-                                </a>
-                            </li>
-                            <li>
-                                <a
-                                    href="#"
-                                    className="text-lg text-neutral-700 hover:text-black"
-                                >
-                                    Plan de Morphea
-                                </a>
-                            </li>
-                            <li>
-                                <a
-                                    href="#"
-                                    className="text-lg text-neutral-700 hover:text-black"
-                                >
-                                    Nos événements
-                                </a>
-                            </li>
-                            <li>
-                                <a
-                                    href="#"
-                                    className="text-lg text-neutral-700 hover:text-black"
-                                >
-                                    Réseaux sociaux
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
+                    {/* Columns - Mobile Responsive */}
+                    <div className="grid grid-cols-1 gap-6 md:col-span-7 md:grid-cols-3 md:gap-8">
+                        <div>
+                            <h3 className="font-recia mb-3 text-base text-neutral-400 uppercase md:mb-4 md:text-lg">
+                                À propos
+                            </h3>
+                            <ul className="space-y-2 md:space-y-3">
+                                <li>
+                                    <a
+                                        href="#"
+                                        className="block touch-manipulation py-1 text-base text-neutral-700 transition-colors hover:text-black md:text-lg"
+                                    >
+                                        A l'origine de Morphea
+                                    </a>
+                                </li>
+                                <li>
+                                    <a
+                                        href="#"
+                                        className="block touch-manipulation py-1 text-base text-neutral-700 transition-colors hover:text-black md:text-lg"
+                                    >
+                                        Plan de Morphea
+                                    </a>
+                                </li>
+                                <li>
+                                    <a
+                                        href="#"
+                                        className="block touch-manipulation py-1 text-base text-neutral-700 transition-colors hover:text-black md:text-lg"
+                                    >
+                                        Nos événements
+                                    </a>
+                                </li>
+                                <li>
+                                    <a
+                                        href="#"
+                                        className="block touch-manipulation py-1 text-base text-neutral-700 transition-colors hover:text-black md:text-lg"
+                                    >
+                                        Réseaux sociaux
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
 
-                    <div className="md:col-span-2">
-                        <h3 className="font-recia text-lg text-neutral-400 uppercase">
-                            Service client
-                        </h3>
-                        <ul className="mt-4 space-y-3 text-sm">
-                            <li>
-                                <a
-                                    href="#"
-                                    className="text-lg text-neutral-700 hover:text-black"
-                                >
-                                    Mon compte
-                                </a>
-                            </li>
-                            <li>
-                                <a
-                                    href="#"
-                                    className="text-lg text-neutral-700 hover:text-black"
-                                >
-                                    Commandes et livraison
-                                </a>
-                            </li>
-                            <li>
-                                <a
-                                    href="#"
-                                    className="text-lg text-neutral-700 hover:text-black"
-                                >
-                                    Cookies et confidentialité
-                                </a>
-                            </li>
-                            <li>
-                                <a
-                                    href="#"
-                                    className="text-lg text-neutral-700 hover:text-black"
-                                >
-                                    FAQ
-                                </a>
-                            </li>
-                            <li>
-                                <a
-                                    href="#"
-                                    className="text-lg text-neutral-700 hover:text-black"
-                                >
-                                    CGV
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
+                        <div>
+                            <h3 className="font-recia mb-3 text-base text-neutral-400 uppercase md:mb-4 md:text-lg">
+                                Service client
+                            </h3>
+                            <ul className="space-y-2 md:space-y-3">
+                                <li>
+                                    <a
+                                        href="#"
+                                        className="block touch-manipulation py-1 text-base text-neutral-700 transition-colors hover:text-black md:text-lg"
+                                    >
+                                        Mon compte
+                                    </a>
+                                </li>
+                                <li>
+                                    <a
+                                        href="#"
+                                        className="block touch-manipulation py-1 text-base text-neutral-700 transition-colors hover:text-black md:text-lg"
+                                    >
+                                        Commandes et livraison
+                                    </a>
+                                </li>
+                                <li>
+                                    <a
+                                        href="#"
+                                        className="block touch-manipulation py-1 text-base text-neutral-700 transition-colors hover:text-black md:text-lg"
+                                    >
+                                        Cookies et confidentialité
+                                    </a>
+                                </li>
+                                <li>
+                                    <a
+                                        href="#"
+                                        className="block touch-manipulation py-1 text-base text-neutral-700 transition-colors hover:text-black md:text-lg"
+                                    >
+                                        FAQ
+                                    </a>
+                                </li>
+                                <li>
+                                    <a
+                                        href="#"
+                                        className="block touch-manipulation py-1 text-base text-neutral-700 transition-colors hover:text-black md:text-lg"
+                                    >
+                                        CGV
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
 
-                    <div className="md:col-span-2">
-                        <h3 className="font-recia text-lg text-neutral-400 uppercase">
-                            Catégorie
-                        </h3>
-                        <ul className="mt-4 space-y-3 text-sm">
-                            <li>
-                                <a
-                                    href="#"
-                                    className="text-lg text-neutral-700 hover:text-black"
-                                >
-                                    Nouvelle collection
-                                </a>
-                            </li>
-                            <li>
-                                <a
-                                    href="#"
-                                    className="text-lg text-neutral-700 hover:text-black"
-                                >
-                                    Habillement
-                                </a>
-                            </li>
-                            <li>
-                                <a
-                                    href="#"
-                                    className="text-lg text-neutral-700 hover:text-black"
-                                >
-                                    Bijoux
-                                </a>
-                            </li>
-                            <li>
-                                <a
-                                    href="#"
-                                    className="text-lg text-neutral-700 hover:text-black"
-                                >
-                                    Accessoires
-                                </a>
-                            </li>
-                        </ul>
+                        <div>
+                            <h3 className="font-recia mb-3 text-base text-neutral-400 uppercase md:mb-4 md:text-lg">
+                                Catégorie
+                            </h3>
+                            <ul className="space-y-2 md:space-y-3">
+                                <li>
+                                    <a
+                                        href="#"
+                                        className="block touch-manipulation py-1 text-base text-neutral-700 transition-colors hover:text-black md:text-lg"
+                                    >
+                                        Nouvelle collection
+                                    </a>
+                                </li>
+                                <li>
+                                    <a
+                                        href="#"
+                                        className="block touch-manipulation py-1 text-base text-neutral-700 transition-colors hover:text-black md:text-lg"
+                                    >
+                                        Habillement
+                                    </a>
+                                </li>
+                                <li>
+                                    <a
+                                        href="#"
+                                        className="block touch-manipulation py-1 text-base text-neutral-700 transition-colors hover:text-black md:text-lg"
+                                    >
+                                        Bijoux
+                                    </a>
+                                </li>
+                                <li>
+                                    <a
+                                        href="#"
+                                        className="block touch-manipulation py-1 text-base text-neutral-700 transition-colors hover:text-black md:text-lg"
+                                    >
+                                        Accessoires
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
 
-                {/* Follow us bar */}
-                <div className="border-y border-gray-200 pt-4 pb-11">
-                    <div className="flex flex-col items-center justify-center gap-6">
-                        <span className="font-recia text-xl font-semibold text-neutral-700">
+                {/* Follow us bar - Mobile Responsive */}
+                <div className="border-y border-gray-200 pt-3 pb-8 md:pt-4 md:pb-11">
+                    <div className="flex flex-col items-center justify-center gap-4 md:gap-6">
+                        <span className="font-recia text-lg font-semibold text-neutral-700 md:text-xl">
                             Suivez-nous
                         </span>
-                        <div className="flex items-center gap-7 text-gray-700">
+                        <div className="flex items-center gap-5 text-gray-700 md:gap-7">
                             <a
                                 aria-label="Facebook"
                                 href="#"
-                                className="hover:text-black"
+                                className="-m-2 touch-manipulation p-2 transition-colors hover:text-black"
                             >
                                 <svg
-                                    width="22"
-                                    height="22"
+                                    width="20"
+                                    height="20"
                                     viewBox="0 0 13 22"
                                     fill="none"
                                     xmlns="http://www.w3.org/2000/svg"
+                                    className="md:h-[22px] md:w-[22px]"
                                 >
                                     <path
                                         d="M7.79559 12.6272V21H4.08371V12.6272H1V9.23225H4.08371V7.99704C4.08371 3.41124 5.93251 1 9.84426 1C11.0435 1 11.3433 1.1997 12 1.36243V4.72041C11.2648 4.58728 11.0578 4.51331 10.294 4.51331C9.38741 4.51331 8.90201 4.77959 8.45944 5.30473C8.01687 5.82988 7.79559 6.73964 7.79559 8.04142V9.23964H12L10.8722 12.6346H7.79559V12.6272Z"
@@ -252,14 +256,15 @@ export default function Footer() {
                             <a
                                 aria-label="Instagram"
                                 href="#"
-                                className="hover:text-black"
+                                className="-m-2 touch-manipulation p-2 transition-colors hover:text-black"
                             >
                                 <svg
-                                    width="22"
-                                    height="22"
+                                    width="20"
+                                    height="20"
                                     viewBox="0 0 22 22"
                                     fill="none"
                                     xmlns="http://www.w3.org/2000/svg"
+                                    className="md:h-[22px] md:w-[22px]"
                                 >
                                     <path
                                         d="M17.6571 21H4.34292C2.50308 21 1 19.4969 1 17.6571V4.34292C1 2.50308 2.50308 1 4.34292 1H17.6571C19.4969 1 21 2.50308 21 4.34292V17.6571C21 19.5051 19.5051 21 17.6571 21Z"
@@ -278,14 +283,15 @@ export default function Footer() {
                             <a
                                 aria-label="LinkedIn"
                                 href="#"
-                                className="hover:text-black"
+                                className="-m-2 touch-manipulation p-2 transition-colors hover:text-black"
                             >
                                 <svg
-                                    width="22"
-                                    height="22"
+                                    width="20"
+                                    height="20"
                                     viewBox="0 0 22 22"
                                     fill="none"
                                     xmlns="http://www.w3.org/2000/svg"
+                                    className="md:h-[22px] md:w-[22px]"
                                 >
                                     <path
                                         d="M5.51699 7.5769H1.33789V20.9038H5.51699V7.5769Z"
@@ -304,7 +310,7 @@ export default function Footer() {
                             <a
                                 aria-label="X"
                                 href="#"
-                                className="hover:text-black"
+                                className="-m-2 touch-manipulation p-2 transition-colors hover:text-black"
                             >
                                 <svg
                                     width="20"
@@ -344,8 +350,8 @@ export default function Footer() {
                     </div>
                 </div>
 
-                {/* Bottom language row */}
-                <div className="py-4 text-lg text-stone-500 font-supreme">
+                {/* Bottom language row - Mobile Responsive */}
+                <div className="font-supreme py-3 text-base text-stone-500 md:py-4 md:text-lg">
                     <div className="relative inline-block" ref={dropdownRef}>
                         <button
                             onClick={() =>
@@ -353,7 +359,7 @@ export default function Footer() {
                                     !isLanguageDropdownOpen
                                 )
                             }
-                            className="flex items-center gap-2 transition-colors hover:text-black"
+                            className="-m-2 flex touch-manipulation items-center gap-2 p-2 transition-colors hover:text-black"
                         >
                             <span>Langue :</span>
                             <span className="flex items-center gap-1">
@@ -374,16 +380,14 @@ export default function Footer() {
                                             setLanguage(lang.code)
                                             setIsLanguageDropdownOpen(false)
                                         }}
-                                        className={`flex w-full items-center gap-2 px-3 py-2 text-left hover:bg-gray-50 ${
+                                        className={`flex w-full touch-manipulation items-center gap-2 px-3 py-3 text-left hover:bg-gray-50 md:py-2 ${
                                             language === lang.code
                                                 ? 'bg-gray-100'
                                                 : ''
                                         }`}
                                     >
                                         <span>{lang.flag}</span>
-                                        <span className="">
-                                            {lang.name}
-                                        </span>
+                                        <span className="">{lang.name}</span>
                                     </button>
                                 ))}
                             </div>

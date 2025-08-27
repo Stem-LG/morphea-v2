@@ -140,119 +140,121 @@ export default function Home() {
                     playsInline
                 />
 
-                {/* Bottom center overlay text for each video */}
-                <div className="absolute bottom-16 left-1/2 z-10 flex w-full -translate-x-1/2 transform justify-center">
+                {/* Bottom center overlay text for each video - Mobile Responsive */}
+                <div className="absolute bottom-16 left-1/2 z-10 flex w-full -translate-x-1/2 transform justify-center px-4 md:bottom-16 md:px-0">
                     <div
                         className={`transition-opacity duration-700 ${hovered === 'right' ? 'opacity-0' : 'opacity-100'}`}
                     >
                         <div className="text-center">
-                            <div className="font-supreme pointer-events-auto mb-2 text-2xl font-medium text-white uppercase select-text text-shadow-md">
+                            <div className="font-supreme pointer-events-auto mb-2 text-lg font-medium text-white uppercase select-text text-shadow-md md:text-2xl">
                                 {videoData.side1.topText}
                             </div>
-                            <div className="font-recia pointer-events-auto mb-10 text-5xl font-medium text-white uppercase select-text text-shadow-md">
+                            <div className="font-recia pointer-events-auto mb-6 text-3xl leading-tight font-medium text-white uppercase select-text text-shadow-md md:mb-10 md:text-5xl">
                                 {videoData.side1.mainText}
                             </div>
                             <a
                                 href="#"
-                                className="font-supreme pointer-events-auto text-2xl font-bold tracking-widest text-white underline"
+                                className="font-supreme pointer-events-auto text-lg font-bold tracking-widest text-white underline transition-colors hover:text-gray-200 md:text-2xl"
                             >
                                 Découvrir
                             </a>
                         </div>
-                        <div className="m-auto mt-14 flex max-w-24 flex-row items-center justify-center gap-2">
-                            <div className="h-[5px] w-[50%] rounded-2xl bg-[#D9D9D9]" />
-                            <div className="h-[5px] w-[50%] rounded-2xl bg-[#7A7676]" />
+                        <div className="m-auto mt-8 flex max-w-20 flex-row items-center justify-center gap-2 md:mt-14 md:max-w-24">
+                            <div className="h-[4px] w-[50%] rounded-2xl bg-[#D9D9D9] md:h-[5px]" />
+                            <div className="h-[4px] w-[50%] rounded-2xl bg-[#7A7676] md:h-[5px]" />
                         </div>
                     </div>
                     <div
                         className={`absolute left-1/2 w-full -translate-x-1/2 transition-opacity duration-700 ${hovered === 'right' ? 'opacity-100' : 'opacity-0'}`}
                     >
                         <div className="text-center">
-                            <div className="font-supreme pointer-events-auto mb-2 text-2xl font-medium text-white uppercase select-text text-shadow-md">
+                            <div className="font-supreme pointer-events-auto mb-2 text-lg font-medium text-white uppercase select-text text-shadow-md md:text-2xl">
                                 {videoData.side2.topText}
                             </div>
-                            <div className="font-recia pointer-events-auto mb-10 text-5xl font-medium text-white uppercase select-text text-shadow-md">
+                            <div className="font-recia pointer-events-auto mb-6 text-3xl leading-tight font-medium text-white uppercase select-text text-shadow-md md:mb-10 md:text-5xl">
                                 {videoData.side2.mainText}
                             </div>
                             <a
                                 href="#"
-                                className="font-supreme pointer-events-auto text-2xl font-bold tracking-widest text-white underline"
+                                className="font-supreme pointer-events-auto text-lg font-bold tracking-widest text-white underline transition-colors hover:text-gray-200 md:text-2xl"
                             >
                                 Découvrir
                             </a>
                         </div>
-                        <div className="m-auto mt-14 flex max-w-24 flex-row items-center justify-center gap-2">
-                            <div className="h-[5px] w-[50%] rounded-2xl bg-[#7A7676]" />
-                            <div className="h-[5px] w-[50%] rounded-2xl bg-[#D9D9D9]" />
+                        <div className="m-auto mt-8 flex max-w-20 flex-row items-center justify-center gap-2 md:mt-14 md:max-w-24">
+                            <div className="h-[4px] w-[50%] rounded-2xl bg-[#7A7676] md:h-[5px]" />
+                            <div className="h-[4px] w-[50%] rounded-2xl bg-[#D9D9D9] md:h-[5px]" />
                         </div>
                     </div>
                 </div>
             </div>
             <div className="relative z-0 flex h-svh flex-row">
-                {/* Trigger Divs */}
+                {/* Trigger Divs - Desktop hover, Mobile touch */}
                 <div
                     className="pointer-events-auto h-full w-[50vw]"
                     onMouseEnter={() => setHovered('left')}
+                    onTouchStart={() => setHovered('left')}
                 />
                 <div
                     className="pointer-events-auto h-full w-[50vw]"
                     onMouseEnter={() => setHovered('right')}
+                    onTouchStart={() => setHovered('right')}
                 />
-                {/* Video Control Buttons */}
-                <div className="absolute bottom-40 left-0 z-50 flex w-full justify-between px-14">
+                {/* Video Control Buttons - Mobile Responsive */}
+                <div className="absolute bottom-32 left-0 z-50 flex w-full justify-between px-6 md:bottom-40 md:px-14">
                     <button
                         onClick={togglePlayPause}
-                        className="flex h-12 w-12 items-center justify-center"
+                        className="flex h-12 w-12 touch-manipulation items-center justify-center rounded-full bg-black/20 backdrop-blur-sm transition-colors hover:bg-black/40 md:h-12 md:w-12"
                         aria-label={isPlaying ? 'Pause video' : 'Play video'}
                     >
                         {isPlaying ? (
-                            <Pause className="size-7 text-white" />
+                            <Pause className="size-6 text-white md:size-7" />
                         ) : (
-                            <Play className="size-7 text-white" />
+                            <Play className="size-6 text-white md:size-7" />
                         )}
                     </button>
                     <button
                         onClick={toggleMute}
-                        className="flex h-12 w-12 items-center justify-center"
+                        className="flex h-12 w-12 touch-manipulation items-center justify-center rounded-full bg-black/20 backdrop-blur-sm transition-colors hover:bg-black/40 md:h-12 md:w-12"
                         aria-label={isMuted ? 'Unmute video' : 'Mute video'}
                     >
                         {isMuted ? (
-                            <VolumeX className="size-7 text-white" />
+                            <VolumeX className="size-6 text-white md:size-7" />
                         ) : (
-                            <Volume2 className="size-7 text-white" />
+                            <Volume2 className="size-6 text-white md:size-7" />
                         )}
                     </button>
                 </div>
             </div>
 
-            {/* Second Section - Collection Cards */}
-            <section className="relative z-20 bg-white pt-20">
-                <div className="mx-auto max-w-7xl px-8">
-                    <div className="mb-16 text-center">
-                        <h2 className="font-recia mb-14 text-5xl font-extrabold text-[#053340] md:text-5xl">
+            {/* Second Section - Collection Cards - Mobile Responsive */}
+            <section className="relative z-20 bg-white pt-12 md:pt-20">
+                <div className="mx-auto max-w-7xl px-4 md:px-8">
+                    <div className="mb-12 text-center md:mb-16">
+                        <h2 className="font-recia mb-8 text-3xl leading-tight font-extrabold text-[#053340] md:mb-14 md:text-5xl">
                             Découvrez Nos Défilé
                         </h2>
-                        <p className="font-supreme mx-auto max-w-4xl text-2xl text-gray-600">
+                        <p className="font-supreme mx-auto max-w-4xl px-4 text-lg text-gray-600 md:px-0 md:text-2xl">
                             {
                                 "Plongez dans l'univers exclusif de nos collections à travers des présentations exceptionnelles"
                             }
                         </p>
                     </div>
 
-                    <div className="flex justify-center gap-16">
+                    <div className="flex flex-col justify-center gap-8 md:flex-row md:gap-16">
                         {collectionData.card1 && (
-                            <div className="group relative w-[500px] cursor-pointer overflow-hidden rounded-2xl">
+                            <div className="group relative w-full cursor-pointer touch-manipulation overflow-hidden rounded-2xl md:w-[500px]">
                                 <img
                                     src={collectionData.card1.image}
                                     alt={collectionData.card1.title}
-                                    className="h-[600px] w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                    className="h-[400px] w-full object-cover transition-transform duration-700 group-hover:scale-105 group-active:scale-105 md:h-[600px]"
                                 />
-                                <div className="absolute inset-0 bg-black/20 transition-colors duration-300 group-hover:bg-black/30" />
-                                <div className="absolute bottom-8 left-8 text-white">
-                                    <h3 className="font-recia mb-2 text-4xl font-extrabold">
+                                <div className="absolute inset-0 bg-black/20 transition-colors duration-300 group-hover:bg-black/30 group-active:bg-black/30" />
+                                <div className="absolute bottom-6 left-6 text-white md:bottom-8 md:left-8">
+                                    <h3 className="font-recia mb-2 text-2xl leading-tight font-extrabold md:text-4xl">
                                         {collectionData.card1.title}
                                     </h3>
-                                    <p className="font-supreme text-2xl font-semibold opacity-90">
+                                    <p className="font-supreme text-lg font-semibold opacity-90 md:text-2xl">
                                         {collectionData.card1.subtitle}
                                     </p>
                                 </div>
@@ -260,18 +262,18 @@ export default function Home() {
                         )}
 
                         {collectionData.card2 && (
-                            <div className="group relative w-[500px] cursor-pointer overflow-hidden rounded-2xl">
+                            <div className="group relative w-full cursor-pointer touch-manipulation overflow-hidden rounded-2xl md:w-[500px]">
                                 <img
                                     src={collectionData.card2.image}
                                     alt={collectionData.card2.title}
-                                    className="h-[600px] w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                    className="h-[400px] w-full object-cover transition-transform duration-700 group-hover:scale-105 group-active:scale-105 md:h-[600px]"
                                 />
-                                <div className="absolute inset-0 bg-black/20 transition-colors duration-300 group-hover:bg-black/30" />
-                                <div className="absolute bottom-8 left-8 text-white">
-                                    <h3 className="font-recia mb-2 text-4xl font-extrabold">
+                                <div className="absolute inset-0 bg-black/20 transition-colors duration-300 group-hover:bg-black/30 group-active:bg-black/30" />
+                                <div className="absolute bottom-6 left-6 text-white md:bottom-8 md:left-8">
+                                    <h3 className="font-recia mb-2 text-2xl leading-tight font-extrabold md:text-4xl">
                                         {collectionData.card2.title}
                                     </h3>
-                                    <p className="font-supreme text-xl opacity-90">
+                                    <p className="font-supreme text-lg opacity-90 md:text-xl">
                                         {collectionData.card2.subtitle}
                                     </p>
                                 </div>
@@ -284,14 +286,14 @@ export default function Home() {
             {/* Third Section - Expandable Categories */}
             <ExpandableCategories data={categoriesData} />
 
-            {/* Fourth Section - 3D Photo Carousel */}
-            <section className="relative z-20 bg-white pt-16 pb-44">
-                <div className="mx-auto max-w-7xl px-8">
-                    <div className="mb-10 text-center">
-                        <h2 className="mb-11 font-recia text-5xl font-extrabold text-[#053340]">
+            {/* Fourth Section - 3D Photo Carousel - Mobile Responsive */}
+            <section className="relative z-20 bg-white pt-12 pb-16 md:pt-16 md:pb-44">
+                <div className="mx-auto max-w-7xl px-4 md:px-8">
+                    <div className="mb-8 text-center md:mb-10">
+                        <h2 className="font-recia mb-6 text-3xl leading-tight font-extrabold text-[#053340] md:mb-11 md:text-5xl">
                             Nos Créateurs
                         </h2>
-                        <p className="mx-auto font-supreme max-w-2xl text-2xl text-gray-600">
+                        <p className="font-supreme mx-auto max-w-2xl px-4 text-lg text-gray-600 md:px-0 md:text-2xl">
                             {
                                 "Découvrez nos espaces d'exception boutique en Tunisie"
                             }

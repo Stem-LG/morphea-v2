@@ -124,7 +124,7 @@ export default function NavBar() {
 
     return (
         <>
-            <nav className="fixed top-0 z-50 flex h-18 w-full bg-white/40 px-6 md:h-24 md:px-12">
+            <nav className="fixed top-0 z-50 flex h-18 w-full bg-white/40 px-4 md:h-24 md:px-6 lg:px-12">
                 <div className="flex flex-1 items-center justify-start">
                     <NavBarIconButton
                         variant="leading"
