@@ -286,9 +286,7 @@ export function ProductCard({
                                 }
                                 className={cn(
                                     'rounded-lg border p-2 transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50',
-                                    isInWishlist
-                                        ? 'border-red-500/60 bg-red-500/80 text-white hover:bg-red-500'
-                                        : 'bg-morpheus-blue-dark/40 border-morpheus-gold-dark/30 text-morpheus-gold-light hover:bg-morpheus-blue-dark/60 hover:text-white'
+                                    'bg-morpheus-blue-dark/40 border-morpheus-gold-dark/30 text-morpheus-gold-light hover:bg-morpheus-blue-dark/60 hover:text-white'
                                 )}
                                 title={
                                     isInWishlist
@@ -368,9 +366,7 @@ export function ProductCard({
                     }
                     className={cn(
                         'absolute top-4 right-4 z-10 rounded-full p-2 shadow-lg transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50',
-                        isInWishlist
-                            ? 'bg-yellow-400 text-white'
-                            : 'bg-white text-gray-600 hover:bg-gray-50'
+                        'bg-white text-gray-600 hover:bg-gray-50'
                     )}
                 >
                     <WishlistIcon className="h-5 w-5" filled={isInWishlist} />

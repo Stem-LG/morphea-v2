@@ -18,9 +18,9 @@ export function useSceneProducts(infospotActionId: string | null) {
                 console.log("No current event found, cannot fetch products");
                 return [];
             }
-            
+
             console.log("Fetching products for infospotActionId:", infospotActionId, "and eventId:", currentEvent.yeventid);
-            
+
             // Query products through yprod table with proper relationships
             const { data, error } = await supabase
                 .schema("morpheus")
@@ -42,7 +42,8 @@ export function useSceneProducts(infospotActionId: string | null) {
                     )
                 `)
                 .eq("yinfospotactionsidfk", infospotActionId)
-                .eq("yprodstatut", "approved"); // Only get approved products
+                .eq("yprodstatut", "approved") // Only get approved products
+                .eq("yestvisible", true); // Only get visible products
 
             if (error) {
                 console.error("Error fetching products for infospot action:", {

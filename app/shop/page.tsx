@@ -429,7 +429,7 @@ function ShopContent() {
                         </p>
                     </div>
                     {/* Grid toggle buttons - Hidden on mobile and small screens */}
-                    <div className="hidden items-center gap-2 lg:flex">
+                    <div className="hidden items-center gap-1 lg:flex">
                         <button
                             onClick={() => setQueryState({ columns: 3 })}
                             className="rounded-lg p-2 transition-opacity hover:opacity-70"

@@ -113,7 +113,7 @@ export default function Footer() {
                                 className="h-12 w-36 object-cover md:h-16 md:w-44"
                             />
                         </div>
-                        <p className="mb-4 px-2 text-lg leading-6 text-neutral-700 md:px-0 md:text-xl">
+                        <p className="mb-4 max-w-xs px-2 text-lg leading-6 text-neutral-700 md:max-w-sm md:px-0 md:text-xl">
                             {t('footer.newsletter.description')}
                         </p>
                         <form
@@ -155,7 +155,10 @@ export default function Footer() {
                             <ul className="space-y-2 md:space-y-3">
                                 <li>
                                     <a
-                                        href="#"
+                                        href={
+                                            homeSettings?.footer.links.origin ||
+                                            '#'
+                                        }
                                         className="block touch-manipulation py-1 text-base text-neutral-700 transition-colors hover:text-black md:text-lg"
                                     >
                                         {t('footer.about.origin')}
@@ -173,7 +176,10 @@ export default function Footer() {
                                 </li>
                                 <li>
                                     <a
-                                        href="#"
+                                        href={
+                                            homeSettings?.footer.links.events ||
+                                            '#'
+                                        }
                                         className="block touch-manipulation py-1 text-base text-neutral-700 transition-colors hover:text-black md:text-lg"
                                     >
                                         {t('footer.about.events')}
@@ -199,7 +205,10 @@ export default function Footer() {
                             <ul className="space-y-2 md:space-y-3">
                                 <li>
                                     <a
-                                        href="#"
+                                        href={
+                                            homeSettings?.footer.links
+                                                .myAccount || '#'
+                                        }
                                         className="block touch-manipulation py-1 text-base text-neutral-700 transition-colors hover:text-black md:text-lg"
                                     >
                                         {t('footer.customerService.myAccount')}
@@ -207,7 +216,10 @@ export default function Footer() {
                                 </li>
                                 <li>
                                     <a
-                                        href="#"
+                                        href={
+                                            homeSettings?.footer.links
+                                                .ordersDelivery || '#'
+                                        }
                                         className="block touch-manipulation py-1 text-base text-neutral-700 transition-colors hover:text-black md:text-lg"
                                     >
                                         {t(
@@ -217,7 +229,10 @@ export default function Footer() {
                                 </li>
                                 <li>
                                     <a
-                                        href="#"
+                                        href={
+                                            homeSettings?.footer.links
+                                                .cookiesPrivacy || '#'
+                                        }
                                         className="block touch-manipulation py-1 text-base text-neutral-700 transition-colors hover:text-black md:text-lg"
                                     >
                                         {t(
@@ -235,7 +250,10 @@ export default function Footer() {
                                 </li>
                                 <li>
                                     <a
-                                        href="#"
+                                        href={
+                                            homeSettings?.footer.links.terms ||
+                                            '#'
+                                        }
                                         className="block touch-manipulation py-1 text-base text-neutral-700 transition-colors hover:text-black md:text-lg"
                                     >
                                         {t('footer.customerService.terms')}

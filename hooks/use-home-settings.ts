@@ -66,6 +66,14 @@ interface HomeSettings {
       linkedin: string | null
     }
     categoryIds: number[]
+    links: {
+      origin: string | null
+      events: string | null
+      myAccount: string | null
+      ordersDelivery: string | null
+      cookiesPrivacy: string | null
+      terms: string | null
+    }
   }
 }
 
@@ -228,7 +236,15 @@ export function useHomeSettings() {
             twitter: getSetting('footer_social_twitter_url'),
             linkedin: getSetting('footer_social_linkedin_url')
           },
-          categoryIds: parseJSON(getSetting('footer_categories_ids'), [])
+          categoryIds: parseJSON(getSetting('footer_categories_ids'), []),
+          links: {
+            origin: getSetting('footer_link_origin'),
+            events: getSetting('footer_link_events'),
+            myAccount: getSetting('footer_link_my_account'),
+            ordersDelivery: getSetting('footer_link_orders_delivery'),
+            cookiesPrivacy: getSetting('footer_link_cookies_privacy'),
+            terms: getSetting('footer_link_terms')
+          }
         }
       }
     },

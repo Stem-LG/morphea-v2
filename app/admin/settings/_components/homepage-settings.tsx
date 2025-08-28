@@ -150,6 +150,18 @@ export function HomepageSettings() {
                 return homeSettings?.footer.social.linkedin || ''
             case 'footer_categories_ids':
                 return JSON.stringify(homeSettings?.footer.categoryIds || [])
+            case 'footer_link_origin':
+                return homeSettings?.footer.links.origin || ''
+            case 'footer_link_events':
+                return homeSettings?.footer.links.events || ''
+            case 'footer_link_my_account':
+                return homeSettings?.footer.links.myAccount || ''
+            case 'footer_link_orders_delivery':
+                return homeSettings?.footer.links.ordersDelivery || ''
+            case 'footer_link_cookies_privacy':
+                return homeSettings?.footer.links.cookiesPrivacy || ''
+            case 'footer_link_terms':
+                return homeSettings?.footer.links.terms || ''
             default:
                 return ''
         }
@@ -2559,6 +2571,265 @@ export function HomepageSettings() {
                                     )}
                                     {t('admin.settings.save')}
                                 </Button>
+                            </div>
+
+                            {/* Footer Links */}
+                            <div className="space-y-4 border-t border-slate-600 pt-6">
+                                <h4 className="text-lg font-semibold text-white">
+                                    Footer Links
+                                </h4>
+                                <p className="text-sm text-gray-400">
+                                    Configure the links in the footer About and
+                                    Customer Service sections.
+                                </p>
+
+                                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                    <div className="space-y-2">
+                                        <Label className="text-white">
+                                            Origin Link
+                                        </Label>
+                                        <Input
+                                            value={getCurrentValue(
+                                                'footer_link_origin'
+                                            )}
+                                            onChange={(e) =>
+                                                handleSettingChange(
+                                                    'footer_link_origin',
+                                                    e.target.value
+                                                )
+                                            }
+                                            className="border-slate-600 bg-slate-700 text-white"
+                                            placeholder="https://example.com/origin"
+                                        />
+                                        <Button
+                                            size="sm"
+                                            onClick={() =>
+                                                handleSaveSetting(
+                                                    'footer_link_origin'
+                                                )
+                                            }
+                                            disabled={
+                                                updateSetting.isPending ||
+                                                editingSettings[
+                                                    'footer_link_origin'
+                                                ] === undefined
+                                            }
+                                            className="bg-morpheus-gold-dark hover:bg-morpheus-gold-light"
+                                        >
+                                            {updateSetting.isPending ? (
+                                                <Loader2 className="h-4 w-4 animate-spin" />
+                                            ) : (
+                                                <Save className="h-4 w-4" />
+                                            )}
+                                            {t('admin.settings.save')}
+                                        </Button>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <Label className="text-white">
+                                            Events Link
+                                        </Label>
+                                        <Input
+                                            value={getCurrentValue(
+                                                'footer_link_events'
+                                            )}
+                                            onChange={(e) =>
+                                                handleSettingChange(
+                                                    'footer_link_events',
+                                                    e.target.value
+                                                )
+                                            }
+                                            className="border-slate-600 bg-slate-700 text-white"
+                                            placeholder="https://example.com/events"
+                                        />
+                                        <Button
+                                            size="sm"
+                                            onClick={() =>
+                                                handleSaveSetting(
+                                                    'footer_link_events'
+                                                )
+                                            }
+                                            disabled={
+                                                updateSetting.isPending ||
+                                                editingSettings[
+                                                    'footer_link_events'
+                                                ] === undefined
+                                            }
+                                            className="bg-morpheus-gold-dark hover:bg-morpheus-gold-light"
+                                        >
+                                            {updateSetting.isPending ? (
+                                                <Loader2 className="h-4 w-4 animate-spin" />
+                                            ) : (
+                                                <Save className="h-4 w-4" />
+                                            )}
+                                            {t('admin.settings.save')}
+                                        </Button>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <Label className="text-white">
+                                            My Account Link
+                                        </Label>
+                                        <Input
+                                            value={getCurrentValue(
+                                                'footer_link_my_account'
+                                            )}
+                                            onChange={(e) =>
+                                                handleSettingChange(
+                                                    'footer_link_my_account',
+                                                    e.target.value
+                                                )
+                                            }
+                                            className="border-slate-600 bg-slate-700 text-white"
+                                            placeholder="https://example.com/account"
+                                        />
+                                        <Button
+                                            size="sm"
+                                            onClick={() =>
+                                                handleSaveSetting(
+                                                    'footer_link_my_account'
+                                                )
+                                            }
+                                            disabled={
+                                                updateSetting.isPending ||
+                                                editingSettings[
+                                                    'footer_link_my_account'
+                                                ] === undefined
+                                            }
+                                            className="bg-morpheus-gold-dark hover:bg-morpheus-gold-light"
+                                        >
+                                            {updateSetting.isPending ? (
+                                                <Loader2 className="h-4 w-4 animate-spin" />
+                                            ) : (
+                                                <Save className="h-4 w-4" />
+                                            )}
+                                            {t('admin.settings.save')}
+                                        </Button>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <Label className="text-white">
+                                            Orders & Delivery Link
+                                        </Label>
+                                        <Input
+                                            value={getCurrentValue(
+                                                'footer_link_orders_delivery'
+                                            )}
+                                            onChange={(e) =>
+                                                handleSettingChange(
+                                                    'footer_link_orders_delivery',
+                                                    e.target.value
+                                                )
+                                            }
+                                            className="border-slate-600 bg-slate-700 text-white"
+                                            placeholder="https://example.com/orders"
+                                        />
+                                        <Button
+                                            size="sm"
+                                            onClick={() =>
+                                                handleSaveSetting(
+                                                    'footer_link_orders_delivery'
+                                                )
+                                            }
+                                            disabled={
+                                                updateSetting.isPending ||
+                                                editingSettings[
+                                                    'footer_link_orders_delivery'
+                                                ] === undefined
+                                            }
+                                            className="bg-morpheus-gold-dark hover:bg-morpheus-gold-light"
+                                        >
+                                            {updateSetting.isPending ? (
+                                                <Loader2 className="h-4 w-4 animate-spin" />
+                                            ) : (
+                                                <Save className="h-4 w-4" />
+                                            )}
+                                            {t('admin.settings.save')}
+                                        </Button>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <Label className="text-white">
+                                            Cookies & Privacy Link
+                                        </Label>
+                                        <Input
+                                            value={getCurrentValue(
+                                                'footer_link_cookies_privacy'
+                                            )}
+                                            onChange={(e) =>
+                                                handleSettingChange(
+                                                    'footer_link_cookies_privacy',
+                                                    e.target.value
+                                                )
+                                            }
+                                            className="border-slate-600 bg-slate-700 text-white"
+                                            placeholder="https://example.com/privacy"
+                                        />
+                                        <Button
+                                            size="sm"
+                                            onClick={() =>
+                                                handleSaveSetting(
+                                                    'footer_link_cookies_privacy'
+                                                )
+                                            }
+                                            disabled={
+                                                updateSetting.isPending ||
+                                                editingSettings[
+                                                    'footer_link_cookies_privacy'
+                                                ] === undefined
+                                            }
+                                            className="bg-morpheus-gold-dark hover:bg-morpheus-gold-light"
+                                        >
+                                            {updateSetting.isPending ? (
+                                                <Loader2 className="h-4 w-4 animate-spin" />
+                                            ) : (
+                                                <Save className="h-4 w-4" />
+                                            )}
+                                            {t('admin.settings.save')}
+                                        </Button>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <Label className="text-white">
+                                            Terms Link
+                                        </Label>
+                                        <Input
+                                            value={getCurrentValue(
+                                                'footer_link_terms'
+                                            )}
+                                            onChange={(e) =>
+                                                handleSettingChange(
+                                                    'footer_link_terms',
+                                                    e.target.value
+                                                )
+                                            }
+                                            className="border-slate-600 bg-slate-700 text-white"
+                                            placeholder="https://example.com/terms"
+                                        />
+                                        <Button
+                                            size="sm"
+                                            onClick={() =>
+                                                handleSaveSetting(
+                                                    'footer_link_terms'
+                                                )
+                                            }
+                                            disabled={
+                                                updateSetting.isPending ||
+                                                editingSettings[
+                                                    'footer_link_terms'
+                                                ] === undefined
+                                            }
+                                            className="bg-morpheus-gold-dark hover:bg-morpheus-gold-light"
+                                        >
+                                            {updateSetting.isPending ? (
+                                                <Loader2 className="h-4 w-4 animate-spin" />
+                                            ) : (
+                                                <Save className="h-4 w-4" />
+                                            )}
+                                            {t('admin.settings.save')}
+                                        </Button>
+                                    </div>
+                                </div>
                             </div>
                         </CardContent>
                     </Card>

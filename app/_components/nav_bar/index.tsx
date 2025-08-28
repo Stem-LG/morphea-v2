@@ -184,18 +184,13 @@ export default function NavBar() {
                             {currentUser && !currentUser.is_anonymous ? (
                                 <>
                                     <DropdownMenuItem>
-                                        <Link href="/account/profile">
+                                        <Link href="/profile">
                                             {t('profile')}
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem>
-                                        <Link href="/account/orders">
+                                        <Link href="/my-orders">
                                             {t('orders')}
-                                        </Link>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem>
-                                        <Link href="/account/addresses">
-                                            {t('addresses')}
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem>

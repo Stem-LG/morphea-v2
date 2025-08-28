@@ -1,238 +1,304 @@
-"use client";
+'use client'
 
-import { User } from '@supabase/supabase-js';
-import { useLanguage } from "@/hooks/useLanguage";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useState, useEffect } from "react";
+import { User } from '@supabase/supabase-js'
+import { useLanguage } from '@/hooks/useLanguage'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { useState, useEffect } from 'react'
 
 interface ProfileInfoEditProps {
-  user: User;
-  onSave: (data: ProfileUpdateData) => Promise<void>;
-  onCancel: () => void;
-  isLoading: boolean;
+    user: User
+    onSave: (data: ProfileUpdateData) => Promise<void>
+    onCancel: () => void
+    isLoading: boolean
 }
 
 interface ProfileUpdateData {
-  name?: string;
-  email?: string;
+    name?: string
+    email?: string
 }
 
 interface ValidationErrors {
-  name?: string;
-  email?: string;
+    name?: string
+    email?: string
 }
 
-export function ProfileInfoEdit({ user, onSave, onCancel, isLoading }: ProfileInfoEditProps) {
-  const { t } = useLanguage();
-  
-  // Form state
-  const [formData, setFormData] = useState<ProfileUpdateData>({
-    name: user.user_metadata?.full_name || '',
-    email: user.email || ''
-  });
-  
-  // Validation state
-  const [errors, setErrors] = useState<ValidationErrors>({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
+export function ProfileInfoEdit({
+    user,
+    onSave,
+    onCancel,
+    isLoading,
+}: ProfileInfoEditProps) {
+    const { t } = useLanguage()
 
-  // Reset form when user changes
-  useEffect(() => {
-    setFormData({
-      name: user.user_metadata?.full_name || '',
-      email: user.email || ''
-    });
-    setErrors({});
-  }, [user]);
+    // Form state
+    const [formData, setFormData] = useState<ProfileUpdateData>({
+        name: user.user_metadata?.full_name || '',
+        email: user.email || '',
+    })
 
-  // Email validation regex
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // Validation state
+    const [errors, setErrors] = useState<ValidationErrors>({})
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
-  // Validate form fields
-  const validateForm = (): boolean => {
-    const newErrors: ValidationErrors = {};
+    // Reset form when user changes
+    useEffect(() => {
+        setFormData({
+            name: user.user_metadata?.full_name || '',
+            email: user.email || '',
+        })
+        setErrors({})
+    }, [user])
 
-    // Name validation - required field
-    if (!formData.name?.trim()) {
-      newErrors.name = t('profile.nameIsRequired');
+    // Email validation regex
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+    // Validate form fields
+    const validateForm = (): boolean => {
+        const newErrors: ValidationErrors = {}
+
+        // Name validation - required field
+        if (!formData.name?.trim()) {
+            newErrors.name = t('profile.nameIsRequired')
+        }
+
+        // Email validation - required and format
+        if (!formData.email?.trim()) {
+            newErrors.email = t('profile.emailIsRequired')
+        } else if (!emailRegex.test(formData.email)) {
+            newErrors.email = t('profile.pleaseEnterValidEmail')
+        }
+
+        setErrors(newErrors)
+        return Object.keys(newErrors).length === 0
     }
 
-    // Email validation - required and format
-    if (!formData.email?.trim()) {
-      newErrors.email = t('profile.emailIsRequired');
-    } else if (!emailRegex.test(formData.email)) {
-      newErrors.email = t('profile.pleaseEnterValidEmail');
+    // Handle input changes
+    const handleInputChange = (
+        field: keyof ProfileUpdateData,
+        value: string
+    ) => {
+        setFormData((prev) => ({
+            ...prev,
+            [field]: value,
+        }))
+
+        // Clear error for this field when user starts typing
+        if (errors[field]) {
+            setErrors((prev) => ({
+                ...prev,
+                [field]: undefined,
+            }))
+        }
     }
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+    // Handle form submission
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault()
 
-  // Handle input changes
-  const handleInputChange = (field: keyof ProfileUpdateData, value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
+        if (!validateForm()) {
+            return
+        }
 
-    // Clear error for this field when user starts typing
-    if (errors[field]) {
-      setErrors(prev => ({
-        ...prev,
-        [field]: undefined
-      }));
-    }
-  };
+        setIsSubmitting(true)
 
-  // Handle form submission
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!validateForm()) {
-      return;
+        try {
+            await onSave(formData)
+        } catch (error) {
+            console.error('Error saving profile:', error)
+        } finally {
+            setIsSubmitting(false)
+        }
     }
 
-    setIsSubmitting(true);
-    
-    try {
-      await onSave(formData);
-    } catch (error) {
-      console.error('Error saving profile:', error);
-    } finally {
-      setIsSubmitting(false);
+    // Handle cancel
+    const handleCancel = () => {
+        // Reset form to original values
+        setFormData({
+            name: user.user_metadata?.full_name || '',
+            email: user.email || '',
+        })
+        setErrors({})
+        onCancel()
     }
-  };
 
-  // Handle cancel
-  const handleCancel = () => {
-    // Reset form to original values
-    setFormData({
-      name: user.user_metadata?.full_name || '',
-      email: user.email || ''
-    });
-    setErrors({});
-    onCancel();
-  };
+    return (
+        <div className="space-y-6">
+            {/* Header */}
+            <div className="border-b border-gray-200 pb-6 text-center">
+                <h2 className="font-recia mb-2 text-2xl font-bold text-[#053340]">
+                    {t('profile.editProfileInformation')}
+                </h2>
+                <p className="font-supreme text-gray-600">
+                    {t('profile.updateAccountDetails')}
+                </p>
+            </div>
 
-  return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="text-center pb-6 border-b border-morpheus-gold-dark/30">
-        <h2 className="text-2xl font-bold text-white mb-2">
-          {t('profile.editProfileInformation')}
-        </h2>
-        <p className="text-gray-300">
-          {t('profile.updateAccountDetails')}
-        </p>
-      </div>
+            {/* Edit Form */}
+            <div className="border border-gray-200 bg-white p-8 shadow-lg">
+                <form onSubmit={handleSubmit} className="space-y-6">
+                    {/* Name Field */}
+                    <div className="space-y-2">
+                        <Label
+                            htmlFor="name"
+                            className="font-supreme text-lg font-medium text-[#053340]"
+                        >
+                            {t('profile.fullName')}
+                        </Label>
+                        <Input
+                            id="name"
+                            type="text"
+                            placeholder={t('profile.enterYourFullName')}
+                            required
+                            value={formData.name || ''}
+                            onChange={(e) =>
+                                handleInputChange('name', e.target.value)
+                            }
+                            className="h-12 border-gray-300 bg-white text-lg text-[#053340] placeholder:text-gray-400 focus:border-[#053340] focus:ring-[#053340]/20"
+                            disabled={isSubmitting || isLoading}
+                        />
+                        {errors.name && (
+                            <div className="mt-1 flex items-center gap-2 text-sm text-red-600">
+                                <svg
+                                    className="h-4 w-4"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                    />
+                                </svg>
+                                {errors.name}
+                            </div>
+                        )}
+                    </div>
 
-      {/* Edit Form */}
-      <div className="bg-gradient-to-br from-morpheus-blue-dark to-morpheus-blue-light border border-slate-700 p-8 shadow-2xl">
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Name Field */}
-          <div className="space-y-2">
-            <Label htmlFor="name" className="text-white text-lg font-medium">
-              {t('profile.fullName')}
-            </Label>
-            <Input
-              id="name"
-              type="text"
-              placeholder={t('profile.enterYourFullName')}
-              required
-              value={formData.name || ''}
-              onChange={(e) => handleInputChange('name', e.target.value)}
-              className="bg-slate-700 border-slate-600 text-white placeholder:text-gray-400 h-12 text-lg focus:border-morpheus-gold-light focus:ring-morpheus-gold-light rounded-none"
-              disabled={isSubmitting || isLoading}
-            />
-            {errors.name && (
-              <div className="text-red-400 text-sm mt-1 flex items-center gap-2">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                {errors.name}
-              </div>
-            )}
-          </div>
+                    {/* Email Field */}
+                    <div className="space-y-2">
+                        <Label
+                            htmlFor="email"
+                            className="font-supreme text-lg font-medium text-[#053340]"
+                        >
+                            {t('profile.emailAddress')}
+                        </Label>
+                        <Input
+                            id="email"
+                            type="email"
+                            placeholder={t('profile.enterYourEmailAddress')}
+                            required
+                            value={formData.email || ''}
+                            onChange={(e) =>
+                                handleInputChange('email', e.target.value)
+                            }
+                            className="h-12 border-gray-300 bg-white text-lg text-[#053340] placeholder:text-gray-400 focus:border-[#053340] focus:ring-[#053340]/20"
+                            disabled={isSubmitting || isLoading}
+                        />
+                        {errors.email && (
+                            <div className="mt-1 flex items-center gap-2 text-sm text-red-600">
+                                <svg
+                                    className="h-4 w-4"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                    />
+                                </svg>
+                                {errors.email}
+                            </div>
+                        )}
+                        {formData.email !== user.email && (
+                            <div className="mt-1 flex items-center gap-2 text-sm text-blue-600">
+                                <svg
+                                    className="h-4 w-4"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                    />
+                                </svg>
+                                {t('profile.changingEmailRequiresConfirmation')}
+                            </div>
+                        )}
+                    </div>
 
-          {/* Email Field */}
-          <div className="space-y-2">
-            <Label htmlFor="email" className="text-white text-lg font-medium">
-              {t('profile.emailAddress')}
-            </Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder={t('profile.enterYourEmailAddress')}
-              required
-              value={formData.email || ''}
-              onChange={(e) => handleInputChange('email', e.target.value)}
-              className="bg-slate-700 border-slate-600 text-white placeholder:text-gray-400 h-12 text-lg focus:border-morpheus-gold-light focus:ring-morpheus-gold-light rounded-none"
-              disabled={isSubmitting || isLoading}
-            />
-            {errors.email && (
-              <div className="text-red-400 text-sm mt-1 flex items-center gap-2">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                {errors.email}
-              </div>
-            )}
-            {formData.email !== user.email && (
-              <div className="text-morpheus-gold-light text-sm mt-1 flex items-center gap-2">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                {t('profile.changingEmailRequiresConfirmation')}
-              </div>
-            )}
-          </div>
+                    {/* Action Buttons */}
+                    <div className="flex gap-4 pt-4">
+                        <Button
+                            type="submit"
+                            disabled={isSubmitting || isLoading}
+                            className="h-12 flex-1 bg-[#053340] text-lg font-semibold text-white shadow-lg transition-all duration-300 hover:bg-[#053340]/90 hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-70"
+                        >
+                            {isSubmitting || isLoading ? (
+                                <div className="flex items-center gap-2">
+                                    <img
+                                        src="/loading.gif"
+                                        alt="Loading"
+                                        className="h-5 w-5"
+                                    />
+                                    {t('profile.savingChanges')}
+                                </div>
+                            ) : (
+                                t('profile.saveChanges')
+                            )}
+                        </Button>
 
-          {/* Action Buttons */}
-          <div className="flex gap-4 pt-4">
-            <Button
-              type="submit"
-              disabled={isSubmitting || isLoading}
-              className="flex-1 bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-[#695029] hover:to-[#d4c066] text-white h-12 text-lg font-semibold shadow-2xl transition-all duration-300 hover:scale-105 rounded-none disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:scale-100"
-            >
-              {isSubmitting || isLoading ? (
-                <div className="flex items-center gap-2">
-                  <img src="/loading.gif" alt="Loading" className="h-5 w-5" />
-                  {t('profile.savingChanges')}
+                        <Button
+                            type="button"
+                            onClick={handleCancel}
+                            disabled={isSubmitting || isLoading}
+                            className="h-12 flex-1 bg-gray-500 text-lg font-semibold text-white shadow-lg transition-all duration-300 hover:bg-gray-600 hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-70"
+                        >
+                            {t('profile.cancel')}
+                        </Button>
+                    </div>
+                </form>
+            </div>
+
+            {/* Information Note */}
+            <div className="border border-gray-200 bg-blue-50 p-4">
+                <div className="flex items-start gap-3">
+                    <svg
+                        className="mt-0.5 h-5 w-5 flex-shrink-0 text-[#053340]"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                    </svg>
+                    <div className="text-sm text-[#053340]">
+                        <p className="font-supreme mb-1 font-medium">
+                            {t('profile.importantNotes')}
+                        </p>
+                        <ul className="font-supreme space-y-1 text-xs">
+                            <li>
+                                • {t('profile.emailChangeRequiresVerification')}
+                            </li>
+                            <li>• {t('profile.confirmationEmailSent')}</li>
+                            <li>• {t('profile.nameUpdatedImmediately')}</li>
+                        </ul>
+                    </div>
                 </div>
-              ) : (
-                t('profile.saveChanges')
-              )}
-            </Button>
-            
-            <Button
-              type="button"
-              onClick={handleCancel}
-              disabled={isSubmitting || isLoading}
-              className="flex-1 bg-slate-600 hover:bg-slate-500 text-white h-12 text-lg font-semibold shadow-2xl transition-all duration-300 hover:scale-105 rounded-none disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:scale-100"
-            >
-              {t('profile.cancel')}
-            </Button>
-          </div>
-        </form>
-      </div>
-
-      {/* Information Note */}
-      <div className="bg-slate-700/30 border border-slate-600 p-4 rounded-none">
-        <div className="flex items-start gap-3">
-          <svg className="w-5 h-5 text-morpheus-gold-light mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <div className="text-gray-300 text-sm">
-            <p className="font-medium mb-1">{t('profile.importantNotes')}</p>
-            <ul className="space-y-1 text-xs">
-              <li>• {t('profile.emailChangeRequiresVerification')}</li>
-              <li>• {t('profile.confirmationEmailSent')}</li>
-              <li>• {t('profile.nameUpdatedImmediately')}</li>
-            </ul>
-          </div>
+            </div>
         </div>
-      </div>
-    </div>
-  );
+    )
 }
