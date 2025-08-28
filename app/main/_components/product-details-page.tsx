@@ -19,9 +19,9 @@ function LoadingSpinner() {
 
     return (
         <Html center>
-            <div className="flex flex-col items-center justify-center rounded-lg bg-black/50 px-4 py-3 text-white backdrop-blur-sm">
-                <div className="border-morpheus-gold-dark border-t-morpheus-gold-light mb-2 h-8 w-8 animate-spin rounded-full border-2"></div>
-                <div className="from-morpheus-gold-dark to-morpheus-gold-light font-parisienne bg-gradient-to-r bg-clip-text text-sm font-medium text-transparent">
+            <div className="flex flex-col items-center justify-center rounded-lg border border-gray-200 bg-white px-4 py-3 shadow-lg">
+                <div className="mb-2 h-8 w-8 animate-spin rounded-full border-2 border-gray-200 border-t-[#053340]"></div>
+                <div className="font-supreme text-sm font-medium text-[#053340]">
                     {t('productDetails.loading3DModel')}
                 </div>
             </div>
@@ -35,12 +35,12 @@ function ModelNotFound({ name }: { name: string }) {
 
     return (
         <Html center>
-            <div className="border-morpheus-gold-dark flex flex-col items-center justify-center rounded-lg border bg-black/70 px-6 py-4 text-white backdrop-blur-sm">
+            <div className="flex flex-col items-center justify-center rounded-lg border border-gray-200 bg-white px-6 py-4 shadow-lg">
                 <div className="mb-3 text-4xl">🌳</div>
-                <div className="from-morpheus-gold-dark to-morpheus-gold-light font-parisienne mb-1 bg-gradient-to-r bg-clip-text text-base font-medium text-transparent">
+                <div className="font-recia mb-1 text-base font-medium text-[#053340]">
                     {name}
                 </div>
-                <div className="text-center text-xs text-gray-300">
+                <div className="font-supreme text-center text-xs text-gray-600">
                     {t('productDetails.modelPreview')}
                 </div>
             </div>
@@ -179,6 +179,7 @@ type ProductVariant = {
     yvarprodpromotiondatefin: string | null
     yvarprodnbrjourlivraison: number
     yvarprodstatut: string // Approval status field
+    yestvisible?: boolean // Visibility status field (optional as it might not always be included)
     xdeviseidfk: number | null // Currency foreign key
     xcouleur: {
         xcouleurid: number
@@ -228,11 +229,19 @@ export function ProductDetailsPage({
     const approvedVariants = useMemo(() => {
         if (!productData.yvarprod || productData.yvarprod.length === 0)
             return []
-        return productData.yvarprod.filter(
-            (variant) =>
-                variant.yvarprodstatut === 'approved' &&
-                variant.yestvisible === true
-        )
+
+        return productData.yvarprod.filter((variant) => {
+            // Always check if variant is approved
+            const isApproved = variant.yvarprodstatut === 'approved'
+
+            // Check visibility if the property exists, otherwise assume visible
+            const isVisible =
+                variant.yestvisible !== undefined
+                    ? variant.yestvisible === true
+                    : true
+
+            return isApproved && isVisible
+        })
     }, [productData.yvarprod])
 
     const [selectedMediaIndex, setSelectedMediaIndex] = useState(0)
@@ -454,14 +463,19 @@ export function ProductDetailsPage({
     // Early return if no approved variants
     if (!approvedVariants || approvedVariants.length === 0) {
         return (
-            <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/90 p-4 backdrop-blur-sm">
-                <div className="from-morpheus-blue-dark via-morpheus-blue-light to-morpheus-blue-dark w-full max-w-md rounded-lg bg-gradient-to-br p-8 text-center shadow-2xl shadow-black/50">
+            <div
+                className={
+                    'fixed inset-0 z-[70] flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm' +
+                    (extraTop ? ' pt-20' : '')
+                }
+            >
+                <div className="relative w-full max-w-md rounded-lg border border-gray-200 bg-white p-8 text-center shadow-2xl">
                     <button
                         onClick={onClose}
-                        className="hover:text-morpheus-gold-light absolute top-4 right-4 text-white/80 transition-colors"
+                        className="absolute top-4 right-4 rounded-full bg-gray-100 p-2 text-gray-500 transition-all duration-300 hover:bg-gray-200 hover:text-[#053340]"
                     >
                         <svg
-                            className="h-6 w-6"
+                            className="h-5 w-5"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -474,11 +488,11 @@ export function ProductDetailsPage({
                             />
                         </svg>
                     </button>
-                    <h2 className="mb-4 text-2xl font-bold text-white">
+                    <h2 className="font-recia mb-4 text-2xl font-bold text-[#053340]">
                         {t('productDetails.noVariantsAvailable') ||
                             'No Variants Available'}
                     </h2>
-                    <p className="text-gray-300">
+                    <p className="font-supreme text-gray-600">
                         {t('productDetails.noVariantsMessage') ||
                             'This product currently has no available variants.'}
                     </p>
@@ -490,15 +504,15 @@ export function ProductDetailsPage({
     return (
         <div
             className={
-                'fixed inset-0 z-[70] bg-black/90 backdrop-blur-sm' +
-                (extraTop ? ' pt-16' : '')
+                'fixed inset-0 z-[70] bg-black/50 backdrop-blur-sm' +
+                (extraTop ? ' pt-24' : '')
             }
         >
-            <div className="from-morpheus-blue-dark via-morpheus-blue-light to-morpheus-blue-dark relative h-full w-full overflow-y-auto bg-gradient-to-br shadow-2xl shadow-black/50">
+            <div className="relative h-full w-full overflow-y-auto bg-white shadow-2xl">
                 {/* Close button - top right */}
                 <button
                     onClick={onClose}
-                    className="hover:text-morpheus-gold-light fixed top-4 right-4 z-20 rounded-full bg-black/20 p-2 text-white/80 backdrop-blur-sm transition-all duration-300 hover:rotate-90"
+                    className="fixed top-28 right-4 z-20 rounded-full bg-white p-2 text-gray-500 shadow-lg transition-all duration-300 hover:rotate-90 hover:text-[#053340]"
                 >
                     <svg
                         className="h-6 w-6"
@@ -524,20 +538,20 @@ export function ProductDetailsPage({
                             <div className="flex gap-2">
                                 <button
                                     onClick={() => setViewMode('media')}
-                                    className={`rounded-lg px-4 py-2 text-sm font-medium transition-all duration-300 ${
+                                    className={`font-supreme rounded-lg px-4 py-2 text-sm font-medium transition-all duration-300 ${
                                         viewMode === 'media'
-                                            ? 'from-morpheus-gold-dark to-morpheus-gold-light bg-gradient-to-r text-white'
-                                            : 'bg-white/10 text-gray-300 hover:bg-white/20 hover:text-white'
+                                            ? 'bg-[#053340] text-white'
+                                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-[#053340]'
                                     }`}
                                 >
                                     {t('productDetails.media') || 'Images'}
                                 </button>
                                 <button
                                     onClick={() => setViewMode('3d')}
-                                    className={`rounded-lg px-4 py-2 text-sm font-medium transition-all duration-300 ${
+                                    className={`font-supreme rounded-lg px-4 py-2 text-sm font-medium transition-all duration-300 ${
                                         viewMode === '3d'
-                                            ? 'from-morpheus-gold-dark to-morpheus-gold-light bg-gradient-to-r text-white'
-                                            : 'bg-white/10 text-gray-300 hover:bg-white/20 hover:text-white'
+                                            ? 'bg-[#053340] text-white'
+                                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-[#053340]'
                                     }`}
                                 >
                                     {t('productDetails.view3D') || '3D View'}
@@ -545,7 +559,7 @@ export function ProductDetailsPage({
                             </div>
 
                             {/* Main Display Area */}
-                            <div className="aspect-square overflow-hidden rounded-lg bg-white/5">
+                            <div className="aspect-square overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
                                 {viewMode === 'media' ? (
                                     <div className="flex h-full flex-col">
                                         {/* Main Media */}
@@ -581,7 +595,7 @@ export function ProductDetailsPage({
                                                         />
                                                     )
                                                 ) : (
-                                                    <div className="text-gray-500">
+                                                    <div className="font-supreme text-gray-500">
                                                         {t(
                                                             'productDetails.noMediaAvailable'
                                                         ) ||
@@ -604,8 +618,8 @@ export function ProductDetailsPage({
                                                     className={`relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg bg-white transition-all duration-300 ${
                                                         selectedMediaIndex ===
                                                         index
-                                                            ? 'ring-morpheus-gold-light ring-2'
-                                                            : 'hover:ring-2 hover:ring-white/50'
+                                                            ? 'ring-2 ring-[#053340]'
+                                                            : 'ring-1 ring-gray-200 hover:ring-2 hover:ring-gray-300'
                                                     }`}
                                                 >
                                                     {media.ymediaboolvideo ? (
@@ -800,7 +814,7 @@ export function ProductDetailsPage({
                                             </Suspense>
                                         </Canvas>
 
-                                        <div className="absolute top-4 right-4 rounded-full bg-black/50 px-3 py-1 text-xs font-semibold text-white">
+                                        <div className="font-supreme absolute top-4 right-4 rounded-full bg-white px-3 py-1 text-xs font-semibold text-[#053340] shadow-lg">
                                             {t('productDetails.preview3D') ||
                                                 '3D Preview'}
                                         </div>
@@ -810,15 +824,15 @@ export function ProductDetailsPage({
                         </div>
 
                         {/* Right Side - Product Details */}
-                        <div className="rounded-lg bg-white/5 p-8 backdrop-blur-sm">
+                        <div className="rounded-lg border border-gray-200 bg-white p-8 shadow-sm">
                             {/* Product Title */}
-                            <h1 className="mb-2 text-3xl font-bold text-white">
+                            <h1 className="font-recia mb-2 text-3xl font-bold text-[#053340]">
                                 {productData.yprodintitule}
                             </h1>
 
                             {/* Price */}
                             <div className="mb-6 flex items-center gap-3">
-                                <span className="from-morpheus-gold-dark via-morpheus-gold-light to-morpheus-gold-dark bg-gradient-to-r bg-clip-text text-4xl font-bold text-transparent">
+                                <span className="text-4xl font-bold text-[#053340]">
                                     {pricing.formattedPrice}
                                 </span>
                                 {pricing.hasDiscount &&
@@ -830,14 +844,14 @@ export function ProductDetailsPage({
                             </div>
 
                             {/* Description */}
-                            <p className="mb-8 leading-relaxed text-gray-300">
+                            <div className="font-supreme mb-8 leading-relaxed whitespace-pre-line text-gray-600">
                                 {productData.yproddetailstech}
-                            </p>
+                            </div>
 
                             {/* Color Selection */}
                             {availableColors.length > 0 && (
                                 <div className="mb-6">
-                                    <h3 className="mb-3 text-lg font-semibold text-white">
+                                    <h3 className="font-recia mb-3 text-lg font-semibold text-[#053340]">
                                         {t('productDetails.color') || 'Color'}
                                     </h3>
                                     <div className="flex flex-wrap gap-3">
@@ -852,8 +866,8 @@ export function ProductDetailsPage({
                                                 className={`group relative h-12 w-12 rounded-full border-2 transition-all duration-300 ${
                                                     selectedColorId ===
                                                     color.xcouleurid
-                                                        ? 'border-morpheus-gold-light scale-110 shadow-lg'
-                                                        : 'border-white/30 hover:scale-105 hover:border-white/60'
+                                                        ? 'scale-110 border-[#053340] shadow-lg'
+                                                        : 'border-gray-300 hover:scale-105 hover:border-gray-400'
                                                 }`}
                                                 style={{
                                                     backgroundColor:
@@ -886,7 +900,7 @@ export function ProductDetailsPage({
                             {/* Size Selection */}
                             {availableSizes.length > 0 && (
                                 <div className="mb-6">
-                                    <h3 className="mb-3 text-lg font-semibold text-white">
+                                    <h3 className="font-recia mb-3 text-lg font-semibold text-[#053340]">
                                         {t('productDetails.size') || 'Size'}
                                     </h3>
                                     <div className="flex flex-wrap gap-2">
@@ -898,11 +912,11 @@ export function ProductDetailsPage({
                                                         size.xtailleid
                                                     )
                                                 }
-                                                className={`rounded-lg border px-4 py-2 transition-all duration-300 ${
+                                                className={`font-supreme rounded-lg border px-4 py-2 transition-all duration-300 ${
                                                     selectedSizeId ===
                                                     size.xtailleid
-                                                        ? 'border-morpheus-gold-light bg-morpheus-gold-light/20 text-morpheus-gold-light'
-                                                        : 'border-white/30 text-gray-300 hover:border-white/60 hover:text-white'
+                                                        ? 'border-[#053340] bg-[#053340] text-white'
+                                                        : 'border-gray-300 text-gray-600 hover:border-gray-400 hover:text-[#053340]'
                                                 }`}
                                             >
                                                 {size.xtailleintitule}
@@ -914,7 +928,7 @@ export function ProductDetailsPage({
 
                             {/* Quantity */}
                             <div className="mb-8">
-                                <h3 className="mb-3 text-lg font-semibold text-white">
+                                <h3 className="font-recia mb-3 text-lg font-semibold text-[#053340]">
                                     {t('productDetails.quantity') || 'Quantity'}
                                 </h3>
                                 <div className="flex items-center gap-4">
@@ -924,18 +938,18 @@ export function ProductDetailsPage({
                                                 Math.max(1, quantity - 1)
                                             )
                                         }
-                                        className="flex h-10 w-10 items-center justify-center rounded-lg border border-white/30 text-lg font-semibold text-white transition-all duration-300 hover:border-white/60 hover:bg-white/10"
+                                        className="font-supreme flex h-10 w-10 items-center justify-center rounded-lg border border-gray-300 text-lg font-semibold text-[#053340] transition-all duration-300 hover:border-gray-400 hover:bg-gray-50"
                                     >
                                         −
                                     </button>
-                                    <span className="w-12 text-center text-xl font-bold text-white">
+                                    <span className="font-supreme w-12 text-center text-xl font-bold text-[#053340]">
                                         {quantity}
                                     </span>
                                     <button
                                         onClick={() =>
                                             setQuantity(quantity + 1)
                                         }
-                                        className="flex h-10 w-10 items-center justify-center rounded-lg border border-white/30 text-lg font-semibold text-white transition-all duration-300 hover:border-white/60 hover:bg-white/10"
+                                        className="font-supreme flex h-10 w-10 items-center justify-center rounded-lg border border-gray-300 text-lg font-semibold text-[#053340] transition-all duration-300 hover:border-gray-400 hover:bg-gray-50"
                                     >
                                         +
                                     </button>
@@ -952,7 +966,7 @@ export function ProductDetailsPage({
                                             addToCartMutation.isPending ||
                                             !selectedVariant
                                         }
-                                        className={`from-morpheus-gold-dark to-morpheus-gold-light hover:shadow-morpheus-gold-light/30 group flex-1 rounded-lg bg-gradient-to-r px-6 py-4 font-semibold text-white shadow-lg transition-all duration-300 ${
+                                        className={`font-supreme group flex-1 rounded-lg bg-[#053340] px-6 py-4 font-semibold text-white shadow-lg transition-all duration-300 hover:bg-[#053340]/90 hover:shadow-xl ${
                                             addToCartMutation.isPending ||
                                             !selectedVariant
                                                 ? 'cursor-not-allowed opacity-50'
@@ -992,8 +1006,8 @@ export function ProductDetailsPage({
                                         }
                                         className={`flex h-14 w-14 items-center justify-center rounded-lg border-2 transition-all duration-300 ${
                                             isInWishlist
-                                                ? 'border-red-500 bg-red-50 text-red-500'
-                                                : 'border-white/30 text-gray-300 hover:border-white/60 hover:text-white'
+                                                ? 'border-[#053340] bg-[#053340]/10 text-[#053340]'
+                                                : 'border-gray-300 text-gray-600 hover:border-gray-400 hover:text-[#053340]'
                                         } ${
                                             addToWishlistMutation.isPending ||
                                             removeFromWishlistMutation.isPending
@@ -1029,7 +1043,7 @@ export function ProductDetailsPage({
                                 {/* Buy Now Button */}
                                 <button
                                     onClick={handleDirectOrder}
-                                    className="w-full rounded-lg bg-gradient-to-r from-green-600 to-green-500 px-6 py-4 font-semibold text-white shadow-lg transition-all duration-300 hover:shadow-green-500/30"
+                                    className="font-supreme w-full rounded-lg border border-[#053340] bg-white px-6 py-4 font-semibold text-[#053340] shadow-lg transition-all duration-300 hover:bg-[#053340] hover:text-white"
                                 >
                                     <span className="flex items-center justify-center">
                                         <svg
