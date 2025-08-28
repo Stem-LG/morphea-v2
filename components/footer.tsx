@@ -14,6 +14,7 @@ export default function Footer() {
     const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [isSocialMediaOpen, setIsSocialMediaOpen] = useState(false)
+    const [isPlanDeMorpheaOpen, setIsPlanDeMorpheaOpen] = useState(false)
     const { language, setLanguage, t } = useLanguage()
     const dropdownRef = useRef<HTMLDivElement>(null)
     const supabase = createClient()
@@ -161,12 +162,14 @@ export default function Footer() {
                                     </a>
                                 </li>
                                 <li>
-                                    <a
-                                        href="#"
+                                    <button
+                                        onClick={() =>
+                                            setIsPlanDeMorpheaOpen(true)
+                                        }
                                         className="block touch-manipulation py-1 text-base text-neutral-700 transition-colors hover:text-black md:text-lg"
                                     >
                                         {t('footer.about.plan')}
-                                    </a>
+                                    </button>
                                 </li>
                                 <li>
                                     <a
@@ -471,6 +474,121 @@ export default function Footer() {
                                         </defs>
                                     </svg>
                                 </a>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Plan de Morphea section - Mobile Responsive - Conditionally rendered */}
+                {isPlanDeMorpheaOpen && (
+                    <div className="border-y border-gray-200 pt-3 pb-8 md:pt-4 md:pb-11">
+                        <div className="flex flex-col items-center justify-center gap-4 md:gap-6">
+                            <div className="flex w-full items-center justify-between">
+                                <div className="size-8" />
+                                <span className="font-recia text-lg font-semibold text-neutral-700 md:text-xl">
+                                    {t('footer.planDeMorphea.title')}
+                                </span>
+                                <button
+                                    onClick={() =>
+                                        setIsPlanDeMorpheaOpen(false)
+                                    }
+                                    className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-gray-600 transition-colors hover:bg-gray-200 hover:text-black"
+                                    aria-label="Close plan de morphea"
+                                >
+                                    <X size={16} />
+                                </button>
+                            </div>
+                            <div className="flex flex-col items-center gap-4 text-gray-700 md:gap-6">
+                                {(() => {
+                                    // Combine main pages and categories into one array
+                                    const mainPages = [
+                                        {
+                                            name: t(
+                                                'footer.planDeMorphea.home'
+                                            ),
+                                            href: '/',
+                                        },
+                                        {
+                                            name: 'Visite Virtuelle',
+                                            href: '/main',
+                                        },
+                                        {
+                                            name: t(
+                                                'footer.planDeMorphea.login'
+                                            ),
+                                            href: '/auth/login',
+                                        },
+                                        {
+                                            name: t(
+                                                'footer.planDeMorphea.register'
+                                            ),
+                                            href: '/auth/sign-up',
+                                        },
+                                        {
+                                            name: t(
+                                                'footer.planDeMorphea.shop'
+                                            ),
+                                            href: '/shop',
+                                        },
+                                    ]
+
+                                    const categoryPages = categories.map(
+                                        (category) => ({
+                                            name: category.xcategprodintitule,
+                                            href: `/shop?category=${category.xcategprodid}`,
+                                        })
+                                    )
+
+                                    const allLinks = [
+                                        ...mainPages,
+                                        ...categoryPages,
+                                    ]
+
+                                    // Split links into columns of max 6 items each
+                                    const columns = []
+                                    for (
+                                        let i = 0;
+                                        i < allLinks.length;
+                                        i += 6
+                                    ) {
+                                        columns.push(allLinks.slice(i, i + 6))
+                                    }
+
+                                    return (
+                                        <div className="flex flex-wrap justify-center gap-8 md:gap-12 lg:gap-20 xl:gap-40">
+                                            {columns.map(
+                                                (column, columnIndex) => (
+                                                    <div
+                                                        key={columnIndex}
+                                                        className="flex flex-col gap-2"
+                                                    >
+                                                        {column.map(
+                                                            (
+                                                                link,
+                                                                linkIndex
+                                                            ) => (
+                                                                <a
+                                                                    key={`${columnIndex}-${linkIndex}`}
+                                                                    href={
+                                                                        link.href
+                                                                    }
+                                                                    className="touch-manipulation text-center text-base transition-colors hover:text-black md:text-left md:text-lg"
+                                                                    onClick={() =>
+                                                                        setIsPlanDeMorpheaOpen(
+                                                                            false
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    {link.name}
+                                                                </a>
+                                                            )
+                                                        )}
+                                                    </div>
+                                                )
+                                            )}
+                                        </div>
+                                    )
+                                })()}
                             </div>
                         </div>
                     </div>

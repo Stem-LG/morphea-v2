@@ -1548,7 +1548,8 @@ export const frTranslations = {
     "priceDesc": "Prix : Décroissant",
     "nameAsc": "Nom : A à Z",
     "nameDesc": "Nom : Z à A",
-    "newest": "Plus récent"
+    "newest": "Plus récent",
+    "results":"Resultats"
   },
   "notifications": {
     "title": "Notifications",
@@ -1622,6 +1623,14 @@ export const frTranslations = {
       "plan": "Plan de Morphea",
       "events": "Nos événements",
       "socialMedia": "Réseaux sociaux"
+    },
+    "planDeMorphea": {
+      "title": "Plan de Morphea",
+      "home": "Accueil",
+      "login": "Connexion",
+      "register": "Inscription",
+      "shop": "Boutique",
+      "categories": "Catégories"
     },
     "customerService": {
       "title": "Service client",

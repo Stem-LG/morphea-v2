@@ -134,7 +134,7 @@ export default function NavBar() {
                 </div>
                 <div className="flex flex-1 items-center justify-center">
                     <Link href={{
-                        href:"/"
+                        pathname:"/"
                     }}>
                         <Image
                             src="/images/morph_logo.webp"

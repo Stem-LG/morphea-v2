@@ -1590,6 +1590,14 @@ export const enTranslations = {
       "events": "Our Events",
       "socialMedia": "Social Media"
     },
+    "planDeMorphea": {
+      "title": "Morphea Plan",
+      "home": "Home",
+      "login": "Login",
+      "register": "Register",
+      "shop": "Shop",
+      "categories": "Categories"
+    },
     "customerService": {
       "title": "Customer Service",
       "myAccount": "My Account",
