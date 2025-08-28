@@ -1039,30 +1039,6 @@ export function ProductDetailsPage({
                                         )}
                                     </button>
                                 </div>
-
-                                {/* Buy Now Button */}
-                                <button
-                                    onClick={handleDirectOrder}
-                                    className="font-supreme w-full rounded-lg border border-[#053340] bg-white px-6 py-4 font-semibold text-[#053340] shadow-lg transition-all duration-300 hover:bg-[#053340] hover:text-white"
-                                >
-                                    <span className="flex items-center justify-center">
-                                        <svg
-                                            className="mr-2 h-5 w-5"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24"
-                                        >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth={2}
-                                                d="M13 10V3L4 14h7v7l9-11h-7z"
-                                            />
-                                        </svg>
-                                        {t('productDetails.buyNow') ||
-                                            'Buy Now'}
-                                    </span>
-                                </button>
                             </div>
 
                             {/* Delivery Info */}
