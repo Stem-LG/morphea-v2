@@ -227,7 +227,7 @@ export default function Footer() {
                                 </li>
                                 <li>
                                     <a
-                                        href="#"
+                                        href="/faq"
                                         className="block touch-manipulation py-1 text-base text-neutral-700 transition-colors hover:text-black md:text-lg"
                                     >
                                         {t('footer.customerService.faq')}

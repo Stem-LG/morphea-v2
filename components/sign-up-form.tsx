@@ -112,7 +112,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
             const currentUser = currentUserData?.user;
 
             // Sign up with email and password
-            const redirectUrl = websiteUrl && !isLoadingWebsiteUrl 
+            const redirectUrl = websiteUrl && !isLoadingWebsiteUrl
                 ? `${websiteUrl}/main`
                 : `${process.env.NEXT_PUBLIC_SITE_URL || window.location.origin}/main`;
 
@@ -156,17 +156,27 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
     };
 
     return (
-        <div className={cn("flex flex-col gap-8 max-w-6xl mx-auto", className)} {...props}>
-            {/* Header */}
-            <div className="text-center">
-                <h2 className="text-3xl font-bold text-white mb-2">{t("auth.joinTheFuture")}</h2>
+        <div className={cn("flex flex-col gap-8 max-w-lg mx-auto", className)} {...props}>
+            {/* Welcome header */}
+            <div className="text-center mb-8">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-[#05141D] to-[#063846] rounded-full mb-6">
+                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                    </svg>
+                </div>
+                <h1 className="font-recia text-4xl md:text-5xl font-extrabold text-[#05141D] mb-4 leading-tight">
+                    {t("auth.joinTheFuture")}
+                </h1>
+                <p className="font-supreme text-lg text-[#063846] max-w-md mx-auto">
+                    Create your account to start your journey with us
+                </p>
             </div>
 
             {/* Form Card */}
-            <div className="bg-gradient-to-br from-morpheus-blue-dark to-morpheus-blue-light border border-slate-700 p-8 shadow-2xl">
+            <div className="bg-white/80 backdrop-blur-sm border border-slate-200 rounded-lg p-8 shadow-xl">
                 <form onSubmit={handleSignUp} className="space-y-6">
                     <div className="space-y-2">
-                        <Label htmlFor="name" className="text-white text-lg font-medium">
+                        <Label htmlFor="name" className="text-[#05141D] text-sm font-medium">
                             {t("auth.name")}
                         </Label>
                         <Input
@@ -176,12 +186,12 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
                             required
                             value={name}
                             onChange={(e) => setName(e.target.value)}
-                            className="bg-slate-700 border-slate-600 text-white placeholder:text-gray-400 h-12 text-lg focus:border-morpheus-gold-light focus:ring-morpheus-gold-light rounded-none"
+                            className="bg-white border-slate-300 text-[#05141D] placeholder:text-slate-400 h-11 text-base focus:border-[#063846] focus:ring-[#063846] rounded-md"
                         />
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="email" className="text-white text-lg font-medium">
+                        <Label htmlFor="email" className="text-[#05141D] text-sm font-medium">
                             {t("auth.email")}
                         </Label>
                         <Input
@@ -191,12 +201,12 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
                             required
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="bg-slate-700 border-slate-600 text-white placeholder:text-gray-400 h-12 text-lg focus:border-morpheus-gold-light focus:ring-morpheus-gold-light rounded-none"
+                            className="bg-white border-slate-300 text-[#05141D] placeholder:text-slate-400 h-11 text-base focus:border-[#063846] focus:ring-[#063846] rounded-md"
                         />
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="password" className="text-white text-lg font-medium">
+                        <Label htmlFor="password" className="text-[#05141D] text-sm font-medium">
                             {t("auth.password")}
                         </Label>
                         <div className="relative">
@@ -207,7 +217,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
                                 required
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="bg-slate-700 border-slate-600 text-white placeholder:text-gray-400 h-12 text-lg focus:border-morpheus-gold-light focus:ring-morpheus-gold-light rounded-none pr-12"
+                                className="bg-white border-slate-300 text-[#05141D] placeholder:text-slate-400 h-11 text-base focus:border-[#063846] focus:ring-[#063846] rounded-md pr-12"
                             />
 
                             {/* Password validation icon */}
@@ -215,16 +225,16 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
                                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
                                     {isPasswordValid ? (
                                         <div className="group relative">
-                                            <CheckCircle className="h-5 w-5 text-green-400" />
-                                            <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-slate-800 text-white text-sm rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
+                                            <CheckCircle className="h-5 w-5 text-green-500" />
+                                            <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-slate-900 text-white text-sm rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
                                                 {t("auth.passwordRequirementsMet")}
-                                                <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-slate-800"></div>
+                                                <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-slate-900"></div>
                                             </div>
                                         </div>
                                     ) : (
                                         <div className="group relative">
-                                            <AlertCircle className="h-5 w-5 text-amber-400" />
-                                            <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-slate-800 text-white text-sm rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10 max-w-xs">
+                                            <AlertCircle className="h-5 w-5 text-amber-500" />
+                                            <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-slate-900 text-white text-sm rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10 max-w-xs">
                                                 <div className="text-xs mb-1 font-medium">
                                                     {t("auth.passwordRequirements")}:
                                                 </div>
@@ -232,11 +242,10 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
                                                     {passwordRequirements.map((requirement, index) => (
                                                         <li key={index} className="flex items-center gap-2 text-xs">
                                                             <span
-                                                                className={`w-3 h-3 rounded-full flex items-center justify-center flex-shrink-0 ${
-                                                                    requirement.met
+                                                                className={`w-3 h-3 rounded-full flex items-center justify-center flex-shrink-0 ${requirement.met
                                                                         ? "bg-green-500 text-white"
                                                                         : "bg-slate-600 text-gray-400"
-                                                                }`}
+                                                                    }`}
                                                             >
                                                                 {requirement.met ? "✓" : "○"}
                                                             </span>
@@ -252,7 +261,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
                                                         </li>
                                                     ))}
                                                 </ul>
-                                                <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-slate-800"></div>
+                                                <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-slate-900"></div>
                                             </div>
                                         </div>
                                     )}
@@ -262,7 +271,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="repeat-password" className="text-white text-lg font-medium">
+                        <Label htmlFor="repeat-password" className="text-[#05141D] text-sm font-medium">
                             {t("auth.confirmPassword")}
                         </Label>
                         <div className="relative">
@@ -273,7 +282,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
                                 required
                                 value={repeatPassword}
                                 onChange={(e) => setRepeatPassword(e.target.value)}
-                                className="bg-slate-700 border-slate-600 text-white placeholder:text-gray-400 h-12 text-lg focus:border-morpheus-gold-light focus:ring-morpheus-gold-light rounded-none pr-12"
+                                className="bg-white border-slate-300 text-[#05141D] placeholder:text-slate-400 h-11 text-base focus:border-[#063846] focus:ring-[#063846] rounded-md pr-12"
                             />
 
                             {/* Password confirmation icon */}
@@ -281,18 +290,18 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
                                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
                                     {passwordsMatch ? (
                                         <div className="group relative">
-                                            <CheckCircle className="h-5 w-5 text-green-400" />
-                                            <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-slate-800 text-white text-sm rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
+                                            <CheckCircle className="h-5 w-5 text-green-500" />
+                                            <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-slate-900 text-white text-sm rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
                                                 {t("auth.passwordsMatch")}
-                                                <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-slate-800"></div>
+                                                <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-slate-900"></div>
                                             </div>
                                         </div>
                                     ) : (
                                         <div className="group relative">
-                                            <XCircle className="h-5 w-5 text-red-400" />
-                                            <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-slate-800 text-white text-sm rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
+                                            <XCircle className="h-5 w-5 text-red-500" />
+                                            <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-slate-900 text-white text-sm rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
                                                 {t("auth.passwordsDoNotMatchTooltip")}
-                                                <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-slate-800"></div>
+                                                <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-slate-900"></div>
                                             </div>
                                         </div>
                                     )}
@@ -308,24 +317,24 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
                                 id="terms"
                                 checked={acceptedTerms}
                                 onCheckedChange={(checked) => setAcceptedTerms(!!checked)}
-                                className="mt-1 border-slate-600 data-[state=checked]:bg-morpheus-gold-light data-[state=checked]:border-morpheus-gold-light focus-visible:ring-morpheus-gold-light/50"
+                                className="mt-1 border-slate-300 data-[state=checked]:bg-[#063846] data-[state=checked]:border-[#063846] focus-visible:ring-[#063846]/50"
                             />
-                            <Label htmlFor="terms" className="text-sm text-gray-300 leading-relaxed cursor-pointer">
+                            <Label htmlFor="terms" className="text-sm text-slate-600 leading-relaxed cursor-pointer">
                                 {t("auth.agreeToTerms")}{" "}
-                                <Link
-                                    href="/terms-and-conditions"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-morpheus-gold-light hover:text-[#d4c066] font-semibold underline underline-offset-2 transition-colors"
-                                >
-                                    {t("auth.termsAndConditions")}
-                                </Link>
                             </Label>
                         </div>
+                        <Link
+                            href="/terms-and-conditions"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[#063846] hover:text-[#05141D] font-semibold underline underline-offset-2 transition-colors text-sm"
+                        >
+                            {t("auth.termsAndConditions")}
+                        </Link>
                     </div>
 
                     {error && (
-                        <div className="bg-red-500/20 border border-red-400 text-red-200 px-4 py-3 mt-6">{error}</div>
+                        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md mt-6">{error}</div>
                     )}
 
                     <Button
@@ -337,7 +346,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
                                 setError(t("auth.pleaseCompleteAllFields"));
                             }
                         }}
-                        className="w-full bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-[#695029] hover:to-[#d4c066] text-white h-12 text-lg font-semibold shadow-2xl transition-all duration-300 hover:scale-105 rounded-none disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:scale-100 mt-6"
+                        className="w-full bg-gradient-to-r from-[#05141D] to-[#063846] hover:from-[#04111a] hover:to-[#052d37] text-white h-11 text-base font-semibold shadow-lg transition-all duration-300 hover:shadow-xl rounded-md disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-lg mt-6"
                     >
                         {isLoading ? (
                             <div className="flex items-center gap-2">
@@ -351,11 +360,11 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
                 </form>
 
                 <div className="mt-8 text-center">
-                    <p className="text-gray-300">
+                    <p className="text-slate-600">
                         {t("auth.alreadyHaveAccount")}{" "}
                         <Link
                             href="/auth/login"
-                            className="text-morpheus-gold-light hover:text-[#d4c066] font-semibold underline underline-offset-4 transition-colors"
+                            className="text-[#063846] hover:text-[#05141D] font-semibold underline underline-offset-2 transition-colors"
                         >
                             {t("auth.signIn")}
                         </Link>
@@ -367,7 +376,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
             <div className="text-center">
                 <Link
                     href="/"
-                    className="text-gray-400 hover:text-white transition-colors inline-flex items-center gap-2"
+                    className="text-slate-500 hover:text-[#05141D] transition-colors inline-flex items-center gap-2"
                 >
                     {t("auth.backToMorpheusMall")}
                 </Link>

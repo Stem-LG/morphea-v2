@@ -4,7 +4,6 @@ import { createClient } from '@/lib/client'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState, useRef } from 'react'
 import Footer from '@/components/footer'
-import NavBar from './_components/nav_bar'
 import ExpandableCategories from '@/components/expandable-categories'
 import { ThreeDPhotoCarousel } from '@/components/three-d-photo-carousel'
 import VideoAnimation from '@/components/video-animation'
@@ -188,54 +187,56 @@ export default function Home() {
                     playsInline
                 />
 
-                {/* Bottom center overlay text for each video - Mobile Responsive */}
-                <div className="absolute bottom-16 left-1/2 z-10 flex w-full -translate-x-1/2 transform justify-center px-4 md:bottom-16 md:px-0">
-                    <div
-                        className={`transition-opacity duration-700 ${hovered === 'right' ? 'opacity-0' : 'opacity-100'}`}
-                    >
-                        <div className="text-center">
-                            <div className="font-supreme pointer-events-auto mb-2 text-lg font-medium text-white uppercase select-text text-shadow-md md:text-2xl">
-                                {videoData.side1.topText}
-                            </div>
-                            <div className="font-recia pointer-events-auto mb-6 text-3xl leading-tight font-medium text-white uppercase select-text text-shadow-md md:mb-10 md:text-5xl">
-                                {videoData.side1.mainText}
-                            </div>
-                            <a
-                                href={videoData.side1.discoverLink}
-                                className="font-supreme pointer-events-auto text-lg font-bold tracking-widest text-white underline transition-colors hover:text-gray-200 md:text-2xl"
-                            >
-                                {t('homepage.hero.discover')}
-                            </a>
+            </div>
+            
+            {/* Bottom center overlay text for each video - Mobile Responsive - Positioned above hover divs */}
+            <div className="fixed bottom-16 left-1/2 z-40 flex w-full -translate-x-1/2 transform justify-center px-4 md:bottom-16 md:px-0 pointer-events-none">
+                <div
+                    className={`transition-opacity duration-700 ${hovered === 'right' ? 'opacity-0' : 'opacity-100'}`}
+                >
+                    <div className="text-center">
+                        <div className="font-supreme pointer-events-auto mb-2 text-lg font-medium text-white uppercase select-text text-shadow-md md:text-2xl">
+                            {videoData.side1.topText}
                         </div>
-                        <div className="m-auto mt-8 flex max-w-20 flex-row items-center justify-center gap-2 md:mt-14 md:max-w-24">
-                            <div className="h-[4px] w-[50%] rounded-2xl bg-[#D9D9D9] md:h-[5px]" />
-                            <div className="h-[4px] w-[50%] rounded-2xl bg-[#7A7676] md:h-[5px]" />
+                        <div className="font-recia pointer-events-auto mb-6 text-3xl leading-tight font-medium text-white uppercase select-text text-shadow-md md:mb-10 md:text-5xl">
+                            {videoData.side1.mainText}
                         </div>
+                        <a
+                            href={videoData.side1.discoverLink}
+                            className="font-supreme pointer-events-auto text-lg font-bold tracking-widest text-white underline transition-colors hover:text-gray-200 md:text-2xl"
+                        >
+                            {t('homepage.hero.discover')}
+                        </a>
                     </div>
-                    <div
-                        className={`absolute left-1/2 w-full -translate-x-1/2 transition-opacity duration-700 ${hovered === 'right' ? 'opacity-100' : 'opacity-0'}`}
-                    >
-                        <div className="text-center">
-                            <div className="font-supreme pointer-events-auto mb-2 text-lg font-medium text-white uppercase select-text text-shadow-md md:text-2xl">
-                                {videoData.side2.topText}
-                            </div>
-                            <div className="font-recia pointer-events-auto mb-6 text-3xl leading-tight font-medium text-white uppercase select-text text-shadow-md md:mb-10 md:text-5xl">
-                                {videoData.side2.mainText}
-                            </div>
-                            <a
-                                href={videoData.side2.discoverLink}
-                                className="font-supreme pointer-events-auto text-lg font-bold tracking-widest text-white underline transition-colors hover:text-gray-200 md:text-2xl"
-                            >
-                                {t('homepage.hero.discover')}
-                            </a>
+                    <div className="m-auto mt-8 flex max-w-20 flex-row items-center justify-center gap-2 md:mt-14 md:max-w-24">
+                        <div className="h-[4px] w-[50%] rounded-2xl bg-[#D9D9D9] md:h-[5px]" />
+                        <div className="h-[4px] w-[50%] rounded-2xl bg-[#7A7676] md:h-[5px]" />
+                    </div>
+                </div>
+                <div
+                    className={`absolute left-1/2 w-full -translate-x-1/2 transition-opacity duration-700 ${hovered === 'right' ? 'opacity-100' : 'opacity-0'}`}
+                >
+                    <div className="text-center">
+                        <div className="font-supreme pointer-events-auto mb-2 text-lg font-medium text-white uppercase select-text text-shadow-md md:text-2xl">
+                            {videoData.side2.topText}
                         </div>
-                        <div className="m-auto mt-8 flex max-w-20 flex-row items-center justify-center gap-2 md:mt-14 md:max-w-24">
-                            <div className="h-[4px] w-[50%] rounded-2xl bg-[#7A7676] md:h-[5px]" />
-                            <div className="h-[4px] w-[50%] rounded-2xl bg-[#D9D9D9] md:h-[5px]" />
+                        <div className="font-recia pointer-events-auto mb-6 text-3xl leading-tight font-medium text-white uppercase select-text text-shadow-md md:mb-10 md:text-5xl">
+                            {videoData.side2.mainText}
                         </div>
+                        <a
+                            href={videoData.side2.discoverLink}
+                            className="font-supreme pointer-events-auto text-lg font-bold tracking-widest text-white underline transition-colors hover:text-gray-200 md:text-2xl"
+                        >
+                            {t('homepage.hero.discover')}
+                        </a>
+                    </div>
+                    <div className="m-auto mt-8 flex max-w-20 flex-row items-center justify-center gap-2 md:mt-14 md:max-w-24">
+                        <div className="h-[4px] w-[50%] rounded-2xl bg-[#7A7676] md:h-[5px]" />
+                        <div className="h-[4px] w-[50%] rounded-2xl bg-[#D9D9D9] md:h-[5px]" />
                     </div>
                 </div>
             </div>
+            
             <div className="relative z-0 flex h-svh flex-row">
                 {/* Trigger Divs - Desktop hover, Mobile touch */}
                 <div
