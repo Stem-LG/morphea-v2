@@ -89,12 +89,26 @@ const ALLOWED_SETTING_KEYS = [
   'homepage_creators_subtitle_en',
   'homepage_creators_subtitle_fr',
   'homepage_creators_images', // JSON array of image URLs
+  // Homepage Video Animation Section
+  'homepage_video_animation_title_en',
+  'homepage_video_animation_title_fr',
+  'homepage_video_animation_description_en',
+  'homepage_video_animation_description_fr',
+  'homepage_video_animation_button_text_en',
+  'homepage_video_animation_button_text_fr',
+  'homepage_video_animation_button_link',
   // Footer Settings
   'footer_social_facebook_url',
   'footer_social_instagram_url',
   'footer_social_twitter_url',
   'footer_social_linkedin_url',
-  'footer_categories_ids' // JSON array of category IDs to display
+  'footer_categories_ids', // JSON array of category IDs to display
+  'footer_link_origin',
+  'footer_link_events',
+  'footer_link_my_account',
+  'footer_link_orders_delivery',
+  'footer_link_cookies_privacy',
+  'footer_link_terms'
 ]
 
 export function useUpdateSetting() {

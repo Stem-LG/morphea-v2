@@ -162,6 +162,20 @@ export function HomepageSettings() {
                 return homeSettings?.footer.links.cookiesPrivacy || ''
             case 'footer_link_terms':
                 return homeSettings?.footer.links.terms || ''
+            case 'homepage_video_animation_title_en':
+                return homeSettings?.videoAnimation.title.en || ''
+            case 'homepage_video_animation_title_fr':
+                return homeSettings?.videoAnimation.title.fr || ''
+            case 'homepage_video_animation_description_en':
+                return homeSettings?.videoAnimation.description.en || ''
+            case 'homepage_video_animation_description_fr':
+                return homeSettings?.videoAnimation.description.fr || ''
+            case 'homepage_video_animation_button_text_en':
+                return homeSettings?.videoAnimation.buttonText.en || ''
+            case 'homepage_video_animation_button_text_fr':
+                return homeSettings?.videoAnimation.buttonText.fr || ''
+            case 'homepage_video_animation_button_link':
+                return homeSettings?.videoAnimation.buttonLink || ''
             default:
                 return ''
         }
@@ -294,9 +308,12 @@ export function HomepageSettings() {
             </div>
 
             <Tabs defaultValue="hero" className="w-full">
-                <TabsList className="grid w-full grid-cols-5 bg-slate-800/50">
+                <TabsList className="grid w-full grid-cols-6 bg-slate-800/50">
                     <TabsTrigger value="hero">
                         {t('admin.settings.hero')}
+                    </TabsTrigger>
+                    <TabsTrigger value="video-animation">
+                        Video Animation
                     </TabsTrigger>
                     <TabsTrigger value="collections">
                         {t('admin.settings.collections')}
@@ -826,6 +843,321 @@ export function HomepageSettings() {
                                         {t('admin.settings.save')}
                                     </Button>
                                 </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </TabsContent>
+
+                {/* Video Animation Section */}
+                <TabsContent value="video-animation" className="space-y-6">
+                    <Card className="border-slate-700 bg-slate-800/50">
+                        <CardHeader>
+                            <CardTitle className="text-white">
+                                Video Animation Section
+                            </CardTitle>
+                            <CardDescription>
+                                Configure the text content for the video
+                                animation section that appears after the hero
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-6">
+                            {/* Title */}
+                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                <div className="space-y-2">
+                                    <Label className="text-white">
+                                        Title (English)
+                                    </Label>
+                                    <Input
+                                        value={getCurrentValue(
+                                            'homepage_video_animation_title_en'
+                                        )}
+                                        onChange={(e) =>
+                                            handleSettingChange(
+                                                'homepage_video_animation_title_en',
+                                                e.target.value
+                                            )
+                                        }
+                                        className="border-slate-600 bg-slate-700 text-white"
+                                        placeholder="The Origin of Morphea"
+                                    />
+                                    <Button
+                                        size="sm"
+                                        onClick={() =>
+                                            handleSaveSetting(
+                                                'homepage_video_animation_title_en'
+                                            )
+                                        }
+                                        disabled={
+                                            updateSetting.isPending ||
+                                            editingSettings[
+                                                'homepage_video_animation_title_en'
+                                            ] === undefined
+                                        }
+                                        className="bg-morpheus-gold-dark hover:bg-morpheus-gold-light"
+                                    >
+                                        {updateSetting.isPending ? (
+                                            <Loader2 className="h-4 w-4 animate-spin" />
+                                        ) : (
+                                            <Save className="h-4 w-4" />
+                                        )}
+                                        {t('admin.settings.save')}
+                                    </Button>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label className="text-white">
+                                        Title (French)
+                                    </Label>
+                                    <Input
+                                        value={getCurrentValue(
+                                            'homepage_video_animation_title_fr'
+                                        )}
+                                        onChange={(e) =>
+                                            handleSettingChange(
+                                                'homepage_video_animation_title_fr',
+                                                e.target.value
+                                            )
+                                        }
+                                        className="border-slate-600 bg-slate-700 text-white"
+                                        placeholder="À L'origine de Morphea"
+                                    />
+                                    <Button
+                                        size="sm"
+                                        onClick={() =>
+                                            handleSaveSetting(
+                                                'homepage_video_animation_title_fr'
+                                            )
+                                        }
+                                        disabled={
+                                            updateSetting.isPending ||
+                                            editingSettings[
+                                                'homepage_video_animation_title_fr'
+                                            ] === undefined
+                                        }
+                                        className="bg-morpheus-gold-dark hover:bg-morpheus-gold-light"
+                                    >
+                                        {updateSetting.isPending ? (
+                                            <Loader2 className="h-4 w-4 animate-spin" />
+                                        ) : (
+                                            <Save className="h-4 w-4" />
+                                        )}
+                                        {t('admin.settings.save')}
+                                    </Button>
+                                </div>
+                            </div>
+
+                            {/* Description */}
+                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                <div className="space-y-2">
+                                    <Label className="text-white">
+                                        Description (English)
+                                    </Label>
+                                    <Textarea
+                                        value={getCurrentValue(
+                                            'homepage_video_animation_description_en'
+                                        )}
+                                        onChange={(e) =>
+                                            handleSettingChange(
+                                                'homepage_video_animation_description_en',
+                                                e.target.value
+                                            )
+                                        }
+                                        className="border-slate-600 bg-slate-700 text-white"
+                                        placeholder="At the origin of Morphea, this space dedicated to luxury fashion..."
+                                        rows={4}
+                                    />
+                                    <Button
+                                        size="sm"
+                                        onClick={() =>
+                                            handleSaveSetting(
+                                                'homepage_video_animation_description_en'
+                                            )
+                                        }
+                                        disabled={
+                                            updateSetting.isPending ||
+                                            editingSettings[
+                                                'homepage_video_animation_description_en'
+                                            ] === undefined
+                                        }
+                                        className="bg-morpheus-gold-dark hover:bg-morpheus-gold-light"
+                                    >
+                                        {updateSetting.isPending ? (
+                                            <Loader2 className="h-4 w-4 animate-spin" />
+                                        ) : (
+                                            <Save className="h-4 w-4" />
+                                        )}
+                                        {t('admin.settings.save')}
+                                    </Button>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label className="text-white">
+                                        Description (French)
+                                    </Label>
+                                    <Textarea
+                                        value={getCurrentValue(
+                                            'homepage_video_animation_description_fr'
+                                        )}
+                                        onChange={(e) =>
+                                            handleSettingChange(
+                                                'homepage_video_animation_description_fr',
+                                                e.target.value
+                                            )
+                                        }
+                                        className="border-slate-600 bg-slate-700 text-white"
+                                        placeholder="A l'origine de Morphea, cet espace dédié à la mode de luxe..."
+                                        rows={4}
+                                    />
+                                    <Button
+                                        size="sm"
+                                        onClick={() =>
+                                            handleSaveSetting(
+                                                'homepage_video_animation_description_fr'
+                                            )
+                                        }
+                                        disabled={
+                                            updateSetting.isPending ||
+                                            editingSettings[
+                                                'homepage_video_animation_description_fr'
+                                            ] === undefined
+                                        }
+                                        className="bg-morpheus-gold-dark hover:bg-morpheus-gold-light"
+                                    >
+                                        {updateSetting.isPending ? (
+                                            <Loader2 className="h-4 w-4 animate-spin" />
+                                        ) : (
+                                            <Save className="h-4 w-4" />
+                                        )}
+                                        {t('admin.settings.save')}
+                                    </Button>
+                                </div>
+                            </div>
+
+                            {/* Button Text */}
+                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                <div className="space-y-2">
+                                    <Label className="text-white">
+                                        Button Text (English)
+                                    </Label>
+                                    <Input
+                                        value={getCurrentValue(
+                                            'homepage_video_animation_button_text_en'
+                                        )}
+                                        onChange={(e) =>
+                                            handleSettingChange(
+                                                'homepage_video_animation_button_text_en',
+                                                e.target.value
+                                            )
+                                        }
+                                        className="border-slate-600 bg-slate-700 text-white"
+                                        placeholder="Learn more"
+                                    />
+                                    <Button
+                                        size="sm"
+                                        onClick={() =>
+                                            handleSaveSetting(
+                                                'homepage_video_animation_button_text_en'
+                                            )
+                                        }
+                                        disabled={
+                                            updateSetting.isPending ||
+                                            editingSettings[
+                                                'homepage_video_animation_button_text_en'
+                                            ] === undefined
+                                        }
+                                        className="bg-morpheus-gold-dark hover:bg-morpheus-gold-light"
+                                    >
+                                        {updateSetting.isPending ? (
+                                            <Loader2 className="h-4 w-4 animate-spin" />
+                                        ) : (
+                                            <Save className="h-4 w-4" />
+                                        )}
+                                        {t('admin.settings.save')}
+                                    </Button>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label className="text-white">
+                                        Button Text (French)
+                                    </Label>
+                                    <Input
+                                        value={getCurrentValue(
+                                            'homepage_video_animation_button_text_fr'
+                                        )}
+                                        onChange={(e) =>
+                                            handleSettingChange(
+                                                'homepage_video_animation_button_text_fr',
+                                                e.target.value
+                                            )
+                                        }
+                                        className="border-slate-600 bg-slate-700 text-white"
+                                        placeholder="En savoir plus"
+                                    />
+                                    <Button
+                                        size="sm"
+                                        onClick={() =>
+                                            handleSaveSetting(
+                                                'homepage_video_animation_button_text_fr'
+                                            )
+                                        }
+                                        disabled={
+                                            updateSetting.isPending ||
+                                            editingSettings[
+                                                'homepage_video_animation_button_text_fr'
+                                            ] === undefined
+                                        }
+                                        className="bg-morpheus-gold-dark hover:bg-morpheus-gold-light"
+                                    >
+                                        {updateSetting.isPending ? (
+                                            <Loader2 className="h-4 w-4 animate-spin" />
+                                        ) : (
+                                            <Save className="h-4 w-4" />
+                                        )}
+                                        {t('admin.settings.save')}
+                                    </Button>
+                                </div>
+                            </div>
+
+                            {/* Button Link */}
+                            <div className="space-y-2">
+                                <Label className="text-white">
+                                    Button Link
+                                </Label>
+                                <Input
+                                    value={getCurrentValue(
+                                        'homepage_video_animation_button_link'
+                                    )}
+                                    onChange={(e) =>
+                                        handleSettingChange(
+                                            'homepage_video_animation_button_link',
+                                            e.target.value
+                                        )
+                                    }
+                                    className="border-slate-600 bg-slate-700 text-white"
+                                    placeholder="https://morpheus-sa.com/"
+                                />
+                                <Button
+                                    size="sm"
+                                    onClick={() =>
+                                        handleSaveSetting(
+                                            'homepage_video_animation_button_link'
+                                        )
+                                    }
+                                    disabled={
+                                        updateSetting.isPending ||
+                                        editingSettings[
+                                            'homepage_video_animation_button_link'
+                                        ] === undefined
+                                    }
+                                    className="bg-morpheus-gold-dark hover:bg-morpheus-gold-light"
+                                >
+                                    {updateSetting.isPending ? (
+                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                    ) : (
+                                        <Save className="h-4 w-4" />
+                                    )}
+                                    {t('admin.settings.save')}
+                                </Button>
                             </div>
                         </CardContent>
                     </Card>

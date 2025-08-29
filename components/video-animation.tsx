@@ -4,6 +4,7 @@ import { useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { useLanguage } from '@/hooks/useLanguage'
 import { useIsMobile } from '@/hooks/use-mobile'
+import { useHomeSettings } from '@/hooks/use-home-settings'
 import Link from 'next/link'
 
 export default function VideoAnimation() {
@@ -23,6 +24,25 @@ export default function VideoAnimation() {
     const isMobile = useIsMobile()
 
     const { language } = useLanguage()
+    const { data: homeSettings } = useHomeSettings()
+
+    // Get text content from settings with fallbacks
+    const title =
+        homeSettings?.videoAnimation.title[language] ||
+        (language === 'fr' ? "À L'origine de Morphea" : 'The Origin of Morphea')
+
+    const description =
+        homeSettings?.videoAnimation.description[language] ||
+        (language === 'fr'
+            ? "A l'origine de Morphea, cet espace dédié à la mode de luxe, il y a Morpheus le Créateur d'expériences uniques où mode, art de vivre et luxe se rencontrent et révèlent des talents et des savoir-faire d'exception qui allient héritages et innovation."
+            : 'At the origin of Morphea, this space dedicated to luxury fashion, there is Morpheus the Creator of unique experiences where fashion, lifestyle and luxury meet and reveal exceptional talents and know-how that combine heritage and innovation.')
+
+    const buttonText =
+        homeSettings?.videoAnimation.buttonText[language] ||
+        (language === 'fr' ? 'En savoir plus' : 'Learn more')
+
+    const buttonLink =
+        homeSettings?.videoAnimation.buttonLink || 'https://morpheus-sa.com/'
 
     return (
         <section className="relative z-20 bg-white">
@@ -93,25 +113,19 @@ export default function VideoAnimation() {
                     >
                         <div className="flex max-w-3xl flex-col gap-3 md:gap-6">
                             <h2 className="font-recia text-center text-xl leading-tight font-extrabold text-[#053340] sm:text-2xl md:text-4xl lg:text-5xl">
-                                {language === 'fr'
-                                    ? "À L'origine de Morphea"
-                                    : 'The Origin of Morphea'}
+                                {title}
                             </h2>
                             <p className="font-supreme text-center text-sm leading-relaxed text-gray-600 sm:text-base md:text-lg lg:text-xl">
-                                {language === 'fr'
-                                    ? "A l'origine de Morphea, cet espace dédié à la mode de luxe, il y a Morpheus le Créateur d'expériences uniques où mode, art de vivre et luxe se rencontrent et révèlent des talents et des savoir-faire d'exception qui allient héritages et innovation."
-                                    : 'At the origin of Morphea, this space dedicated to luxury fashion, there is Morpheus the Creator of unique experiences where fashion, lifestyle and luxury meet and reveal exceptional talents and know-how that combine heritage and innovation.'}
+                                {description}
                             </p>
                             <div className="mt-3 flex justify-center md:mt-6">
                                 <Link
-                                    href="https://morpheus-sa.com/"
+                                    href={buttonLink}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="font-supreme w-fit rounded-[30px] bg-gradient-to-r from-[#053340] to-[#0E4D66] px-5 py-2.5 text-base font-semibold text-white transition-all duration-300 hover:from-[#042a35] hover:to-[#0a3d52] md:px-6 md:py-3 md:text-lg lg:text-xl"
                                 >
-                                    {language === 'fr'
-                                        ? 'En savoir plus'
-                                        : 'Learn more'}
+                                    {buttonText}
                                 </Link>
                             </div>
                         </div>
