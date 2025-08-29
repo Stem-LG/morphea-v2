@@ -1,51 +1,51 @@
-"use client";
-import React, { useState } from "react";
-import { useAuth } from "@/hooks/useAuth";
-import { ModernSidebar } from "./_components/modern-sidebar";
-import { LoadingScreen } from "./_components/loading-screen";
-import { AccessDenied } from "./_components/access-denied";
+'use client'
+import React, { useState } from 'react'
+import { useAuth } from '@/hooks/useAuth'
+import { ModernSidebar } from './_components/modern-sidebar'
+import { LoadingScreen } from './_components/loading-screen'
+import { AccessDenied } from './_components/access-denied'
 
 interface AdminV2LayoutProps {
-    children: React.ReactNode;
+    children: React.ReactNode
 }
 
 export default function AdminV2Layout({ children }: AdminV2LayoutProps) {
-    const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [sidebarOpen, setSidebarOpen] = useState(false)
 
-    const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+    const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
-    const { data: user, isLoading } = useAuth();
+    const { data: user, isLoading } = useAuth()
 
     // Show loading screen while checking authentication
     if (isLoading) {
-        return <LoadingScreen />;
+        return <LoadingScreen />
     }
 
     // Check if user has admin or store_admin role
-    const userMetadata = user?.app_metadata as { roles?: string[] };
-    const roles = userMetadata?.roles || [];
-    const hasAccess = roles.includes("admin") || roles.includes("store_admin");
+    const userMetadata = user?.app_metadata as { roles?: string[] }
+    const roles = userMetadata?.roles || []
+    const hasAccess = roles.includes('admin') || roles.includes('store_admin')
 
     if (!hasAccess) {
-        return <AccessDenied />;
+        return <AccessDenied />
     }
 
     return (
-        <div className="bg-gradient-to-br from-morpheus-blue-dark to-morpheus-blue-light flex min-h-[calc(100svh-6rem)] w-full">
+        <div className="flex min-h-[calc(100svh-6rem)] w-full bg-gradient-to-br from-white to-gray-50">
             {/* Modern Sidebar - Account for existing navbar */}
             <ModernSidebar
                 isOpen={sidebarOpen}
                 isCollapsed={sidebarCollapsed}
                 onToggle={() => setSidebarOpen(!sidebarOpen)}
                 onCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
-                userRole={roles.includes("admin") ? "admin" : "store_admin"}
+                userRole={roles.includes('admin') ? 'admin' : 'store_admin'}
             />
 
             {/* Main Content Area */}
-            <div className={`flex-1 w-full transition-all duration-300`}>
+            <div className={`w-full flex-1 transition-all duration-300`}>
                 {/* Page Content - No duplicate top navigation */}
                 <main className="w-full">
-                    <div className="w-full bg-gradient-to-br from-morpheus-blue-dark/20 to-morpheus-blue-light/20 border border-slate-700/50 shadow-2xl min-h-[calc(100vh-6rem)]">
+                    <div className="min-h-[calc(100vh-6rem)] w-full border border-gray-200/50 bg-gradient-to-br from-gray-50/50 to-white/50 shadow-2xl">
                         {children}
                     </div>
                 </main>
@@ -53,8 +53,11 @@ export default function AdminV2Layout({ children }: AdminV2LayoutProps) {
 
             {/* Mobile Overlay */}
             {sidebarOpen && (
-                <div className="lg:hidden fixed inset-0 bg-black/50 z-40" onClick={() => setSidebarOpen(false)} />
+                <div
+                    className="fixed inset-0 z-40 bg-gray-900/20 lg:hidden"
+                    onClick={() => setSidebarOpen(false)}
+                />
             )}
         </div>
-    );
+    )
 }
