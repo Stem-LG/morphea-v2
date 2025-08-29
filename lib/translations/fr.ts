@@ -902,6 +902,10 @@ export const frTranslations = {
       "websiteUrlDescription": "L'URL principale du site web pour votre application",
       "defaultCurrency": "Devise par Défaut",
       "defaultCurrencyDescription": "La devise par défaut pour les nouveaux utilisateurs et l'affichage des prix",
+      "deliveryFee": "Frais de Livraison",
+      "deliveryFeeDescription": "Frais de livraison standard facturés pour les commandes",
+      "deliveryFeeCurrency": "Devise des Frais de Livraison",
+      "deliveryFeeCurrencyDescription": "La devise dans laquelle les frais de livraison sont définis",
       "poweredBy": "Powered by",
       "poweredByDescription": "Texte à afficher dans le pied de page 'Powered by'",
       "mellimeUrl": "URL Mellime",
@@ -1549,7 +1553,7 @@ export const frTranslations = {
     "nameAsc": "Nom : A à Z",
     "nameDesc": "Nom : Z à A",
     "newest": "Plus récent",
-    "results":"Resultats"
+    "results": "Resultats"
   },
   "notifications": {
     "title": "Notifications",

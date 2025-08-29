@@ -7,13 +7,14 @@ import { useQuery } from "@tanstack/react-query"
 export function useCart() {
 
   const supabase = createClient();
-  const { data: userData, isError } = useAuth()
+  const { data: userData, isError, isLoading: isAuthLoading } = useAuth()
 
   return useQuery({
     queryKey: ["cart"],
     queryFn: async () => {
 
-      if (!userData || isError) return [];
+      if (isError) return [];
+      if (!userData) throw new Error("User not authenticated");
 
       const { data, error } = await supabase
         .schema("morpheus")
@@ -45,7 +46,7 @@ export function useCart() {
                 `)
                 .eq("yvarprodidfk", item.yvarprod.yvarprodid)
                 .limit(1);
-              
+
               return {
                 ...item,
                 yvarprod: {
@@ -65,6 +66,7 @@ export function useCart() {
 
       return data || [];
     },
+    enabled: !isAuthLoading && !!userData, // Only run when auth is loaded and user exists
   })
 
 }

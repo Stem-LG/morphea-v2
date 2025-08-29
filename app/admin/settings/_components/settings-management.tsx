@@ -63,6 +63,22 @@ const getPredefinedSettings = (
         required: false,
     },
     {
+        key: 'delivery_fee',
+        label: t('admin.settings.deliveryFee'),
+        description: t('admin.settings.deliveryFeeDescription'),
+        type: 'number' as const,
+        defaultValue: '10',
+        required: false,
+    },
+    {
+        key: 'delivery_fee_currency_id',
+        label: t('admin.settings.deliveryFeeCurrency'),
+        description: t('admin.settings.deliveryFeeCurrencyDescription'),
+        type: 'currency_select' as const,
+        defaultValue: '',
+        required: false,
+    },
+    {
         key: 'powered_by',
         label: t('admin.settings.poweredBy'),
         description: t('admin.settings.poweredByDescription'),

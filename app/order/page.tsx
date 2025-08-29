@@ -5,6 +5,7 @@ import { useCurrency } from '@/hooks/useCurrency'
 import { useAuth } from '@/hooks/useAuth'
 import { useCart } from '@/app/_hooks/cart/useCart'
 import { useCreateOrder } from '@/app/_hooks/order/useCreateOrder'
+import { useDeliveryFee } from '@/hooks/use-delivery-fee'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -37,11 +38,14 @@ interface PaymentForm {
 
 export default function OrderPage() {
     const { t } = useLanguage()
-    const { formatPrice, currencies, convertPrice } = useCurrency()
+    const { formatPrice, currencies, convertPrice, currentCurrency } =
+        useCurrency()
     const { data: currentUser } = useAuth()
     const router = useRouter()
     const { data: cartItems = [], isLoading } = useCart()
     const createOrderMutation = useCreateOrder()
+    const { data: deliveryFee = 10, isLoading: isLoadingDeliveryFee } =
+        useDeliveryFee()
 
     // Stepper state
     const [currentStep, setCurrentStep] = useState(1)
@@ -175,7 +179,7 @@ export default function OrderPage() {
 
     const subtotal = calculateSubtotal()
     const discount = calculateDiscount()
-    const shipping = 10 // Fixed shipping cost
+    const shipping = deliveryFee // Dynamic delivery fee from settings
     const total = subtotal - discount + shipping
 
     // Stepper navigation functions
@@ -984,7 +988,11 @@ export default function OrderPage() {
                                         {t('order.subtotal')}
                                     </span>
                                     <span className="font-semibold">
-                                        {formatPrice(subtotal)}
+                                        {formatPrice(
+                                            subtotal,
+                                            currentCurrency,
+                                            currentCurrency
+                                        )}
                                     </span>
                                 </div>
                                 {discount > 0 && (
@@ -993,7 +1001,12 @@ export default function OrderPage() {
                                             {t('order.discount')}
                                         </span>
                                         <span className="font-supreme font-semibold">
-                                            -{formatPrice(discount)}
+                                            -
+                                            {formatPrice(
+                                                discount,
+                                                currentCurrency,
+                                                currentCurrency
+                                            )}
                                         </span>
                                     </div>
                                 )}
@@ -1002,7 +1015,11 @@ export default function OrderPage() {
                                         {t('cart.shipping')}
                                     </span>
                                     <span className="font-semibold">
-                                        {formatPrice(shipping)}
+                                        {formatPrice(
+                                            shipping,
+                                            currentCurrency,
+                                            currentCurrency
+                                        )}
                                     </span>
                                 </div>
                                 <Separator className="bg-gray-200" />
@@ -1011,7 +1028,11 @@ export default function OrderPage() {
                                         {t('cart.total')}
                                     </span>
                                     <span className="font-recia text-[#053340]">
-                                        {formatPrice(total)}
+                                        {formatPrice(
+                                            total,
+                                            currentCurrency,
+                                            currentCurrency
+                                        )}
                                     </span>
                                 </div>
                             </CardContent>

@@ -43,6 +43,8 @@ const ALLOWED_SETTING_KEYS = [
   'default_currency_id',
   'powered_by',
   'mellime_url',
+  'delivery_fee',
+  "delivery_fee_currency_id",
   // Homepage Hero Section
   'homepage_hero_video1_url',
   'homepage_hero_video1_top_text_en',
