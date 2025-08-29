@@ -22,6 +22,7 @@ import {
     AlertCircle,
 } from "lucide-react";
 import { useUpdateCurrency } from "../_hooks/use-update-currency";
+import { useCurrenciesWithStats } from "../_hooks/use-currencies-with-stats";
 import type { Database } from "@/lib/supabase";
 
 type Currency = Database['morpheus']['Tables']['xdevise']['Row'] & {
@@ -46,6 +47,10 @@ interface EditCurrencyDialogProps {
 export function EditCurrencyDialog({ currency, isOpen, onClose }: EditCurrencyDialogProps) {
     const { t } = useLanguage();
     const updateCurrencyMutation = useUpdateCurrency();
+    const { data: currencies } = useCurrenciesWithStats();
+    
+    // Get current pivot currency
+    const currentPivotCurrency = currencies?.find(curr => curr.xispivot);
     
     const [formData, setFormData] = useState<CurrencyFormData>({
         xdeviseintitule: "",
@@ -65,7 +70,7 @@ export function EditCurrencyDialog({ currency, isOpen, onClose }: EditCurrencyDi
                 xdeviseintitule: currency.xdeviseintitule || "",
                 xdevisecodealpha: currency.xdevisecodealpha || "",
                 xdevisecodenum: currency.xdevisecodenum || "",
-                xdevisenbrdec: currency.xdevisenbrdec || 2,
+                xdevisenbrdec: currency.xdevisenbrdec ?? 2,
                 xdeviseboolautorisepaiement: currency.xdeviseboolautorisepaiement === "Y" ? "true" : "false",
                 xtauxechange: currency.xtauxechange || 1.0
             });
@@ -272,19 +277,30 @@ export function EditCurrencyDialog({ currency, isOpen, onClose }: EditCurrencyDi
                         
                         <div>
                             <Label className="text-gray-300">
-                                {t('admin.currencies.exchangeRateLabel')}
+                                1 {currentPivotCurrency?.xdevisecodealpha || 'Pivot'} = {formData.xtauxechange || 1.0} {formData.xdeviseintitule || 'This Currency'}
                             </Label>
                             <div className="flex items-center gap-2 mt-1">
                                 <TrendingUp className="h-4 w-4 text-blue-400" />
                                 <Input
                                     type="number"
-                                    step="0.0000000001"
+                                    step="any"
                                     min="0.0000000001"
                                     value={formData.xtauxechange}
-                                    onChange={(e) => setFormData(prev => ({
-                                        ...prev,
-                                        xtauxechange: parseFloat(e.target.value) || 1.0
-                                    }))}
+                                    onChange={(e) => {
+                                        const inputValue = e.target.value;
+                                        const maxDecimals = formData.xdevisenbrdec;
+                                        
+                                        // Check decimal places
+                                        const decimalIndex = inputValue.indexOf('.');
+                                        const actualDecimals = decimalIndex === -1 ? 0 : inputValue.length - decimalIndex - 1;
+                                        
+                                        if (actualDecimals <= maxDecimals) {
+                                            setFormData(prev => ({
+                                                ...prev,
+                                                xtauxechange: parseFloat(inputValue) || 1.0
+                                            }));
+                                        }
+                                    }}
                                     className={`bg-morpheus-blue-dark/30 border-slate-600 text-white ${
                                         errors.xtauxechange ? 'border-red-500' : ''
                                     }`}
