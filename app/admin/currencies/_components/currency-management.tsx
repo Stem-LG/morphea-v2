@@ -277,10 +277,14 @@ export function CurrencyManagement() {
     };
 
     const handleSetAsPivot = (currency: Currency) => {
-        if (!currencies) return;
+        if (!currencies) {
+            return;
+        }
         
         // Prevent multiple clicks by checking if already loading
-        if (pivotChangeHook.isLoading) return;
+        if (pivotChangeHook.isLoading) {
+            return;
+        }
         
         // Ensure we have fresh data
         openPivotChangeDialog(currency, currencies);

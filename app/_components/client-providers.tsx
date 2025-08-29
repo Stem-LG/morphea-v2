@@ -6,6 +6,7 @@ import { LanguageProvider } from '@/hooks/useLanguage'
 import { CurrencyProvider } from '@/hooks/useCurrency'
 import VisitorFormDialog from './visitor-form-dialog'
 import { Toaster } from '@/components/ui/sonner'
+import { TooltipProvider } from '@/components/ui/tooltip'
 import NavBar from './nav_bar'
 
 const queryClient = new QueryClient()
@@ -20,11 +21,13 @@ export default function ClientProviders({
             <NuqsAdapter>
                 <LanguageProvider>
                     <CurrencyProvider>
-                        <NavBar />
-                        {/* Main content with navbar spacing */}
-                        <div className="relative z-10">{children}</div>
-                        {/* Visitor form dialog */}
-                        <VisitorFormDialog />
+                        <TooltipProvider>
+                            <NavBar />
+                            {/* Main content with navbar spacing */}
+                            <div className="relative z-10">{children}</div>
+                            {/* Visitor form dialog */}
+                            <VisitorFormDialog />
+                        </TooltipProvider>
                     </CurrencyProvider>
                 </LanguageProvider>
             </NuqsAdapter>

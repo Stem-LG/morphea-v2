@@ -248,12 +248,12 @@ export function PivotChangeStepperComponent({
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center gap-2 mb-4">
-              <Badge variant="outline" className="text-gray-400 border-gray-600">
-                {currentRateData.currencyCode}
-              </Badge>
-              <span className="text-gray-300">→</span>
               <Badge className="text-yellow-400 bg-yellow-400/10 border-yellow-400/20">
                 {selectedCurrency.xdevisecodealpha}
+              </Badge>
+              <span className="text-gray-300">→</span>
+              <Badge variant="outline" className="text-gray-400 border-gray-600">
+                {currentRateData.currencyCode}
               </Badge>
             </div>
 

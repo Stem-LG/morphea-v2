@@ -37,11 +37,20 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
+  // Explicitly protect profile routes - ensure user is authenticated for any profile page
+  if (user && user.is_anonymous && request.nextUrl.pathname.startsWith('/profile')) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/auth/login'
+    return NextResponse.redirect(url)
+  }
+
+  // General protection for other authenticated routes
   if (
     !user &&
     !request.nextUrl.pathname.startsWith('/login') &&
     !request.nextUrl.pathname.startsWith('/auth') &&
     !request.nextUrl.pathname.startsWith('/shop') &&
+    !request.nextUrl.pathname.startsWith('/profile') && // Already handled above
     request.nextUrl.pathname !== '/' &&
     request.nextUrl.pathname !== '/main'
   ) {

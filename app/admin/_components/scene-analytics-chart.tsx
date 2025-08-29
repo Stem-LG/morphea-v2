@@ -250,7 +250,7 @@ export function SceneAnalyticsChart({ className }: SceneAnalyticsChartProps) {
                                     <p className="mb-1 text-2xl font-bold text-gray-900">
                                         {item.value}
                                     </p>
-                                    <div className="flex items-center gap-1">
+                                    {/* <div className="flex items-center gap-1">
                                         <TrendingUp className="h-3 w-3 text-emerald-400" />
                                         <span className="text-xs font-medium text-emerald-400">
                                             {item.change}
@@ -258,7 +258,7 @@ export function SceneAnalyticsChart({ className }: SceneAnalyticsChartProps) {
                                         <span className="text-xs text-gray-400">
                                             vs last month
                                         </span>
-                                    </div>
+                                    </div> */}
                                 </div>
                                 <div
                                     className={`${item.bgColor} ${item.color} rounded-lg p-3`}

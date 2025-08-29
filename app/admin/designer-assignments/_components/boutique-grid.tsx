@@ -117,7 +117,7 @@ export function BoutiqueGrid({ eventId, mallId, boutiques, assignments, isLoadin
                 return (
                     <Card
                         key={boutique.yboutiqueid}
-                        className="bg-gradient-to-br from-gray-900/50 to-gray-800/30 border-gray-700/50 backdrop-blur-sm hover:border-morpheus-gold-light/30 transition-all duration-300"
+                        className="flex flex-col justify-between bg-gradient-to-br from-gray-900/50 to-gray-800/30 border-gray-700/50 backdrop-blur-sm hover:border-morpheus-gold-light/30 transition-all duration-300"
                     >
                         <CardHeader>
                             <div className="flex items-center gap-3">
@@ -139,6 +139,7 @@ export function BoutiqueGrid({ eventId, mallId, boutiques, assignments, isLoadin
                                 )}
                             </div>
                         </CardHeader>
+
                         <CardContent className="space-y-4">
                             {hasDesigner && assignment?.ydesign ? (
                                 <div className="space-y-3">

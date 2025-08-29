@@ -70,18 +70,18 @@ export function ModernSidebar({
                 roles: ['admin', 'store_admin'],
             },
             {
-                id: 'designer-assignments',
-                label: t('admin.designerAssignments.title'),
-                icon: Users,
-                href: '/admin/designer-assignments',
-                roles: ['admin'],
-            },
-            {
                 id: 'boutiques',
                 label: t('admin.storeManagement'),
                 icon: Store,
                 href: '/admin/stores',
                 roles: ['admin', 'store_admin'],
+            },
+            {
+                id: 'designer-assignments',
+                label: t('admin.designerAssignments.title'),
+                icon: Users,
+                href: '/admin/designer-assignments',
+                roles: ['admin'],
             },
             {
                 id: 'orders',

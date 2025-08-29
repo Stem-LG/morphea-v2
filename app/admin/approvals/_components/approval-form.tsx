@@ -420,9 +420,26 @@ function VariantCard({ variant, onApprove, onReject, isLoading, eventStartDate, 
                                     <Label className="text-xs text-gray-400">{t("admin.approvals.catalogPriceRequired")}</Label>
                                     <Input
                                         type="number"
-                                        step="0.01"
+                                        step={(() => {
+                                            const selectedCurrency = currencies?.find(c => c.xdeviseid === selectedCurrencyId);
+                                            const decimals = selectedCurrency?.xdevisenbrdec ?? 2;
+                                            if (decimals === 0) return "1";
+                                            return (1 / Math.pow(10, decimals)).toFixed(decimals);
+                                        })()}
                                         value={catalogPrice}
-                                        onChange={(e) => setCatalogPrice(e.target.value)}
+                                        onChange={(e) => {
+                                            const inputValue = e.target.value;
+                                            const selectedCurrency = currencies?.find(c => c.xdeviseid === selectedCurrencyId);
+                                            const maxDecimals = selectedCurrency?.xdevisenbrdec ?? 2;
+                                            
+                                            // Check decimal places
+                                            const decimalIndex = inputValue.indexOf('.');
+                                            const actualDecimals = decimalIndex === -1 ? 0 : inputValue.length - decimalIndex - 1;
+                                            
+                                            if (actualDecimals <= maxDecimals) {
+                                                setCatalogPrice(inputValue);
+                                            }
+                                        }}
                                         className="h-8 text-xs bg-gray-800 border-gray-600 text-white"
                                         placeholder={t("admin.approvals.requiredCatalogPrice")}
                                         required
@@ -455,9 +472,26 @@ function VariantCard({ variant, onApprove, onReject, isLoading, eventStartDate, 
                                 <Label className="text-xs text-gray-400">{t("admin.approvals.promotionPrice")}</Label>
                                 <Input
                                     type="number"
-                                    step="0.01"
+                                    step={(() => {
+                                        const selectedCurrency = currencies?.find(c => c.xdeviseid === selectedCurrencyId);
+                                        const decimals = selectedCurrency?.xdevisenbrdec ?? 2;
+                                        if (decimals === 0) return "1";
+                                        return (1 / Math.pow(10, decimals)).toFixed(decimals);
+                                    })()}
                                     value={promotionPrice}
-                                    onChange={(e) => setPromotionPrice(e.target.value)}
+                                    onChange={(e) => {
+                                        const inputValue = e.target.value;
+                                        const selectedCurrency = currencies?.find(c => c.xdeviseid === selectedCurrencyId);
+                                        const maxDecimals = selectedCurrency?.xdevisenbrdec ?? 2;
+                                        
+                                        // Check decimal places
+                                        const decimalIndex = inputValue.indexOf('.');
+                                        const actualDecimals = decimalIndex === -1 ? 0 : inputValue.length - decimalIndex - 1;
+                                        
+                                        if (actualDecimals <= maxDecimals) {
+                                            setPromotionPrice(inputValue);
+                                        }
+                                    }}
                                     className="h-8 text-xs bg-gray-800 border-gray-600 text-white"
                                     placeholder={t("admin.approvals.optionalPromotionPrice")}
                                 />

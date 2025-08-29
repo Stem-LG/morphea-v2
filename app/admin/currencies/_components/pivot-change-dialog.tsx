@@ -30,12 +30,23 @@ export function PivotChangeDialog({ pivotChangeHook }: PivotChangeDialogProps) {
     handleStepperComplete,
   } = pivotChangeHook;
 
+  console.log('PivotChangeDialog render:', {
+    isDialogOpen,
+    hasSelectedCurrency: !!selectedCurrency,
+    selectedCurrencyName: selectedCurrency?.xdeviseintitule,
+    allCurrenciesCount: allCurrencies.length
+  });
+
   if (!selectedCurrency) {
+    console.log('PivotChangeDialog: No selected currency, returning null');
     return null;
   }
 
   return (
-    <Dialog open={isDialogOpen} onOpenChange={handleCloseDialog}>
+    <Dialog open={isDialogOpen} onOpenChange={(open) => {
+      console.log('Dialog onOpenChange:', open);
+      if (!open) handleCloseDialog();
+    }}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-gradient-to-br from-morpheus-blue-dark to-morpheus-blue-light border-slate-700/50">
         <DialogHeader>
           <DialogTitle className="text-white flex items-center gap-2">

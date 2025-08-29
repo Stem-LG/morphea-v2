@@ -1199,15 +1199,30 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                                         <Input
                                                                             type="number"
                                                                             min="0"
-                                                                            step="0.01"
+                                                                            step={(() => {
+                                                                                const selectedCurrency = currencies?.find(c => c.xdeviseid === variant.currencyId);
+                                                                                const decimals = selectedCurrency?.xdevisenbrdec ?? 2;
+                                                                                if (decimals === 0) return "1";
+                                                                                return (1 / Math.pow(10, decimals)).toFixed(decimals);
+                                                                            })()}
                                                                             value={variant.catalogPrice || ""}
-                                                                            onChange={(e) =>
-                                                                                handleVariantChange(
-                                                                                    variant.id,
-                                                                                    "catalogPrice",
-                                                                                    parseFloat(e.target.value) || 0
-                                                                                )
-                                                                            }
+                                                                            onChange={(e) => {
+                                                                                const inputValue = e.target.value;
+                                                                                const selectedCurrency = currencies?.find(c => c.xdeviseid === variant.currencyId);
+                                                                                const maxDecimals = selectedCurrency?.xdevisenbrdec ?? 2;
+                                                                                
+                                                                                // Check decimal places
+                                                                                const decimalIndex = inputValue.indexOf('.');
+                                                                                const actualDecimals = decimalIndex === -1 ? 0 : inputValue.length - decimalIndex - 1;
+                                                                                
+                                                                                if (actualDecimals <= maxDecimals) {
+                                                                                    handleVariantChange(
+                                                                                        variant.id,
+                                                                                        "catalogPrice",
+                                                                                        parseFloat(inputValue) || 0
+                                                                                    );
+                                                                                }
+                                                                            }}
                                                                             placeholder="0.00"
                                                                             className="mt-1 bg-gray-600/50 border-gray-500 text-white"
                                                                         />
