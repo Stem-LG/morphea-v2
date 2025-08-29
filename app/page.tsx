@@ -163,7 +163,7 @@ export default function Home() {
                   ],
     }
     return (
-        <div className="relative min-h-[calc(100svh)] w-full">
+        <div className="relative min-h-[100svh] w-full">
             {/* Fullscreen video background with fade animation */}
             <div className="fixed top-0 left-0 h-full w-full">
                 <video
@@ -186,11 +186,10 @@ export default function Home() {
                     muted={isMuted}
                     playsInline
                 />
-
             </div>
-            
+
             {/* Bottom center overlay text for each video - Mobile Responsive - Positioned above hover divs */}
-            <div className="fixed bottom-16 left-1/2 z-40 flex w-full -translate-x-1/2 transform justify-center px-4 md:bottom-16 md:px-0 pointer-events-none">
+            <div className="pointer-events-none relative top-[calc(100vh-320px)] left-1/2 z-50 flex w-full -translate-x-1/2 transform justify-center px-4 sm:top-[calc(100vh-400px)] md:bottom-16 md:px-0">
                 <div
                     className={`transition-opacity duration-700 ${hovered === 'right' ? 'opacity-0' : 'opacity-100'}`}
                 >
@@ -236,8 +235,8 @@ export default function Home() {
                     </div>
                 </div>
             </div>
-            
-            <div className="relative z-0 flex h-svh flex-row">
+
+            <div className="relative z-0 flex h-[calc(100svh-250px)] flex-row sm:h-[calc(100svh-280px)]">
                 {/* Trigger Divs - Desktop hover, Mobile touch */}
                 <div
                     className="pointer-events-auto h-full w-[50vw]"
@@ -250,7 +249,7 @@ export default function Home() {
                     onTouchStart={() => setHovered('right')}
                 />
                 {/* Video Control Buttons - Mobile Responsive */}
-                <div className="absolute bottom-32 left-0 z-50 flex w-full justify-between px-6 md:bottom-40 md:px-14">
+                <div className="absolute bottom-20 left-0 z-50 flex w-full justify-between px-6 sm:bottom-32 md:bottom-40 md:px-14">
                     <button
                         onClick={togglePlayPause}
                         className="flex h-12 w-12 touch-manipulation items-center justify-center rounded-full bg-black/20 backdrop-blur-sm transition-colors hover:bg-black/40 md:h-12 md:w-12"
