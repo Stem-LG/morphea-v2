@@ -26,6 +26,7 @@ import { useCategories } from "../_hooks/use-categories";
 import { Model3DViewer } from "../../../approvals/_components/three-d-viewer";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useVariantVisibility } from "../_hooks/use-variant-visibility";
+import { useAuth } from "@/hooks/useAuth";
 
 interface ProductViewDialogProps {
     isOpen: boolean;
@@ -38,6 +39,12 @@ export function ProductViewDialog({ isOpen, onClose, productId }: ProductViewDia
     const supabase = createClient();
     const { t } = useLanguage();
     const { updateBulkVisibility, isBulkUpdating } = useVariantVisibility();
+    const { data: user } = useAuth();
+
+    // Check if current user is admin (not store_admin)
+    const isAdmin = user?.app_metadata?.roles?.includes('admin');
+    const isStoreAdmin = user?.app_metadata?.roles?.includes('store_admin');
+    const canEditVisibility = isAdmin;
 
     // Fetch product details (same query as approval form but read-only)
     const { data: product, isLoading: productLoading } = useQuery({
@@ -204,6 +211,22 @@ export function ProductViewDialog({ isOpen, onClose, productId }: ProductViewDia
                                             </div>
                                         </div>
                                         <div>
+                                            <Label className="text-gray-700 text-sm">{t("admin.visibility") || "Visibility"}</Label>
+                                            <div className="flex items-center gap-2 mt-1">
+                                                {product.yestvisible ? (
+                                                    <>
+                                                        <Eye className="h-4 w-4 text-green-600" />
+                                                        <span className="text-green-600 font-medium">{t("admin.visible") || "Visible"}</span>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <EyeOff className="h-4 w-4 text-gray-500" />
+                                                        <span className="text-gray-500 font-medium">{t("admin.invisible") || "Hidden"}</span>
+                                                    </>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <div>
                                             <Label className="text-gray-700 text-sm">{t("admin.technicalDetails")}</Label>
                                             <div className="text-gray-700 text-sm bg-gray-100 p-3 rounded border border-gray-200">
                                                 {product.yproddetailstech || t("admin.productView.noTechnicalDetails")}
@@ -314,7 +337,7 @@ export function ProductViewDialog({ isOpen, onClose, productId }: ProductViewDia
                                 </h3>
 
                                 {/* Bulk Visibility Actions for Variants */}
-                                {product.yvarprod?.length > 0 && (
+                                {product.yvarprod?.length > 0 && canEditVisibility && (
                                     <div className="flex items-center gap-2">
                                         <Button
                                             variant="outline"
@@ -338,12 +361,26 @@ export function ProductViewDialog({ isOpen, onClose, productId }: ProductViewDia
                                         </Button>
                                     </div>
                                 )}
+
+                                {/* Visibility Summary for non-admin users */}
+                                {product.yvarprod?.length > 0 && !canEditVisibility && (
+                                    <div className="flex items-center gap-4 text-xs">
+                                        <div className="flex items-center gap-1 text-green-400">
+                                            <Eye className="h-3 w-3" />
+                                            <span>{product.yvarprod?.filter((v: any) => v.yestvisible).length || 0} {t("admin.visible") || "Visible"}</span>
+                                        </div>
+                                        <div className="flex items-center gap-1 text-gray-400">
+                                            <EyeOff className="h-3 w-3" />
+                                            <span>{product.yvarprod?.filter((v: any) => !v.yestvisible).length || 0} {t("admin.invisible") || "Hidden"}</span>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
 
                             <ScrollArea className="h-[calc(95vh-200px)]">
                                 <div className="space-y-4 pr-4">
                                     {product.yvarprod?.map((variant: any) => (
-                                        <VariantViewCard key={variant.yvarprodid} variant={variant} t={t} />
+                                        <VariantViewCard key={variant.yvarprodid} variant={variant} t={t} canEditVisibility={canEditVisibility} />
                                     ))}
                                 </div>
                             </ScrollArea>
@@ -367,7 +404,7 @@ export function ProductViewDialog({ isOpen, onClose, productId }: ProductViewDia
 }
 
 // Read-only variant card component
-function VariantViewCard({ variant, t }: { variant: any; t: (key: string) => string }) {
+function VariantViewCard({ variant, t, canEditVisibility }: { variant: any; t: (key: string) => string; canEditVisibility: boolean }) {
     const { updateSingleVisibility, isUpdatingSingle } = useVariantVisibility();
     // Extract media data directly from the variant object
     const models3d = variant.yobjet3d?.map((obj: any) => obj.yobjet3durl) || [];
@@ -539,17 +576,19 @@ function VariantViewCard({ variant, t }: { variant: any; t: (key: string) => str
                         <span className={`text-xs ${variant.yestvisible ? 'text-green-600' : 'text-gray-600'}`}>
                             {variant.yestvisible ? (t("admin.visible") || "Visible") : (t("admin.hidden") || "Hidden")}
                         </span>
-                        <Switch
-                            checked={variant.yestvisible || false}
-                            disabled={isUpdatingSingle}
-                            onCheckedChange={(checked) => {
-                                updateSingleVisibility.mutate({
-                                    variantId: variant.yvarprodid,
-                                    yestvisible: checked,
-                                });
-                            }}
-                            className="data-[state=checked]:bg-green-500 data-[state=unchecked]:bg-gray-400 scale-75"
-                        />
+                        {canEditVisibility && (
+                            <Switch
+                                checked={variant.yestvisible || false}
+                                disabled={isUpdatingSingle}
+                                onCheckedChange={(checked) => {
+                                    updateSingleVisibility.mutate({
+                                        variantId: variant.yvarprodid,
+                                        yestvisible: checked,
+                                    });
+                                }}
+                                className="data-[state=checked]:bg-green-500 data-[state=unchecked]:bg-gray-400 scale-75"
+                            />
+                        )}
                     </div>
                 </div>
 
