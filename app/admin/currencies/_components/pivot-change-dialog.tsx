@@ -47,13 +47,13 @@ export function PivotChangeDialog({ pivotChangeHook }: PivotChangeDialogProps) {
       console.log('Dialog onOpenChange:', open);
       if (!open) handleCloseDialog();
     }}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-gradient-to-br from-morpheus-blue-dark to-morpheus-blue-light border-slate-700/50">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white border-gray-200">
         <DialogHeader>
-          <DialogTitle className="text-white flex items-center gap-2">
-            <Star className="h-5 w-5 text-yellow-400" />
+          <DialogTitle className="text-gray-900 flex items-center gap-2">
+            <Star className="h-5 w-5 text-yellow-600" />
             {t('admin.currencies.changePivotCurrency')}
           </DialogTitle>
-          <DialogDescription className="text-gray-300">
+          <DialogDescription className="text-gray-600">
             {t('admin.currencies.changePivotCurrencyDescription')
               .replace('{currency}', selectedCurrency.xdeviseintitule || '')
               .replace('{code}', selectedCurrency.xdevisecodealpha || '')}
