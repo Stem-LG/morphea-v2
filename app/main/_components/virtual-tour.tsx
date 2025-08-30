@@ -339,7 +339,7 @@ export default function VirtualTour({
                 panorama: currentSceneData.panorama,
                 minFov: 30,
                 maxFov: 120,
-                loadingImg: "/loading.gif", // Remove loading icon
+                loadingImg: "/logo.png", // Remove loading icon
                 loadingTxt: "", // Remove loading text
                 navbar: showNavbar && !isProductDetailsOpen && !isProductsListOpen ? ["zoom", "fullscreen"] : false,
                 plugins: [
@@ -693,7 +693,7 @@ export default function VirtualTour({
                 style={{ height: actualHeight, width }}
             >
                 <div className="text-center">
-                    <img src="/loading.gif" alt="Loading" className="h-12 w-12 mx-auto mb-4" />
+                    <img src="/logo.png" alt="Loading" className="h-12 w-12 mx-auto mb-4" />
                     <p className="text-gray-600">Chargement de la visite virtuelle...</p>
                 </div>
             </div>
