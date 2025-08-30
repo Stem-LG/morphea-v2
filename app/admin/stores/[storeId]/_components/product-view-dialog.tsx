@@ -169,8 +169,8 @@ export function ProductViewDialog({ isOpen, onClose, productId }: ProductViewDia
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="max-w-7xl max-h-[95vh] bg-white border-gray-300 p-0">
-                <DialogHeader className="px-6 py-4 border-b border-gray-200">
+            <DialogContent className="max-w-7xl max-h-[95vh] bg-white border-gray-300">
+                <DialogHeader className="border-b border-gray-200">
                     <div className="flex items-center justify-between">
                         <div>
                             <DialogTitle className="text-xl text-gray-900">
@@ -186,7 +186,7 @@ export function ProductViewDialog({ isOpen, onClose, productId }: ProductViewDia
                     {/* Left Panel - Product Information */}
                     <div className="w-1/2 border-r border-gray-200">
                         <ScrollArea className="h-full">
-                            <div className="p-6 space-y-6">
+                            <div className="space-y-6">
                                 {/* Basic Product Info */}
                                 <Card className="bg-gray-50 border-gray-200">
                                     <CardHeader>
@@ -330,8 +330,7 @@ export function ProductViewDialog({ isOpen, onClose, productId }: ProductViewDia
 
                     {/* Right Panel - Variant Cards (Read-only) */}
                     <div className="w-1/2">
-                        <div className="p-6">
-                            <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center justify-between mb-4">
                                 <h3 className="text-lg font-semibold text-gray-900">
                                     {t("admin.productView.productVariants")} ({product.yvarprod?.length || 0})
                                 </h3>
@@ -386,18 +385,6 @@ export function ProductViewDialog({ isOpen, onClose, productId }: ProductViewDia
                             </ScrollArea>
                         </div>
                     </div>
-                </div>
-
-                <div className="px-6 py-4 border-t border-gray-200 flex justify-end">
-                    <Button
-                        type="button"
-                        variant="outline"
-                        onClick={onClose}
-                        className="border-gray-300 text-gray-700 hover:bg-gray-50"
-                    >
-                        {t("common.close")}
-                    </Button>
-                </div>
             </DialogContent>
         </Dialog>
     );
