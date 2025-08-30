@@ -190,7 +190,7 @@ export default function ApprovalsPage() {
                 <div className="flex items-center gap-2">
                     <Badge
                         variant="secondary"
-                        className="border-yellow-500/30 bg-yellow-500/20 text-yellow-700"
+                        className="border-yellow-200 bg-yellow-100 text-yellow-800"
                     >
                         <Clock className="mr-1 h-3 w-3" />
                         {t('admin.approvals.productPending')}
@@ -198,7 +198,7 @@ export default function ApprovalsPage() {
                     {variants.length > 0 && (
                         <Badge
                             variant="secondary"
-                            className="border-gray-500/30 bg-gray-500/20 text-xs text-gray-700"
+                            className="border-gray-200 bg-gray-100 text-xs text-gray-700"
                         >
                             {variants.length} {t('admin.approvals.variants')}
                         </Badge>
@@ -210,7 +210,7 @@ export default function ApprovalsPage() {
                 <div className="flex items-center gap-2">
                     <Badge
                         variant="secondary"
-                        className="border-red-500/30 bg-red-500/20 text-red-700"
+                        className="border-red-200 bg-red-100 text-red-800"
                     >
                         <AlertTriangle className="mr-1 h-3 w-3" />
                         {t('admin.approvals.rejected')}
@@ -218,7 +218,7 @@ export default function ApprovalsPage() {
                     {variants.length > 0 && (
                         <Badge
                             variant="secondary"
-                            className="border-gray-500/30 bg-gray-500/20 text-xs text-gray-700"
+                            className="border-gray-200 bg-gray-100 text-xs text-gray-700"
                         >
                             {variants.length} {t('admin.approvals.variants')}
                         </Badge>
@@ -230,7 +230,7 @@ export default function ApprovalsPage() {
                 <div className="flex items-center gap-2">
                     <Badge
                         variant="secondary"
-                        className="border-blue-500/30 bg-blue-500/20 text-blue-300"
+                        className="border-blue-200 bg-blue-100 text-blue-800"
                     >
                         <Package className="mr-1 h-3 w-3" />
                         {t('admin.approvals.variantIssues')}
@@ -239,7 +239,7 @@ export default function ApprovalsPage() {
                         {pendingVariants > 0 && (
                             <Badge
                                 variant="secondary"
-                                className="border-yellow-500/30 bg-yellow-500/20 text-xs text-yellow-300"
+                                className="border-yellow-200 bg-yellow-100 text-xs text-yellow-800"
                             >
                                 {pendingVariants} {t('admin.approvals.pending')}
                             </Badge>
@@ -247,7 +247,7 @@ export default function ApprovalsPage() {
                         {rejectedVariants > 0 && (
                             <Badge
                                 variant="secondary"
-                                className="border-red-500/30 bg-red-500/20 text-xs text-red-300"
+                                className="border-red-200 bg-red-100 text-xs text-red-800"
                             >
                                 {rejectedVariants}{' '}
                                 {t('admin.approvals.rejected')}
@@ -256,7 +256,7 @@ export default function ApprovalsPage() {
                         {approvedVariants > 0 && (
                             <Badge
                                 variant="secondary"
-                                className="border-green-500/30 bg-green-500/20 text-xs text-green-300"
+                                className="border-green-200 bg-green-100 text-xs text-green-800"
                             >
                                 {approvedVariants}{' '}
                                 {t('admin.approvals.approved')}
@@ -297,15 +297,15 @@ export default function ApprovalsPage() {
                 if (media) {
                     if (media.ymediaboolvideo) {
                         return (
-                            <div className="flex h-24 w-24 items-center justify-center rounded-lg bg-gray-800">
-                                <span className="text-xs text-gray-400">
+                            <div className="flex h-24 w-24 items-center justify-center rounded-lg bg-gray-100">
+                                <span className="text-xs text-gray-600">
                                     Video
                                 </span>
                             </div>
                         )
                     } else {
                         return (
-                            <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-lg bg-gray-800">
+                            <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-lg bg-gray-100">
                                 <img
                                     src={media.ymediaurl}
                                     alt={media.ymediaintitule}
@@ -321,8 +321,8 @@ export default function ApprovalsPage() {
                 }
                 // No media fallback
                 return (
-                    <div className="flex h-24 w-24 items-center justify-center rounded-lg bg-gray-800">
-                        <span className="text-xs text-gray-400">
+                    <div className="flex h-24 w-24 items-center justify-center rounded-lg bg-gray-100">
+                        <span className="text-xs text-gray-600">
                             {t('admin.approvals.noMedia')}
                         </span>
                     </div>
@@ -351,7 +351,7 @@ export default function ApprovalsPage() {
                 return (
                     <Badge
                         variant="secondary"
-                        className="border-blue-500/30 bg-blue-500/20 text-blue-300"
+                        className="border-blue-200 bg-blue-100 text-blue-800"
                     >
                         {category?.xcategprodintitule ||
                             t('admin.approvals.unknown')}
@@ -371,7 +371,7 @@ export default function ApprovalsPage() {
             cell: ({ row }) => {
                 const date = new Date(row.getValue('sysdate'))
                 return (
-                    <div className="text-sm text-gray-400">
+                    <div className="text-sm text-gray-600">
                         {date.toLocaleDateString()}
                     </div>
                 )
@@ -387,7 +387,7 @@ export default function ApprovalsPage() {
                         size="sm"
                         variant="ghost"
                         onClick={() => handleAuditProduct(product)}
-                        className="h-8 px-3 text-gray-400 hover:bg-blue-900/50 hover:text-blue-400"
+                        className="h-8 px-3 text-gray-600 hover:bg-blue-50 hover:text-blue-600"
                         title={t('admin.approvals.auditProduct')}
                     >
                         <FileSearch className="mr-1 h-3 w-3" />
@@ -520,10 +520,10 @@ export default function ApprovalsPage() {
             ) : (
                 <div className="space-y-4">
                     {/* Filters for card view */}
-                    <Card className="border-gray-700/50 bg-gradient-to-br from-gray-900/50 to-gray-800/30 backdrop-blur-sm">
+                    <Card className="border-gray-200 bg-gradient-to-br from-gray-50/50 to-white/50 backdrop-blur-sm">
                         <CardContent className="p-4">
                             <div className="flex items-center gap-2">
-                                <Filter className="h-4 w-4 text-gray-400" />
+                                <Filter className="h-4 w-4 text-gray-600" />
                                 <SuperSelect
                                     value={approvalType}
                                     onValueChange={handleApprovalTypeChange}
@@ -594,7 +594,7 @@ export default function ApprovalsPage() {
                                                 onClick={() =>
                                                     handlePageChange(pageNum)
                                                 }
-                                                className="border-gray-600"
+                                                className="border-gray-300"
                                             >
                                                 {pageNum}
                                             </Button>
