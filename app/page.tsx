@@ -10,6 +10,7 @@ import VideoAnimation from '@/components/video-animation'
 import { Play, Pause, Volume2, VolumeX } from 'lucide-react'
 import { useLanguage } from '@/hooks/useLanguage'
 import { useHomeSettings } from '@/hooks/use-home-settings'
+import { PoweredBy } from '@/components/powered-by'
 
 export default function Home() {
     const supabase = createClient()
@@ -364,6 +365,7 @@ export default function Home() {
             </section>
 
             <Footer />
+            <PoweredBy/>
         </div>
     )
 }

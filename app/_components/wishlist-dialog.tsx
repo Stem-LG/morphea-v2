@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/credenza'
 import { Button } from '@/components/ui/button'
 import Image from 'next/image'
-import { Heart, ShoppingCart, Trash2 } from 'lucide-react'
+import { Heart, ShoppingCart, Star, Trash2 } from 'lucide-react'
 
 interface WishlistDialogProps {
     isOpen: boolean
@@ -116,14 +116,14 @@ export function WishlistDialog({ isOpen, onClose }: WishlistDialogProps) {
                 <CredenzaHeader className="border-b border-gray-100 pb-4">
                     <CredenzaTitle className="flex items-center gap-3 text-[#053340]">
                         <div className="rounded-lg bg-gray-50 p-2">
-                            <Heart className="h-5 w-5 text-red-500" />
+                            <Star className="h-5 w-5 text-yellow-600" />
                         </div>
                         <div className="flex items-center gap-3">
                             <span className="font-recia text-2xl font-extrabold">
                                 {t('wishlist.title') || 'Wishlist'}
                             </span>
                             {wishlistItems.length > 0 && (
-                                <span className="font-supreme rounded-full bg-red-500 px-3 py-1 text-sm font-medium text-white">
+                                <span className="font-supreme rounded-full bg-yellow-600 px-3 py-1 text-sm font-medium text-white">
                                     {wishlistItems.length}
                                 </span>
                             )}
@@ -139,7 +139,7 @@ export function WishlistDialog({ isOpen, onClose }: WishlistDialogProps) {
                     ) : wishlistItems.length === 0 ? (
                         <div className="py-12 text-center">
                             <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gray-50 p-4">
-                                <Heart className="h-10 w-10 text-red-400" />
+                                <Star className="h-10 w-10 text-yellow-600" />
                             </div>
                             <h3 className="font-recia mb-3 text-xl font-extrabold text-[#053340]">
                                 {t('wishlist.empty') ||
@@ -179,7 +179,7 @@ export function WishlistDialog({ isOpen, onClose }: WishlistDialogProps) {
                                             />
                                         ) : (
                                             <div className="flex h-full w-full items-center justify-center text-gray-400">
-                                                <Heart className="h-6 w-6" />
+                                                <Star className="h-6 w-6" />
                                             </div>
                                         )}
                                     </div>

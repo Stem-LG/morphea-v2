@@ -378,7 +378,7 @@ export function ProductCard({
                         onClick={onViewDetails}
                         className="rounded-full bg-white px-6 py-2 text-sm font-medium text-gray-900 shadow-lg transition-all duration-300 hover:bg-gray-50"
                     >
-                        Quick View
+                        {t('shop.quickView')}
                     </button>
                 </div>
             </div>
