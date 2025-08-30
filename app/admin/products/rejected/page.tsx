@@ -55,9 +55,9 @@ export default function AdminRejectedProductsPage() {
         return (
             <div className="p-6 space-y-6">
                 <div className="animate-pulse">
-                    <div className="h-8 bg-gray-700 rounded w-1/4 mb-4"></div>
-                    <div className="h-32 bg-gray-700 rounded mb-6"></div>
-                    <div className="h-64 bg-gray-700 rounded"></div>
+                    <div className="h-8 bg-gray-300 rounded w-1/4 mb-4"></div>
+                    <div className="h-32 bg-gray-300 rounded mb-6"></div>
+                    <div className="h-64 bg-gray-300 rounded"></div>
                 </div>
             </div>
         );
@@ -68,10 +68,10 @@ export default function AdminRejectedProductsPage() {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl lg:text-4xl font-bold text-white">
+                    <h1 className="text-3xl lg:text-4xl font-bold text-gray-900">
                         {t("admin.rejectedProducts") || "Rejected Products"}
                     </h1>
-                    <p className="text-lg text-gray-300">
+                    <p className="text-lg text-gray-600">
                         {t("admin.manageRejectedProductsDesc") || "View and manage all rejected products"}
                     </p>
                 </div>
@@ -80,7 +80,7 @@ export default function AdminRejectedProductsPage() {
                         variant={viewMode === 'table' ? 'default' : 'outline'}
                         size="sm"
                         onClick={() => setViewMode('table')}
-                        className="border-gray-600"
+                        className="border-gray-300"
                     >
                         {t("admin.approvals.table") || "Table"}
                     </Button>
@@ -88,7 +88,7 @@ export default function AdminRejectedProductsPage() {
                         variant={viewMode === 'cards' ? 'default' : 'outline'}
                         size="sm"
                         onClick={() => setViewMode('cards')}
-                        className="border-gray-600"
+                        className="border-gray-300"
                     >
                         {t("admin.approvals.cards") || "Cards"}
                     </Button>
@@ -97,14 +97,14 @@ export default function AdminRejectedProductsPage() {
 
             {/* Content */}
             {viewMode === 'table' ? (
-                <Card className="bg-gradient-to-br from-gray-900/50 to-gray-800/30 border-gray-700/50 backdrop-blur-sm">
+                <Card className="border-gray-200 bg-gradient-to-br from-gray-50/50 to-white/50 shadow-xl">
                     <CardHeader>
-                        <CardTitle className="text-xl text-white flex items-center justify-between">
+                        <CardTitle className="text-xl text-gray-900 flex items-center justify-between">
                             <div className="flex items-center gap-2">
-                                <X className="h-5 w-5 text-red-400" />
+                                <X className="h-5 w-5 text-red-600" />
                                 {t("admin.rejectedProductsList") || "Rejected Products List"}
                             </div>
-                            <div className="text-sm text-gray-300">
+                            <div className="text-sm text-gray-600">
                                 {paginationData?.total || 0} {t("admin.totalItems") || "total"}
                             </div>
                         </CardTitle>
@@ -129,10 +129,10 @@ export default function AdminRejectedProductsPage() {
             ) : (
                 <div className="space-y-4">
                     {/* Filters for card view */}
-                    <Card className="bg-gradient-to-br from-gray-900/50 to-gray-800/30 border-gray-700/50 backdrop-blur-sm relative z-10">
+                    <Card className="border-gray-200 bg-white shadow-sm relative z-10">
                         <CardContent className="p-4">
                             <div className="flex flex-wrap gap-2 items-center">
-                                <Filter className="h-4 w-4 text-gray-400" />
+                                <Filter className="h-4 w-4 text-gray-600" />
                                 <SuperSelect
                                     value={filters.event || ""}
                                     onValueChange={(value) => updateFilters({ event: value === "" ? null : (value as string) })}
@@ -215,7 +215,7 @@ export default function AdminRejectedProductsPage() {
                                             variant={pagination.page === pageNum ? "default" : "outline"}
                                             size="sm"
                                             onClick={() => updatePagination({ page: pageNum })}
-                                            className="border-gray-600"
+                                            className="border-gray-300"
                                         >
                                             {pageNum}
                                         </Button>

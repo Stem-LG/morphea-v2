@@ -36,7 +36,7 @@ export const useProductColumns = (onViewProduct?: (product: ProductWithDetails) 
                     checked={row.getIsSelected()}
                     onCheckedChange={(value) => row.toggleSelected(!!value)}
                     aria-label={t("admin.selectRow") || "Select row"}
-                    className="border-gray-400 data-[state=checked]:bg-morpheus-gold-light data-[state=checked]:border-morpheus-gold-light"
+                    className="border-gray-400 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
                 />
             ),
             enableSorting: false,
@@ -49,9 +49,9 @@ export const useProductColumns = (onViewProduct?: (product: ProductWithDetails) 
                 const code = row.getValue("yprodcode") as string;
                 return (
                     <div className="flex items-center gap-2">
-                        <Package className="h-4 w-4 text-morpheus-gold-light" />
-                        <span className="font-mono text-sm">{code}</span>
-                    </div>
+                            <Package className="h-4 w-4 text-blue-600" />
+                            <span className="font-mono text-sm text-gray-900">{code}</span>
+                        </div>
                 );
             },
         },
@@ -62,11 +62,11 @@ export const useProductColumns = (onViewProduct?: (product: ProductWithDetails) 
                 const title = row.getValue("yprodintitule") as string;
                 return (
                     <div className="max-w-[200px]">
-                        <div className="font-medium text-white truncate">{title}</div>
-                        <div className="text-sm text-gray-400 truncate">
-                            {row.original.yprodinfobulle}
+                            <div className="font-medium text-gray-900 truncate">{title}</div>
+                            <div className="text-sm text-gray-600 truncate">
+                                {row.original.yprodinfobulle}
+                            </div>
                         </div>
-                    </div>
                 );
             },
         },
@@ -78,8 +78,8 @@ export const useProductColumns = (onViewProduct?: (product: ProductWithDetails) 
                 if (!designer) return <span className="text-gray-500">N/A</span>;
                 return (
                     <div>
-                        <div className="font-medium text-white">{designer.ydesignnom}</div>
-                        <div className="text-sm text-gray-400">{designer.ydesignmarque}</div>
+                        <div className="font-medium text-gray-900">{designer.ydesignnom}</div>
+                        <div className="text-sm text-gray-600">{designer.ydesignmarque}</div>
                     </div>
                 );
             },
@@ -91,7 +91,7 @@ export const useProductColumns = (onViewProduct?: (product: ProductWithDetails) 
                 const category = row.original.category;
                 if (!category) return <span className="text-gray-500">N/A</span>;
                 return (
-                    <Badge variant="outline" className="text-morpheus-gold-light border-morpheus-gold-light/30">
+                    <Badge variant="outline" className="text-blue-600 border-blue-300">
                         {category.xcategprodintitule}
                     </Badge>
                 );
@@ -106,13 +106,13 @@ export const useProductColumns = (onViewProduct?: (product: ProductWithDetails) 
                 const getStatusColor = (status: string) => {
                     switch (status) {
                         case "approved":
-                            return "bg-green-500/20 text-green-400 border-green-400/30";
+                            return "bg-green-100 text-green-800 border-green-200";
                         case "not_approved":
-                            return "bg-yellow-500/20 text-yellow-400 border-yellow-400/30";
+                            return "bg-yellow-100 text-yellow-800 border-yellow-200";
                         case "rejected":
-                            return "bg-red-500/20 text-red-400 border-red-400/30";
+                            return "bg-red-100 text-red-800 border-red-200";
                         default:
-                            return "bg-gray-500/20 text-gray-400 border-gray-400/30";
+                            return "bg-gray-100 text-gray-700 border-gray-200";
                     }
                 };
 
@@ -154,18 +154,18 @@ export const useProductColumns = (onViewProduct?: (product: ProductWithDetails) 
                                     yestvisible: checked,
                                 });
                             }}
-                            className="data-[state=checked]:bg-green-500 data-[state=unchecked]:bg-gray-600"
+                            className="data-[state=checked]:bg-green-500 data-[state=unchecked]:bg-gray-400"
                         />
                         <div className="flex items-center gap-1">
                             {isVisible ? (
                                 <>
-                                    <Eye className="h-4 w-4 text-green-400" />
-                                    <span className="text-sm text-green-400">{t("admin.visible") || "Visible"}</span>
+                                    <Eye className="h-4 w-4 text-green-600" />
+                                    <span className="text-sm text-green-600">{t("admin.visible") || "Visible"}</span>
                                 </>
                             ) : (
                                 <>
-                                    <EyeOff className="h-4 w-4 text-gray-400" />
-                                    <span className="text-sm text-gray-400">{t("admin.hidden") || "Hidden"}</span>
+                                    <EyeOff className="h-4 w-4 text-gray-600" />
+                                    <span className="text-sm text-gray-600">{t("admin.hidden") || "Hidden"}</span>
                                 </>
                             )}
                         </div>
@@ -181,21 +181,21 @@ export const useProductColumns = (onViewProduct?: (product: ProductWithDetails) 
                 if (!events || events.length === 0) {
                     return <span className="text-gray-500">No events</span>;
                 }
-                
+
                 return (
                     <div className="max-w-[150px]">
                         {events.slice(0, 2).map((event, index) => (
                             <div key={index} className="text-sm">
-                                <div className="font-medium text-white truncate">
+                                <div className="font-medium text-gray-900 truncate">
                                     {event.yeventintitule}
                                 </div>
                                 {event.mall && (
-                                    <div className="text-gray-400 truncate">
+                                    <div className="text-gray-600 truncate">
                                         {event.mall.ymallintitule}
                                     </div>
                                 )}
                                 {event.boutique && (
-                                    <div className="text-gray-400 truncate">
+                                    <div className="text-gray-600 truncate">
                                         {event.boutique.yboutiqueintitule}
                                     </div>
                                 )}
@@ -219,7 +219,7 @@ export const useProductColumns = (onViewProduct?: (product: ProductWithDetails) 
                         <Button
                             variant="ghost"
                             size="sm"
-                            className="h-8 w-8 p-0 text-gray-400 hover:text-white"
+                            className="h-8 w-8 p-0 text-gray-600 hover:text-gray-900"
                             onClick={() => {
                                 if (onViewProduct) {
                                     onViewProduct(row.original);

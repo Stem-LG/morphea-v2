@@ -156,7 +156,7 @@ export default function AdminApprovedProductsPage() {
                         size="sm"
                         onClick={handleBulkMakeVisible}
                         disabled={isBulkUpdating || !products.length}
-                        className="border-green-600 text-green-400 hover:bg-green-600/20"
+                        className="border-green-300 text-green-600 hover:bg-green-50"
                     >
                         <Eye className="mr-2 h-4 w-4" />
                         {Object.keys(rowSelection).length > 0
@@ -169,7 +169,7 @@ export default function AdminApprovedProductsPage() {
                         size="sm"
                         onClick={handleBulkMakeInvisible}
                         disabled={isBulkUpdating || !products.length}
-                        className="border-gray-600 text-gray-400 hover:bg-gray-600/20"
+                        className="border-gray-300 text-gray-600 hover:bg-gray-50"
                     >
                         <EyeOff className="mr-2 h-4 w-4" />
                         {Object.keys(rowSelection).length > 0
@@ -186,7 +186,7 @@ export default function AdminApprovedProductsPage() {
                             }
                             size="sm"
                             onClick={() => setViewMode('table')}
-                            className="border-gray-600"
+                            className="border-gray-300"
                         >
                             {t('admin.approvals.table') || 'Table'}
                         </Button>
@@ -196,7 +196,7 @@ export default function AdminApprovedProductsPage() {
                             }
                             size="sm"
                             onClick={() => setViewMode('cards')}
-                            className="ml-1 border-gray-600"
+                            className="ml-1 border-gray-300"
                         >
                             {t('admin.approvals.cards') || 'Cards'}
                         </Button>
@@ -210,7 +210,7 @@ export default function AdminApprovedProductsPage() {
                     <CardHeader>
                         <CardTitle className="flex items-center justify-between text-xl text-gray-900">
                             <div className="flex items-center gap-2">
-                                <CheckCircle className="h-5 w-5 text-green-400" />
+                                <CheckCircle className="h-5 w-5 text-green-600" />
                                 {t('admin.approvedProductsList') ||
                                     'Approved Products List'}
                             </div>
@@ -250,10 +250,10 @@ export default function AdminApprovedProductsPage() {
             ) : (
                 <div className="space-y-4">
                     {/* Filters for card view */}
-                    <Card className="relative z-10 border-gray-200/50 bg-gradient-to-br from-gray-50/50 to-white/50 backdrop-blur-sm">
+                    <Card className="relative z-10 border-gray-200 bg-white shadow-sm">
                         <CardContent className="p-4">
                             <div className="flex flex-wrap items-center gap-2">
-                                <Filter className="h-4 w-4 text-gray-400" />
+                                <Filter className="h-4 w-4 text-gray-600" />
                                 <SuperSelect
                                     value={filters.event || ''}
                                     onValueChange={(value) =>
@@ -452,7 +452,7 @@ export default function AdminApprovedProductsPage() {
                                                         page: pageNum,
                                                     })
                                                 }
-                                                className="border-gray-600"
+                                                className="border-gray-300"
                                             >
                                                 {pageNum}
                                             </Button>

@@ -28,7 +28,7 @@ export function ProductFilters({ filters, onFiltersChange, onReset }: ProductFil
 
             {/* Event Filter */}
             <div className="min-w-[180px]">
-                <label className="block text-sm font-medium text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
                     {t('admin.event') || 'Event'}
                 </label>
                 <SuperSelect
@@ -47,7 +47,7 @@ export function ProductFilters({ filters, onFiltersChange, onReset }: ProductFil
 
             {/* Mall Filter */}
             <div className="min-w-[180px]">
-                <label className="block text-sm font-medium text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
                     {t('admin.mall') || 'Mall'}
                 </label>
                 <SuperSelect
@@ -66,7 +66,7 @@ export function ProductFilters({ filters, onFiltersChange, onReset }: ProductFil
 
             {/* Boutique Filter */}
             <div className="min-w-[180px]">
-                <label className="block text-sm font-medium text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
                     {t('admin.boutique') || 'Boutique'}
                 </label>
                 <SuperSelect
@@ -85,7 +85,7 @@ export function ProductFilters({ filters, onFiltersChange, onReset }: ProductFil
 
             {/* Category Filter */}
             <div className="min-w-[180px]">
-                <label className="block text-sm font-medium text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
                     {t('admin.category') || 'Category'}
                 </label>
                 <SuperSelect
@@ -104,7 +104,7 @@ export function ProductFilters({ filters, onFiltersChange, onReset }: ProductFil
 
             {/* Visibility Filter */}
             <div className="min-w-[180px]">
-                <label className="block text-sm font-medium text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
                     {t('admin.visibility') || 'Visibilité'}
                 </label>
                 <SuperSelect
@@ -125,7 +125,7 @@ export function ProductFilters({ filters, onFiltersChange, onReset }: ProductFil
                     <Button
                         variant="outline"
                         onClick={onReset}
-                        className="border-slate-600 text-gray-300 hover:text-white hover:bg-slate-700 h-10"
+                        className="border-gray-300 text-gray-700 hover:text-gray-900 hover:bg-gray-50 h-10"
                     >
                         <RefreshCw className="h-4 w-4 mr-2" />
                         {t('admin.resetFilters') || 'Reset'}
