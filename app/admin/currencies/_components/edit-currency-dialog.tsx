@@ -297,7 +297,7 @@ export function EditCurrencyDialog({ currency, isOpen, onClose }: EditCurrencyDi
                                         if (actualDecimals <= maxDecimals) {
                                             setFormData(prev => ({
                                                 ...prev,
-                                                xtauxechange: parseFloat(inputValue) || 1.0
+                                                xtauxechange: parseFloat(inputValue) || 0
                                             }));
                                         }
                                     }}
