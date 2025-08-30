@@ -1,22 +1,22 @@
-"use client";
+'use client'
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button'
 import {
     Dialog,
     DialogContent,
     DialogHeader,
     DialogTitle,
     DialogFooter,
-} from "@/components/ui/dialog";
-import { useLanguage } from "@/hooks/useLanguage";
-import { AlertTriangle } from "lucide-react";
+} from '@/components/ui/dialog'
+import { useLanguage } from '@/hooks/useLanguage'
+import { AlertTriangle } from 'lucide-react'
 
 interface DeleteEventDialogProps {
-    isOpen: boolean;
-    onClose: () => void;
-    onConfirm: () => void;
-    eventName: string;
-    isLoading?: boolean;
+    isOpen: boolean
+    onClose: () => void
+    onConfirm: () => void
+    eventName: string
+    isLoading?: boolean
 }
 
 export function DeleteEventDialog({
@@ -24,40 +24,40 @@ export function DeleteEventDialog({
     onClose,
     onConfirm,
     eventName,
-    isLoading = false
+    isLoading = false,
 }: DeleteEventDialogProps) {
-    const { t } = useLanguage();
-    
+    const { t } = useLanguage()
+
     const handleClose = () => {
         if (!isLoading) {
-            onClose();
+            onClose()
         }
-    };
+    }
 
     return (
         <Dialog open={isOpen} onOpenChange={handleClose}>
-            <DialogContent className="bg-gradient-to-br from-gray-900/95 to-gray-800/95 backdrop-blur-sm border-red-700/50 text-white sm:max-w-md">
+            <DialogContent className="border-red-200/50 bg-gradient-to-br from-gray-50/95 to-white/95 text-gray-900 backdrop-blur-sm sm:max-w-md shadow-xl">
                 <DialogHeader>
                     <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-lg bg-red-900/50 flex items-center justify-center">
-                            <AlertTriangle className="h-5 w-5 text-red-400" />
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-100">
+                            <AlertTriangle className="h-5 w-5 text-red-500" />
                         </div>
-                        <DialogTitle className="text-xl font-semibold text-white">
+                        <DialogTitle className="text-xl font-semibold text-gray-900">
                             {t('admin.events.deleteEventTitle')}
                         </DialogTitle>
                     </div>
                 </DialogHeader>
 
                 <div className="space-y-4">
-                    <p className="text-white">
+                    <p className="text-gray-700">
                         {t('admin.events.deleteEventConfirm')}
                     </p>
-                    <div className="bg-red-900/20 border border-red-700/30 rounded-lg p-4">
-                        <p className="text-red-300 font-medium text-center">
+                    <div className="rounded-lg border border-red-200 bg-red-50 p-4">
+                        <p className="text-center font-medium text-red-700">
                             &ldquo;{eventName}&rdquo;
                         </p>
                     </div>
-                    <p className="text-gray-300 text-sm">
+                    <p className="text-sm text-gray-600">
                         {t('admin.events.deleteEventWarning')}
                     </p>
                 </div>
@@ -68,7 +68,7 @@ export function DeleteEventDialog({
                         variant="outline"
                         onClick={handleClose}
                         disabled={isLoading}
-                        className="flex-1 border-gray-600 text-gray-300 hover:bg-gray-800/50 hover:text-white"
+                        className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-gray-900"
                     >
                         {t('common.cancel')}
                     </Button>
@@ -76,12 +76,14 @@ export function DeleteEventDialog({
                         type="button"
                         onClick={onConfirm}
                         disabled={isLoading}
-                        className="flex-1 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold transition-all duration-300 hover:scale-105"
+                        className="flex-1 bg-gradient-to-r from-red-500 to-red-600 font-semibold text-white transition-all duration-300 hover:scale-105 hover:from-red-600 hover:to-red-700"
                     >
-                        {isLoading ? t('admin.events.deleting') : t('admin.events.deleteEvent')}
+                        {isLoading
+                            ? t('admin.events.deleting')
+                            : t('admin.events.deleteEvent')}
                     </Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>
-    );
+    )
 }

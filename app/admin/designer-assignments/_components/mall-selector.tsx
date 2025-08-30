@@ -63,8 +63,8 @@ export function MallSelector({ eventId, selectedMallId, onMallChange }: MallSele
 
     if (!eventId) {
         return (
-            <div className="flex items-center gap-2 text-gray-400">
-                <Building2 className="h-4 w-4" />
+            <div className="flex items-center gap-2 text-gray-600">
+                <Building2 className="h-4 w-4 text-gray-400" />
                 <span>Select an event first</span>
             </div>
         );
@@ -72,8 +72,8 @@ export function MallSelector({ eventId, selectedMallId, onMallChange }: MallSele
 
     if (isLoading) {
         return (
-            <div className="flex items-center gap-2 text-gray-400">
-                <Building2 className="h-4 w-4 animate-pulse" />
+            <div className="flex items-center gap-2 text-gray-600">
+                <Building2 className="h-4 w-4 animate-pulse text-gray-400" />
                 <span>Loading malls...</span>
             </div>
         );
@@ -84,11 +84,11 @@ export function MallSelector({ eventId, selectedMallId, onMallChange }: MallSele
             value={selectedMallId?.toString() || ""}
             onValueChange={(value) => onMallChange(value ? parseInt(value) : null)}
         >
-            <SelectTrigger className="bg-gray-800/50 border-gray-600 text-white">
+            <SelectTrigger className="bg-white border-gray-300 text-gray-900 shadow-sm">
                 <SelectValue placeholder="Select a mall">
                     {selectedMallId && (
                         <div className="flex items-center gap-2">
-                            <Building2 className="h-4 w-4 text-morpheus-gold-light" />
+                            <Building2 className="h-4 w-4 text-blue-600" />
                             <span>
                                 {eventMalls.find(m => m.ymallid === selectedMallId)?.ymallintitule || "Unknown Mall"}
                             </span>
@@ -96,9 +96,9 @@ export function MallSelector({ eventId, selectedMallId, onMallChange }: MallSele
                     )}
                 </SelectValue>
             </SelectTrigger>
-            <SelectContent className="bg-gray-800 border-gray-600 max-h-60">
+            <SelectContent className="bg-white border-gray-300 max-h-60 shadow-lg">
                 {eventMalls.length === 0 ? (
-                    <SelectItem value="" disabled className="text-gray-400">
+                    <SelectItem value="" disabled className="text-gray-500">
                         No malls available for this event
                     </SelectItem>
                 ) : (
@@ -106,14 +106,14 @@ export function MallSelector({ eventId, selectedMallId, onMallChange }: MallSele
                         <SelectItem
                             key={mall.ymallid}
                             value={mall.ymallid.toString()}
-                            className="text-white focus:bg-gray-700"
+                            className="text-gray-900 focus:bg-gray-100"
                         >
                             <div className="flex flex-col gap-1 py-1">
                                 <div className="flex items-center gap-2">
-                                    <Building2 className="h-4 w-4 text-morpheus-gold-light" />
+                                    <Building2 className="h-4 w-4 text-blue-600" />
                                     <span className="font-medium">{mall.ymallintitule}</span>
                                 </div>
-                                <div className="flex items-center gap-1 text-xs text-gray-400">
+                                <div className="flex items-center gap-1 text-xs text-gray-600">
                                     <MapPin className="h-3 w-3" />
                                     <span>{mall.ymalllocalisation}</span>
                                 </div>

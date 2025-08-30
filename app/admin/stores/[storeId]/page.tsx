@@ -261,7 +261,7 @@ export default function StoreDetails() {
                 const categoryId = row.getValue("xcategprodidfk") as number;
                 const category = categories?.find(cat => cat.xcategprodid === categoryId);
                 return (
-                    <Badge variant="secondary" className="bg-blue-500/20 text-blue-300 border-blue-500/30">
+                    <Badge variant="secondary" className="bg-blue-100 text-blue-800 border-blue-200">
                         {category?.xcategprodintitule || t('admin.unknown')}
                     </Badge>
                 );
@@ -277,30 +277,30 @@ export default function StoreDetails() {
                 const statusConfig = {
                     approved: {
                         icon: CheckCircle,
-                        color: "text-green-400",
-                        bgColor: "bg-green-500/20",
-                        borderColor: "border-green-500/30",
+                        color: "text-green-800",
+                        bgColor: "bg-green-100",
+                        borderColor: "border-green-200",
                         label: t('admin.approved')
                     },
                     rejected: {
                         icon: XCircle,
-                        color: "text-red-400",
-                        bgColor: "bg-red-500/20",
-                        borderColor: "border-red-500/30",
+                        color: "text-red-800",
+                        bgColor: "bg-red-100",
+                        borderColor: "border-red-200",
                         label: t('admin.rejected')
                     },
                     pending: {
                         icon: Clock,
-                        color: "text-yellow-400",
-                        bgColor: "bg-yellow-500/20",
-                        borderColor: "border-yellow-500/30",
+                        color: "text-yellow-800",
+                        bgColor: "bg-yellow-100",
+                        borderColor: "border-yellow-200",
                         label: t('admin.pending')
                     },
                     mixed: {
                         icon: AlertTriangle,
-                        color: "text-blue-400",
-                        bgColor: "bg-blue-500/20",
-                        borderColor: "border-blue-500/30",
+                        color: "text-blue-800",
+                        bgColor: "bg-blue-100",
+                        borderColor: "border-blue-200",
                         label: t('admin.mixedStatus')
                     }
                 };
@@ -360,7 +360,7 @@ export default function StoreDetails() {
                             size="sm"
                             variant="ghost"
                             onClick={() => handleViewProduct(product)}
-                            className="h-8 w-8 p-0 text-gray-400 hover:text-white hover:bg-gray-800/50"
+                            className="h-8 w-8 p-0 text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                             title={t('admin.viewProduct')}
                         >
                             <Eye className="h-3 w-3" />
@@ -372,8 +372,8 @@ export default function StoreDetails() {
                             disabled={!canEditProduct(product)}
                             className={`h-8 w-8 p-0 ${
                                 canEditProduct(product)
-                                    ? "text-gray-400 hover:text-white hover:bg-gray-800/50"
-                                    : "text-gray-600 cursor-not-allowed"
+                                    ? "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                                    : "text-gray-400 cursor-not-allowed"
                             }`}
                             title={canEditProduct(product) ? t('admin.editProduct') : t('admin.cannotEditProduct')}
                         >
@@ -386,8 +386,8 @@ export default function StoreDetails() {
                             disabled={!canDeleteProduct(product)}
                             className={`h-8 w-8 p-0 ${
                                 canDeleteProduct(product)
-                                    ? "text-gray-400 hover:text-red-400 hover:bg-red-900/50"
-                                    : "text-gray-600 cursor-not-allowed"
+                                    ? "text-gray-600 hover:text-red-600 hover:bg-red-50"
+                                    : "text-gray-400 cursor-not-allowed"
                             }`}
                             title={canDeleteProduct(product) ? t('admin.deleteProduct') : t('admin.cannotDeleteProduct')}
                         >
@@ -404,9 +404,9 @@ export default function StoreDetails() {
         return (
             <div className="p-6 space-y-6">
                 <div className="animate-pulse">
-                    <div className="h-8 bg-gray-700 rounded w-1/4 mb-4"></div>
-                    <div className="h-32 bg-gray-700 rounded mb-6"></div>
-                    <div className="h-64 bg-gray-700 rounded"></div>
+                    <div className="h-8 bg-gray-300 rounded w-1/4 mb-4"></div>
+                    <div className="h-32 bg-gray-300 rounded mb-6"></div>
+                    <div className="h-64 bg-gray-300 rounded"></div>
                 </div>
             </div>
         );
@@ -416,13 +416,13 @@ export default function StoreDetails() {
     if (storeError || !store) {
         return (
             <div className="p-6">
-                <Card className="bg-gradient-to-br from-red-900/20 to-red-800/10 border-red-700/50 backdrop-blur-sm">
+                <Card className="bg-gradient-to-br from-red-50/50 to-white/50 border-red-200 backdrop-blur-sm">
                     <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-                        <div className="h-16 w-16 rounded-full bg-red-900/30 flex items-center justify-center mb-4">
-                            <Store className="h-8 w-8 text-red-400" />
+                        <div className="h-16 w-16 rounded-full bg-red-100 flex items-center justify-center mb-4">
+                            <Store className="h-8 w-8 text-red-600" />
                         </div>
-                        <h3 className="text-xl font-semibold text-white mb-2">{t('admin.storeNotFound')}</h3>
-                        <p className="text-gray-400 mb-4">
+                        <h3 className="text-xl font-semibold text-gray-900 mb-2">{t('admin.storeNotFound')}</h3>
+                        <p className="text-gray-600 mb-4">
                             {t('admin.storeNotFoundMessage')}
                         </p>
                         <Link href={`/admin/stores${
@@ -433,7 +433,7 @@ export default function StoreDetails() {
                                 }).toString()}`
                                 : ''
                         }`}>
-                            <Button variant="outline" className="border-red-700/50 text-red-400 hover:bg-red-900/30">
+                            <Button variant="outline" className="border-red-300 text-red-600 hover:bg-red-50">
                                 <ArrowLeft className="h-4 w-4 mr-2" />
                                 {t('admin.backToStores')}
                             </Button>
@@ -459,29 +459,29 @@ export default function StoreDetails() {
                     <Button
                         variant="outline"
                         size="sm"
-                        className="border-gray-600 text-gray-300 hover:bg-gray-800/50 hover:text-white"
+                        className="border-gray-300 text-gray-700 hover:bg-gray-50"
                     >
                         <ArrowLeft className="h-4 w-4 mr-2" />
                         {t('admin.backToStores')}
                     </Button>
                 </Link>
                 <div>
-                    <h1 className="text-3xl lg:text-4xl font-bold text-white">{t('admin.storeDetails')}</h1>
-                    <p className="text-lg text-gray-300">{t('admin.manageProductsAndStore')}</p>
+                    <h1 className="text-3xl lg:text-4xl font-bold text-gray-900">{t('admin.storeDetails')}</h1>
+                    <p className="text-lg text-gray-600">{t('admin.manageProductsAndStore')}</p>
                 </div>
             </div>
 
             {/* Store Information Card */}
-            <Card className="bg-gradient-to-br from-gray-900/50 to-gray-800/30 border-gray-700/50 backdrop-blur-sm">
+            <Card className="bg-gradient-to-br from-gray-50/50 to-white/50 border-gray-200 backdrop-blur-sm">
                 <CardHeader>
                     <div className="flex items-center gap-4">
-                        <div className="h-12 w-12 rounded-lg bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light flex items-center justify-center">
+                        <div className="h-12 w-12 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center">
                             <Store className="h-6 w-6 text-white" />
                         </div>
                         <div>
-                            <CardTitle className="text-2xl text-white">{store.yboutiqueintitule}</CardTitle>
-                            <div className="flex items-center gap-2 text-gray-300 mt-2">
-                                <MapPin className="h-4 w-4 text-morpheus-gold-light" />
+                            <CardTitle className="text-2xl text-gray-900">{store.yboutiqueintitule}</CardTitle>
+                            <div className="flex items-center gap-2 text-gray-600 mt-2">
+                                <MapPin className="h-4 w-4 text-blue-600" />
                                 <span className="text-sm">
                                     {store.yboutiqueadressemall || t('admin.noAddressSpecified')}
                                 </span>
@@ -491,30 +491,30 @@ export default function StoreDetails() {
                 </CardHeader>
                 <CardContent>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="bg-gray-800/30 rounded-lg p-4">
+                        <div className="bg-gray-100 rounded-lg p-4">
                             <div className="flex items-center gap-2 mb-2">
-                                <Package className="h-5 w-5 text-morpheus-gold-light" />
-                                <span className="text-sm font-medium text-gray-300">{t('admin.totalProducts')}</span>
+                                <Package className="h-5 w-5 text-blue-600" />
+                                <span className="text-sm font-medium text-gray-600">{t('admin.totalProducts')}</span>
                             </div>
-                            <div className="text-2xl font-bold text-white">
+                            <div className="text-2xl font-bold text-gray-900">
                                 {productsData?.count || 0}
                             </div>
                         </div>
-                        <div className="bg-gray-800/30 rounded-lg p-4">
+                        <div className="bg-gray-100 rounded-lg p-4">
                             <div className="flex items-center gap-2 mb-2">
-                                <Store className="h-5 w-5 text-morpheus-gold-light" />
-                                <span className="text-sm font-medium text-gray-300">{t('admin.storeId')}</span>
+                                <Store className="h-5 w-5 text-blue-600" />
+                                <span className="text-sm font-medium text-gray-600">{t('admin.storeId')}</span>
                             </div>
-                            <div className="text-2xl font-bold text-white">
+                            <div className="text-2xl font-bold text-gray-900">
                                 #{store.yboutiqueid}
                             </div>
                         </div>
-                        <div className="bg-gray-800/30 rounded-lg p-4">
+                        <div className="bg-gray-100 rounded-lg p-4">
                             <div className="flex items-center gap-2 mb-2">
-                                <MapPin className="h-5 w-5 text-morpheus-gold-light" />
-                                <span className="text-sm font-medium text-gray-300">{t('admin.mallId')}</span>
+                                <MapPin className="h-5 w-5 text-blue-600" />
+                                <span className="text-sm font-medium text-gray-600">{t('admin.mallId')}</span>
                             </div>
-                            <div className="text-2xl font-bold text-white">
+                            <div className="text-2xl font-bold text-gray-900">
                                 {store.ymallidfk ? `#${store.ymallidfk}` : "N/A"}
                             </div>
                         </div>
@@ -523,9 +523,9 @@ export default function StoreDetails() {
             </Card>
 
             {/* Products Table */}
-            <Card className="bg-gradient-to-br from-gray-900/50 to-gray-800/30 border-gray-700/50 backdrop-blur-sm">
+            <Card className="bg-gradient-to-br from-gray-50/50 to-white/50 border-gray-200 backdrop-blur-sm">
                 <CardHeader>
-                    <CardTitle className="text-xl text-white flex items-center gap-2">
+                    <CardTitle className="text-xl text-gray-900 flex items-center gap-2">
                         <Package className="h-5 w-5" />
                         {t('admin.products')}
                     </CardTitle>
@@ -547,7 +547,7 @@ export default function StoreDetails() {
                                 <Button
                                     onClick={handleCreateProduct}
                                     disabled={!eventId}
-                                    className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-morpheus-gold-dark hover:to-morpheus-gold-light text-white font-semibold transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-semibold transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
                                     title={eventId ? t('admin.addProduct') : t('admin.selectEventToAddProducts')}
                                 >
                                     <Plus className="h-4 w-4 mr-2" />

@@ -123,9 +123,9 @@ export function StoreDialog({ isOpen, onClose, onSubmit, store, isLoading = fals
 
     return (
         <Dialog open={isOpen} onOpenChange={handleClose}>
-            <DialogContent className="bg-gradient-to-br from-gray-900/95 to-gray-800/95 backdrop-blur-sm border-gray-700/50 text-white sm:max-w-md">
+            <DialogContent className="bg-white border-gray-200 text-gray-900 sm:max-w-md">
                 <DialogHeader>
-                    <DialogTitle className="text-xl font-semibold text-white">
+                    <DialogTitle className="text-xl font-semibold text-gray-900">
                         {store ? t("admin.editStore") : t("admin.addStore")}
                     </DialogTitle>
                 </DialogHeader>
@@ -133,7 +133,7 @@ export function StoreDialog({ isOpen, onClose, onSubmit, store, isLoading = fals
                 <form onSubmit={handleSubmit} className="space-y-4">
                     {/* Store Name */}
                     <div className="space-y-2">
-                        <Label htmlFor="storeName" className="text-white">
+                        <Label htmlFor="storeName" className="text-gray-900">
                             {t("admin.storeName")} *
                         </Label>
                         <Input
@@ -143,18 +143,18 @@ export function StoreDialog({ isOpen, onClose, onSubmit, store, isLoading = fals
                             onChange={(e) => handleInputChange("yboutiqueintitule", e.target.value)}
                             placeholder={t("admin.storeNamePlaceholder")}
                             disabled={isLoading}
-                            className={`bg-gray-800/50 border-gray-600 text-white placeholder-gray-400 focus:border-morpheus-gold-light ${
+                            className={`bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-500 ${
                                 formErrors.yboutiqueintitule ? "border-red-500" : ""
                             }`}
                         />
                         {formErrors.yboutiqueintitule && (
-                            <p className="text-red-400 text-sm">{formErrors.yboutiqueintitule}</p>
+                            <p className="text-red-600 text-sm">{formErrors.yboutiqueintitule}</p>
                         )}
                     </div>
 
                     {/* Mall Selection */}
                     <div className="space-y-2">
-                        <Label htmlFor="mallSelect" className="text-white">
+                        <Label htmlFor="mallSelect" className="text-gray-900">
                             {t("admin.mall")} *
                         </Label>
                         <Select
@@ -162,20 +162,20 @@ export function StoreDialog({ isOpen, onClose, onSubmit, store, isLoading = fals
                             onValueChange={(value) => handleInputChange("ymallidfk", parseInt(value))}
                             disabled={isLoading || mallsLoading}
                         >
-                            <SelectTrigger className={`bg-gray-800/50 border-gray-600 text-white focus:border-morpheus-gold-light ${
+                            <SelectTrigger className={`bg-white border-gray-300 text-gray-900 focus:border-blue-500 ${
                                 formErrors.ymallidfk ? "border-red-500" : ""
                             }`}>
-                                <SelectValue 
+                                <SelectValue
                                     placeholder={mallsLoading ? t("admin.loadingMalls") : t("admin.selectMall")}
-                                    className="text-white"
+                                    className="text-gray-900"
                                 />
                             </SelectTrigger>
-                            <SelectContent className="bg-gray-800 border-gray-600">
+                            <SelectContent className="bg-white border-gray-300">
                                 {malls?.map((mall) => (
-                                    <SelectItem 
-                                        key={mall.ymallid} 
+                                    <SelectItem
+                                        key={mall.ymallid}
                                         value={mall.ymallid.toString()}
-                                        className="text-white hover:bg-gray-700 focus:bg-gray-700"
+                                        className="text-gray-900 focus:bg-gray-100"
                                     >
                                         {mall.ymallintitule}
                                     </SelectItem>
@@ -183,16 +183,16 @@ export function StoreDialog({ isOpen, onClose, onSubmit, store, isLoading = fals
                             </SelectContent>
                         </Select>
                         {formErrors.ymallidfk && (
-                            <p className="text-red-400 text-sm">{formErrors.ymallidfk}</p>
+                            <p className="text-red-600 text-sm">{formErrors.ymallidfk}</p>
                         )}
                         {!mallsLoading && (!malls || malls.length === 0) && (
-                            <p className="text-yellow-400 text-sm">{t("admin.noMallsAvailable")}</p>
+                            <p className="text-yellow-600 text-sm">{t("admin.noMallsAvailable")}</p>
                         )}
                     </div>
 
                     {/* Store Address */}
                     <div className="space-y-2">
-                        <Label htmlFor="storeAddress" className="text-white">
+                        <Label htmlFor="storeAddress" className="text-gray-900">
                             {t("admin.storeAddress")}
                         </Label>
                         <Textarea
@@ -202,7 +202,7 @@ export function StoreDialog({ isOpen, onClose, onSubmit, store, isLoading = fals
                             placeholder={t("admin.storeAddressPlaceholder")}
                             disabled={isLoading}
                             rows={3}
-                            className="bg-gray-800/50 border-gray-600 text-white placeholder-gray-400 focus:border-morpheus-gold-light resize-none"
+                            className="bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-500 resize-none"
                         />
                     </div>
 
@@ -212,14 +212,14 @@ export function StoreDialog({ isOpen, onClose, onSubmit, store, isLoading = fals
                             variant="outline"
                             onClick={handleClose}
                             disabled={isLoading}
-                            className="flex-1 border-gray-600 text-gray-300 hover:bg-gray-800/50 hover:text-white"
+                            className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50"
                         >
                             {t("common.cancel")}
                         </Button>
                         <Button
                             type="submit"
                             disabled={isLoading}
-                            className="flex-1 bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-morpheus-gold-dark hover:to-morpheus-gold-light text-white font-semibold"
+                            className="flex-1 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-semibold"
                         >
                             {isLoading
                                 ? (store ? t("admin.updatingStore") : t("admin.creatingStore"))

@@ -413,23 +413,23 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
         const statusConfig = {
             approved: {
                 icon: CheckCircle,
-                color: "text-green-400",
-                bgColor: "bg-green-500/20",
-                borderColor: "border-green-500/30",
+                color: "text-green-600",
+                bgColor: "bg-green-100",
+                borderColor: "border-green-200",
                 label: t("admin.approved")
             },
             rejected: {
                 icon: XCircle,
-                color: "text-red-400",
-                bgColor: "bg-red-500/20",
-                borderColor: "border-red-500/30",
+                color: "text-red-600",
+                bgColor: "bg-red-100",
+                borderColor: "border-red-200",
                 label: t("admin.rejected")
             },
             not_approved: {
                 icon: Clock,
-                color: "text-yellow-400",
-                bgColor: "bg-yellow-500/20",
-                borderColor: "border-yellow-500/30",
+                color: "text-yellow-600",
+                bgColor: "bg-yellow-100",
+                borderColor: "border-yellow-200",
                 label: t("admin.pending")
             }
         };
@@ -679,10 +679,10 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="max-w-7xl max-h-[95vh] bg-gradient-to-br from-gray-900/95 to-gray-800/95 border-gray-700/50 text-white">
+            <DialogContent className="max-w-7xl max-h-[95vh] bg-white border-gray-200 text-gray-900">
                 <DialogHeader>
-                    <DialogTitle className="text-2xl font-bold text-white flex items-center gap-2">
-                        <Package className="h-6 w-6 text-morpheus-gold-light" />
+                    <DialogTitle className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                        <Package className="h-6 w-6 text-blue-600" />
                         {isEditMode ? t("admin.editProduct") : t("admin.createNewProduct")}
                     </DialogTitle>
                 </DialogHeader>
@@ -690,17 +690,17 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                 {/* Loading and error states */}
                 {isEditMode && productDetailsLoading ? (
                     <div className="flex flex-col items-center justify-center min-h-[300px] py-12">
-                        <Loader2 className="h-8 w-8 animate-spin text-morpheus-gold-light mb-4" />
-                        <span className="text-lg text-gray-300">{t("admin.createProduct.loadingProductDetails")}</span>
+                        <Loader2 className="h-8 w-8 animate-spin text-blue-600 mb-4" />
+                        <span className="text-lg text-gray-600">{t("admin.createProduct.loadingProductDetails")}</span>
                     </div>
                 ) : isEditMode && productDetailsError ? (
                     <div className="flex flex-col items-center justify-center min-h-[300px] py-12">
                         <div className="flex items-center gap-2 mb-2">
-                            <Info className="h-6 w-6 text-red-400" />
-                            <span className="text-lg text-red-300 font-semibold">{t("admin.createProduct.failedToLoadProductDetails")}</span>
+                            <Info className="h-6 w-6 text-red-600" />
+                            <span className="text-lg text-red-700 font-semibold">{t("admin.createProduct.failedToLoadProductDetails")}</span>
                         </div>
-                        <span className="text-gray-400 mb-2">{t("admin.createProduct.tryAgainOrContactSupport")}</span>
-                        <Button onClick={onClose} className="bg-gray-700 text-white">
+                        <span className="text-gray-500 mb-2">{t("admin.createProduct.tryAgainOrContactSupport")}</span>
+                        <Button onClick={onClose} className="bg-gray-100 text-gray-900 hover:bg-gray-200">
                             {t("common.close")}
                         </Button>
                     </div>
@@ -710,17 +710,17 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                             {/* Left Column - Product Information & Creation Forms */}
                             <div className="space-y-6">
                                 {/* Product Information */}
-                                <Card className="bg-gray-800/50 border-gray-700/50">
+                                <Card className="bg-gray-50 border-gray-200">
                                     <CardHeader>
-                                        <CardTitle className="text-lg text-white flex items-center gap-2">
-                                            <FileText className="h-5 w-5 text-morpheus-gold-light" />
+                                        <CardTitle className="text-lg text-gray-900 flex items-center gap-2">
+                                            <FileText className="h-5 w-5 text-blue-600" />
                                             {t("admin.productInformation")}
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent className="space-y-4">
                                         {!canEditProductInfo() && isEditMode && (
-                                            <div className="mb-4 p-3 bg-yellow-900/20 border border-yellow-700/50 rounded-lg">
-                                                <div className="flex items-center gap-2 text-yellow-300 text-sm">
+                                            <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                                                <div className="flex items-center gap-2 text-yellow-800 text-sm">
                                                     <Info className="h-4 w-4" />
                                                     {t("admin.createProduct.productInfoReadOnly")}
                                                 </div>
@@ -729,7 +729,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
 
                                         <div className="grid grid-cols-2 gap-4">
                                             <div>
-                                                <Label htmlFor="category" className="text-gray-300">
+                                                <Label htmlFor="category" className="text-gray-700">
                                                     {t("admin.category")}
                                                 </Label>
                                                 <SuperSelect
@@ -742,7 +742,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                 />
                                             </div>
                                             <div>
-                                                <Label htmlFor="productCode" className="text-gray-300">
+                                                <Label htmlFor="productCode" className="text-gray-700">
                                                     {t("admin.productCode")}
                                                 </Label>
                                                 <Input
@@ -750,22 +750,22 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                     value={productCode}
                                                     onChange={(e) => setProductCode(e.target.value)}
                                                     placeholder={t("admin.createProduct.autoGeneratedIfEmpty")}
-                                                    className="mt-1 bg-gray-700/50 border-gray-600 text-white"
+                                                    className="mt-1 bg-white border-gray-300 text-gray-900"
                                                     disabled={!canEditProductInfo()}
                                                 />
                                             </div>
                                         </div>
 
                                         <div>
-                                            <Label htmlFor="productName" className="text-gray-300">
-                                                {t("admin.productName")} <span className="text-red-400">*</span>
+                                            <Label htmlFor="productName" className="text-gray-700">
+                                                {t("admin.productName")} <span className="text-red-600">*</span>
                                             </Label>
                                             <Input
                                                 id="productName"
                                                 value={productName}
                                                 onChange={(e) => setProductName(e.target.value)}
                                                 placeholder={t("admin.createProduct.enterProductName")}
-                                                className="mt-1 bg-gray-700/50 border-gray-600 text-white"
+                                                className="mt-1 bg-white border-gray-300 text-gray-900"
                                                 required
                                                 disabled={!canEditProductInfo()}
                                             />
@@ -774,9 +774,9 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                         <div>
                                             <Label
                                                 htmlFor="shortDescription"
-                                                className="text-gray-300 flex items-center gap-1"
+                                                className="text-gray-700 flex items-center gap-1"
                                             >
-                                                {t("admin.createProduct.shortDescription")} <span className="text-red-400">*</span>
+                                                {t("admin.createProduct.shortDescription")} <span className="text-red-600">*</span>
                                                 <Info className="h-3 w-3 text-gray-500" />
                                             </Label>
                                             <Input
@@ -784,22 +784,22 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                 value={shortDescription}
                                                 onChange={(e) => setShortDescription(e.target.value)}
                                                 placeholder={t("admin.createProduct.briefDescriptionTooltips")}
-                                                className="mt-1 bg-gray-700/50 border-gray-600 text-white"
+                                                className="mt-1 bg-white border-gray-300 text-gray-900"
                                                 required
                                                 disabled={!canEditProductInfo()}
                                             />
                                         </div>
 
                                         <div>
-                                            <Label htmlFor="fullDescription" className="text-gray-300">
-                                                {t("admin.createProduct.fullDescription")} <span className="text-red-400">*</span>
+                                            <Label htmlFor="fullDescription" className="text-gray-700">
+                                                {t("admin.createProduct.fullDescription")} <span className="text-red-600">*</span>
                                             </Label>
                                             <Textarea
                                                 id="fullDescription"
                                                 value={fullDescription}
                                                 onChange={(e) => setFullDescription(e.target.value)}
                                                 placeholder={t("admin.createProduct.detailedProductDescription")}
-                                                className="mt-1 bg-gray-700/50 border-gray-600 text-white min-h-[100px]"
+                                                className="mt-1 bg-white border-gray-300 text-gray-900 min-h-[100px]"
                                                 required
                                                 disabled={!canEditProductInfo()}
                                             />
@@ -808,8 +808,8 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                         {/* Infospotaction Selection (Admin Only) */}
                                         {isAdmin && (
                                             <div>
-                                                <Label className="text-gray-300">{t("admin.createProduct.productPlacement")}</Label>
-                                                <div className="text-gray-400 text-xs mb-1">
+                                                <Label className="text-gray-700">{t("admin.createProduct.productPlacement")}</Label>
+                                                <div className="text-gray-500 text-xs mb-1">
                                                     {t("admin.createProduct.chooseProductPlacement")}
                                                 </div>
                                                 <SuperSelect
@@ -829,40 +829,40 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
 
                                 {/* Color Creation Form */}
                                 {showColorForm && (
-                                    <Card className="bg-blue-900/20 border-blue-700/50">
+                                    <Card className="bg-blue-50 border-blue-200">
                                         <CardHeader>
-                                            <CardTitle className="text-lg text-white flex items-center gap-2">
-                                                <Palette className="h-5 w-5 text-blue-400" />
+                                            <CardTitle className="text-lg text-gray-900 flex items-center gap-2">
+                                                <Palette className="h-5 w-5 text-blue-600" />
                                                 {t("admin.createProduct.createNewColor")}
                                             </CardTitle>
                                         </CardHeader>
                                         <CardContent className="space-y-4">
                                             <div className="grid grid-cols-1 gap-4">
                                                 <div>
-                                                    <Label className="text-gray-300">{t("admin.createProduct.colorCode")}</Label>
+                                                    <Label className="text-gray-700">{t("admin.createProduct.colorCode")}</Label>
                                                     <Input
                                                         value={newColor.code}
                                                         onChange={(e) =>
                                                             setNewColor({ ...newColor, code: e.target.value })
                                                         }
                                                         placeholder={t("admin.createProduct.colorCodePlaceholder")}
-                                                        className="mt-1 bg-gray-700/50 border-gray-600 text-white"
+                                                        className="mt-1 bg-white border-gray-300 text-gray-900"
                                                     />
                                                 </div>
                                                 <div>
-                                                    <Label className="text-gray-300">{t("admin.createProduct.colorName")}</Label>
+                                                    <Label className="text-gray-700">{t("admin.createProduct.colorName")}</Label>
                                                     <Input
                                                         value={newColor.name}
                                                         onChange={(e) =>
                                                             setNewColor({ ...newColor, name: e.target.value })
                                                         }
                                                         placeholder={t("admin.createProduct.colorNamePlaceholder")}
-                                                        className="mt-1 bg-gray-700/50 border-gray-600 text-white"
+                                                        className="mt-1 bg-white border-gray-300 text-gray-900"
                                                     />
                                                 </div>
                                             </div>
                                             <div>
-                                                <Label className="text-gray-300">{t("admin.createProduct.hexColor")}</Label>
+                                                <Label className="text-gray-700">{t("admin.createProduct.hexColor")}</Label>
                                                 <div className="flex gap-2 mt-1">
                                                     <Input
                                                         type="color"
@@ -875,7 +875,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                                 rgbColor: hexToRgb(hex),
                                                             });
                                                         }}
-                                                        className="w-16 h-10 bg-gray-700/50 border-gray-600"
+                                                        className="w-16 h-10 bg-white border-gray-300"
                                                     />
                                                     <Input
                                                         value={newColor.hexColor}
@@ -888,7 +888,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                             });
                                                         }}
                                                         placeholder="#000000"
-                                                        className="flex-1 bg-gray-700/50 border-gray-600 text-white"
+                                                        className="flex-1 bg-white border-gray-300 text-gray-900"
                                                     />
                                                 </div>
                                             </div>
@@ -903,7 +903,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                 <Button
                                                     onClick={() => setShowColorForm(false)}
                                                     variant="outline"
-                                                    className="border-gray-600 text-gray-300 hover:bg-gray-700"
+                                                    className="border-gray-300 text-gray-700 hover:bg-gray-50"
                                                 >
                                                     {t("common.cancel")}
                                                 </Button>
@@ -914,66 +914,66 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
 
                                 {/* Size Creation Form */}
                                 {showSizeForm && (
-                                    <Card className="bg-green-900/20 border-green-700/50">
+                                    <Card className="bg-green-50 border-green-200">
                                         <CardHeader>
-                                            <CardTitle className="text-lg text-white flex items-center gap-2">
-                                                <Ruler className="h-5 w-5 text-green-400" />
+                                            <CardTitle className="text-lg text-gray-900 flex items-center gap-2">
+                                                <Ruler className="h-5 w-5 text-green-600" />
                                                 {t("admin.createProduct.createNewSize")}
                                             </CardTitle>
                                         </CardHeader>
                                         <CardContent className="space-y-4">
                                             <div className="grid grid-cols-1 gap-4">
                                                 <div>
-                                                    <Label className="text-gray-300">{t("admin.createProduct.sizeCode")}</Label>
+                                                    <Label className="text-gray-700">{t("admin.createProduct.sizeCode")}</Label>
                                                     <Input
                                                         value={newSize.code}
                                                         onChange={(e) =>
                                                             setNewSize({ ...newSize, code: e.target.value })
                                                         }
                                                         placeholder={t("admin.createProduct.sizeCodePlaceholder")}
-                                                        className="mt-1 bg-gray-700/50 border-gray-600 text-white"
+                                                        className="mt-1 bg-white border-gray-300 text-gray-900"
                                                     />
                                                 </div>
                                                 <div>
-                                                    <Label className="text-gray-300">{t("admin.createProduct.sizeName")}</Label>
+                                                    <Label className="text-gray-700">{t("admin.createProduct.sizeName")}</Label>
                                                     <Input
                                                         value={newSize.name}
                                                         onChange={(e) =>
                                                             setNewSize({ ...newSize, name: e.target.value })
                                                         }
                                                         placeholder={t("admin.createProduct.sizeNamePlaceholder")}
-                                                        className="mt-1 bg-gray-700/50 border-gray-600 text-white"
+                                                        className="mt-1 bg-white border-gray-300 text-gray-900"
                                                     />
                                                 </div>
                                             </div>
                                             <div className="grid grid-cols-3 gap-4">
                                                 <div>
-                                                    <Label className="text-gray-300">{t("admin.createProduct.eurSize")}</Label>
+                                                    <Label className="text-gray-700">{t("admin.createProduct.eurSize")}</Label>
                                                     <Input
                                                         value={newSize.eur}
                                                         onChange={(e) =>
                                                             setNewSize({ ...newSize, eur: e.target.value })
                                                         }
                                                         placeholder={t("admin.createProduct.eurSizePlaceholder")}
-                                                        className="mt-1 bg-gray-700/50 border-gray-600 text-white"
+                                                        className="mt-1 bg-white border-gray-300 text-gray-900"
                                                     />
                                                 </div>
                                                 <div>
-                                                    <Label className="text-gray-300">{t("admin.createProduct.usSize")}</Label>
+                                                    <Label className="text-gray-700">{t("admin.createProduct.usSize")}</Label>
                                                     <Input
                                                         value={newSize.us}
                                                         onChange={(e) => setNewSize({ ...newSize, us: e.target.value })}
                                                         placeholder={t("admin.createProduct.usSizePlaceholder")}
-                                                        className="mt-1 bg-gray-700/50 border-gray-600 text-white"
+                                                        className="mt-1 bg-white border-gray-300 text-gray-900"
                                                     />
                                                 </div>
                                                 <div>
-                                                    <Label className="text-gray-300">{t("admin.createProduct.xSize")}</Label>
+                                                    <Label className="text-gray-700">{t("admin.createProduct.xSize")}</Label>
                                                     <Input
                                                         value={newSize.x}
                                                         onChange={(e) => setNewSize({ ...newSize, x: e.target.value })}
                                                         placeholder={t("admin.createProduct.xSizePlaceholder")}
-                                                        className="mt-1 bg-gray-700/50 border-gray-600 text-white"
+                                                        className="mt-1 bg-white border-gray-300 text-gray-900"
                                                     />
                                                 </div>
                                             </div>
@@ -988,7 +988,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                 <Button
                                                     onClick={() => setShowSizeForm(false)}
                                                     variant="outline"
-                                                    className="border-gray-600 text-gray-300 hover:bg-gray-700"
+                                                    className="border-gray-300 text-gray-700 hover:bg-gray-50"
                                                 >
                                                     {t("common.cancel")}
                                                 </Button>
@@ -1000,17 +1000,17 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
 
                             {/* Right Column - Product Variants */}
                             <div className="space-y-6">
-                                <Card className="bg-gray-800/50 border-gray-700/50">
+                                <Card className="bg-gray-50 border-gray-200">
                                     <CardHeader>
                                         <div className="flex items-center justify-between">
-                                            <CardTitle className="text-lg text-white flex items-center gap-2">
-                                                <Box className="h-5 w-5 text-morpheus-gold-light" />
+                                            <CardTitle className="text-lg text-gray-900 flex items-center gap-2">
+                                                <Box className="h-5 w-5 text-blue-600" />
                                                 {t("admin.createProduct.productVariants")}
                                             </CardTitle>
                                             <Button
                                                 onClick={handleAddVariant}
                                                 size="sm"
-                                                className="bg-morpheus-gold-dark hover:bg-morpheus-gold-light text-white"
+                                                className="bg-blue-600 hover:bg-blue-500 text-white"
                                             >
                                                 <Plus className="h-4 w-4 mr-1" />
                                                 {t("admin.createProduct.addVariant")}
@@ -1024,11 +1024,11 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                             const StatusIcon = statusDisplay.icon;
 
                                             return (
-                                                <Card key={variant.id} className={`bg-gray-700/30 border-gray-600/50 ${!canEdit ? 'opacity-75' : ''}`}>
+                                                <Card key={variant.id} className={`bg-white border-gray-200 ${!canEdit ? 'opacity-75' : ''}`}>
                                                     <CardHeader className="pb-3">
                                                         <div className="flex items-center justify-between">
                                                             <div className="flex items-center gap-3">
-                                                                <CardTitle className="text-base text-white">
+                                                                <CardTitle className="text-base text-gray-900">
                                                                     {t("admin.createProduct.variant")} {index + 1}
                                                                 </CardTitle>
                                                                 {variant.yvarprodid && (
@@ -1041,7 +1041,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                                     </Badge>
                                                                 )}
                                                                 {!canEdit && variant.yvarprodid && (
-                                                                    <Badge variant="secondary" className="bg-gray-500/20 text-gray-400 border-gray-500/30 text-xs">
+                                                                    <Badge variant="secondary" className="bg-gray-100 text-gray-600 border-gray-200 text-xs">
                                                                         {t("admin.createProduct.readOnly")}
                                                                     </Badge>
                                                                 )}
@@ -1051,7 +1051,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                                     onClick={() => handleRemoveVariant(variant.id)}
                                                                     size="sm"
                                                                     variant="outline"
-                                                                    className="border-red-600 text-red-400 hover:bg-red-900/50"
+                                                                    className="border-red-300 text-red-600 hover:bg-red-50"
                                                                 >
                                                                     <Trash2 className="h-3 w-3" />
                                                                 </Button>
@@ -1061,8 +1061,8 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                     <CardContent className="space-y-4">
                                                         <div className="grid grid-cols-1 gap-4">
                                                             <div>
-                                                                <Label className="text-gray-300">
-                                                                    {t("admin.createProduct.variantName")} <span className="text-red-400">*</span>
+                                                                <Label className="text-gray-700">
+                                                                    {t("admin.createProduct.variantName")} <span className="text-red-600">*</span>
                                                                 </Label>
                                                                 <Input
                                                                     value={variant.name}
@@ -1074,12 +1074,12 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                                         )
                                                                     }
                                                                     placeholder={t("admin.createProduct.enterVariantName")}
-                                                                    className="mt-1 bg-gray-600/50 border-gray-500 text-white"
+                                                                    className="mt-1 bg-white border-gray-300 text-gray-900"
                                                                     disabled={!canEdit}
                                                                 />
                                                             </div>
                                                             <div>
-                                                                <Label className="text-gray-300">
+                                                                <Label className="text-gray-700">
                                                                     {t("admin.createProduct.variantCode")}{" "}
                                                                     <span className="text-gray-500 text-sm">
                                                                         ({t("common.optional")})
@@ -1095,7 +1095,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                                         )
                                                                     }
                                                                     placeholder={t("admin.createProduct.autoGeneratedIfEmpty")}
-                                                                    className="mt-1 bg-gray-600/50 border-gray-500 text-white"
+                                                                    className="mt-1 bg-white border-gray-300 text-gray-900"
                                                                     disabled={!canEdit}
                                                                 />
                                                             </div>
@@ -1104,9 +1104,9 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                         <div className="grid grid-cols-2 gap-4">
                                                             {/* Color Selection */}
                                                             <div>
-                                                                <Label className="text-gray-300 flex items-center gap-1">
+                                                                <Label className="text-gray-700 flex items-center gap-1">
                                                                     <Palette className="h-3 w-3" />
-                                                                    {t("admin.color") || "Color"} <span className="text-red-400">*</span>
+                                                                    {t("admin.color") || "Color"} <span className="text-red-600">*</span>
                                                                 </Label>
                                                                 <div className="flex gap-2 mt-1">
                                                                     <SuperSelect
@@ -1128,7 +1128,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                                             onClick={() => setShowColorForm(!showColorForm)}
                                                                             size="sm"
                                                                             variant="outline"
-                                                                            className="border-gray-600 text-gray-300 hover:bg-gray-700"
+                                                                            className="border-gray-300 text-gray-700 hover:bg-gray-50"
                                                                         >
                                                                             <Plus className="h-3 w-3" />
                                                                         </Button>
@@ -1138,9 +1138,9 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
 
                                                             {/* Size Selection */}
                                                             <div>
-                                                                <Label className="text-gray-300 flex items-center gap-1">
+                                                                <Label className="text-gray-700 flex items-center gap-1">
                                                                     <Ruler className="h-3 w-3" />
-                                                                    {t("admin.createProduct.size")} <span className="text-red-400">*</span>
+                                                                    {t("admin.createProduct.size")} <span className="text-red-600">*</span>
                                                                 </Label>
                                                                 <div className="flex gap-2 mt-1">
                                                                     <SuperSelect
@@ -1158,7 +1158,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                                             onClick={() => setShowSizeForm(!showSizeForm)}
                                                                             size="sm"
                                                                             variant="outline"
-                                                                            className="border-gray-600 text-gray-300 hover:bg-gray-700"
+                                                                            className="border-gray-300 text-gray-700 hover:bg-gray-50"
                                                                         >
                                                                             <Plus className="h-3 w-3" />
                                                                         </Button>
@@ -1169,9 +1169,9 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
 
                                                         {/* Pricing Section (Admin Only) */}
                                                         {isAdmin && canEdit && (
-                                                            <div className="space-y-4 border-t border-gray-600/30 pt-4">
-                                                                <Label className="text-gray-300 flex items-center gap-2">
-                                                                    <svg className="h-4 w-4 text-morpheus-gold-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <div className="space-y-4 border-t border-gray-200 pt-4">
+                                                                <Label className="text-gray-700 flex items-center gap-2">
+                                                                    <svg className="h-4 w-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
                                                                     </svg>
                                                                     {t("admin.createProduct.pricingPromotion")}
@@ -1180,7 +1180,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                                     {/* Currency Selection */}
                                                                     <div>
-                                                                        <Label className="text-gray-300 text-sm">{t("admin.createProduct.currency")}</Label>
+                                                                        <Label className="text-gray-700 text-sm">{t("admin.createProduct.currency")}</Label>
                                                                         <SuperSelect
                                                                             value={variant.currencyId}
                                                                             onValueChange={(value) =>
@@ -1195,7 +1195,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
 
                                                                     {/* Catalog Price */}
                                                                     <div>
-                                                                        <Label className="text-gray-300 text-sm">{t("admin.createProduct.catalogPrice")}</Label>
+                                                                        <Label className="text-gray-700 text-sm">{t("admin.createProduct.catalogPrice")}</Label>
                                                                         <Input
                                                                             type="number"
                                                                             min="0"
@@ -1224,13 +1224,13 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                                                 }
                                                                             }}
                                                                             placeholder="0.00"
-                                                                            className="mt-1 bg-gray-600/50 border-gray-500 text-white"
+                                                                            className="mt-1 bg-white border-gray-300 text-gray-900"
                                                                         />
                                                                     </div>
 
                                                                     {/* Promotion Price */}
                                                                     <div>
-                                                                        <Label className="text-gray-300 text-sm">{t("admin.createProduct.promotionPriceOptional")}</Label>
+                                                                        <Label className="text-gray-700 text-sm">{t("admin.createProduct.promotionPriceOptional")}</Label>
                                                                         <Input
                                                                             type="number"
                                                                             min="0"
@@ -1244,13 +1244,13 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                                                 )
                                                                             }
                                                                             placeholder="0.00"
-                                                                            className="mt-1 bg-gray-600/50 border-gray-500 text-white"
+                                                                            className="mt-1 bg-white border-gray-300 text-gray-900"
                                                                         />
                                                                     </div>
 
                                                                     {/* Promotion Start Date */}
                                                                     <div>
-                                                                        <Label className="text-gray-300 text-sm">{t("admin.createProduct.promotionStartDate")}</Label>
+                                                                        <Label className="text-gray-700 text-sm">{t("admin.createProduct.promotionStartDate")}</Label>
                                                                         <Input
                                                                             type="date"
                                                                             value={variant.promotionStartDate || ""}
@@ -1261,13 +1261,13 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                                                     e.target.value || null
                                                                                 )
                                                                             }
-                                                                            className="mt-1 bg-gray-600/50 border-gray-500 text-white"
+                                                                            className="mt-1 bg-white border-gray-300 text-gray-900"
                                                                         />
                                                                     </div>
 
                                                                     {/* Promotion End Date */}
                                                                     <div className="sm:col-span-2">
-                                                                        <Label className="text-gray-300 text-sm">{t("admin.createProduct.promotionEndDate")}</Label>
+                                                                        <Label className="text-gray-700 text-sm">{t("admin.createProduct.promotionEndDate")}</Label>
                                                                         <Input
                                                                             type="date"
                                                                             value={variant.promotionEndDate || ""}
@@ -1278,7 +1278,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                                                     e.target.value || null
                                                                                 )
                                                                             }
-                                                                            className="mt-1 bg-gray-600/50 border-gray-500 text-white"
+                                                                            className="mt-1 bg-white border-gray-300 text-gray-900"
                                                                         />
                                                                     </div>
                                                                 </div>
@@ -1288,13 +1288,13 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                         {/* Media Upload */}
                                                         {canEdit && (
                                                             <div className="space-y-3">
-                                                                <Label className="text-gray-300">{t("admin.createProduct.mediaFiles")}</Label>
+                                                                <Label className="text-gray-700">{t("admin.createProduct.mediaFiles")}</Label>
 
                                                                 {/* Images */}
                                                                 <div>
                                                                     <div className="flex items-center gap-2 mb-2">
-                                                                        <Image className="h-4 w-4 text-blue-400" />
-                                                                        <span className="text-sm text-gray-300">{t("admin.createProduct.images")}</span>
+                                                                        <Image className="h-4 w-4 text-blue-600" />
+                                                                        <span className="text-sm text-gray-700">{t("admin.createProduct.images")}</span>
                                                                         <input
                                                                             type="file"
                                                                             multiple
@@ -1318,7 +1318,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                                             }
                                                                             size="sm"
                                                                             variant="outline"
-                                                                            className="border-blue-600 text-blue-400 hover:bg-blue-900/50"
+                                                                            className="border-blue-300 text-blue-600 hover:bg-blue-50"
                                                                         >
                                                                             <Upload className="h-3 w-3 mr-1" />
                                                                             {t("admin.createProduct.upload")}
@@ -1329,7 +1329,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                                             <Badge
                                                                                 key={fileIndex}
                                                                                 variant="secondary"
-                                                                                className="bg-blue-500/20 text-blue-300 border-blue-500/30"
+                                                                                className="bg-blue-100 text-blue-800 border-blue-200"
                                                                             >
                                                                                 {file instanceof File
                                                                                     ? file.name
@@ -1344,7 +1344,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                                                     }
                                                                                     size="sm"
                                                                                     variant="ghost"
-                                                                                    className="h-4 w-4 p-0 ml-1 hover:bg-red-500/20"
+                                                                                    className="h-4 w-4 p-0 ml-1 hover:bg-red-100"
                                                                                 >
                                                                                     <Trash2 className="h-2 w-2" />
                                                                                 </Button>
@@ -1356,8 +1356,8 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                                 {/* Videos */}
                                                                 <div>
                                                                     <div className="flex items-center gap-2 mb-2">
-                                                                        <Video className="h-4 w-4 text-green-400" />
-                                                                        <span className="text-sm text-gray-300">{t("admin.createProduct.videos")}</span>
+                                                                        <Video className="h-4 w-4 text-green-600" />
+                                                                        <span className="text-sm text-gray-700">{t("admin.createProduct.videos")}</span>
                                                                         <input
                                                                             type="file"
                                                                             multiple
@@ -1381,7 +1381,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                                             }
                                                                             size="sm"
                                                                             variant="outline"
-                                                                            className="border-green-600 text-green-400 hover:bg-green-900/50"
+                                                                            className="border-green-300 text-green-600 hover:bg-green-50"
                                                                         >
                                                                             <Upload className="h-3 w-3 mr-1" />
                                                                             {t("admin.createProduct.upload")}
@@ -1392,7 +1392,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                                             <Badge
                                                                                 key={fileIndex}
                                                                                 variant="secondary"
-                                                                                className="bg-green-500/20 text-green-300 border-green-500/30"
+                                                                                className="bg-green-100 text-green-800 border-green-200"
                                                                             >
                                                                                 {file instanceof File
                                                                                     ? file.name
@@ -1407,7 +1407,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                                                     }
                                                                                     size="sm"
                                                                                     variant="ghost"
-                                                                                    className="h-4 w-4 p-0 ml-1 hover:bg-red-500/20"
+                                                                                    className="h-4 w-4 p-0 ml-1 hover:bg-red-100"
                                                                                 >
                                                                                     <Trash2 className="h-2 w-2" />
                                                                                 </Button>
@@ -1419,8 +1419,8 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                                 {/* 3D Models */}
                                                                 <div>
                                                                     <div className="flex items-center gap-2 mb-2">
-                                                                        <Box className="h-4 w-4 text-purple-400" />
-                                                                        <span className="text-sm text-gray-300">{t("admin.createProduct.models3d")}</span>
+                                                                        <Box className="h-4 w-4 text-purple-600" />
+                                                                        <span className="text-sm text-gray-700">{t("admin.createProduct.models3d")}</span>
                                                                         <input
                                                                             type="file"
                                                                             // Only allow one file for 3D models
@@ -1445,7 +1445,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                                             }
                                                                             size="sm"
                                                                             variant="outline"
-                                                                            className="border-purple-600 text-purple-400 hover:bg-purple-900/50"
+                                                                            className="border-purple-300 text-purple-600 hover:bg-purple-50"
                                                                         >
                                                                             <Upload className="h-3 w-3 mr-1" />
                                                                             {t("admin.createProduct.upload")}
@@ -1454,7 +1454,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
 
                                                                     {/* Background Color Input */}
                                                                     <div className="mb-3">
-                                                                        <Label className="text-gray-300 text-sm flex items-center gap-1">
+                                                                        <Label className="text-gray-700 text-sm flex items-center gap-1">
                                                                             <Palette className="h-3 w-3" />
                                                                             3D Model Background Color
                                                                         </Label>
@@ -1469,7 +1469,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                                                         e.target.value
                                                                                     )
                                                                                 }
-                                                                                className="w-12 h-8 bg-gray-700/50 border border-gray-600 rounded cursor-pointer"
+                                                                                className="w-12 h-8 bg-white border border-gray-300 rounded cursor-pointer"
                                                                                 title="Select background color for 3D model"
                                                                             />
                                                                             <Input
@@ -1482,11 +1482,11 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                                                     )
                                                                                 }
                                                                                 placeholder="#ffffff"
-                                                                                className="flex-1 bg-gray-600/50 border-gray-500 text-white text-sm"
+                                                                                className="flex-1 bg-white border-gray-300 text-gray-900 text-sm"
                                                                                 maxLength={7}
                                                                             />
                                                                         </div>
-                                                                        <div className="text-xs text-gray-400 mt-1">
+                                                                        <div className="text-xs text-gray-500 mt-1">
                                                                             Background color for the 3D model viewer
                                                                         </div>
                                                                     </div>
@@ -1496,7 +1496,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                                             <Badge
                                                                                 key={fileIndex}
                                                                                 variant="secondary"
-                                                                                className="bg-purple-500/20 text-purple-300 border-purple-500/30"
+                                                                                className="bg-purple-100 text-purple-800 border-purple-200"
                                                                             >
                                                                                 {file instanceof File
                                                                                     ? file.name
@@ -1511,7 +1511,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                                                     }
                                                                                     size="sm"
                                                                                     variant="ghost"
-                                                                                    className="h-4 w-4 p-0 ml-1 hover:bg-red-500/20"
+                                                                                    className="h-4 w-4 p-0 ml-1 hover:bg-red-100"
                                                                                 >
                                                                                     <Trash2 className="h-2 w-2" />
                                                                                 </Button>
@@ -1525,21 +1525,21 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                         {/* Read-only media display for non-editable variants */}
                                                         {!canEdit && variant.yvarprodid && (
                                                             <div className="space-y-3">
-                                                                <Label className="text-gray-300">{t("admin.createProduct.mediaFilesReadOnly")}</Label>
+                                                                <Label className="text-gray-700">{t("admin.createProduct.mediaFilesReadOnly")}</Label>
 
                                                                 {/* Display existing images */}
                                                                 {variant.images.length > 0 && (
                                                                     <div>
                                                                         <div className="flex items-center gap-2 mb-2">
-                                                                            <Image className="h-4 w-4 text-blue-400" />
-                                                                            <span className="text-sm text-gray-300">{t("admin.createProduct.images")}</span>
+                                                                            <Image className="h-4 w-4 text-blue-600" />
+                                                                            <span className="text-sm text-gray-700">{t("admin.createProduct.images")}</span>
                                                                         </div>
                                                                         <div className="flex flex-wrap gap-2">
                                                                             {variant.images.map((file, fileIndex) => (
                                                                                 <Badge
                                                                                     key={fileIndex}
                                                                                     variant="secondary"
-                                                                                    className="bg-blue-500/20 text-blue-300 border-blue-500/30"
+                                                                                    className="bg-blue-100 text-blue-800 border-blue-200"
                                                                                 >
                                                                                     {file instanceof File
                                                                                         ? file.name
@@ -1554,15 +1554,15 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                                 {variant.videos.length > 0 && (
                                                                     <div>
                                                                         <div className="flex items-center gap-2 mb-2">
-                                                                            <Video className="h-4 w-4 text-green-400" />
-                                                                            <span className="text-sm text-gray-300">{t("admin.createProduct.videos")}</span>
+                                                                            <Video className="h-4 w-4 text-green-600" />
+                                                                            <span className="text-sm text-gray-700">{t("admin.createProduct.videos")}</span>
                                                                         </div>
                                                                         <div className="flex flex-wrap gap-2">
                                                                             {variant.videos.map((file, fileIndex) => (
                                                                                 <Badge
                                                                                     key={fileIndex}
                                                                                     variant="secondary"
-                                                                                    className="bg-green-500/20 text-green-300 border-green-500/30"
+                                                                                    className="bg-green-100 text-green-800 border-green-200"
                                                                                 >
                                                                                     {file instanceof File
                                                                                         ? file.name
@@ -1577,15 +1577,15 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                                 {variant.models3d.length > 0 && (
                                                                     <div>
                                                                         <div className="flex items-center gap-2 mb-2">
-                                                                            <Box className="h-4 w-4 text-purple-400" />
-                                                                            <span className="text-sm text-gray-300">{t("admin.createProduct.models3d")}</span>
+                                                                            <Box className="h-4 w-4 text-purple-600" />
+                                                                            <span className="text-sm text-gray-700">{t("admin.createProduct.models3d")}</span>
                                                                         </div>
                                                                         <div className="flex flex-wrap gap-2">
                                                                             {variant.models3d.map((file, fileIndex) => (
                                                                                 <Badge
                                                                                     key={fileIndex}
                                                                                     variant="secondary"
-                                                                                    className="bg-purple-500/20 text-purple-300 border-purple-500/30"
+                                                                                    className="bg-purple-100 text-purple-800 border-purple-200"
                                                                                 >
                                                                                     {file instanceof File
                                                                                         ? file.name
@@ -1613,27 +1613,27 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                     <div className="px-6 pb-4">
                         <div className="space-y-2">
                             <div className="flex items-center justify-between text-sm">
-                                <span className="text-gray-300">
+                                <span className="text-gray-700">
                                     {isEditMode ? t("admin.createProduct.updatingProduct") : t("admin.createProduct.creatingProduct")}
                                 </span>
-                                <span className="text-morpheus-gold-light font-medium">
+                                <span className="text-blue-600 font-medium">
                                     {Math.round(progress)}%
                                 </span>
                             </div>
                             <Progress
                                 value={progress}
-                                className="h-2 bg-gray-700"
+                                className="h-2 bg-gray-200"
                             />
                         </div>
                     </div>
                 )}
 
                 {/* Dialog Footer */}
-                <div className="flex justify-end gap-3 pt-4 border-t border-gray-700/50">
+                <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
                     <Button
                         onClick={onClose}
                         variant="outline"
-                        className="border-gray-600 text-gray-300 hover:bg-gray-700"
+                        className="border-gray-300 text-gray-700 hover:bg-gray-50"
                         disabled={isSubmitting || (isEditMode && productDetailsLoading) || (isEditMode && productDetailsError)}
                     >
                         {t("common.cancel")}
@@ -1648,7 +1648,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                             (isEditMode && productDetailsLoading) ||
                             (isEditMode && productDetailsError)
                         }
-                        className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-morpheus-gold-dark hover:to-morpheus-gold-light text-white font-semibold transition-all duration-300 hover:scale-105"
+                        className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-semibold transition-all duration-300 hover:scale-105"
                     >
                         {isSubmitting ? (
                             <div className="flex items-center gap-2">

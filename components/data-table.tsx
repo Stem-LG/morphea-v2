@@ -129,8 +129,8 @@ export function DataTable<T extends object>({
     if (isLoading) {
         return (
             <div className="flex flex-col items-center justify-center gap-4">
-                <Loader className="animate-spin-slow size-12 text-primary" />
-                <div className="text-lg font-semibold">Please wait</div>
+                <Loader className="animate-spin-slow size-12 text-blue-600" />
+                <div className="text-lg font-semibold text-gray-900">Please wait</div>
             </div>
         );
     }
@@ -141,17 +141,17 @@ export function DataTable<T extends object>({
             <div className="flex justify-between items-center mb-4">
                 <div className="flex items-center gap-4">
                     <div className="relative max-w-80 w-full">
-                        <Search className="absolute left-3 top-2.5 size-4" />
+                        <Search className="absolute left-3 top-2.5 size-4 text-gray-400" />
                         <Input
                             placeholder="Search"
-                            className="w-full px-8"
+                            className="w-full px-8 bg-white border-gray-300 text-gray-900 placeholder:text-gray-500"
                             value={globalFilter}
                             onChange={(e) => handleGlobalFilterChange(e.target.value)}
                         />
                         <Button
                             variant="ghost"
                             size="sm"
-                            className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                            className="absolute right-0 top-0 h-full px-3 hover:bg-gray-100 text-gray-500"
                             onClick={() => handleGlobalFilterChange("")}
                         >
                             <Delete className="h-4 w-4" />
@@ -162,23 +162,23 @@ export function DataTable<T extends object>({
                 <div>{actions}</div>
             </div>
             {/* Table */}
-            <div className="rounded-md border bg-gradient-to-br from-morpheus-blue-dark to-morpheus-blue-light">
+            <div className="rounded-md border bg-white shadow-sm">
                 <Table>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
-                            <TableRow key={headerGroup.id}>
+                            <TableRow key={headerGroup.id} className="border-b bg-gray-50/50">
                                 {headerGroup.headers.map((header, index) => (
                                     <TableHead
                                         key={header.id}
-                                        className={index === 0 ? "text-center py-4" : "py-4"}
+                                        className={index === 0 ? "text-center py-4 text-gray-900 font-semibold" : "py-4 text-gray-900 font-semibold"}
                                         onClick={() => header.column.toggleSorting()}
                                     >
                                         {header.isPlaceholder
                                             ? null
                                             : flexRender(header.column.columnDef.header, header.getContext())}
                                         {{
-                                            asc: <span className="inline-block transform rotate-0">▲</span>,
-                                            desc: <span className="inline-block transform rotate-180">▲</span>,
+                                            asc: <span className="inline-block transform rotate-0 text-blue-600">▲</span>,
+                                            desc: <span className="inline-block transform rotate-180 text-blue-600">▲</span>,
                                         }[header.column.getIsSorted() as string] ?? null}
                                     </TableHead>
                                 ))}
@@ -190,13 +190,13 @@ export function DataTable<T extends object>({
                             table.getRowModel().rows.map((row) => (
                                 <TableRow
                                     key={row.id}
-                                    className="hover:bg-muted/50 cursor-pointer"
+                                    className="hover:bg-gray-50 border-b border-gray-100 cursor-pointer"
                                     onClick={() => onRowClick && onRowClick(row.original)}
                                 >
                                     {row.getVisibleCells().map((cell, index) => (
                                         <TableCell
                                             key={cell.id}
-                                            className={index === 0 ? "text-center py-4 px-2" : "py-4 px-2"}
+                                            className={index === 0 ? "text-center py-4 px-2 text-gray-900" : "py-4 px-2 text-gray-900"}
                                         >
                                             {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                         </TableCell>
@@ -205,7 +205,7 @@ export function DataTable<T extends object>({
                             ))
                         ) : (
                             <TableRow>
-                                <TableCell colSpan={columns.length} className="h-24 text-center">
+                                <TableCell colSpan={columns.length} className="h-24 text-center text-gray-500">
                                     No results.
                                 </TableCell>
                             </TableRow>

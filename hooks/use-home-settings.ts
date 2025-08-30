@@ -19,6 +19,13 @@ interface HomeSettings {
       discoverLink: string | null
     }
   }
+  // Video Animation Section
+  videoAnimation: {
+    title: { en: string | null; fr: string | null }
+    description: { en: string | null; fr: string | null }
+    buttonText: { en: string | null; fr: string | null }
+    buttonLink: string | null
+  }
   // Collections Section
   collections: {
     title: { en: string | null; fr: string | null }
@@ -166,6 +173,21 @@ export function useHomeSettings() {
             },
             discoverLink: getSetting('homepage_hero_video2_discover_link')
           }
+        },
+        videoAnimation: {
+          title: {
+            en: getSetting('homepage_video_animation_title_en'),
+            fr: getSetting('homepage_video_animation_title_fr')
+          },
+          description: {
+            en: getSetting('homepage_video_animation_description_en'),
+            fr: getSetting('homepage_video_animation_description_fr')
+          },
+          buttonText: {
+            en: getSetting('homepage_video_animation_button_text_en'),
+            fr: getSetting('homepage_video_animation_button_text_fr')
+          },
+          buttonLink: getSetting('homepage_video_animation_button_link')
         },
         collections: {
           title: {

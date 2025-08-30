@@ -176,7 +176,7 @@ export default function StoresManagement() {
                 {isAdmin && (
                     <Button
                         onClick={handleAddStore}
-                        className="from-morpheus-gold-dark to-morpheus-gold-light hover:from-morpheus-gold-dark hover:to-morpheus-gold-light bg-gradient-to-r font-semibold text-white shadow-2xl transition-all duration-300 hover:scale-105"
+                        className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 font-semibold text-white shadow-2xl transition-all duration-300 hover:scale-105"
                     >
                         <Plus className="mr-2 h-4 w-4" />
                         {t('admin.addNewStore')}
@@ -191,7 +191,7 @@ export default function StoresManagement() {
                         {/* Event Selector */}
                         <div className="space-y-2">
                             <Label className="flex items-center gap-2 text-gray-900">
-                                <Calendar className="text-morpheus-gold-light h-4 w-4" />
+                                <Calendar className="text-blue-600 h-4 w-4" />
                                 {t('admin.selectEvent')} {isStoreAdmin && '*'}
                             </Label>
                             <Select
@@ -206,7 +206,7 @@ export default function StoresManagement() {
                                 }
                                 disabled={eventsLoading}
                             >
-                                <SelectTrigger className="focus:border-morpheus-gold-light border-gray-300 bg-white text-gray-900">
+                                <SelectTrigger className="focus:border-blue-500 border-gray-300 bg-white text-gray-900 shadow-sm">
                                     <SelectValue
                                         placeholder={
                                             eventsLoading
@@ -215,11 +215,11 @@ export default function StoresManagement() {
                                         }
                                     />
                                 </SelectTrigger>
-                                <SelectContent className="border-gray-600 bg-gray-800">
+                                <SelectContent className="border-gray-300 bg-white shadow-lg">
                                     {isAdmin && (
                                         <SelectItem
                                             value="all"
-                                            className="text-white hover:bg-gray-700 focus:bg-gray-700"
+                                            className="text-gray-900 focus:bg-gray-100"
                                         >
                                             {t('admin.allEvents')}
                                         </SelectItem>
@@ -228,7 +228,7 @@ export default function StoresManagement() {
                                         <SelectItem
                                             key={event.yeventid}
                                             value={event.yeventid.toString()}
-                                            className="text-white hover:bg-gray-700 focus:bg-gray-700"
+                                            className="text-gray-900 focus:bg-gray-100"
                                         >
                                             {event.yeventintitule}
                                         </SelectItem>
@@ -236,7 +236,7 @@ export default function StoresManagement() {
                                 </SelectContent>
                             </Select>
                             {isStoreAdmin && !selectedEventId && (
-                                <p className="text-sm text-yellow-400">
+                                <p className="text-sm text-yellow-600">
                                     {t('admin.eventRequiredForDesigners')}
                                 </p>
                             )}
@@ -244,8 +244,8 @@ export default function StoresManagement() {
 
                         {/* Mall Selector */}
                         <div className="space-y-2">
-                            <Label className="flex items-center gap-2 text-white">
-                                <Building2 className="text-morpheus-gold-light h-4 w-4" />
+                            <Label className="flex items-center gap-2 text-gray-900">
+                                <Building2 className="text-blue-600 h-4 w-4" />
                                 {t('admin.selectMall')}
                             </Label>
                             <Select
@@ -260,7 +260,7 @@ export default function StoresManagement() {
                                 }
                                 disabled={mallsLoading}
                             >
-                                <SelectTrigger className="focus:border-morpheus-gold-light border-gray-600 bg-gray-800/50 text-white">
+                                <SelectTrigger className="focus:border-blue-500 border-gray-300 bg-white text-gray-900 shadow-sm">
                                     <SelectValue
                                         placeholder={
                                             mallsLoading
@@ -269,10 +269,10 @@ export default function StoresManagement() {
                                         }
                                     />
                                 </SelectTrigger>
-                                <SelectContent className="border-gray-600 bg-gray-800">
+                                <SelectContent className="border-gray-300 bg-white shadow-lg">
                                     <SelectItem
                                         value="all"
-                                        className="text-white hover:bg-gray-700 focus:bg-gray-700"
+                                        className="text-gray-900 focus:bg-gray-100"
                                     >
                                         {t('admin.allMalls')}
                                     </SelectItem>
@@ -280,7 +280,7 @@ export default function StoresManagement() {
                                         <SelectItem
                                             key={mall.ymallid}
                                             value={mall.ymallid.toString()}
-                                            className="text-white hover:bg-gray-700 focus:bg-gray-700"
+                                            className="text-gray-900 focus:bg-gray-100"
                                         >
                                             {mall.ymallintitule}
                                         </SelectItem>
@@ -305,21 +305,21 @@ export default function StoresManagement() {
 
                 {/* Error State */}
                 {isError && (
-                    <Card className="border-red-700/50 bg-gradient-to-br from-red-900/20 to-red-800/10 backdrop-blur-sm">
+                    <Card className="border-red-200 bg-gradient-to-br from-red-50/50 to-white/50 backdrop-blur-sm">
                         <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-                            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-900/30">
-                                <Store className="h-8 w-8 text-red-400" />
+                            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
+                                <Store className="h-8 w-8 text-red-600" />
                             </div>
-                            <h3 className="mb-2 text-xl font-semibold text-white">
+                            <h3 className="mb-2 text-xl font-semibold text-gray-900">
                                 {t('admin.errorLoadingStores')}
                             </h3>
-                            <p className="mb-4 text-gray-400">
+                            <p className="mb-4 text-gray-600">
                                 {error?.message || t('common.error')}
                             </p>
                             <Button
                                 variant="outline"
                                 onClick={() => window.location.reload()}
-                                className="border-red-700/50 text-red-400 hover:bg-red-900/30"
+                                className="border-red-300 text-red-600 hover:bg-red-50"
                             >
                                 {t('common.retry') || 'Retry'}
                             </Button>
@@ -342,15 +342,15 @@ export default function StoresManagement() {
                                 ))}
                             </div>
                         ) : (
-                            <Card className="border-gray-700/50 bg-gradient-to-br from-gray-900/50 to-gray-800/30 backdrop-blur-sm">
+                            <Card className="border-gray-200 bg-gradient-to-br from-gray-50/50 to-white/50 backdrop-blur-sm">
                                 <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-                                    <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-800/50">
+                                    <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
                                         <Store className="h-8 w-8 text-gray-400" />
                                     </div>
-                                    <h3 className="mb-2 text-xl font-semibold text-white">
+                                    <h3 className="mb-2 text-xl font-semibold text-gray-900">
                                         {t('admin.noStoresFound')}
                                     </h3>
-                                    <p className="mb-6 text-gray-400">
+                                    <p className="mb-6 text-gray-600">
                                         {isAdmin
                                             ? t('admin.noStoresDescription')
                                             : isStoreAdmin
@@ -364,7 +364,7 @@ export default function StoresManagement() {
                                     {isAdmin && (
                                         <Button
                                             onClick={handleAddStore}
-                                            className="from-morpheus-gold-dark to-morpheus-gold-light hover:from-morpheus-gold-dark hover:to-morpheus-gold-light bg-gradient-to-r font-semibold text-white transition-all duration-300 hover:scale-105"
+                                            className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 font-semibold text-white transition-all duration-300 hover:scale-105"
                                         >
                                             <Plus className="mr-2 h-4 w-4" />
                                             {t('admin.addNewStore')}
