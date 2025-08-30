@@ -21,6 +21,8 @@ import {
     SheetContent,
     SheetTitle,
 } from '@/components/ui/sheet'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { Separator } from '@/components/ui/separator'
 
 // Custom SVG Components
 const ThreeColumnIcon = ({
@@ -535,20 +537,23 @@ function ShopContent() {
                 <SheetTitle />
                 <SheetContent side="right" className="bg-white">
                     {/* Header */}
-                    <div className="flex items-center justify-between border-b border-gray-200 p-6">
-                        <h2 className="text-xl font-medium text-gray-900">
-                            Filtrer & Trier
-                        </h2>
-                        <SheetClose>
-                            <div className="rounded-full p-2 transition-colors hover:bg-gray-100">
-                                <X className="h-5 w-5" />
-                            </div>
-                        </SheetClose>
+                    <div className="flex-shrink-0">
+                        <div className="flex items-center justify-center py-4 text-3xl">
+                            <h1 className="font-recia font-medium">Filtrer & Trier</h1>
+                        </div>
+                        <Separator />
                     </div>
 
+                    {/* Close button - positioned relative to the entire sheet */}
+                    <SheetClose>
+                        <div className="absolute top-10 right-7 z-10">
+                            <X className="size-5" />
+                        </div>
+                    </SheetClose>
+
                     {/* Content */}
-                    <div className="flex-1 overflow-y-auto">
-                        <div className="space-y-1 p-6">
+                    <ScrollArea className="flex-1 overflow-hidden">
+                        <div className="flex flex-col px-6">
                             {/* Sort Options */}
                             <div className="mb-6">
                                 <button
@@ -558,22 +563,21 @@ function ShopContent() {
                                             sort: !prev.sort,
                                         }))
                                     }
-                                    className="flex w-full items-center justify-between py-3 text-left"
+                                    className="h-12 w-full justify-between rounded-none text-lg text-neutral-400 hover:bg-morpheus-blue-lighter hover:text-white flex items-center p-4"
                                 >
-                                    <h3 className="text-lg font-medium text-gray-900">
-                                        Trier Par
-                                    </h3>
+                                    <span className="flex-1 text-left">Trier Par</span>
                                     <ChevronDown
                                         className={cn(
-                                            'h-5 w-5 text-gray-400 transition-transform',
+                                            'size-5 transition-transform',
                                             expandedSections.sort
                                                 ? 'rotate-180'
                                                 : ''
                                         )}
                                     />
                                 </button>
+                                <Separator />
                                 {expandedSections.sort && (
-                                    <div className="mt-2 space-y-2">
+                                    <div className="mt-2 space-y-0 px-2">
                                         <button
                                             onClick={() =>
                                                 handleFilterChange('sortBy')(
@@ -581,14 +585,15 @@ function ShopContent() {
                                                 )
                                             }
                                             className={cn(
-                                                'w-full rounded-lg px-4 py-3 text-left transition-colors',
+                                                'h-12 w-full justify-start rounded-none text-lg hover:bg-morpheus-blue-lighter hover:text-white flex items-center p-4',
                                                 sortBy === 'newest'
-                                                    ? 'bg-black text-white'
-                                                    : 'text-gray-700 hover:bg-gray-50'
+                                                    ? 'text-morpheus-blue-dark bg-gray-50'
+                                                    : 'text-neutral-400'
                                             )}
                                         >
                                             <span>Plus récent</span>
                                         </button>
+                                        <Separator />
                                         <button
                                             onClick={() =>
                                                 handleFilterChange('sortBy')(
@@ -596,14 +601,15 @@ function ShopContent() {
                                                 )
                                             }
                                             className={cn(
-                                                'w-full rounded-lg px-4 py-3 text-left transition-colors',
+                                                'h-12 w-full justify-start rounded-none text-lg hover:bg-morpheus-blue-lighter hover:text-white flex items-center p-4',
                                                 sortBy === 'price_asc'
-                                                    ? 'bg-black text-white'
-                                                    : 'text-gray-700 hover:bg-gray-50'
+                                                    ? 'text-morpheus-blue-dark bg-gray-50'
+                                                    : 'text-neutral-400'
                                             )}
                                         >
                                             <span>Prix croissant</span>
                                         </button>
+                                        <Separator />
                                         <button
                                             onClick={() =>
                                                 handleFilterChange('sortBy')(
@@ -611,14 +617,15 @@ function ShopContent() {
                                                 )
                                             }
                                             className={cn(
-                                                'w-full rounded-lg px-4 py-3 text-left transition-colors',
+                                                'h-12 w-full justify-start rounded-none text-lg hover:bg-morpheus-blue-lighter hover:text-white flex items-center p-4',
                                                 sortBy === 'price_desc'
-                                                    ? 'bg-black text-white'
-                                                    : 'text-gray-700 hover:bg-gray-50'
+                                                    ? 'text-morpheus-blue-dark bg-gray-50'
+                                                    : 'text-neutral-400'
                                             )}
                                         >
                                             <span>Prix décroissant</span>
                                         </button>
+                                        <Separator />
                                         <button
                                             onClick={() =>
                                                 handleFilterChange('sortBy')(
@@ -626,20 +633,21 @@ function ShopContent() {
                                                 )
                                             }
                                             className={cn(
-                                                'w-full rounded-lg px-4 py-3 text-left transition-colors',
+                                                'h-12 w-full justify-start rounded-none text-lg hover:bg-morpheus-blue-lighter hover:text-white flex items-center p-4',
                                                 sortBy === 'alphabetical'
-                                                    ? 'bg-black text-white'
-                                                    : 'text-gray-700 hover:bg-gray-50'
+                                                    ? 'text-morpheus-blue-dark bg-gray-50'
+                                                    : 'text-neutral-400'
                                             )}
                                         >
                                             <span>Alphabétique</span>
                                         </button>
+                                        <Separator />
                                     </div>
                                 )}
                             </div>
 
                             {/* Filter Categories */}
-                            <div className="space-y-4">
+                            <div className="space-y-0">
                                 {/* Categories */}
                                 {categories.length > 0 && (
                                     <div>
@@ -651,46 +659,45 @@ function ShopContent() {
                                                         !prev.categories,
                                                 }))
                                             }
-                                            className="flex w-full items-center justify-between py-3 text-left"
+                                            className="h-12 w-full justify-between rounded-none text-lg text-neutral-400 hover:bg-morpheus-blue-lighter hover:text-white flex items-center p-4"
                                         >
-                                            <h3 className="text-lg font-medium text-gray-900">
-                                                Catégories
-                                            </h3>
+                                            <span className="flex-1 text-left">Catégories</span>
                                             <ChevronDown
                                                 className={cn(
-                                                    'h-5 w-5 text-gray-400 transition-transform',
+                                                    'size-5 transition-transform',
                                                     expandedSections.categories
                                                         ? 'rotate-180'
                                                         : ''
                                                 )}
                                             />
                                         </button>
+                                        <Separator />
                                         {expandedSections.categories && (
-                                            <div className="mt-2 space-y-2">
+                                            <div className="mt-2 space-y-0 px-2">
                                                 {categories.map((category) => (
-                                                    <button
-                                                        key={
-                                                            category.xcategprodid
-                                                        }
-                                                        onClick={() =>
-                                                            handleFilterChange(
-                                                                'categoryId'
-                                                            )(
-                                                                category.xcategprodid
-                                                            )
-                                                        }
-                                                        className={cn(
-                                                            'w-full rounded-lg px-4 py-3 text-left transition-colors',
-                                                            categoryId ===
-                                                                category.xcategprodid
-                                                                ? 'bg-black text-white'
-                                                                : 'text-gray-700 hover:bg-gray-50'
-                                                        )}
-                                                    >
-                                                        {
-                                                            category.xcategprodintitule
-                                                        }
-                                                    </button>
+                                                    <div key={category.xcategprodid}>
+                                                        <button
+                                                            onClick={() =>
+                                                                handleFilterChange(
+                                                                    'categoryId'
+                                                                )(
+                                                                    category.xcategprodid
+                                                                )
+                                                            }
+                                                            className={cn(
+                                                                'h-12 w-full justify-start rounded-none text-lg hover:bg-morpheus-blue-lighter hover:text-white flex items-center p-4',
+                                                                categoryId ===
+                                                                    category.xcategprodid
+                                                                    ? 'text-morpheus-blue-dark bg-gray-50'
+                                                                    : 'text-neutral-400'
+                                                            )}
+                                                        >
+                                                            {
+                                                                category.xcategprodintitule
+                                                            }
+                                                        </button>
+                                                        <Separator />
+                                                    </div>
                                                 ))}
                                             </div>
                                         )}
@@ -707,45 +714,44 @@ function ShopContent() {
                                                     creators: !prev.creators,
                                                 }))
                                             }
-                                            className="flex w-full items-center justify-between py-3 text-left"
+                                            className="h-12 w-full justify-between rounded-none text-lg text-neutral-400 hover:bg-morpheus-blue-lighter hover:text-white flex items-center p-4"
                                         >
-                                            <h3 className="text-lg font-medium text-gray-900">
-                                                Créateurs
-                                            </h3>
+                                            <span className="flex-1 text-left">Créateurs</span>
                                             <ChevronDown
                                                 className={cn(
-                                                    'h-5 w-5 text-gray-400 transition-transform',
+                                                    'size-5 transition-transform',
                                                     expandedSections.creators
                                                         ? 'rotate-180'
                                                         : ''
                                                 )}
                                             />
                                         </button>
+                                        <Separator />
                                         {expandedSections.creators && (
-                                            <div className="mt-2 space-y-2">
+                                            <div className="mt-2 space-y-0 px-2">
                                                 {boutiques.map((boutique) => (
-                                                    <button
-                                                        key={
-                                                            boutique.yboutiqueid
-                                                        }
-                                                        onClick={() =>
-                                                            handleFilterChange(
-                                                                'boutiqueId'
-                                                            )(
-                                                                boutique.yboutiqueid
-                                                            )
-                                                        }
-                                                        className={cn(
-                                                            'w-full rounded-lg px-4 py-3 text-left transition-colors',
-                                                            boutiqueId ===
-                                                                boutique.yboutiqueid
-                                                                ? 'bg-black text-white'
-                                                                : 'text-gray-700 hover:bg-gray-50'
-                                                        )}
-                                                    >
-                                                        {boutique.yboutiqueintitule ||
-                                                            boutique.yboutiquecode}
-                                                    </button>
+                                                    <div key={boutique.yboutiqueid}>
+                                                        <button
+                                                            onClick={() =>
+                                                                handleFilterChange(
+                                                                    'boutiqueId'
+                                                                )(
+                                                                    boutique.yboutiqueid
+                                                                )
+                                                            }
+                                                            className={cn(
+                                                                'h-12 w-full justify-start rounded-none text-lg hover:bg-morpheus-blue-lighter hover:text-white flex items-center p-4',
+                                                                boutiqueId ===
+                                                                    boutique.yboutiqueid
+                                                                    ? 'text-morpheus-blue-dark bg-gray-50'
+                                                                    : 'text-neutral-400'
+                                                            )}
+                                                        >
+                                                            {boutique.yboutiqueintitule ||
+                                                                boutique.yboutiquecode}
+                                                        </button>
+                                                        <Separator />
+                                                    </div>
                                                 ))}
                                             </div>
                                         )}
@@ -762,51 +768,52 @@ function ShopContent() {
                                                     colors: !prev.colors,
                                                 }))
                                             }
-                                            className="flex w-full items-center justify-between py-3 text-left"
+                                            className="h-12 w-full justify-between rounded-none text-lg text-neutral-400 hover:bg-morpheus-blue-lighter hover:text-white flex items-center p-4"
                                         >
-                                            <h3 className="text-lg font-medium text-gray-900">
-                                                Couleurs
-                                            </h3>
+                                            <span className="flex-1 text-left">Couleurs</span>
                                             <ChevronDown
                                                 className={cn(
-                                                    'h-5 w-5 text-gray-400 transition-transform',
+                                                    'size-5 transition-transform',
                                                     expandedSections.colors
                                                         ? 'rotate-180'
                                                         : ''
                                                 )}
                                             />
                                         </button>
+                                        <Separator />
                                         {expandedSections.colors && (
-                                            <div className="mt-2 space-y-2">
+                                            <div className="mt-2 space-y-0 px-2">
                                                 {colors.map((color) => (
-                                                    <button
-                                                        key={color.xcouleurid}
-                                                        onClick={() =>
-                                                            handleFilterChange(
-                                                                'colorId'
-                                                            )(color.xcouleurid)
-                                                        }
-                                                        className={cn(
-                                                            'flex w-full items-center gap-3 rounded-lg px-4 py-3 text-left transition-colors',
-                                                            colorId ===
-                                                                color.xcouleurid
-                                                                ? 'bg-black text-white'
-                                                                : 'text-gray-700 hover:bg-gray-50'
-                                                        )}
-                                                    >
-                                                        <div
-                                                            className="h-4 w-4 rounded-full border border-gray-300"
-                                                            style={{
-                                                                backgroundColor:
-                                                                    color.xcouleurhexa,
-                                                            }}
-                                                        />
-                                                        <span>
-                                                            {
-                                                                color.xcouleurintitule
+                                                    <div key={color.xcouleurid}>
+                                                        <button
+                                                            onClick={() =>
+                                                                handleFilterChange(
+                                                                    'colorId'
+                                                                )(color.xcouleurid)
                                                             }
-                                                        </span>
-                                                    </button>
+                                                            className={cn(
+                                                                'h-12 w-full justify-start rounded-none text-lg hover:bg-morpheus-blue-lighter hover:text-white flex items-center gap-3 p-4',
+                                                                colorId ===
+                                                                    color.xcouleurid
+                                                                    ? 'text-morpheus-blue-dark bg-gray-50'
+                                                                    : 'text-neutral-400'
+                                                            )}
+                                                        >
+                                                            <div
+                                                                className="h-4 w-4 rounded-full border border-gray-300"
+                                                                style={{
+                                                                    backgroundColor:
+                                                                        color.xcouleurhexa,
+                                                                }}
+                                                            />
+                                                            <span>
+                                                                {
+                                                                    color.xcouleurintitule
+                                                                }
+                                                            </span>
+                                                        </button>
+                                                        <Separator />
+                                                    </div>
                                                 ))}
                                             </div>
                                         )}
@@ -823,44 +830,45 @@ function ShopContent() {
                                                     sizes: !prev.sizes,
                                                 }))
                                             }
-                                            className="flex w-full items-center justify-between py-3 text-left"
+                                            className="h-12 w-full justify-between rounded-none text-lg text-neutral-400 hover:bg-morpheus-blue-lighter hover:text-white flex items-center p-4"
                                         >
-                                            <h3 className="text-lg font-medium text-gray-900">
-                                                Tailles
-                                            </h3>
+                                            <span className="flex-1 text-left">Tailles</span>
                                             <ChevronDown
                                                 className={cn(
-                                                    'h-5 w-5 text-gray-400 transition-transform',
+                                                    'size-5 transition-transform',
                                                     expandedSections.sizes
                                                         ? 'rotate-180'
                                                         : ''
                                                 )}
                                             />
                                         </button>
+                                        <Separator />
                                         {expandedSections.sizes && (
-                                            <div className="mt-2 space-y-2">
+                                            <div className="mt-2 space-y-0 px-2">
                                                 {sizes.map((size) => (
-                                                    <button
-                                                        key={size.xtailleid}
-                                                        onClick={() =>
-                                                            handleFilterChange(
-                                                                'sizeId'
-                                                            )(size.xtailleid)
-                                                        }
-                                                        className={cn(
-                                                            'w-full rounded-lg px-4 py-3 text-left transition-colors',
-                                                            sizeId ===
-                                                                size.xtailleid
-                                                                ? 'bg-black text-white'
-                                                                : 'text-gray-700 hover:bg-gray-50'
-                                                        )}
-                                                    >
-                                                        <span>
-                                                            {
-                                                                size.xtailleintitule
+                                                    <div key={size.xtailleid}>
+                                                        <button
+                                                            onClick={() =>
+                                                                handleFilterChange(
+                                                                    'sizeId'
+                                                                )(size.xtailleid)
                                                             }
-                                                        </span>
-                                                    </button>
+                                                            className={cn(
+                                                                'h-12 w-full justify-start rounded-none text-lg hover:bg-morpheus-blue-lighter hover:text-white flex items-center p-4',
+                                                                sizeId ===
+                                                                    size.xtailleid
+                                                                    ? 'text-morpheus-blue-dark bg-gray-50'
+                                                                    : 'text-neutral-400'
+                                                            )}
+                                                        >
+                                                            <span>
+                                                                {
+                                                                    size.xtailleintitule
+                                                                }
+                                                            </span>
+                                                        </button>
+                                                        <Separator />
+                                                    </div>
                                                 ))}
                                             </div>
                                         )}
@@ -945,11 +953,12 @@ function ShopContent() {
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </ScrollArea>
 
                     {/* Footer */}
-                    <div className="border-t border-gray-200 p-6">
-                        <div className="flex gap-3">
+                    <div className="mt-2 px-6 pb-4">
+                        <Separator className="mb-4" />
+                        <div className="flex flex-col px-2 gap-3">
                             <button
                                 onClick={() => {
                                     setQueryState({
@@ -963,13 +972,14 @@ function ShopContent() {
                                         maxPrice: null,
                                     })
                                 }}
-                                className="flex-1 rounded-lg border border-gray-300 px-4 py-3 text-gray-700 transition-colors hover:bg-gray-50"
+                                className="h-12 w-full justify-start rounded-none text-lg text-neutral-400 hover:bg-morpheus-blue-lighter hover:text-white flex items-center p-4"
                             >
                                 Effacer tout
                             </button>
+                            <Separator />
                             <button
                                 onClick={() => setShowFilterSheet(false)}
-                                className="flex-1 rounded-lg bg-black px-4 py-3 text-white transition-colors hover:bg-gray-800"
+                                className="h-12 w-full justify-start rounded-none text-lg text-neutral-400 hover:bg-morpheus-blue-lighter hover:text-white flex items-center p-4"
                             >
                                 Appliquer
                             </button>
