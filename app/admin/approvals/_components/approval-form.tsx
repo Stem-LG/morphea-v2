@@ -968,14 +968,17 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="max-w-7xl max-h-[95vh] bg-white border-gray-200 p-0">
-                <DialogHeader className="px-6 py-4 border-b border-gray-200">
+            <DialogContent className="max-h-[95vh] max-w-7xl border-gray-200 bg-white p-0">
+                <DialogHeader className="border-b border-gray-200 px-6 py-4">
                     <div className="flex items-center justify-between">
                         <div>
                             <DialogTitle className="text-xl text-gray-900">
-                                {t("admin.approvals.productApproval")}: {product.yprodintitule}
+                                {t('admin.approvals.productApproval')}:{' '}
+                                {product.yprodintitule}
                             </DialogTitle>
-                            <p className="text-sm text-gray-600 font-mono mt-1">{product.yprodcode}</p>
+                            <p className="mt-1 font-mono text-sm text-gray-600">
+                                {product.yprodcode}
+                            </p>
                         </div>
                         {getProductStatusBadge()}
                     </div>
@@ -985,125 +988,246 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                     {/* Left Panel - Product Information */}
                     <div className="w-1/2 border-r border-gray-200">
                         <ScrollArea className="h-full">
-                            <div className="p-6 space-y-6">
+                            <div className="space-y-6 p-6">
                                 {/* Basic Product Info */}
-                                <Card className="bg-gray-50 border-gray-200">
+                                <Card className="border-gray-200 bg-gray-50">
                                     <CardHeader>
-                                        <CardTitle className="text-gray-900 text-lg flex items-center gap-2">
+                                        <CardTitle className="flex items-center gap-2 text-lg text-gray-900">
                                             <Package className="h-5 w-5 text-blue-600" />
-                                            {t("admin.approvals.productInformation")}
+                                            {t(
+                                                'admin.approvals.productInformation'
+                                            )}
                                         </CardTitle>
+                                        {/* Product Approval Requirements Warning */}
+                                        {product?.yprodstatut ===
+                                            'not_approved' &&
+                                            !canApproveProduct() && (
+                                                <div className="flex items-center gap-2 rounded border border-yellow-200 bg-yellow-50 p-3 text-sm text-yellow-600">
+                                                    <AlertTriangle className="h-4 w-4" />
+                                                    <div>
+                                                        {t(
+                                                            'admin.approvals.productApprovalRequirementsMessage'
+                                                        )}
+                                                        :
+                                                        <ul className="mt-1 list-inside list-disc text-xs">
+                                                            {!(
+                                                                selectedCategoryId ||
+                                                                product?.xcategprodidfk
+                                                            ) && (
+                                                                <li>
+                                                                    {t(
+                                                                        'admin.approvals.categoryRequired'
+                                                                    )}
+                                                                </li>
+                                                            )}
+                                                            {isAdmin &&
+                                                                !selectedInfospotactionId && (
+                                                                    <li>
+                                                                        {t(
+                                                                            'admin.approvals.placementRequired'
+                                                                        )}
+                                                                    </li>
+                                                                )}
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            )}
                                     </CardHeader>
                                     <CardContent className="space-y-4">
                                         <div>
-                                            <Label className="text-gray-700 text-sm">{t("admin.approvals.productName")}</Label>
-                                            <div className="text-gray-900 font-medium">{product.yprodintitule}</div>
-                                        </div>
-                                        <div>
-                                            <Label className="text-gray-700 text-sm">{t("admin.approvals.productCode")}</Label>
-                                            <div className="text-gray-900 font-mono text-sm">{product.yprodcode}</div>
-                                        </div>
-                                        <div>
-                                            <Label className="text-gray-700 text-sm flex items-center gap-2">
-                                                {t("admin.approvals.category")}
-                                                {product.yprodstatut === "not_approved" && !(selectedCategoryId || product.xcategprodidfk) && (
-                                                    <AlertTriangle className="h-3 w-3 text-yellow-600" />
+                                            <Label className="text-sm text-gray-700">
+                                                {t(
+                                                    'admin.approvals.productName'
                                                 )}
                                             </Label>
-                                            {product.yprodstatut === "not_approved" ? (
+                                            <div className="font-medium text-gray-900">
+                                                {product.yprodintitule}
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <Label className="text-sm text-gray-700">
+                                                {t(
+                                                    'admin.approvals.productCode'
+                                                )}
+                                            </Label>
+                                            <div className="font-mono text-sm text-gray-900">
+                                                {product.yprodcode}
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <Label className="flex items-center gap-2 text-sm text-gray-700">
+                                                {t('admin.approvals.category')}
+                                                {product.yprodstatut ===
+                                                    'not_approved' &&
+                                                    !(
+                                                        selectedCategoryId ||
+                                                        product.xcategprodidfk
+                                                    ) && (
+                                                        <AlertTriangle className="h-3 w-3 text-yellow-600" />
+                                                    )}
+                                            </Label>
+                                            {product.yprodstatut ===
+                                            'not_approved' ? (
                                                 <Select
-                                                    value={selectedCategoryId?.toString() || product.xcategprodidfk?.toString() || ""}
+                                                    value={
+                                                        selectedCategoryId?.toString() ||
+                                                        product.xcategprodidfk?.toString() ||
+                                                        ''
+                                                    }
                                                     onValueChange={(value) =>
-                                                        setSelectedCategoryId(value ? parseInt(value) : null)
+                                                        setSelectedCategoryId(
+                                                            value
+                                                                ? parseInt(
+                                                                      value
+                                                                  )
+                                                                : null
+                                                        )
                                                     }
                                                 >
-                                                    <SelectTrigger className="h-8 text-xs bg-white border-gray-300 text-gray-900">
-                                                        <SelectValue placeholder={t("admin.approvals.selectCategory")} />
+                                                    <SelectTrigger className="h-8 border-gray-300 bg-white text-xs text-gray-900">
+                                                        <SelectValue
+                                                            placeholder={t(
+                                                                'admin.approvals.selectCategory'
+                                                            )}
+                                                        />
                                                     </SelectTrigger>
-                                                    <SelectContent className="bg-white border-gray-300">
-                                                        {categories?.map((cat: Category) => (
-                                                            <SelectItem
-                                                                key={cat.xcategprodid}
-                                                                value={cat.xcategprodid.toString()}
-                                                                className="text-gray-900 hover:bg-gray-100"
-                                                            >
-                                                                {cat.xcategprodintitule}
-                                                            </SelectItem>
-                                                        ))}
+                                                    <SelectContent className="border-gray-300 bg-white">
+                                                        {categories?.map(
+                                                            (cat: Category) => (
+                                                                <SelectItem
+                                                                    key={
+                                                                        cat.xcategprodid
+                                                                    }
+                                                                    value={cat.xcategprodid.toString()}
+                                                                    className="text-gray-900 hover:bg-gray-100"
+                                                                >
+                                                                    {
+                                                                        cat.xcategprodintitule
+                                                                    }
+                                                                </SelectItem>
+                                                            )
+                                                        )}
                                                     </SelectContent>
                                                 </Select>
                                             ) : (
                                                 <div className="text-gray-900">
-                                                    {category?.xcategprodintitule || t("admin.approvals.unknown")}
+                                                    {category?.xcategprodintitule ||
+                                                        t(
+                                                            'admin.approvals.unknown'
+                                                        )}
                                                 </div>
                                             )}
                                         </div>
-                                        
+
                                         {/* Infospotaction Selection (Admin Only) */}
-                                        {isAdmin && product.yprodstatut === "not_approved" && (
-                                            <div>
-                                                <Label className="text-gray-700 text-sm flex items-center gap-2">
-                                                    {t("admin.approvals.productPlacement")}
-                                                    {!selectedInfospotactionId && (
-                                                        <AlertTriangle className="h-3 w-3 text-yellow-600" />
+                                        {isAdmin &&
+                                            product.yprodstatut ===
+                                                'not_approved' && (
+                                                <div>
+                                                    <Label className="flex items-center gap-2 text-sm text-gray-700">
+                                                        {t(
+                                                            'admin.approvals.productPlacement'
+                                                        )}
+                                                        {!selectedInfospotactionId && (
+                                                            <AlertTriangle className="h-3 w-3 text-yellow-600" />
+                                                        )}
+                                                    </Label>
+                                                    {!boutiqueId && (
+                                                        <div className="mb-1 flex items-center gap-1 text-xs text-yellow-600">
+                                                            <AlertTriangle className="h-3 w-3" />
+                                                            Product not linked
+                                                            to a boutique -
+                                                            showing all
+                                                            available placements
+                                                        </div>
                                                     )}
-                                                </Label>
-                                                {!boutiqueId && (
-                                                    <div className="text-xs text-yellow-600 mb-1 flex items-center gap-1">
-                                                        <AlertTriangle className="h-3 w-3" />
-                                                        Product not linked to a boutique - showing all available placements
-                                                    </div>
-                                                )}
-                                                <Select
-                                                    value={selectedInfospotactionId?.toString() || ""}
-                                                    onValueChange={(value) =>
-                                                        setSelectedInfospotactionId(value ? parseInt(value) : null)
-                                                    }
-                                                >
-                                                    <SelectTrigger className="h-8 text-xs bg-white border-gray-300 text-gray-900">
-                                                        <SelectValue placeholder={t("admin.approvals.selectProductPlacement")} />
-                                                    </SelectTrigger>
-                                                    <SelectContent className="bg-white border-gray-300">
-                                                        {infospotactions?.map((action) => (
-                                                            <SelectItem
-                                                                key={action.yinfospotactionsid}
-                                                                value={action.yinfospotactionsid.toString()}
-                                                                className="text-gray-900 hover:bg-gray-100"
-                                                            >
-                                                                {action.yinfospotactionstitle}
-                                                                {!boutiqueId && (
-                                                                    <span className="text-xs text-gray-600 ml-2">
-                                                                        (Global)
-                                                                    </span>
+                                                    <Select
+                                                        value={
+                                                            selectedInfospotactionId?.toString() ||
+                                                            ''
+                                                        }
+                                                        onValueChange={(
+                                                            value
+                                                        ) =>
+                                                            setSelectedInfospotactionId(
+                                                                value
+                                                                    ? parseInt(
+                                                                          value
+                                                                      )
+                                                                    : null
+                                                            )
+                                                        }
+                                                    >
+                                                        <SelectTrigger className="h-8 border-gray-300 bg-white text-xs text-gray-900">
+                                                            <SelectValue
+                                                                placeholder={t(
+                                                                    'admin.approvals.selectProductPlacement'
                                                                 )}
-                                                            </SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
-                                            </div>
-                                        )}
-                                        
+                                                            />
+                                                        </SelectTrigger>
+                                                        <SelectContent className="border-gray-300 bg-white">
+                                                            {infospotactions?.map(
+                                                                (action) => (
+                                                                    <SelectItem
+                                                                        key={
+                                                                            action.yinfospotactionsid
+                                                                        }
+                                                                        value={action.yinfospotactionsid.toString()}
+                                                                        className="text-gray-900 hover:bg-gray-100"
+                                                                    >
+                                                                        {
+                                                                            action.yinfospotactionstitle
+                                                                        }
+                                                                        {!boutiqueId && (
+                                                                            <span className="ml-2 text-xs text-gray-600">
+                                                                                (Global)
+                                                                            </span>
+                                                                        )}
+                                                                    </SelectItem>
+                                                                )
+                                                            )}
+                                                        </SelectContent>
+                                                    </Select>
+                                                </div>
+                                            )}
+
                                         <div>
-                                            <Label className="text-gray-700 text-sm">{t("admin.approvals.technicalDetails")}</Label>
-                                            <div className="text-gray-700 text-sm bg-gray-100 p-3 rounded border border-gray-300">
-                                                {product.yproddetailstech || t("admin.approvals.noTechnicalDetails")}
+                                            <Label className="text-sm text-gray-700">
+                                                {t(
+                                                    'admin.approvals.technicalDetails'
+                                                )}
+                                            </Label>
+                                            <div className="rounded border border-gray-300 bg-gray-100 p-3 text-sm text-gray-700">
+                                                {product.yproddetailstech ||
+                                                    t(
+                                                        'admin.approvals.noTechnicalDetails'
+                                                    )}
                                             </div>
                                         </div>
                                         <div>
-                                            <Label className="text-gray-700 text-sm">{t("admin.approvals.infoBubble")}</Label>
-                                            <div className="text-gray-700 text-sm bg-gray-100 p-3 rounded border border-gray-300">
-                                                {product.yprodinfobulle || t("admin.approvals.noInfoBubble")}
+                                            <Label className="text-sm text-gray-700">
+                                                {t(
+                                                    'admin.approvals.infoBubble'
+                                                )}
+                                            </Label>
+                                            <div className="rounded border border-gray-300 bg-gray-100 p-3 text-sm text-gray-700">
+                                                {product.yprodinfobulle ||
+                                                    t(
+                                                        'admin.approvals.noInfoBubble'
+                                                    )}
                                             </div>
                                         </div>
                                     </CardContent>
                                 </Card>
 
                                 {/* Context Information */}
-                                <Card className="bg-gray-50 border-gray-200">
+                                <Card className="border-gray-200 bg-gray-50">
                                     <CardHeader>
-                                        <CardTitle className="text-gray-900 text-lg flex items-center gap-2">
+                                        <CardTitle className="flex items-center gap-2 text-lg text-gray-900">
                                             <MapPin className="h-5 w-5 text-blue-600" />
-                                            {t("admin.approvals.contextInformation")}
+                                            {t(
+                                                'admin.approvals.contextInformation'
+                                            )}
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent className="space-y-4">
@@ -1111,9 +1235,15 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                             <div className="flex items-center gap-3">
                                                 <User className="h-4 w-4 text-gray-600" />
                                                 <div>
-                                                    <Label className="text-gray-700 text-sm">{t("admin.approvals.designer")}</Label>
+                                                    <Label className="text-sm text-gray-700">
+                                                        {t(
+                                                            'admin.approvals.designer'
+                                                        )}
+                                                    </Label>
                                                     <div className="text-gray-900">
-                                                        {designer.ydesignnom} ({designer.ydesignmarque})
+                                                        {designer.ydesignnom} (
+                                                        {designer.ydesignmarque}
+                                                        )
                                                     </div>
                                                 </div>
                                             </div>
@@ -1122,9 +1252,14 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                             <div className="flex items-center gap-3">
                                                 <Store className="h-4 w-4 text-gray-600" />
                                                 <div>
-                                                    <Label className="text-gray-700 text-sm">{t("admin.approvals.store")}</Label>
+                                                    <Label className="text-sm text-gray-700">
+                                                        {t(
+                                                            'admin.approvals.store'
+                                                        )}
+                                                    </Label>
                                                     <div className="text-gray-900">
-                                                        {store.yboutiqueintitule || store.yboutiquecode}
+                                                        {store.yboutiqueintitule ||
+                                                            store.yboutiquecode}
                                                     </div>
                                                 </div>
                                             </div>
@@ -1133,8 +1268,14 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                             <div className="flex items-center gap-3">
                                                 <MapPin className="h-4 w-4 text-gray-600" />
                                                 <div>
-                                                    <Label className="text-gray-700 text-sm">{t("admin.approvals.mall")}</Label>
-                                                    <div className="text-gray-900">{mall.ymallintitule}</div>
+                                                    <Label className="text-sm text-gray-700">
+                                                        {t(
+                                                            'admin.approvals.mall'
+                                                        )}
+                                                    </Label>
+                                                    <div className="text-gray-900">
+                                                        {mall.ymallintitule}
+                                                    </div>
                                                 </div>
                                             </div>
                                         )}
@@ -1142,10 +1283,20 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                             <div className="flex items-center gap-3">
                                                 <Calendar className="h-4 w-4 text-gray-600" />
                                                 <div>
-                                                    <Label className="text-gray-700 text-sm">{t("admin.approvals.event")}</Label>
-                                                    <div className="text-gray-900">{event.yeventintitule}</div>
-                                                    <div className="text-gray-600 text-xs">
-                                                        {event.yeventdatedeb} {t("admin.approvals.to")} {event.yeventdatefin}
+                                                    <Label className="text-sm text-gray-700">
+                                                        {t(
+                                                            'admin.approvals.event'
+                                                        )}
+                                                    </Label>
+                                                    <div className="text-gray-900">
+                                                        {event.yeventintitule}
+                                                    </div>
+                                                    <div className="text-xs text-gray-600">
+                                                        {event.yeventdatedeb}{' '}
+                                                        {t(
+                                                            'admin.approvals.to'
+                                                        )}{' '}
+                                                        {event.yeventdatefin}
                                                     </div>
                                                 </div>
                                             </div>
@@ -1154,9 +1305,13 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                 </Card>
 
                                 {/* Variant Summary */}
-                                <Card className="bg-gray-50 border-gray-200">
+                                <Card className="border-gray-200 bg-gray-50">
                                     <CardHeader>
-                                        <CardTitle className="text-gray-900 text-lg">{t("admin.approvals.variantSummary")}</CardTitle>
+                                        <CardTitle className="text-lg text-gray-900">
+                                            {t(
+                                                'admin.approvals.variantSummary'
+                                            )}
+                                        </CardTitle>
                                     </CardHeader>
                                     <CardContent>
                                         <div className="grid grid-cols-3 gap-4 text-center">
@@ -1164,19 +1319,31 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                                 <div className="text-2xl font-bold text-yellow-600">
                                                     {pendingVariants.length}
                                                 </div>
-                                                <div className="text-xs text-gray-600">{t("admin.approvals.pending")}</div>
+                                                <div className="text-xs text-gray-600">
+                                                    {t(
+                                                        'admin.approvals.pending'
+                                                    )}
+                                                </div>
                                             </div>
                                             <div>
                                                 <div className="text-2xl font-bold text-green-600">
                                                     {approvedVariants.length}
                                                 </div>
-                                                <div className="text-xs text-gray-600">{t("admin.approvals.approved")}</div>
+                                                <div className="text-xs text-gray-600">
+                                                    {t(
+                                                        'admin.approvals.approved'
+                                                    )}
+                                                </div>
                                             </div>
                                             <div>
                                                 <div className="text-2xl font-bold text-red-600">
                                                     {rejectedVariants.length}
                                                 </div>
-                                                <div className="text-xs text-gray-600">{t("admin.approvals.rejected")}</div>
+                                                <div className="text-xs text-gray-600">
+                                                    {t(
+                                                        'admin.approvals.rejected'
+                                                    )}
+                                                </div>
                                             </div>
                                         </div>
                                     </CardContent>
@@ -1188,87 +1355,106 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                     {/* Right Panel - Variant Cards */}
                     <div className="w-1/2">
                         <div className="p-6">
-                            <div className="flex items-center justify-between mb-4">
+                            <div className="mb-4 flex items-center justify-between">
                                 <h3 className="text-lg font-semibold text-gray-900">
-                                    {t("admin.approvals.productVariants")} ({product.yvarprod?.length || 0})
+                                    {t('admin.approvals.productVariants')} (
+                                    {product.yvarprod?.length || 0})
                                 </h3>
                                 {pendingVariants.length > 0 && (
                                     <Button
                                         size="sm"
                                         onClick={handleBulkApproveVariants}
-                                        disabled={variantLoading || !canBulkApprove}
-                                        className="bg-green-600 hover:bg-green-500 text-white disabled:opacity-50 disabled:cursor-not-allowed"
-                                        title={!canBulkApprove ? t("admin.approvals.bulkApprovalRequiresPrices") : undefined}
+                                        disabled={
+                                            variantLoading || !canBulkApprove
+                                        }
+                                        className="bg-green-600 text-white hover:bg-green-500 disabled:cursor-not-allowed disabled:opacity-50"
+                                        title={
+                                            !canBulkApprove
+                                                ? t(
+                                                      'admin.approvals.bulkApprovalRequiresPrices'
+                                                  )
+                                                : undefined
+                                        }
                                     >
-                                        <CheckCircle className="h-4 w-4 mr-2" />
-                                        {t("admin.approvals.approveAll")} ({pendingVariants.length})
+                                        <CheckCircle className="mr-2 h-4 w-4" />
+                                        {t('admin.approvals.approveAll')} (
+                                        {pendingVariants.length})
                                     </Button>
                                 )}
                             </div>
 
                             {/* Bulk Approval Error */}
                             {bulkApprovalError && (
-                                <div className="mb-4 text-sm text-red-600 bg-red-50 border border-red-200 rounded p-3">
+                                <div className="mb-4 rounded border border-red-200 bg-red-50 p-3 text-sm text-red-600">
                                     {bulkApprovalError}
                                 </div>
                             )}
 
                             {/* Bulk Approval Warning - when variants don't have prices */}
-                            {pendingVariants.length > 0 && pendingVariantsWithoutValidPrice.length > 0 && (
-                                <div className="mb-4 text-sm text-yellow-600 bg-yellow-50 border border-yellow-200 rounded p-3 flex items-center gap-2">
-                                    <AlertTriangle className="h-4 w-4" />
-                                    {t("admin.approvals.bulkApprovalPriceWarning")} ({pendingVariantsWithoutValidPrice.length} {pendingVariantsWithoutValidPrice.length === 1 ? 'variant' : 'variants'})
-                                </div>
-                            )}
+                            {pendingVariants.length > 0 &&
+                                pendingVariantsWithoutValidPrice.length > 0 && (
+                                    <div className="mb-4 flex items-center gap-2 rounded border border-yellow-200 bg-yellow-50 p-3 text-sm text-yellow-600">
+                                        <AlertTriangle className="h-4 w-4" />
+                                        {t(
+                                            'admin.approvals.bulkApprovalPriceWarning'
+                                        )}{' '}
+                                        (
+                                        {
+                                            pendingVariantsWithoutValidPrice.length
+                                        }{' '}
+                                        {pendingVariantsWithoutValidPrice.length ===
+                                        1
+                                            ? 'variant'
+                                            : 'variants'}
+                                        )
+                                    </div>
+                                )}
 
                             <ScrollArea className="h-[calc(95vh-300px)] overflow-y-auto">
                                 <div className="space-y-4 pr-4">
-                                    {product.yvarprod?.map((variant: ProductVariant) => (
-                                        <VariantCard
-                                            key={variant.yvarprodid}
-                                            variant={variant}
-                                            onApprove={(promotionData) =>
-                                                handleApproveVariant(variant.yvarprodid, promotionData)
-                                            }
-                                            onReject={() => handleRejectVariant(variant.yvarprodid)}
-                                            isLoading={variantLoading}
-                                            eventStartDate={event?.yeventdatedeb}
-                                            eventEndDate={event?.yeventdatefin}
-                                            onPriceValidityChange={handlePriceValidityChange}
-                                        />
-                                    ))}
+                                    {product.yvarprod?.map(
+                                        (variant: ProductVariant) => (
+                                            <VariantCard
+                                                key={variant.yvarprodid}
+                                                variant={variant}
+                                                onApprove={(promotionData) =>
+                                                    handleApproveVariant(
+                                                        variant.yvarprodid,
+                                                        promotionData
+                                                    )
+                                                }
+                                                onReject={() =>
+                                                    handleRejectVariant(
+                                                        variant.yvarprodid
+                                                    )
+                                                }
+                                                isLoading={variantLoading}
+                                                eventStartDate={
+                                                    event?.yeventdatedeb
+                                                }
+                                                eventEndDate={
+                                                    event?.yeventdatefin
+                                                }
+                                                onPriceValidityChange={
+                                                    handlePriceValidityChange
+                                                }
+                                            />
+                                        )
+                                    )}
                                 </div>
                             </ScrollArea>
                         </div>
                     </div>
                 </div>
 
-                <DialogFooter className="px-6 py-4 border-t border-gray-200 flex flex-col gap-3">
-                    {/* Product Approval Requirements Warning */}
-                    {product?.yprodstatut === "not_approved" && !canApproveProduct() && (
-                        <div className="text-sm text-yellow-600 bg-yellow-50 border border-yellow-200 rounded p-3 flex items-center gap-2">
-                            <AlertTriangle className="h-4 w-4" />
-                            <div>
-                                {t("admin.approvals.productApprovalRequirementsMessage")}:
-                                <ul className="list-disc list-inside mt-1 text-xs">
-                                    {!(selectedCategoryId || product?.xcategprodidfk) && (
-                                        <li>{t("admin.approvals.categoryRequired")}</li>
-                                    )}
-                                    {isAdmin && !selectedInfospotactionId && (
-                                        <li>{t("admin.approvals.placementRequired")}</li>
-                                    )}
-                                </ul>
-                            </div>
-                        </div>
-                    )}
-
+                <DialogFooter className="flex flex-col gap-3 border-t border-gray-200 px-6 py-4">
                     {/* Product Approval Error */}
                     {productApprovalError && (
-                        <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded p-3">
+                        <div className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-600">
                             {productApprovalError}
                         </div>
                     )}
-                    
+
                     <div className="flex gap-2">
                         <Button
                             type="button"
@@ -1277,7 +1463,7 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                             disabled={isLoading || variantLoading}
                             className="border-gray-300 text-gray-700 hover:bg-gray-50"
                         >
-                            {t("common.cancel")}
+                            {t('common.cancel')}
                         </Button>
                         <Button
                             type="button"
@@ -1286,25 +1472,35 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                             disabled={isLoading || variantLoading}
                             className="border-red-300 text-red-600 hover:bg-red-50"
                         >
-                            <X className="h-4 w-4 mr-2" />
-                            {t("admin.approvals.rejectProduct")}
+                            <X className="mr-2 h-4 w-4" />
+                            {t('admin.approvals.rejectProduct')}
                         </Button>
                         <Button
                             type="button"
                             onClick={handleApproveProduct}
-                            disabled={isLoading || variantLoading || !canApproveProduct()}
-                            className="bg-green-600 hover:bg-green-500 text-white disabled:opacity-50 disabled:cursor-not-allowed"
-                            title={!canApproveProduct() ? t("admin.approvals.productApprovalRequirements") : undefined}
+                            disabled={
+                                isLoading ||
+                                variantLoading ||
+                                !canApproveProduct()
+                            }
+                            className="bg-green-600 text-white hover:bg-green-500 disabled:cursor-not-allowed disabled:opacity-50"
+                            title={
+                                !canApproveProduct()
+                                    ? t(
+                                          'admin.approvals.productApprovalRequirements'
+                                      )
+                                    : undefined
+                            }
                         >
                             {isLoading || variantLoading ? (
                                 <div className="flex items-center gap-2">
                                     <Loader2 className="h-4 w-4 animate-spin" />
-                                    {t("admin.approvals.processing")}
+                                    {t('admin.approvals.processing')}
                                 </div>
                             ) : (
                                 <>
-                                    <CheckCircle className="h-4 w-4 mr-2" />
-                                    {t("admin.approvals.approveProduct")}
+                                    <CheckCircle className="mr-2 h-4 w-4" />
+                                    {t('admin.approvals.approveProduct')}
                                 </>
                             )}
                         </Button>
@@ -1312,5 +1508,5 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                 </DialogFooter>
             </DialogContent>
         </Dialog>
-    );
+    )
 }
