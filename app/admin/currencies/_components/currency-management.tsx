@@ -98,13 +98,13 @@ export function CurrencyManagement() {
                 <Button
                     variant="ghost"
                     onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                    className="h-auto p-0 font-semibold text-white hover:text-morpheus-gold-light"
+                    className="h-auto p-0 font-semibold text-gray-900 hover:text-blue-600"
                 >
                     {t('admin.currencies.currencyName')}
                 </Button>
             ),
             cell: ({ row }) => (
-                <div className="font-medium text-white">
+                <div className="font-medium text-gray-900">
                     {row.original.xdeviseintitule}
                 </div>
             ),
@@ -114,10 +114,10 @@ export function CurrencyManagement() {
             header: t('admin.currencies.codes'),
             cell: ({ row }) => (
                 <div className="space-y-1">
-                    <div className="text-sm text-white font-medium">
+                    <div className="text-sm text-gray-900 font-medium">
                         {row.original.xdevisecodealpha}
                     </div>
-                    <div className="text-xs text-gray-400">
+                    <div className="text-xs text-gray-500">
                         {row.original.xdevisecodenum}
                     </div>
                 </div>
@@ -128,7 +128,7 @@ export function CurrencyManagement() {
             accessorKey: "xdevisenbrdec",
             header: t('admin.currencies.decimals'),
             cell: ({ row }) => (
-                <div className="text-white font-medium">
+                <div className="text-gray-900 font-medium">
                     {row.original.xdevisenbrdec}
                 </div>
             ),
@@ -137,12 +137,12 @@ export function CurrencyManagement() {
             accessorKey: "xtauxechange",
             header: t('admin.currencies.exchangeRate'),
             cell: ({ row }) => (
-                <div className="text-white font-medium flex items-center gap-1">
+                <div className="text-gray-900 font-medium flex items-center gap-1">
                     {row.original.xispivot ? (
-                        <span className="text-yellow-400">1.0 (Pivot)</span>
+                        <span className="text-yellow-600">1.0 (Pivot)</span>
                     ) : (
                         <>
-                            <TrendingUp className="h-3 w-3 text-blue-400" />
+                            <TrendingUp className="h-3 w-3 text-blue-600" />
                             {row.original.xtauxechange || 1.0}
                         </>
                     )}
@@ -160,19 +160,19 @@ export function CurrencyManagement() {
                 return (
                     <div className="flex flex-wrap gap-1">
                         {row.original.xispivot && (
-                            <Badge className="px-2 py-1 text-xs font-medium flex items-center gap-1 border text-yellow-400 bg-yellow-400/10 border-yellow-400/20">
+                            <Badge className="px-2 py-1 text-xs font-medium flex items-center gap-1 border text-yellow-800 bg-yellow-100 border-yellow-200">
                                 <Star className="h-3 w-3" />
                                 {t('admin.currencies.pivot')}
                             </Badge>
                         )}
                         {isPaymentEnabled && (
-                            <Badge className="px-2 py-1 text-xs font-medium flex items-center gap-1 border text-green-400 bg-green-400/10 border-green-400/20">
+                            <Badge className="px-2 py-1 text-xs font-medium flex items-center gap-1 border text-green-800 bg-green-100 border-green-200">
                                 <CheckCircle className="h-3 w-3" />
                                 {t('admin.currencies.payment')}
                             </Badge>
                         )}
                         {isInUse && (
-                            <Badge className="px-2 py-1 text-xs font-medium flex items-center gap-1 border text-blue-400 bg-blue-400/10 border-blue-400/20">
+                            <Badge className="px-2 py-1 text-xs font-medium flex items-center gap-1 border text-blue-800 bg-blue-100 border-blue-200">
                                 <Package className="h-3 w-3" />
                                 {variantCount} {t('admin.currencies.variants')}
                             </Badge>
@@ -196,7 +196,7 @@ export function CurrencyManagement() {
                             variant="outline"
                             size="sm"
                             onClick={() => handleEdit(row.original)}
-                            className="border-slate-600 text-white hover:bg-slate-700/50"
+                            className="border-gray-300 text-gray-700 hover:bg-gray-50"
                         >
                             <Edit className="h-4 w-4 mr-1" />
                             {t('common.edit')}
@@ -212,7 +212,7 @@ export function CurrencyManagement() {
                                     handleSetAsPivot(row.original);
                                 }}
                                 disabled={pivotChangeHook.isLoading}
-                                className="border-yellow-600 text-yellow-400 hover:bg-yellow-600/10 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="border-yellow-300 text-yellow-700 hover:bg-yellow-50 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 <Star className="h-4 w-4 mr-1" />
                                 {t('admin.currencies.setAsPivot')}
@@ -228,8 +228,8 @@ export function CurrencyManagement() {
                                         onClick={() => handleDelete(row.original.xdeviseid)}
                                         disabled={deleteCurrencyMutation.isPending || isInUse || isPivot}
                                         className={`px-3 ${isInUse || isPivot
-                                            ? "border-gray-600 text-gray-500 cursor-not-allowed"
-                                            : "border-red-600 text-red-400 hover:bg-red-600/10"
+                                            ? "border-gray-300 text-gray-400 cursor-not-allowed"
+                                            : "border-red-300 text-red-600 hover:bg-red-50"
                                         }`}
                                     >
                                         {isInUse || isPivot ? <AlertTriangle className="h-4 w-4" /> : <Trash2 className="h-4 w-4" />}
@@ -332,7 +332,7 @@ export function CurrencyManagement() {
                 <div className="flex items-center justify-center h-64">
                     <div className="text-center">
                         <div className="animate-spin rounded-full h-12 w-12 border-4 border-morpheus-gold-light/30 border-t-morpheus-gold-light mx-auto mb-4"></div>
-                        <p className="text-white text-lg">{t('admin.currencies.loadingCurrencies')}</p>
+                        <p className="text-gray-900 text-lg">{t('admin.currencies.loadingCurrencies')}</p>
                     </div>
                 </div>
             </div>
@@ -344,10 +344,10 @@ export function CurrencyManagement() {
             {/* Header */}
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl lg:text-4xl font-bold text-white mb-2">
+                    <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-2">
                         {t('admin.currencies.title')}
                     </h1>
-                    <p className="text-lg text-gray-300">
+                    <p className="text-lg text-gray-600">
                         {t('admin.currencies.subtitle')}
                     </p>
                 </div>
@@ -362,29 +362,29 @@ export function CurrencyManagement() {
 
             {/* Stats */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <Card className="bg-gradient-to-br from-morpheus-blue-dark/40 to-morpheus-blue-light/40 border-slate-700/50">
+                <Card className="border-gray-200 bg-gradient-to-br from-gray-50/50 to-white/50 shadow-xl">
                     <CardContent className="p-4">
                         <div className="flex items-center gap-3">
-                            <div className="p-2 bg-morpheus-gold-light/20 rounded-lg">
-                                <DollarSign className="h-5 w-5 text-morpheus-gold-light" />
+                            <div className="p-2 bg-blue-100 rounded-lg">
+                                <DollarSign className="h-5 w-5 text-blue-600" />
                             </div>
                             <div>
-                                <p className="text-sm text-gray-400">{t('admin.currencies.totalCurrencies')}</p>
-                                <p className="text-2xl font-bold text-white">{currencies?.length || 0}</p>
+                                <p className="text-sm text-gray-600">{t('admin.currencies.totalCurrencies')}</p>
+                                <p className="text-2xl font-bold text-gray-900">{currencies?.length || 0}</p>
                             </div>
                         </div>
                     </CardContent>
                 </Card>
-                
-                <Card className="bg-gradient-to-br from-morpheus-blue-dark/40 to-morpheus-blue-light/40 border-slate-700/50">
+
+                <Card className="border-gray-200 bg-gradient-to-br from-gray-50/50 to-white/50 shadow-xl">
                     <CardContent className="p-4">
                         <div className="flex items-center gap-3">
-                            <div className="p-2 bg-green-500/20 rounded-lg">
-                                <Package className="h-5 w-5 text-green-400" />
+                            <div className="p-2 bg-green-100 rounded-lg">
+                                <Package className="h-5 w-5 text-green-600" />
                             </div>
                             <div>
-                                <p className="text-sm text-gray-400">{t('admin.currencies.currenciesInUse')}</p>
-                                <p className="text-2xl font-bold text-white">
+                                <p className="text-sm text-gray-600">{t('admin.currencies.currenciesInUse')}</p>
+                                <p className="text-2xl font-bold text-gray-900">
                                     {currencies?.filter(curr => getVariantCount(curr) > 0).length || 0}
                                 </p>
                             </div>
@@ -392,15 +392,15 @@ export function CurrencyManagement() {
                     </CardContent>
                 </Card>
 
-                <Card className="bg-gradient-to-br from-morpheus-blue-dark/40 to-morpheus-blue-light/40 border-slate-700/50">
+                <Card className="border-gray-200 bg-gradient-to-br from-gray-50/50 to-white/50 shadow-xl">
                     <CardContent className="p-4">
                         <div className="flex items-center gap-3">
-                            <div className="p-2 bg-blue-500/20 rounded-lg">
-                                <CheckCircle className="h-5 w-5 text-blue-400" />
+                            <div className="p-2 bg-blue-100 rounded-lg">
+                                <CheckCircle className="h-5 w-5 text-blue-600" />
                             </div>
                             <div>
-                                <p className="text-sm text-gray-400">{t('admin.currencies.paymentEnabled')}</p>
-                                <p className="text-2xl font-bold text-white">
+                                <p className="text-sm text-gray-600">{t('admin.currencies.paymentEnabled')}</p>
+                                <p className="text-2xl font-bold text-gray-900">
                                     {currencies?.filter(curr => curr.xdeviseboolautorisepaiement === "Y").length || 0}
                                 </p>
                             </div>
@@ -408,15 +408,15 @@ export function CurrencyManagement() {
                     </CardContent>
                 </Card>
 
-                <Card className="bg-gradient-to-br from-morpheus-blue-dark/40 to-morpheus-blue-light/40 border-slate-700/50">
+                <Card className="border-gray-200 bg-gradient-to-br from-gray-50/50 to-white/50 shadow-xl">
                     <CardContent className="p-4">
                         <div className="flex items-center gap-3">
-                            <div className="p-2 bg-yellow-500/20 rounded-lg">
-                                <Star className="h-5 w-5 text-yellow-400" />
+                            <div className="p-2 bg-yellow-100 rounded-lg">
+                                <Star className="h-5 w-5 text-yellow-600" />
                             </div>
                             <div>
-                                <p className="text-sm text-gray-400">{t('admin.currencies.pivotCurrency')}</p>
-                                <p className="text-lg font-bold text-white">
+                                <p className="text-sm text-gray-600">{t('admin.currencies.pivotCurrency')}</p>
+                                <p className="text-lg font-bold text-gray-900">
                                     {currentPivotCurrency?.xdevisecodealpha || t('common.none')}
                                 </p>
                             </div>
@@ -427,15 +427,15 @@ export function CurrencyManagement() {
 
             {/* Pivot Currency Info */}
             {currentPivotCurrency && (
-                <Card className="bg-gradient-to-br from-yellow-500/10 to-yellow-600/10 border-yellow-500/20">
+                <Card className="border-yellow-200 bg-gradient-to-br from-yellow-50/50 to-white/50 shadow-xl">
                     <CardContent className="p-4">
                         <div className="flex items-center gap-3">
-                            <Star className="h-5 w-5 text-yellow-400" />
+                            <Star className="h-5 w-5 text-yellow-600" />
                             <div>
-                                <p className="text-yellow-400 font-medium">
+                                <p className="text-yellow-800 font-medium">
                                     {t('admin.currencies.currentPivotCurrency')}: {currentPivotCurrency.xdeviseintitule} ({currentPivotCurrency.xdevisecodealpha})
                                 </p>
-                                <p className="text-sm text-gray-300">
+                                <p className="text-sm text-gray-600">
                                     {t('admin.currencies.exchangeRate')}: {currentPivotCurrency.xtauxechange || 1.0}
                                 </p>
                             </div>
@@ -446,10 +446,10 @@ export function CurrencyManagement() {
 
             {/* Currency Form */}
             {showForm && (
-                <Card className="bg-gradient-to-br from-morpheus-blue-dark/40 to-morpheus-blue-light/40 border-slate-700/50">
+                <Card className="border-gray-200 bg-gradient-to-br from-gray-50/50 to-white/50 shadow-xl">
                     <CardHeader>
-                        <CardTitle className="text-white flex items-center gap-2">
-                            <DollarSign className="h-5 w-5 text-morpheus-gold-light" />
+                        <CardTitle className="text-gray-900 flex items-center gap-2">
+                            <DollarSign className="h-5 w-5 text-blue-600" />
                             {t('admin.currencies.addNewCurrency')}
                         </CardTitle>
                     </CardHeader>
@@ -457,46 +457,46 @@ export function CurrencyManagement() {
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <Label className="text-gray-300">{t('admin.currencies.currencyNameRequired')}</Label>
+                                    <Label className="text-gray-900">{t('admin.currencies.currencyNameRequired')}</Label>
                                     <Input
                                         value={formData.xdeviseintitule}
                                         onChange={(e) => setFormData(prev => ({ ...prev, xdeviseintitule: e.target.value }))}
-                                        className="bg-morpheus-blue-dark/30 border-slate-600 text-white"
+                                        className="bg-white border-gray-300 text-gray-900"
                                         placeholder={t('admin.currencies.currencyNamePlaceholder')}
                                         required
                                     />
                                 </div>
                                 <div>
-                                    <Label className="text-gray-300">{t('admin.currencies.alphaCodeRequired')}</Label>
+                                    <Label className="text-gray-900">{t('admin.currencies.alphaCodeRequired')}</Label>
                                     <Input
                                         value={formData.xdevisecodealpha}
                                         onChange={(e) => setFormData(prev => ({ ...prev, xdevisecodealpha: e.target.value.toUpperCase() }))}
-                                        className="bg-morpheus-blue-dark/30 border-slate-600 text-white"
+                                        className="bg-white border-gray-300 text-gray-900"
                                         placeholder={t('admin.currencies.alphaCodePlaceholder')}
                                         maxLength={3}
                                         required
                                     />
                                 </div>
                                 <div>
-                                    <Label className="text-gray-300">{t('admin.currencies.numericCodeRequired')}</Label>
+                                    <Label className="text-gray-900">{t('admin.currencies.numericCodeRequired')}</Label>
                                     <Input
                                         value={formData.xdevisecodenum}
                                         onChange={(e) => setFormData(prev => ({ ...prev, xdevisecodenum: e.target.value }))}
-                                        className="bg-morpheus-blue-dark/30 border-slate-600 text-white"
+                                        className="bg-white border-gray-300 text-gray-900"
                                         placeholder={t('admin.currencies.numericCodePlaceholder')}
                                         maxLength={3}
                                         required
                                     />
                                 </div>
                                 <div>
-                                    <Label className="text-gray-300">{t('admin.currencies.decimalPlacesRequired')}</Label>
+                                    <Label className="text-gray-900">{t('admin.currencies.decimalPlacesRequired')}</Label>
                                     <Input
                                         type="number"
                                         min="0"
                                         max="4"
                                         value={formData.xdevisenbrdec}
                                         onChange={(e) => setFormData(prev => ({ ...prev, xdevisenbrdec: parseInt(e.target.value) || 0 }))}
-                                        className="bg-morpheus-blue-dark/30 border-slate-600 text-white"
+                                        className="bg-white border-gray-300 text-gray-900"
                                         required
                                     />
                                 </div>
@@ -512,9 +512,9 @@ export function CurrencyManagement() {
                                             ...prev,
                                             xdeviseboolautorisepaiement: e.target.checked ? "true" : "false"
                                         }))}
-                                        className="rounded border-slate-600"
+                                        className="rounded border-gray-300"
                                     />
-                                    <Label htmlFor="allowPayment" className="text-gray-300">
+                                    <Label htmlFor="allowPayment" className="text-gray-900">
                                         {t('admin.currencies.allowPayments')}
                                     </Label>
                                 </div>
@@ -531,25 +531,25 @@ export function CurrencyManagement() {
                                         }))}
                                         className="data-[state=checked]:bg-yellow-500"
                                     />
-                                    <Label htmlFor="isPivot" className="text-gray-300 flex items-center gap-1">
-                                        <Star className="h-4 w-4 text-yellow-400" />
+                                    <Label htmlFor="isPivot" className="text-gray-900 flex items-center gap-1">
+                                        <Star className="h-4 w-4 text-yellow-600" />
                                         Set as Pivot Currency
                                     </Label>
                                 </div>
                             </div>
 
                             {formData.xispivot && (
-                                <div className="p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
+                                <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                                     <div className="flex items-center gap-2 mb-2">
-                                        <AlertTriangle className="h-4 w-4 text-yellow-400" />
-                                        <p className="text-yellow-400 font-medium">Pivot Currency Settings</p>
+                                        <AlertTriangle className="h-4 w-4 text-yellow-600" />
+                                        <p className="text-yellow-800 font-medium">Pivot Currency Settings</p>
                                     </div>
-                                    <p className="text-sm text-gray-300 mb-3">
+                                    <p className="text-sm text-gray-600 mb-3">
                                         Setting this currency as pivot will automatically unset the current pivot currency.
                                         The exchange rate for pivot currency should typically be 1.0.
                                     </p>
                                     <div>
-                                        <Label className="text-gray-300">Exchange Rate</Label>
+                                        <Label className="text-gray-900">Exchange Rate</Label>
                                         <Input
                                             type="number"
                                             step="any"
@@ -558,11 +558,11 @@ export function CurrencyManagement() {
                                             onChange={(e) => {
                                                 const inputValue = e.target.value;
                                                 const maxDecimals = formData.xdevisenbrdec;
-                                                
+
                                                 // Check decimal places
                                                 const decimalIndex = inputValue.indexOf('.');
                                                 const actualDecimals = decimalIndex === -1 ? 0 : inputValue.length - decimalIndex - 1;
-                                                
+
                                                 if (actualDecimals <= maxDecimals) {
                                                     setFormData(prev => ({
                                                         ...prev,
@@ -570,7 +570,7 @@ export function CurrencyManagement() {
                                                     }));
                                                 }
                                             }}
-                                            className="bg-morpheus-blue-dark/30 border-slate-600 text-white"
+                                            className="bg-white border-gray-300 text-gray-900"
                                             placeholder="1.0000000000"
                                             required
                                         />
@@ -580,11 +580,11 @@ export function CurrencyManagement() {
 
                             {!formData.xispivot && (
                                 <div>
-                                    <Label className="text-gray-300">
+                                    <Label className="text-gray-900">
                                         1 {currentPivotCurrency?.xdevisecodealpha || 'Pivot'} = {formData.xtauxechange || 1.0} {formData.xdeviseintitule || 'This Currency'}
                                     </Label>
                                     <div className="flex items-center gap-2">
-                                        <TrendingUp className="h-4 w-4 text-blue-400" />
+                                        <TrendingUp className="h-4 w-4 text-blue-600" />
                                         <Input
                                             type="number"
                                             step="any"
@@ -593,11 +593,11 @@ export function CurrencyManagement() {
                                             onChange={(e) => {
                                                 const inputValue = e.target.value;
                                                 const maxDecimals = formData.xdevisenbrdec;
-                                                
+
                                                 // Check decimal places
                                                 const decimalIndex = inputValue.indexOf('.');
                                                 const actualDecimals = decimalIndex === -1 ? 0 : inputValue.length - decimalIndex - 1;
-                                                
+
                                                 if (actualDecimals <= maxDecimals) {
                                                     setFormData(prev => ({
                                                         ...prev,
@@ -605,12 +605,12 @@ export function CurrencyManagement() {
                                                     }));
                                                 }
                                             }}
-                                            className="bg-morpheus-blue-dark/30 border-slate-600 text-white"
+                                            className="bg-white border-gray-300 text-gray-900"
                                             placeholder="1.0000000000"
                                             required
                                         />
                                     </div>
-                                    <p className="text-xs text-gray-400 mt-1">
+                                    <p className="text-xs text-gray-500 mt-1">
                                         How many units of this currency equal 1 unit of the pivot currency
                                     </p>
                                 </div>
@@ -629,7 +629,7 @@ export function CurrencyManagement() {
                                     type="button"
                                     variant="outline"
                                     onClick={resetForm}
-                                    className="border-slate-600 text-gray-300 hover:bg-slate-700/50"
+                                    className="border-gray-300 text-gray-700 hover:bg-gray-50"
                                 >
                                     <X className="h-4 w-4 mr-2" />
                                     {t('common.cancel')}

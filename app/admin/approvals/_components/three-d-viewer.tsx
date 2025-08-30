@@ -16,9 +16,9 @@ interface Model3DViewerProps {
 function LoadingSpinner() {
     return (
         <Html center>
-            <div className="flex flex-col items-center justify-center text-white bg-black/50 backdrop-blur-sm px-4 py-3 rounded-lg">
-                <div className="w-8 h-8 border-2 border-purple-400 rounded-full border-t-purple-300 animate-spin mb-2"></div>
-                <div className="text-sm font-medium text-gray-300">
+            <div className="flex flex-col items-center justify-center text-gray-900 bg-white/90 backdrop-blur-sm px-4 py-3 rounded-lg border border-gray-200">
+                <div className="w-8 h-8 border-2 border-blue-600 rounded-full border-t-blue-500 animate-spin mb-2"></div>
+                <div className="text-sm font-medium text-gray-700">
                     Loading 3D Model
                 </div>
             </div>
@@ -30,12 +30,12 @@ function LoadingSpinner() {
 function ModelNotFound({ name }: { name: string }) {
     return (
         <Html center>
-            <div className="flex flex-col items-center justify-center text-white bg-black/70 backdrop-blur-sm px-6 py-4 border border-gray-600 rounded-lg">
+            <div className="flex flex-col items-center justify-center text-gray-900 bg-white/90 backdrop-blur-sm px-6 py-4 border border-gray-200 rounded-lg">
                 <div className="text-4xl mb-3">🌳</div>
-                <div className="text-base font-medium text-gray-300 mb-1">
+                <div className="text-base font-medium text-gray-700 mb-1">
                     {name}
                 </div>
-                <div className="text-xs text-gray-400 text-center">3D Model Preview</div>
+                <div className="text-xs text-gray-600 text-center">3D Model Preview</div>
             </div>
         </Html>
     );
@@ -139,14 +139,14 @@ function ProductModel({ url, name }: { url: string; name: string }) {
 export function Model3DViewer({ modelUrl, className = "", autoRotate = false, backgroundColor = "#f0f0f0" }: Model3DViewerProps) {
     if (!modelUrl) {
         return (
-            <div className={`bg-gray-800 rounded-lg flex items-center justify-center ${className}`}>
-                <div className="text-gray-400 text-sm">No 3D model available</div>
+            <div className={`bg-gray-100 rounded-lg flex items-center justify-center border border-gray-200 ${className}`}>
+                <div className="text-gray-600 text-sm">No 3D model available</div>
             </div>
         );
     }
 
     return (
-        <div className={`bg-gray-100 rounded-lg overflow-hidden ${className}`} style={{ backgroundColor }}>
+        <div className={`bg-gray-50 rounded-lg overflow-hidden border border-gray-200 ${className}`} style={{ backgroundColor }}>
             <Canvas
                 camera={{ position: [3, 3, 3], fov: 50 }}
                 shadows

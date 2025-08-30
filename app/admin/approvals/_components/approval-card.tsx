@@ -54,7 +54,7 @@ export function ApprovalCard({
                     <div className="flex flex-col items-end gap-1">
                         <Badge
                             variant="secondary"
-                            className="border-yellow-300 bg-yellow-100 text-yellow-700"
+                            className="border-yellow-200 bg-yellow-100 text-yellow-800"
                         >
                             <Clock className="mr-1 h-3 w-3" />
                             {t('admin.approvals.productPending')}
@@ -62,7 +62,7 @@ export function ApprovalCard({
                         {variants.length > 0 && (
                             <Badge
                                 variant="secondary"
-                                className="border-gray-300 bg-gray-100 text-xs text-gray-700"
+                                className="border-gray-200 bg-gray-100 text-xs text-gray-700"
                             >
                                 {variants.length}{' '}
                                 {t('admin.approvals.variants')}
@@ -70,7 +70,7 @@ export function ApprovalCard({
                         )}
                     </div>
                 ),
-                color: 'border-yellow-500/30',
+                color: 'border-yellow-200',
             }
         } else if (product.yprodstatut === 'rejected') {
             return {
@@ -78,7 +78,7 @@ export function ApprovalCard({
                     <div className="flex flex-col items-end gap-1">
                         <Badge
                             variant="secondary"
-                            className="border-orange-300 bg-orange-100 text-orange-700"
+                            className="border-orange-200 bg-orange-100 text-orange-800"
                         >
                             <AlertTriangle className="mr-1 h-3 w-3" />
                             {t('admin.approvals.needsRevision')}
@@ -86,7 +86,7 @@ export function ApprovalCard({
                         {variants.length > 0 && (
                             <Badge
                                 variant="secondary"
-                                className="border-gray-300 bg-gray-100 text-xs text-gray-700"
+                                className="border-gray-200 bg-gray-100 text-xs text-gray-700"
                             >
                                 {variants.length}{' '}
                                 {t('admin.approvals.variants')}
@@ -94,7 +94,7 @@ export function ApprovalCard({
                         )}
                     </div>
                 ),
-                color: 'border-orange-500/30',
+                color: 'border-orange-200',
             }
         } else if (pendingVariants > 0 || revisionVariants > 0) {
             return {
@@ -102,7 +102,7 @@ export function ApprovalCard({
                     <div className="flex flex-col items-end gap-1">
                         <Badge
                             variant="secondary"
-                            className="border-blue-500/30 bg-blue-500/20 text-blue-300"
+                            className="border-blue-200 bg-blue-100 text-blue-800"
                         >
                             <Package className="mr-1 h-3 w-3" />
                             {t('admin.approvals.variantIssues')}
@@ -111,7 +111,7 @@ export function ApprovalCard({
                             {pendingVariants > 0 && (
                                 <Badge
                                     variant="secondary"
-                                    className="border-yellow-500/30 bg-yellow-500/20 text-xs text-yellow-300"
+                                    className="border-yellow-200 bg-yellow-100 text-xs text-yellow-800"
                                 >
                                     {pendingVariants}{' '}
                                     {t('admin.approvals.pending')}
@@ -120,7 +120,7 @@ export function ApprovalCard({
                             {revisionVariants > 0 && (
                                 <Badge
                                     variant="secondary"
-                                    className="border-orange-500/30 bg-orange-500/20 text-xs text-orange-300"
+                                    className="border-orange-200 bg-orange-100 text-xs text-orange-800"
                                 >
                                     {revisionVariants}{' '}
                                     {t('admin.approvals.revision')}
@@ -129,7 +129,7 @@ export function ApprovalCard({
                             {rejectedVariants > 0 && (
                                 <Badge
                                     variant="secondary"
-                                    className="border-red-500/30 bg-red-500/20 text-xs text-red-300"
+                                    className="border-red-200 bg-red-100 text-xs text-red-800"
                                 >
                                     {rejectedVariants}{' '}
                                     {t('admin.approvals.rejected')}
@@ -138,7 +138,7 @@ export function ApprovalCard({
                             {approvedVariants > 0 && (
                                 <Badge
                                     variant="secondary"
-                                    className="border-green-500/30 bg-green-500/20 text-xs text-green-300"
+                                    className="border-green-200 bg-green-100 text-xs text-green-800"
                                 >
                                     {approvedVariants}{' '}
                                     {t('admin.approvals.approved')}
@@ -147,12 +147,12 @@ export function ApprovalCard({
                         </div>
                     </div>
                 ),
-                color: 'border-blue-500/30',
+                color: 'border-blue-200',
             }
         }
         return {
             badge: null,
-            color: 'border-gray-700/50',
+            color: 'border-gray-200',
         }
     }
 
@@ -169,7 +169,7 @@ export function ApprovalCard({
             // Use ycouleurarriereplan if set, else fallback to white
             const backgroundColor = model?.ycouleurarriereplan || '#ffffff'
             return (
-                <div className="relative flex h-40 w-full items-center justify-center rounded-lg border border-purple-500/30 bg-gray-900/30">
+                <div className="relative flex h-40 w-full items-center justify-center rounded-lg border border-purple-200 bg-gray-50">
                     <Model3DViewer
                         modelUrl={model?.ymodelurl}
                         backgroundColor={backgroundColor}
@@ -179,7 +179,7 @@ export function ApprovalCard({
                     <div className="absolute top-2 right-2">
                         <Badge
                             variant="secondary"
-                            className="border-purple-500/30 bg-purple-500/20 text-xs text-purple-300"
+                            className="border-purple-200 bg-purple-100 text-xs text-purple-800"
                         >
                             {t('admin.approvals.preview3D')}
                         </Badge>
@@ -187,7 +187,7 @@ export function ApprovalCard({
                     <div className="absolute top-2 left-2">
                         <Badge
                             variant="secondary"
-                            className="border-blue-500/30 bg-blue-500/20 text-xs text-blue-300"
+                            className="border-blue-200 bg-blue-100 text-xs text-blue-800"
                         >
                             {product.yobjet3d.length}{' '}
                             {product.yobjet3d.length > 1
@@ -205,12 +205,12 @@ export function ApprovalCard({
 
         if (media.ymediaboolvideo) {
             return (
-                <div className="relative flex h-32 w-full items-center justify-center rounded-lg bg-gray-800">
-                    <Play className="h-8 w-8 text-gray-400" />
+                <div className="relative flex h-32 w-full items-center justify-center rounded-lg bg-gray-100">
+                    <Play className="h-8 w-8 text-gray-600" />
                     <div className="absolute top-2 right-2">
                         <Badge
                             variant="secondary"
-                            className="border-purple-500/30 bg-purple-500/20 text-xs text-purple-300"
+                            className="border-purple-200 bg-purple-100 text-xs text-purple-800"
                         >
                             {t('admin.approvals.video')}
                         </Badge>
@@ -219,7 +219,7 @@ export function ApprovalCard({
             )
         } else {
             return (
-                <div className="relative h-32 w-full overflow-hidden rounded-lg bg-gray-800">
+                <div className="relative h-32 w-full overflow-hidden rounded-lg bg-gray-100">
                     <img
                         src={media.ymediaurl}
                         alt={media.ymediaintitule}
@@ -229,7 +229,7 @@ export function ApprovalCard({
                             target.style.display = 'none'
                             target.parentElement!.innerHTML = `
                                 <div class="w-full h-full flex items-center justify-center">
-                                    <svg class="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <svg class="h-8 w-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                     </svg>
                                 </div>
@@ -276,9 +276,9 @@ export function ApprovalCard({
             <CardContent className="space-y-3">
                 {/* Media Preview */}
                 {getMediaPreview() || (
-                    <div className="flex h-32 w-full items-center justify-center rounded-lg bg-gray-800">
-                        <ImageIcon className="h-8 w-8 text-gray-400" />
-                        <span className="ml-2 text-sm text-gray-500">
+                    <div className="flex h-32 w-full items-center justify-center rounded-lg bg-gray-100">
+                        <ImageIcon className="h-8 w-8 text-gray-600" />
+                        <span className="ml-2 text-sm text-gray-600">
                             {t('admin.approvals.noMedia')}
                         </span>
                     </div>
@@ -287,12 +287,12 @@ export function ApprovalCard({
                 {/* Product Info */}
                 <div className="space-y-2">
                     <div className="flex items-center justify-between text-xs">
-                        <span className="text-gray-400">
+                        <span className="text-gray-600">
                             {t('admin.approvals.category')}:
                         </span>
                         <Badge
                             variant="secondary"
-                            className="border-blue-500/30 bg-blue-500/20 text-xs text-blue-300"
+                            className="border-blue-200 bg-blue-100 text-xs text-blue-800"
                         >
                             {category?.xcategprodintitule ||
                                 t('admin.approvals.unknown')}
@@ -300,27 +300,27 @@ export function ApprovalCard({
                     </div>
 
                     <div className="flex items-center justify-between text-xs">
-                        <span className="text-gray-400">
+                        <span className="text-gray-600">
                             {t('admin.approvals.store')}:
                         </span>
-                        <span className="text-white">
+                        <span className="text-gray-900">
                             {product.store?.yboutiqueintitule ||
                                 t('admin.approvals.unknownStore')}
                         </span>
                     </div>
 
                     <div className="flex items-center justify-between text-xs">
-                        <span className="text-gray-400">
+                        <span className="text-gray-600">
                             {t('admin.approvals.variants')}:
                         </span>
                         <div className="flex flex-wrap items-center justify-end gap-1">
-                            <span className="text-white">
+                            <span className="text-gray-900">
                                 {variants.length || 0}
                             </span>
                             {variantCounts.pending > 0 && (
                                 <Badge
                                     variant="secondary"
-                                    className="border-yellow-500/30 bg-yellow-500/20 text-xs text-yellow-300"
+                                    className="border-yellow-200 bg-yellow-100 text-xs text-yellow-800"
                                 >
                                     {variantCounts.pending}{' '}
                                     {t('admin.approvals.pending')}
@@ -329,7 +329,7 @@ export function ApprovalCard({
                             {variantCounts.revision > 0 && (
                                 <Badge
                                     variant="secondary"
-                                    className="border-orange-500/30 bg-orange-500/20 text-xs text-orange-300"
+                                    className="border-orange-200 bg-orange-100 text-xs text-orange-800"
                                 >
                                     {variantCounts.revision}{' '}
                                     {t('admin.approvals.revision')}
@@ -338,7 +338,7 @@ export function ApprovalCard({
                             {variantCounts.rejected > 0 && (
                                 <Badge
                                     variant="secondary"
-                                    className="border-red-500/30 bg-red-500/20 text-xs text-red-300"
+                                    className="border-red-200 bg-red-100 text-xs text-red-800"
                                 >
                                     {variantCounts.rejected}{' '}
                                     {t('admin.approvals.rejected')}
@@ -347,7 +347,7 @@ export function ApprovalCard({
                             {variantCounts.approved > 0 && (
                                 <Badge
                                     variant="secondary"
-                                    className="border-green-500/30 bg-green-500/20 text-xs text-green-300"
+                                    className="border-green-200 bg-green-100 text-xs text-green-800"
                                 >
                                     {variantCounts.approved}{' '}
                                     {t('admin.approvals.approved')}
@@ -359,12 +359,12 @@ export function ApprovalCard({
                     {/* 3D Models indicator */}
                     {product.yobjet3d?.length > 0 && (
                         <div className="flex items-center justify-between text-xs">
-                            <span className="text-gray-400">
+                            <span className="text-gray-600">
                                 {t('admin.approvals.models3D')}:
                             </span>
                             <div className="flex items-center gap-1">
-                                <Box className="h-3 w-3 text-purple-400" />
-                                <span className="text-purple-400">
+                                <Box className="h-3 w-3 text-purple-600" />
+                                <span className="text-purple-600">
                                     {product.yobjet3d.length}
                                 </span>
                             </div>
@@ -372,21 +372,21 @@ export function ApprovalCard({
                     )}
 
                     <div className="flex items-center justify-between text-xs">
-                        <span className="text-gray-400">
+                        <span className="text-gray-600">
                             {t('admin.approvals.created')}:
                         </span>
-                        <span className="text-white">
+                        <span className="text-gray-900">
                             {new Date(product.sysdate).toLocaleDateString()}
                         </span>
                     </div>
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center border-t border-gray-700/50 pt-2">
+                <div className="flex items-center border-t border-gray-200 pt-2">
                     <Button
                         size="sm"
                         onClick={onAudit}
-                        className="h-9 w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800"
+                        className="h-9 w-full bg-gradient-to-r from-blue-600 to-blue-500 text-white hover:from-blue-700 hover:to-blue-600"
                         title={t('admin.approvals.auditProduct')}
                     >
                         <FileSearch className="mr-2 h-4 w-4" />

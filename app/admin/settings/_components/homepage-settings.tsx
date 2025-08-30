@@ -261,7 +261,7 @@ export function HomepageSettings() {
 
         return (
             <div className="space-y-2">
-                <p className="text-sm text-gray-400">
+                <p className="text-sm text-gray-600">
                     {t('admin.settings.currentFile')}: {currentValue}
                 </p>
                 <Button
@@ -293,7 +293,7 @@ export function HomepageSettings() {
     if (isLoading) {
         return (
             <div className="flex items-center justify-center p-8">
-                <Loader2 className="text-morpheus-gold-light h-8 w-8 animate-spin" />
+                <Loader2 className="text-blue-600 h-8 w-8 animate-spin" />
             </div>
         )
     }
@@ -301,14 +301,14 @@ export function HomepageSettings() {
     return (
         <div className="space-y-6">
             <div className="flex items-center gap-2">
-                <h2 className="text-2xl font-bold text-white">
+                <h2 className="text-2xl font-bold text-gray-900">
                     {t('admin.settings.homepageSettings')}
                 </h2>
-                <Badge variant="secondary">{t('admin.settings.dynamic')}</Badge>
+                <Badge variant="secondary" className="bg-gray-100 text-gray-800">{t('admin.settings.dynamic')}</Badge>
             </div>
 
             <Tabs defaultValue="hero" className="w-full">
-                <TabsList className="grid w-full grid-cols-6 bg-slate-800/50">
+                <TabsList className="grid w-full grid-cols-6 bg-gray-100">
                     <TabsTrigger value="hero">
                         {t('admin.settings.hero')}
                     </TabsTrigger>
@@ -331,12 +331,12 @@ export function HomepageSettings() {
 
                 {/* Hero Section */}
                 <TabsContent value="hero" className="space-y-6">
-                    <Card className="border-slate-700 bg-slate-800/50">
+                    <Card className="border-gray-200 bg-white shadow-xl">
                         <CardHeader>
-                            <CardTitle className="text-white">
+                            <CardTitle className="text-gray-900">
                                 {t('admin.settings.heroSection')}
                             </CardTitle>
-                            <CardDescription>
+                            <CardDescription className="text-gray-600">
                                 {t('admin.settings.heroSectionDescription')}
                             </CardDescription>
                         </CardHeader>
@@ -349,7 +349,7 @@ export function HomepageSettings() {
 
                                 {/* Video Upload */}
                                 <div className="space-y-2">
-                                    <Label className="text-white">
+                                    <Label className="text-gray-900">
                                         {t('admin.settings.videoFile')}
                                     </Label>
                                     <div className="flex items-center gap-4">
@@ -366,7 +366,7 @@ export function HomepageSettings() {
                                                     )
                                                 }
                                             }}
-                                            className="border-slate-600 bg-slate-700 text-white"
+                                            className="border-gray-300 bg-white text-gray-900"
                                             disabled={
                                                 uploadingFiles[
                                                     'homepage_hero_video1_url'
@@ -398,7 +398,7 @@ export function HomepageSettings() {
                                                     e.target.value
                                                 )
                                             }
-                                            className="border-slate-600 bg-slate-700 text-white"
+                                            className="border-gray-300 bg-white text-gray-900"
                                             placeholder="MODE"
                                         />
                                         <Button
@@ -439,7 +439,7 @@ export function HomepageSettings() {
                                                     e.target.value
                                                 )
                                             }
-                                            className="border-slate-600 bg-slate-700 text-white"
+                                            className="border-gray-300 bg-white text-gray-900"
                                             placeholder="MODE"
                                         />
                                         <Button
@@ -482,7 +482,7 @@ export function HomepageSettings() {
                                                     e.target.value
                                                 )
                                             }
-                                            className="border-slate-600 bg-slate-700 text-white"
+                                            className="border-gray-300 bg-white text-gray-900"
                                             placeholder="PRE-COLLECTION 2026/27"
                                         />
                                         <Button
@@ -523,7 +523,7 @@ export function HomepageSettings() {
                                                     e.target.value
                                                 )
                                             }
-                                            className="border-slate-600 bg-slate-700 text-white"
+                                            className="border-gray-300 bg-white text-gray-900"
                                             placeholder="PRÉ-COLLECTION 2026/27"
                                         />
                                         <Button
@@ -565,7 +565,7 @@ export function HomepageSettings() {
                                                 e.target.value
                                             )
                                         }
-                                        className="border-slate-600 bg-slate-700 text-white"
+                                        className="border-gray-300 bg-white text-gray-900"
                                         placeholder="#"
                                     />
                                     <Button
@@ -601,7 +601,7 @@ export function HomepageSettings() {
 
                                 {/* Video Upload */}
                                 <div className="space-y-2">
-                                    <Label className="text-white">
+                                    <Label className="text-gray-900">
                                         {t('admin.settings.videoFile')}
                                     </Label>
                                     <div className="flex items-center gap-4">
@@ -618,7 +618,7 @@ export function HomepageSettings() {
                                                     )
                                                 }
                                             }}
-                                            className="border-slate-600 bg-slate-700 text-white"
+                                            className="border-gray-300 bg-white text-gray-900"
                                             disabled={
                                                 uploadingFiles[
                                                     'homepage_hero_video2_url'
@@ -650,7 +650,7 @@ export function HomepageSettings() {
                                                     e.target.value
                                                 )
                                             }
-                                            className="border-slate-600 bg-slate-700 text-white"
+                                            className="border-gray-300 bg-white text-gray-900"
                                             placeholder="PRE-COLLECTION"
                                         />
                                         <Button
@@ -691,7 +691,7 @@ export function HomepageSettings() {
                                                     e.target.value
                                                 )
                                             }
-                                            className="border-slate-600 bg-slate-700 text-white"
+                                            className="border-gray-300 bg-white text-gray-900"
                                             placeholder="PRÉ-COLLECTION"
                                         />
                                         <Button
@@ -734,7 +734,7 @@ export function HomepageSettings() {
                                                     e.target.value
                                                 )
                                             }
-                                            className="border-slate-600 bg-slate-700 text-white"
+                                            className="border-gray-300 bg-white text-gray-900"
                                             placeholder="SUMMER COLLECTION 2026"
                                         />
                                         <Button
@@ -775,7 +775,7 @@ export function HomepageSettings() {
                                                     e.target.value
                                                 )
                                             }
-                                            className="border-slate-600 bg-slate-700 text-white"
+                                            className="border-gray-300 bg-white text-gray-900"
                                             placeholder="COLLECTION ÉTÉ 2026"
                                         />
                                         <Button
@@ -817,7 +817,7 @@ export function HomepageSettings() {
                                                 e.target.value
                                             )
                                         }
-                                        className="border-slate-600 bg-slate-700 text-white"
+                                        className="border-gray-300 bg-white text-gray-900"
                                         placeholder="#"
                                     />
                                     <Button
@@ -850,12 +850,12 @@ export function HomepageSettings() {
 
                 {/* Video Animation Section */}
                 <TabsContent value="video-animation" className="space-y-6">
-                    <Card className="border-slate-700 bg-slate-800/50">
+                    <Card className="border-gray-200 bg-white shadow-xl">
                         <CardHeader>
-                            <CardTitle className="text-white">
+                            <CardTitle className="text-gray-900">
                                 Video Animation Section
                             </CardTitle>
-                            <CardDescription>
+                            <CardDescription className="text-gray-600">
                                 Configure the text content for the video
                                 animation section that appears after the hero
                             </CardDescription>
@@ -877,7 +877,7 @@ export function HomepageSettings() {
                                                 e.target.value
                                             )
                                         }
-                                        className="border-slate-600 bg-slate-700 text-white"
+                                        className="border-gray-300 bg-white text-gray-900"
                                         placeholder="The Origin of Morphea"
                                     />
                                     <Button
@@ -918,7 +918,7 @@ export function HomepageSettings() {
                                                 e.target.value
                                             )
                                         }
-                                        className="border-slate-600 bg-slate-700 text-white"
+                                        className="border-gray-300 bg-white text-gray-900"
                                         placeholder="À L'origine de Morphea"
                                     />
                                     <Button
@@ -962,7 +962,7 @@ export function HomepageSettings() {
                                                 e.target.value
                                             )
                                         }
-                                        className="border-slate-600 bg-slate-700 text-white"
+                                        className="border-gray-300 bg-white text-gray-900"
                                         placeholder="At the origin of Morphea, this space dedicated to luxury fashion..."
                                         rows={4}
                                     />
@@ -1004,7 +1004,7 @@ export function HomepageSettings() {
                                                 e.target.value
                                             )
                                         }
-                                        className="border-slate-600 bg-slate-700 text-white"
+                                        className="border-gray-300 bg-white text-gray-900"
                                         placeholder="A l'origine de Morphea, cet espace dédié à la mode de luxe..."
                                         rows={4}
                                     />
@@ -1049,7 +1049,7 @@ export function HomepageSettings() {
                                                 e.target.value
                                             )
                                         }
-                                        className="border-slate-600 bg-slate-700 text-white"
+                                        className="border-gray-300 bg-white text-gray-900"
                                         placeholder="Learn more"
                                     />
                                     <Button
@@ -1090,7 +1090,7 @@ export function HomepageSettings() {
                                                 e.target.value
                                             )
                                         }
-                                        className="border-slate-600 bg-slate-700 text-white"
+                                        className="border-gray-300 bg-white text-gray-900"
                                         placeholder="En savoir plus"
                                     />
                                     <Button
@@ -1133,7 +1133,7 @@ export function HomepageSettings() {
                                             e.target.value
                                         )
                                     }
-                                    className="border-slate-600 bg-slate-700 text-white"
+                                    className="border-gray-300 bg-white text-gray-900"
                                     placeholder="https://morpheus-sa.com/"
                                 />
                                 <Button
@@ -1165,12 +1165,12 @@ export function HomepageSettings() {
 
                 {/* Collections Section */}
                 <TabsContent value="collections" className="space-y-6">
-                    <Card className="border-slate-700 bg-slate-800/50">
+                    <Card className="border-gray-200 bg-white shadow-xl">
                         <CardHeader>
-                            <CardTitle className="text-white">
+                            <CardTitle className="text-gray-900">
                                 {t('admin.settings.collectionsSection')}
                             </CardTitle>
-                            <CardDescription>
+                            <CardDescription className="text-gray-600">
                                 {t(
                                     'admin.settings.collectionsSectionDescription'
                                 )}
@@ -1180,7 +1180,7 @@ export function HomepageSettings() {
                             {/* Title and Subtitle */}
                             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                 <div className="space-y-2">
-                                    <Label className="text-white">
+                                    <Label className="text-gray-900">
                                         {t('admin.settings.titleEn')}
                                     </Label>
                                     <Input
@@ -1193,7 +1193,7 @@ export function HomepageSettings() {
                                                 e.target.value
                                             )
                                         }
-                                        className="border-slate-600 bg-slate-700 text-white"
+                                        className="border-gray-300 bg-white text-gray-900"
                                         placeholder="Discover Our Shows"
                                     />
                                     <Button
@@ -1221,7 +1221,7 @@ export function HomepageSettings() {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label className="text-white">
+                                    <Label className="text-gray-900">
                                         {t('admin.settings.titleFr')}
                                     </Label>
                                     <Input
@@ -1234,7 +1234,7 @@ export function HomepageSettings() {
                                                 e.target.value
                                             )
                                         }
-                                        className="border-slate-600 bg-slate-700 text-white"
+                                        className="border-gray-300 bg-white text-gray-900"
                                         placeholder="Découvrez nos défilés"
                                     />
                                     <Button
@@ -1277,7 +1277,7 @@ export function HomepageSettings() {
                                                 e.target.value
                                             )
                                         }
-                                        className="border-slate-600 bg-slate-700 text-white"
+                                        className="border-gray-300 bg-white text-gray-900"
                                         placeholder="Dive into the exclusive universe..."
                                     />
                                     <Button
@@ -1318,7 +1318,7 @@ export function HomepageSettings() {
                                                 e.target.value
                                             )
                                         }
-                                        className="border-slate-600 bg-slate-700 text-white"
+                                        className="border-gray-300 bg-white text-gray-900"
                                         placeholder="Plongez dans l'univers exclusif..."
                                     />
                                     <Button
@@ -1366,7 +1366,7 @@ export function HomepageSettings() {
                                                     )
                                                 }
                                             }}
-                                            className="border-slate-600 bg-slate-700 text-white"
+                                            className="border-gray-300 bg-white text-gray-900"
                                             disabled={
                                                 uploadingFiles[
                                                     'homepage_collections_image1_url'
@@ -1400,7 +1400,7 @@ export function HomepageSettings() {
                                                     )
                                                 }
                                             }}
-                                            className="border-slate-600 bg-slate-700 text-white"
+                                            className="border-gray-300 bg-white text-gray-900"
                                             disabled={
                                                 uploadingFiles[
                                                     'homepage_collections_image2_url'
@@ -1422,12 +1422,12 @@ export function HomepageSettings() {
 
                 {/* Other tabs will be implemented in the next part */}
                 <TabsContent value="categories">
-                    <Card className="border-slate-700 bg-slate-800/50">
+                    <Card className="border-gray-200 bg-white shadow-xl">
                         <CardHeader>
-                            <CardTitle className="text-white">
+                            <CardTitle className="text-gray-900">
                                 {t('admin.settings.categoriesSection')}
                             </CardTitle>
-                            <CardDescription>
+                            <CardDescription className="text-gray-600">
                                 {t(
                                     'admin.settings.categoriesSectionDescription'
                                 )}
@@ -1437,7 +1437,7 @@ export function HomepageSettings() {
                             {/* Section Title */}
                             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                 <div className="space-y-2">
-                                    <Label className="text-white">
+                                    <Label className="text-gray-900">
                                         {t('admin.settings.titleEn')}
                                     </Label>
                                     <Input
@@ -1450,7 +1450,7 @@ export function HomepageSettings() {
                                                 e.target.value
                                             )
                                         }
-                                        className="border-slate-600 bg-slate-700 text-white"
+                                        className="border-gray-300 bg-white text-gray-900"
                                         placeholder="Our Categories"
                                     />
                                     <Button
@@ -1478,7 +1478,7 @@ export function HomepageSettings() {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label className="text-white">
+                                    <Label className="text-gray-900">
                                         {t('admin.settings.titleFr')}
                                     </Label>
                                     <Input
@@ -1491,7 +1491,7 @@ export function HomepageSettings() {
                                                 e.target.value
                                             )
                                         }
-                                        className="border-slate-600 bg-slate-700 text-white"
+                                        className="border-gray-300 bg-white text-gray-900"
                                         placeholder="Nos Catégories"
                                     />
                                     <Button
@@ -1520,13 +1520,13 @@ export function HomepageSettings() {
                             </div>
 
                             {/* Category 1 */}
-                            <div className="space-y-4 border-t border-slate-600 pt-6">
-                                <h4 className="text-lg font-semibold text-white">
+                            <div className="space-y-4 border-t border-gray-200 pt-6">
+                                <h4 className="text-lg font-semibold text-gray-900">
                                     Category 1
                                 </h4>
 
                                 <div className="space-y-2">
-                                    <Label className="text-white">
+                                    <Label className="text-gray-900">
                                         Category Selection
                                     </Label>
                                     <Select
@@ -1540,7 +1540,7 @@ export function HomepageSettings() {
                                             )
                                         }
                                     >
-                                        <SelectTrigger className="border-slate-600 bg-slate-700 text-white">
+                                        <SelectTrigger className="border-gray-300 bg-white text-gray-900">
                                             <SelectValue placeholder="Select a category..." />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -1569,7 +1569,7 @@ export function HomepageSettings() {
                                                 'homepage_categories_category1_id'
                                             ] === undefined
                                         }
-                                        className="bg-morpheus-gold-dark hover:bg-morpheus-gold-light"
+                                        className="bg-blue-600 hover:bg-blue-700 text-white"
                                     >
                                         {updateSetting.isPending ? (
                                             <Loader2 className="h-4 w-4 animate-spin" />
@@ -1582,7 +1582,7 @@ export function HomepageSettings() {
 
                                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                     <div className="space-y-2">
-                                        <Label className="text-white">
+                                        <Label className="text-gray-900">
                                             {t('admin.settings.subtitleEn')}
                                         </Label>
                                         <Input
@@ -1595,7 +1595,7 @@ export function HomepageSettings() {
                                                     e.target.value
                                                 )
                                             }
-                                            className="border-slate-600 bg-slate-700 text-white"
+                                            className="border-gray-300 bg-white text-gray-900"
                                             placeholder="Custom subtitle..."
                                         />
                                         <Button
@@ -1623,7 +1623,7 @@ export function HomepageSettings() {
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label className="text-white">
+                                        <Label className="text-gray-900">
                                             {t('admin.settings.subtitleFr')}
                                         </Label>
                                         <Input
@@ -1636,7 +1636,7 @@ export function HomepageSettings() {
                                                     e.target.value
                                                 )
                                             }
-                                            className="border-slate-600 bg-slate-700 text-white"
+                                            className="border-gray-300 bg-white text-gray-900"
                                             placeholder="Sous-titre personnalisé..."
                                         />
                                         <Button
@@ -1666,7 +1666,7 @@ export function HomepageSettings() {
 
                                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                     <div className="space-y-2">
-                                        <Label className="text-white">
+                                        <Label className="text-gray-900">
                                             Custom Link
                                         </Label>
                                         <Input
@@ -1679,7 +1679,7 @@ export function HomepageSettings() {
                                                     e.target.value
                                                 )
                                             }
-                                            className="border-slate-600 bg-slate-700 text-white"
+                                            className="border-gray-300 bg-white text-gray-900"
                                             placeholder="#"
                                         />
                                         <Button
@@ -1707,7 +1707,7 @@ export function HomepageSettings() {
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label className="text-white">
+                                        <Label className="text-gray-900">
                                             Category Image
                                         </Label>
                                         <div className="flex items-center gap-4">
@@ -1725,7 +1725,7 @@ export function HomepageSettings() {
                                                         )
                                                     }
                                                 }}
-                                                className="border-slate-600 bg-slate-700 text-white"
+                                                className="border-gray-300 bg-white text-gray-900"
                                                 disabled={
                                                     uploadingFiles[
                                                         'homepage_categories_category1_image_url'
@@ -1744,8 +1744,8 @@ export function HomepageSettings() {
                             </div>
 
                             {/* Category 2 */}
-                            <div className="space-y-4 border-t border-slate-600 pt-6">
-                                <h4 className="text-lg font-semibold text-white">
+                            <div className="space-y-4 border-t border-gray-200 pt-6">
+                                <h4 className="text-lg font-semibold text-gray-900">
                                     Category 2
                                 </h4>
 
@@ -1764,7 +1764,7 @@ export function HomepageSettings() {
                                             )
                                         }
                                     >
-                                        <SelectTrigger className="border-slate-600 bg-slate-700 text-white">
+                                        <SelectTrigger className="border-gray-300 bg-white text-gray-900">
                                             <SelectValue placeholder="Select a category..." />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -1806,7 +1806,7 @@ export function HomepageSettings() {
 
                                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                     <div className="space-y-2">
-                                        <Label className="text-white">
+                                        <Label className="text-gray-900">
                                             {t('admin.settings.subtitleEn')}
                                         </Label>
                                         <Input
@@ -1819,7 +1819,7 @@ export function HomepageSettings() {
                                                     e.target.value
                                                 )
                                             }
-                                            className="border-slate-600 bg-slate-700 text-white"
+                                            className="border-gray-300 bg-white text-gray-900"
                                             placeholder="Custom subtitle..."
                                         />
                                         <Button
@@ -1847,7 +1847,7 @@ export function HomepageSettings() {
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label className="text-white">
+                                        <Label className="text-gray-900">
                                             {t('admin.settings.subtitleFr')}
                                         </Label>
                                         <Input
@@ -1860,7 +1860,7 @@ export function HomepageSettings() {
                                                     e.target.value
                                                 )
                                             }
-                                            className="border-slate-600 bg-slate-700 text-white"
+                                            className="border-gray-300 bg-white text-gray-900"
                                             placeholder="Sous-titre personnalisé..."
                                         />
                                         <Button
@@ -1903,7 +1903,7 @@ export function HomepageSettings() {
                                                     e.target.value
                                                 )
                                             }
-                                            className="border-slate-600 bg-slate-700 text-white"
+                                            className="border-gray-300 bg-white text-gray-900"
                                             placeholder="#"
                                         />
                                         <Button
@@ -1949,7 +1949,7 @@ export function HomepageSettings() {
                                                         )
                                                     }
                                                 }}
-                                                className="border-slate-600 bg-slate-700 text-white"
+                                                className="border-gray-300 bg-white text-gray-900"
                                                 disabled={
                                                     uploadingFiles[
                                                         'homepage_categories_category2_image_url'
@@ -1968,8 +1968,8 @@ export function HomepageSettings() {
                             </div>
 
                             {/* Category 3 */}
-                            <div className="space-y-4 border-t border-slate-600 pt-6">
-                                <h4 className="text-lg font-semibold text-white">
+                            <div className="space-y-4 border-t border-gray-200 pt-6">
+                                <h4 className="text-lg font-semibold text-gray-900">
                                     Category 3
                                 </h4>
 
@@ -1988,7 +1988,7 @@ export function HomepageSettings() {
                                             )
                                         }
                                     >
-                                        <SelectTrigger className="border-slate-600 bg-slate-700 text-white">
+                                        <SelectTrigger className="border-gray-300 bg-white text-gray-900">
                                             <SelectValue placeholder="Select a category..." />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -2043,7 +2043,7 @@ export function HomepageSettings() {
                                                     e.target.value
                                                 )
                                             }
-                                            className="border-slate-600 bg-slate-700 text-white"
+                                            className="border-gray-300 bg-white text-gray-900"
                                             placeholder="Custom subtitle..."
                                         />
                                         <Button
@@ -2084,7 +2084,7 @@ export function HomepageSettings() {
                                                     e.target.value
                                                 )
                                             }
-                                            className="border-slate-600 bg-slate-700 text-white"
+                                            className="border-gray-300 bg-white text-gray-900"
                                             placeholder="Sous-titre personnalisé..."
                                         />
                                         <Button
@@ -2127,7 +2127,7 @@ export function HomepageSettings() {
                                                     e.target.value
                                                 )
                                             }
-                                            className="border-slate-600 bg-slate-700 text-white"
+                                            className="border-gray-300 bg-white text-gray-900"
                                             placeholder="#"
                                         />
                                         <Button
@@ -2173,7 +2173,7 @@ export function HomepageSettings() {
                                                         )
                                                     }
                                                 }}
-                                                className="border-slate-600 bg-slate-700 text-white"
+                                                className="border-gray-300 bg-white text-gray-900"
                                                 disabled={
                                                     uploadingFiles[
                                                         'homepage_categories_category3_image_url'
@@ -2195,12 +2195,12 @@ export function HomepageSettings() {
                 </TabsContent>
 
                 <TabsContent value="creators">
-                    <Card className="border-slate-700 bg-slate-800/50">
+                    <Card className="border-gray-200 bg-white shadow-xl">
                         <CardHeader>
-                            <CardTitle className="text-white">
+                            <CardTitle className="text-gray-900">
                                 {t('admin.settings.creatorsSection')}
                             </CardTitle>
-                            <CardDescription>
+                            <CardDescription className="text-gray-600">
                                 {t('admin.settings.creatorsSectionDescription')}
                             </CardDescription>
                         </CardHeader>
@@ -2221,7 +2221,7 @@ export function HomepageSettings() {
                                                 e.target.value
                                             )
                                         }
-                                        className="border-slate-600 bg-slate-700 text-white"
+                                        className="border-gray-300 bg-white text-gray-900"
                                         placeholder="Our Creators"
                                     />
                                     <Button
@@ -2262,7 +2262,7 @@ export function HomepageSettings() {
                                                 e.target.value
                                             )
                                         }
-                                        className="border-slate-600 bg-slate-700 text-white"
+                                        className="border-gray-300 bg-white text-gray-900"
                                         placeholder="Nos Créateurs"
                                     />
                                     <Button
@@ -2305,7 +2305,7 @@ export function HomepageSettings() {
                                                 e.target.value
                                             )
                                         }
-                                        className="border-slate-600 bg-slate-700 text-white"
+                                        className="border-gray-300 bg-white text-gray-900"
                                         placeholder="Discover our exceptional boutique spaces..."
                                         rows={3}
                                     />
@@ -2347,7 +2347,7 @@ export function HomepageSettings() {
                                                 e.target.value
                                             )
                                         }
-                                        className="border-slate-600 bg-slate-700 text-white"
+                                        className="border-gray-300 bg-white text-gray-900"
                                         placeholder="Découvrez nos espaces d'exception boutique..."
                                         rows={3}
                                     />
@@ -2377,18 +2377,18 @@ export function HomepageSettings() {
                             </div>
 
                             {/* Carousel Images Management */}
-                            <div className="space-y-4 border-t border-slate-600 pt-6">
-                                <h4 className="text-lg font-semibold text-white">
+                            <div className="space-y-4 border-t border-gray-200 pt-6">
+                                <h4 className="text-lg font-semibold text-gray-900">
                                     Carousel Images
                                 </h4>
-                                <p className="text-sm text-gray-400">
+                                <p className="text-sm text-gray-600">
                                     Upload multiple images for the 3D photo
                                     carousel. Images will be displayed in the
                                     order they are uploaded.
                                 </p>
 
                                 <div className="space-y-2">
-                                    <Label className="text-white">
+                                    <Label className="text-gray-900">
                                         Add New Image
                                     </Label>
                                     <div className="flex items-center gap-4">
@@ -2405,7 +2405,7 @@ export function HomepageSettings() {
                                                     )
                                                 }
                                             }}
-                                            className="border-slate-600 bg-slate-700 text-white"
+                                            className="border-gray-300 bg-white text-gray-900"
                                             disabled={
                                                 uploadingFiles[
                                                     'homepage_creators_images'
@@ -2422,10 +2422,10 @@ export function HomepageSettings() {
 
                                 {/* Current Images Display */}
                                 <div className="space-y-2">
-                                    <Label className="text-white">
+                                    <Label className="text-gray-900">
                                         Current Images
                                     </Label>
-                                    <div className="text-sm text-gray-400">
+                                    <div className="text-sm text-gray-600">
                                         {homeSettings?.creators.images &&
                                         homeSettings.creators.images.length >
                                             0 ? (
@@ -2483,25 +2483,25 @@ export function HomepageSettings() {
                 </TabsContent>
 
                 <TabsContent value="footer">
-                    <Card className="border-slate-700 bg-slate-800/50">
+                    <Card className="border-gray-200 bg-white shadow-xl">
                         <CardHeader>
-                            <CardTitle className="text-white">
+                            <CardTitle className="text-gray-900">
                                 {t('admin.settings.footerSection')}
                             </CardTitle>
-                            <CardDescription>
+                            <CardDescription className="text-gray-600">
                                 {t('admin.settings.footerSectionDescription')}
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-6">
                             {/* Social Media Links */}
                             <div className="space-y-4">
-                                <h4 className="text-lg font-semibold text-white">
+                                <h4 className="text-lg font-semibold text-gray-900">
                                     Social Media Links
                                 </h4>
 
                                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                     <div className="space-y-2">
-                                        <Label className="text-white">
+                                        <Label className="text-gray-900">
                                             Facebook URL
                                         </Label>
                                         <Input
@@ -2514,7 +2514,7 @@ export function HomepageSettings() {
                                                     e.target.value
                                                 )
                                             }
-                                            className="border-slate-600 bg-slate-700 text-white"
+                                            className="border-gray-300 bg-white text-gray-900"
                                             placeholder="https://facebook.com/yourpage"
                                         />
                                         <Button
@@ -2542,7 +2542,7 @@ export function HomepageSettings() {
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label className="text-white">
+                                        <Label className="text-gray-900">
                                             Instagram URL
                                         </Label>
                                         <Input
@@ -2555,7 +2555,7 @@ export function HomepageSettings() {
                                                     e.target.value
                                                 )
                                             }
-                                            className="border-slate-600 bg-slate-700 text-white"
+                                            className="border-gray-300 bg-white text-gray-900"
                                             placeholder="https://instagram.com/yourpage"
                                         />
                                         <Button
@@ -2583,7 +2583,7 @@ export function HomepageSettings() {
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label className="text-white">
+                                        <Label className="text-gray-900">
                                             Twitter URL
                                         </Label>
                                         <Input
@@ -2596,7 +2596,7 @@ export function HomepageSettings() {
                                                     e.target.value
                                                 )
                                             }
-                                            className="border-slate-600 bg-slate-700 text-white"
+                                            className="border-gray-300 bg-white text-gray-900"
                                             placeholder="https://twitter.com/yourpage"
                                         />
                                         <Button
@@ -2624,7 +2624,7 @@ export function HomepageSettings() {
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label className="text-white">
+                                        <Label className="text-gray-900">
                                             LinkedIn URL
                                         </Label>
                                         <Input
@@ -2637,7 +2637,7 @@ export function HomepageSettings() {
                                                     e.target.value
                                                 )
                                             }
-                                            className="border-slate-600 bg-slate-700 text-white"
+                                            className="border-gray-300 bg-white text-gray-900"
                                             placeholder="https://linkedin.com/company/yourpage"
                                         />
                                         <Button
@@ -2667,11 +2667,11 @@ export function HomepageSettings() {
                             </div>
 
                             {/* Footer Categories */}
-                            <div className="space-y-4 border-t border-slate-600 pt-6">
-                                <h4 className="text-lg font-semibold text-white">
+                            <div className="space-y-4 border-t border-gray-200 pt-6">
+                                <h4 className="text-lg font-semibold text-gray-900">
                                     Footer Categories
                                 </h4>
-                                <p className="text-sm text-gray-400">
+                                <p className="text-sm text-gray-600">
                                     Select which categories to display in the
                                     footer categories column.
                                 </p>
@@ -2679,7 +2679,7 @@ export function HomepageSettings() {
                                 <div className="space-y-4">
                                     {/* Selected Categories with Ordering */}
                                     <div className="space-y-2">
-                                        <Label className="text-white">
+                                        <Label className="text-gray-900">
                                             Selected Categories (Drag to
                                             reorder)
                                         </Label>
@@ -2830,7 +2830,7 @@ export function HomepageSettings() {
 
                                     {/* Available Categories to Add */}
                                     <div className="space-y-2">
-                                        <Label className="text-white">
+                                        <Label className="text-gray-900">
                                             Add Categories
                                         </Label>
                                         <div className="space-y-2">
@@ -2906,18 +2906,18 @@ export function HomepageSettings() {
                             </div>
 
                             {/* Footer Links */}
-                            <div className="space-y-4 border-t border-slate-600 pt-6">
-                                <h4 className="text-lg font-semibold text-white">
+                            <div className="space-y-4 border-t border-gray-200 pt-6">
+                                <h4 className="text-lg font-semibold text-gray-900">
                                     Footer Links
                                 </h4>
-                                <p className="text-sm text-gray-400">
+                                <p className="text-sm text-gray-600">
                                     Configure the links in the footer About and
                                     Customer Service sections.
                                 </p>
 
                                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                     <div className="space-y-2">
-                                        <Label className="text-white">
+                                        <Label className="text-gray-900">
                                             Origin Link
                                         </Label>
                                         <Input
@@ -2930,7 +2930,7 @@ export function HomepageSettings() {
                                                     e.target.value
                                                 )
                                             }
-                                            className="border-slate-600 bg-slate-700 text-white"
+                                            className="border-gray-300 bg-white text-gray-900"
                                             placeholder="https://example.com/origin"
                                         />
                                         <Button
@@ -2958,7 +2958,7 @@ export function HomepageSettings() {
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label className="text-white">
+                                        <Label className="text-gray-900">
                                             Events Link
                                         </Label>
                                         <Input
@@ -2971,7 +2971,7 @@ export function HomepageSettings() {
                                                     e.target.value
                                                 )
                                             }
-                                            className="border-slate-600 bg-slate-700 text-white"
+                                            className="border-gray-300 bg-white text-gray-900"
                                             placeholder="https://example.com/events"
                                         />
                                         <Button
@@ -2999,7 +2999,7 @@ export function HomepageSettings() {
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label className="text-white">
+                                        <Label className="text-gray-900">
                                             My Account Link
                                         </Label>
                                         <Input
@@ -3012,7 +3012,7 @@ export function HomepageSettings() {
                                                     e.target.value
                                                 )
                                             }
-                                            className="border-slate-600 bg-slate-700 text-white"
+                                            className="border-gray-300 bg-white text-gray-900"
                                             placeholder="https://example.com/account"
                                         />
                                         <Button
@@ -3040,7 +3040,7 @@ export function HomepageSettings() {
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label className="text-white">
+                                        <Label className="text-gray-900">
                                             Orders & Delivery Link
                                         </Label>
                                         <Input
@@ -3053,7 +3053,7 @@ export function HomepageSettings() {
                                                     e.target.value
                                                 )
                                             }
-                                            className="border-slate-600 bg-slate-700 text-white"
+                                            className="border-gray-300 bg-white text-gray-900"
                                             placeholder="https://example.com/orders"
                                         />
                                         <Button
@@ -3081,7 +3081,7 @@ export function HomepageSettings() {
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label className="text-white">
+                                        <Label className="text-gray-900">
                                             Cookies & Privacy Link
                                         </Label>
                                         <Input
@@ -3094,7 +3094,7 @@ export function HomepageSettings() {
                                                     e.target.value
                                                 )
                                             }
-                                            className="border-slate-600 bg-slate-700 text-white"
+                                            className="border-gray-300 bg-white text-gray-900"
                                             placeholder="https://example.com/privacy"
                                         />
                                         <Button
@@ -3122,7 +3122,7 @@ export function HomepageSettings() {
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label className="text-white">
+                                        <Label className="text-gray-900">
                                             Terms Link
                                         </Label>
                                         <Input
@@ -3135,7 +3135,7 @@ export function HomepageSettings() {
                                                     e.target.value
                                                 )
                                             }
-                                            className="border-slate-600 bg-slate-700 text-white"
+                                            className="border-gray-300 bg-white text-gray-900"
                                             placeholder="https://example.com/terms"
                                         />
                                         <Button

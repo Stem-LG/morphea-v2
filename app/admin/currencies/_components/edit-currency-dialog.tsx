@@ -139,24 +139,24 @@ export function EditCurrencyDialog({ currency, isOpen, onClose }: EditCurrencyDi
 
     return (
         <Dialog open={isOpen} onOpenChange={handleClose}>
-            <DialogContent className="sm:max-w-[600px] bg-gradient-to-br from-morpheus-blue-dark/95 to-morpheus-blue-light/95 border-slate-700/50">
+            <DialogContent className="sm:max-w-[600px] bg-white border-gray-200">
                 <DialogHeader>
-                    <DialogTitle className="text-white flex items-center gap-2">
-                        <DollarSign className="h-5 w-5 text-morpheus-gold-light" />
+                    <DialogTitle className="text-gray-900 flex items-center gap-2">
+                        <DollarSign className="h-5 w-5 text-blue-600" />
                         {t('admin.currencies.editCurrencyDialog')}
                     </DialogTitle>
-                    <DialogDescription className="text-gray-300">
+                    <DialogDescription className="text-gray-600">
                         {t('admin.currencies.editCurrencyDialogDescription')}
                     </DialogDescription>
                 </DialogHeader>
 
                 {hasErrors && (
-                    <div className="p-4 border border-red-500/20 bg-red-500/10 rounded-lg">
+                    <div className="p-4 border border-red-200 bg-red-50 rounded-lg">
                         <div className="flex items-center gap-2 mb-2">
-                            <AlertCircle className="h-4 w-4 text-red-400" />
-                            <p className="text-red-400 font-medium">{t('admin.currencies.formErrors')}</p>
+                            <AlertCircle className="h-4 w-4 text-red-600" />
+                            <p className="text-red-600 font-medium">{t('admin.currencies.formErrors')}</p>
                         </div>
-                        <ul className="list-disc list-inside space-y-1 text-sm text-red-400">
+                        <ul className="list-disc list-inside space-y-1 text-sm text-red-600">
                             {Object.values(errors).map((error, index) => (
                                 <li key={index}>{error}</li>
                             ))}
@@ -168,21 +168,21 @@ export function EditCurrencyDialog({ currency, isOpen, onClose }: EditCurrencyDi
                     {/* Currency Information Section */}
                     <div className="space-y-4">
                         <div className="flex items-center gap-2">
-                            <DollarSign className="h-4 w-4 text-morpheus-gold-light" />
-                            <h3 className="text-lg font-semibold text-white">
+                            <DollarSign className="h-4 w-4 text-blue-600" />
+                            <h3 className="text-lg font-semibold text-gray-900">
                                 {t('admin.currencies.currencyInformation')}
                             </h3>
                         </div>
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <Label className="text-gray-300">
+                                <Label className="text-gray-900">
                                     {t('admin.currencies.currencyNameRequired')}
                                 </Label>
                                 <Input
                                     value={formData.xdeviseintitule}
                                     onChange={(e) => setFormData(prev => ({ ...prev, xdeviseintitule: e.target.value }))}
-                                    className={`bg-morpheus-blue-dark/30 border-slate-600 text-white ${
+                                    className={`bg-white border-gray-300 text-gray-900 ${
                                         errors.xdeviseintitule ? 'border-red-500' : ''
                                     }`}
                                     placeholder={t('admin.currencies.currencyNamePlaceholder')}
@@ -190,31 +190,31 @@ export function EditCurrencyDialog({ currency, isOpen, onClose }: EditCurrencyDi
                             </div>
                             
                             <div>
-                                <Label className="text-gray-300">
+                                <Label className="text-gray-900">
                                     {t('admin.currencies.alphaCodeRequired')}
                                 </Label>
                                 <Input
                                     value={formData.xdevisecodealpha}
-                                    onChange={(e) => setFormData(prev => ({ 
-                                        ...prev, 
-                                        xdevisecodealpha: e.target.value.toUpperCase() 
+                                    onChange={(e) => setFormData(prev => ({
+                                        ...prev,
+                                        xdevisecodealpha: e.target.value.toUpperCase()
                                     }))}
-                                    className={`bg-morpheus-blue-dark/30 border-slate-600 text-white ${
+                                    className={`bg-white border-gray-300 text-gray-900 ${
                                         errors.xdevisecodealpha ? 'border-red-500' : ''
                                     }`}
                                     placeholder={t('admin.currencies.alphaCodePlaceholder')}
                                     maxLength={3}
                                 />
                             </div>
-                            
+
                             <div>
-                                <Label className="text-gray-300">
+                                <Label className="text-gray-900">
                                     {t('admin.currencies.numericCodeRequired')}
                                 </Label>
                                 <Input
                                     value={formData.xdevisecodenum}
                                     onChange={(e) => setFormData(prev => ({ ...prev, xdevisecodenum: e.target.value }))}
-                                    className={`bg-morpheus-blue-dark/30 border-slate-600 text-white ${
+                                    className={`bg-white border-gray-300 text-gray-900 ${
                                         errors.xdevisecodenum ? 'border-red-500' : ''
                                     }`}
                                     placeholder={t('admin.currencies.numericCodePlaceholder')}
@@ -223,7 +223,7 @@ export function EditCurrencyDialog({ currency, isOpen, onClose }: EditCurrencyDi
                             </div>
                             
                             <div>
-                                <Label className="text-gray-300">
+                                <Label className="text-gray-900">
                                     {t('admin.currencies.decimalPlacesRequired')}
                                 </Label>
                                 <Input
@@ -231,11 +231,11 @@ export function EditCurrencyDialog({ currency, isOpen, onClose }: EditCurrencyDi
                                     min="0"
                                     max="4"
                                     value={formData.xdevisenbrdec}
-                                    onChange={(e) => setFormData(prev => ({ 
-                                        ...prev, 
-                                        xdevisenbrdec: parseInt(e.target.value) || 0 
+                                    onChange={(e) => setFormData(prev => ({
+                                        ...prev,
+                                        xdevisenbrdec: parseInt(e.target.value) || 0
                                     }))}
-                                    className={`bg-morpheus-blue-dark/30 border-slate-600 text-white ${
+                                    className={`bg-white border-gray-300 text-gray-900 ${
                                         errors.xdevisenbrdec ? 'border-red-500' : ''
                                     }`}
                                 />
@@ -247,10 +247,10 @@ export function EditCurrencyDialog({ currency, isOpen, onClose }: EditCurrencyDi
 
                     {/* Payment Settings Section */}
                     <div className="space-y-4">
-                        <h3 className="text-lg font-semibold text-white">
+                        <h3 className="text-lg font-semibold text-gray-900">
                             {t('admin.currencies.paymentSettings')}
                         </h3>
-                        
+
                         <div className="flex items-center gap-3">
                             <Switch
                                 id="allowPayment"
@@ -261,7 +261,7 @@ export function EditCurrencyDialog({ currency, isOpen, onClose }: EditCurrencyDi
                                 }))}
                                 className="data-[state=checked]:bg-green-500"
                             />
-                            <Label htmlFor="allowPayment" className="text-gray-300">
+                            <Label htmlFor="allowPayment" className="text-gray-900">
                                 {t('admin.currencies.allowPayments')}
                             </Label>
                         </div>
@@ -271,16 +271,16 @@ export function EditCurrencyDialog({ currency, isOpen, onClose }: EditCurrencyDi
 
                     {/* Exchange Rate Settings Section */}
                     <div className="space-y-4">
-                        <h3 className="text-lg font-semibold text-white">
+                        <h3 className="text-lg font-semibold text-gray-900">
                             {t('admin.currencies.exchangeRateSettings')}
                         </h3>
-                        
+
                         <div>
-                            <Label className="text-gray-300">
+                            <Label className="text-gray-900">
                                 1 {currentPivotCurrency?.xdevisecodealpha || 'Pivot'} = {formData.xtauxechange || 1.0} {formData.xdeviseintitule || 'This Currency'}
                             </Label>
                             <div className="flex items-center gap-2 mt-1">
-                                <TrendingUp className="h-4 w-4 text-blue-400" />
+                                <TrendingUp className="h-4 w-4 text-blue-600" />
                                 <Input
                                     type="number"
                                     step="any"
@@ -289,25 +289,25 @@ export function EditCurrencyDialog({ currency, isOpen, onClose }: EditCurrencyDi
                                     onChange={(e) => {
                                         const inputValue = e.target.value;
                                         const maxDecimals = formData.xdevisenbrdec;
-                                        
+
                                         // Check decimal places
                                         const decimalIndex = inputValue.indexOf('.');
                                         const actualDecimals = decimalIndex === -1 ? 0 : inputValue.length - decimalIndex - 1;
-                                        
+
                                         if (actualDecimals <= maxDecimals) {
                                             setFormData(prev => ({
                                                 ...prev,
-                                                xtauxechange: parseFloat(inputValue) || 1.0
+                                                xtauxechange: parseFloat(inputValue) || 0
                                             }));
                                         }
                                     }}
-                                    className={`bg-morpheus-blue-dark/30 border-slate-600 text-white ${
+                                    className={`bg-white border-gray-300 text-gray-900 ${
                                         errors.xtauxechange ? 'border-red-500' : ''
                                     }`}
                                     placeholder={t('admin.currencies.exchangeRatePlaceholder')}
                                 />
                             </div>
-                            <p className="text-xs text-gray-400 mt-1">
+                            <p className="text-xs text-gray-500 mt-1">
                                 {t('admin.currencies.exchangeRateHelp')}
                             </p>
                         </div>
@@ -318,7 +318,7 @@ export function EditCurrencyDialog({ currency, isOpen, onClose }: EditCurrencyDi
                             type="button"
                             variant="outline"
                             onClick={handleClose}
-                            className="border-slate-600 text-gray-300 hover:bg-slate-700/50"
+                            className="border-gray-300 text-gray-700 hover:bg-gray-50"
                         >
                             <X className="h-4 w-4 mr-2" />
                             {t('common.cancel')}
@@ -329,8 +329,8 @@ export function EditCurrencyDialog({ currency, isOpen, onClose }: EditCurrencyDi
                             className="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white"
                         >
                             <Save className="h-4 w-4 mr-2" />
-                            {updateCurrencyMutation.isPending 
-                                ? t('admin.currencies.updating') 
+                            {updateCurrencyMutation.isPending
+                                ? t('admin.currencies.updating')
                                 : t('admin.currencies.updateCurrency')
                             }
                         </Button>

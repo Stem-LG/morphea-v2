@@ -7,12 +7,12 @@ export function Toaster() {
         <SonnerToaster
             position="top-right"
             richColors
-            theme="dark"
+            theme="light"
             toastOptions={{
                 style: {
-                    background: 'rgb(31 41 55)',
-                    border: '1px solid rgb(75 85 99)',
-                    color: 'rgb(243 244 246)',
+                    background: 'rgb(255 255 255)',
+                    border: '1px solid rgb(209 213 219)',
+                    color: 'rgb(17 24 39)',
                 },
             }}
         />

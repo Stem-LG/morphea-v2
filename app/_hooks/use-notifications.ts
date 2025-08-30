@@ -14,6 +14,9 @@ const PAGE_SIZE = 4;
 export function useNotifications(userId: string) {
   const queryClient = useQueryClient();
 
+  // Debug logging
+  console.log('useNotifications - userId:', userId)
+
   // Infinite query for notifications
   const {
     data,
@@ -70,6 +73,13 @@ export function useNotifications(userId: string) {
   const notifications =
     data?.pages.flat() ?? [];
 
+  // Debug logging
+  console.log('useNotifications - data:', data)
+  console.log('useNotifications - notifications:', notifications)
+  console.log('useNotifications - unreadCountData:', unreadCountData)
+  console.log('useNotifications - isLoading:', isLoading)
+  console.log('useNotifications - isError:', isError)
+
   // Use the separate unread count query result
   const unreadCount = unreadCountData || 0;
 
@@ -87,7 +97,7 @@ export function useNotifications(userId: string) {
       // Update the notifications cache directly instead of invalidating
       queryClient.setQueryData(["notifications", userId], (oldData: any) => {
         if (!oldData) return oldData;
-        
+
         return {
           ...oldData,
           pages: oldData.pages.map((page: any[]) =>
@@ -99,7 +109,7 @@ export function useNotifications(userId: string) {
           ),
         };
       });
-      
+
       // Update the unread count cache
       queryClient.setQueryData(["notifications-unread-count", userId], (oldCount: number) => {
         return Math.max(0, (oldCount || 0) - 1);
@@ -122,7 +132,7 @@ export function useNotifications(userId: string) {
       // Update the notifications cache directly instead of invalidating
       queryClient.setQueryData(["notifications", userId], (oldData: any) => {
         if (!oldData) return oldData;
-        
+
         return {
           ...oldData,
           pages: oldData.pages.map((page: any[]) =>
@@ -133,7 +143,7 @@ export function useNotifications(userId: string) {
           ),
         };
       });
-      
+
       // Update the unread count cache to 0
       queryClient.setQueryData(["notifications-unread-count", userId], 0);
     },
