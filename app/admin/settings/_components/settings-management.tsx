@@ -79,14 +79,6 @@ const getPredefinedSettings = (
         required: false,
     },
     {
-        key: 'powered_by',
-        label: t('admin.settings.poweredBy'),
-        description: t('admin.settings.poweredByDescription'),
-        type: 'text' as const,
-        defaultValue: '',
-        required: false,
-    },
-    {
         key: 'mellime_url',
         label: t('admin.settings.mellimeUrl'),
         description: t('admin.settings.mellimeUrlDescription'),
@@ -202,7 +194,7 @@ export function SettingsManagement() {
         <div className="space-y-6">
             {/* Header */}
             <div className="flex items-center gap-3">
-                <SettingsIcon className="text-blue-600 h-8 w-8" />
+                <SettingsIcon className="h-8 w-8 text-blue-600" />
                 <div>
                     <h1 className="text-3xl font-bold text-gray-900">
                         {t('admin.settings.title')}
@@ -367,7 +359,7 @@ export function SettingsManagement() {
                                                     disabled={
                                                         updateSetting.isPending
                                                     }
-                                                    className="bg-green-600 hover:bg-green-700 text-white"
+                                                    className="bg-green-600 text-white hover:bg-green-700"
                                                 >
                                                     {updateSetting.isPending ? (
                                                         <Loader2 className="h-4 w-4 animate-spin" />
