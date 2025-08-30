@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useLanguage } from "@/hooks/useLanguage";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -72,9 +72,10 @@ interface VariantCardProps {
     isLoading: boolean;
     eventStartDate?: string;
     eventEndDate?: string;
+    onPriceValidityChange?: (variantId: number, hasValidPrice: boolean, formData?: PromotionData | null) => void;
 }
 
-function VariantCard({ variant, onApprove, onReject, isLoading, eventStartDate, eventEndDate }: VariantCardProps) {
+function VariantCard({ variant, onApprove, onReject, isLoading, eventStartDate, eventEndDate, onPriceValidityChange }: VariantCardProps) {
     const { t } = useLanguage();
     const [showPromotionForm, setShowPromotionForm] = useState(false);
     const [promotionPrice, setPromotionPrice] = useState(variant.yvarprodprixpromotion || "");
@@ -84,6 +85,47 @@ function VariantCard({ variant, onApprove, onReject, isLoading, eventStartDate, 
     const [selectedCurrencyId, setSelectedCurrencyId] = useState(variant.xdeviseidfk || 1);
 
     const supabase = createClient();
+    
+    // Ref to track last sent values to prevent unnecessary updates
+    const lastSentRef = useRef<{validity: boolean, formDataHash: string}>({ validity: false, formDataHash: "" });
+
+    // Check if variant has a valid price (either from database or from form)
+    const hasValidPrice = useCallback(() => {
+        if (showPromotionForm) {
+            // If form is shown, check the form price
+            return catalogPrice && parseFloat(catalogPrice) > 0;
+        } else {
+            // If form is not shown, check the database price
+            return variant.yvarprodprixcatalogue && parseFloat(variant.yvarprodprixcatalogue.toString()) > 0;
+        }
+    }, [showPromotionForm, catalogPrice, variant.yvarprodprixcatalogue]);
+
+    // Notify parent when price validity changes
+    useEffect(() => {
+        if (!onPriceValidityChange) return;
+        
+        // Calculate validity directly here to avoid function in dependencies
+        const isValid = showPromotionForm 
+            ? (catalogPrice && parseFloat(catalogPrice) > 0)
+            : (variant.yvarprodprixcatalogue && parseFloat(variant.yvarprodprixcatalogue.toString()) > 0);
+            
+        const formData = showPromotionForm ? {
+            catalogPrice: catalogPrice ? parseFloat(catalogPrice) : undefined,
+            currencyId: selectedCurrencyId,
+            promotionPrice: promotionPrice ? parseFloat(promotionPrice) : undefined,
+            promotionStartDate: promotionStartDate || undefined,
+            promotionEndDate: promotionEndDate || undefined,
+        } : null;
+        
+        // Create a hash to detect changes in form data
+        const formDataHash = JSON.stringify(formData);
+        
+        // Only call if something actually changed
+        if (lastSentRef.current.validity !== isValid || lastSentRef.current.formDataHash !== formDataHash) {
+            lastSentRef.current = { validity: isValid, formDataHash };
+            onPriceValidityChange(variant.yvarprodid, isValid, formData);
+        }
+    }, [showPromotionForm, catalogPrice, variant.yvarprodprixcatalogue, promotionPrice, promotionStartDate, promotionEndDate, selectedCurrencyId, onPriceValidityChange, variant.yvarprodid]);
 
     // Validation functions
     const validatePromotionDates = () => {
@@ -544,6 +586,13 @@ function VariantCard({ variant, onApprove, onReject, isLoading, eventStartDate, 
                                 {promotionValidation.error}
                             </div>
                         )}
+
+                        {/* Price Validation Error */}
+                        {!showPromotionForm && (!variant.yvarprodprixcatalogue || parseFloat(variant.yvarprodprixcatalogue.toString()) <= 0) && (
+                            <div className="text-xs text-red-400 bg-red-900/20 border border-red-600/30 rounded p-2">
+                                {t("admin.approvals.catalogPriceRequiredForApproval")}
+                            </div>
+                        )}
                         
                         <div className="flex gap-2">
                             <Button
@@ -562,7 +611,8 @@ function VariantCard({ variant, onApprove, onReject, isLoading, eventStartDate, 
                                 }}
                                 disabled={
                                     isLoading ||
-                                    (showPromotionForm && !catalogPrice) ||
+                                    (!showPromotionForm && (!variant.yvarprodprixcatalogue || parseFloat(variant.yvarprodprixcatalogue.toString()) <= 0)) ||
+                                    (showPromotionForm && (!catalogPrice || parseFloat(catalogPrice) <= 0)) ||
                                     (showPromotionForm && !promotionValidation.isValid)
                                 }
                                 className="flex-1 h-8 bg-green-600 hover:bg-green-700 text-white text-xs disabled:opacity-50 disabled:cursor-not-allowed"
@@ -622,6 +672,30 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
     // State for category and infospotaction selection
     const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
     const [selectedInfospotactionId, setSelectedInfospotactionId] = useState<number | null>(null);
+    const [productApprovalError, setProductApprovalError] = useState<string | null>(null);
+    const [bulkApprovalError, setBulkApprovalError] = useState<string | null>(null);
+    
+    // Track which variants have valid prices (including form prices)
+    const [variantPriceValidity, setVariantPriceValidity] = useState<Record<number, boolean>>({});
+    
+    // Track variant form data for bulk approval
+    const [variantFormData, setVariantFormData] = useState<Record<number, PromotionData | null>>({});
+
+    // Handle price validity changes from variant cards
+    const handlePriceValidityChange = useCallback((variantId: number, hasValidPrice: boolean, formData?: PromotionData | null) => {
+        setVariantPriceValidity(prev => ({
+            ...prev,
+            [variantId]: hasValidPrice
+        }));
+        
+        // Also store the form data for bulk approval
+        if (formData !== undefined) {
+            setVariantFormData(prev => ({
+                ...prev,
+                [variantId]: formData
+            }));
+        }
+    }, []);
 
     // Fetch product details
     const { data: product, isLoading: productLoading } = useQuery({
@@ -668,6 +742,19 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
         enabled: !!productId && isOpen,
     });
 
+    // Initialize price validity for all variants when product loads
+    useEffect(() => {
+        if (product?.yvarprod) {
+            const initialValidity: Record<number, boolean> = {};
+            product.yvarprod.forEach(variant => {
+                initialValidity[variant.yvarprodid] = Boolean(
+                    variant.yvarprodprixcatalogue && parseFloat(variant.yvarprodprixcatalogue.toString()) > 0
+                );
+            });
+            setVariantPriceValidity(initialValidity);
+        }
+    }, [product?.yvarprod]);
+
     // Get category name
     const category = categories?.find((cat) => cat.xcategprodid === product?.xcategprodidfk);
 
@@ -702,8 +789,36 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
     const approvedVariants = product?.yvarprod?.filter((v) => v.yvarprodstatut === "approved") || [];
     const rejectedVariants = product?.yvarprod?.filter((v) => v.yvarprodstatut === "rejected") || [];
 
+    // Check which pending variants don't have valid prices (considering both database and form states)
+    const pendingVariantsWithoutValidPrice = pendingVariants.filter(variant => 
+        !variantPriceValidity[variant.yvarprodid]
+    );
+    
+    // Can bulk approve only if all pending variants have valid prices
+    const canBulkApprove = pendingVariants.length > 0 && pendingVariantsWithoutValidPrice.length === 0;
+
+    // Check if product can be approved (category and placement must be set)
+    const canApproveProduct = () => {
+        // Category must be selected (either existing or newly selected)
+        const hasCategory = selectedCategoryId || product?.xcategprodidfk;
+        
+        // For admin users, placement (infospotaction) must be selected
+        const hasPlacement = !isAdmin || selectedInfospotactionId;
+        
+        return hasCategory && hasPlacement;
+    };
+
     const handleApproveProduct = async () => {
         if (!productId || !product) return;
+
+        // Clear previous errors
+        setProductApprovalError(null);
+
+        // Validate that infospotaction is selected (admin only)
+        if (isAdmin && !selectedInfospotactionId) {
+            setProductApprovalError(t("admin.approvals.productPlacementRequired"));
+            return;
+        }
 
         try {
             await approveProduct.mutateAsync({
@@ -716,6 +831,7 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
             onClose();
         } catch (error: any) {
             console.error("Product approval error:", error);
+            setProductApprovalError(t("admin.approvals.productApprovalError"));
         }
     };
 
@@ -734,11 +850,18 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
         const variant = product?.yvarprod?.find((v) => v.yvarprodid === variantId);
         if (!variant) return;
 
+        // Validate that catalog price is set and valid
+        const catalogPrice = approvalData?.catalogPrice || variant.yvarprodprixcatalogue;
+        if (!catalogPrice || parseFloat(catalogPrice.toString()) <= 0) {
+            // This error should be handled by the VariantCard component
+            return;
+        }
+
         try {
             await approveVariant.mutateAsync({
                 variantId,
                 approvalData: {
-                    yvarprodprixcatalogue: approvalData?.catalogPrice || variant.yvarprodprixcatalogue || 1,
+                    yvarprodprixcatalogue: catalogPrice,
                     yvarprodprixpromotion: approvalData?.promotionPrice || variant.yvarprodprixpromotion,
                     yvarprodpromotiondatedeb: approvalData?.promotionStartDate || variant.yvarprodpromotiondatedeb,
                     yvarprodpromotiondatefin: approvalData?.promotionEndDate || variant.yvarprodpromotiondatefin,
@@ -762,22 +885,39 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
     const handleBulkApproveVariants = async () => {
         if (!product?.yvarprod || pendingVariants.length === 0) return;
 
-        const variantApprovals = pendingVariants.map((variant) => ({
-            variantId: variant.yvarprodid,
-            approvalData: {
-                yvarprodprixcatalogue: variant.yvarprodprixcatalogue || 1,
-                yvarprodprixpromotion: variant.yvarprodprixpromotion,
-                yvarprodpromotiondatedeb: variant.yvarprodpromotiondatedeb,
-                yvarprodpromotiondatefin: variant.yvarprodpromotiondatefin,
-                yvarprodnbrjourlivraison: variant.yvarprodnbrjourlivraison || 1,
-                currencyId: variant.xdeviseidfk || 1,
-            },
-        }));
+        // Clear previous errors
+        setBulkApprovalError(null);
+
+        // Validate that all pending variants have valid catalog prices
+        if (pendingVariantsWithoutValidPrice.length > 0) {
+            setBulkApprovalError(
+                `${t("admin.approvals.bulkApprovalRequiresPrices")} (${pendingVariantsWithoutValidPrice.length} variants)`
+            );
+            return;
+        }
+
+        const variantApprovals = pendingVariants.map((variant) => {
+            // Use form data if available, otherwise use database values
+            const formData = variantFormData[variant.yvarprodid];
+            
+            return {
+                variantId: variant.yvarprodid,
+                approvalData: {
+                    yvarprodprixcatalogue: formData?.catalogPrice || variant.yvarprodprixcatalogue,
+                    yvarprodprixpromotion: formData?.promotionPrice || variant.yvarprodprixpromotion,
+                    yvarprodpromotiondatedeb: formData?.promotionStartDate || variant.yvarprodpromotiondatedeb,
+                    yvarprodpromotiondatefin: formData?.promotionEndDate || variant.yvarprodpromotiondatefin,
+                    yvarprodnbrjourlivraison: variant.yvarprodnbrjourlivraison || 1,
+                    currencyId: formData?.currencyId || variant.xdeviseidfk || 1,
+                },
+            };
+        });
 
         try {
             await bulkApproveVariants.mutateAsync({ variantApprovals });
         } catch (error: any) {
             console.error("Bulk approval error:", error);
+            setBulkApprovalError(t("admin.approvals.bulkApprovalError"));
         }
     };
 
@@ -864,7 +1004,12 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                             <div className="text-white font-mono text-sm">{product.yprodcode}</div>
                                         </div>
                                         <div>
-                                            <Label className="text-gray-300 text-sm">{t("admin.approvals.category")}</Label>
+                                            <Label className="text-gray-300 text-sm flex items-center gap-2">
+                                                {t("admin.approvals.category")}
+                                                {product.yprodstatut === "not_approved" && !(selectedCategoryId || product.xcategprodidfk) && (
+                                                    <AlertTriangle className="h-3 w-3 text-yellow-400" />
+                                                )}
+                                            </Label>
                                             {product.yprodstatut === "not_approved" ? (
                                                 <Select
                                                     value={selectedCategoryId?.toString() || product.xcategprodidfk?.toString() || ""}
@@ -897,7 +1042,12 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                         {/* Infospotaction Selection (Admin Only) */}
                                         {isAdmin && product.yprodstatut === "not_approved" && (
                                             <div>
-                                                <Label className="text-gray-300 text-sm">{t("admin.approvals.productPlacement")}</Label>
+                                                <Label className="text-gray-300 text-sm flex items-center gap-2">
+                                                    {t("admin.approvals.productPlacement")}
+                                                    {!selectedInfospotactionId && (
+                                                        <AlertTriangle className="h-3 w-3 text-yellow-400" />
+                                                    )}
+                                                </Label>
                                                 {!boutiqueId && (
                                                     <div className="text-xs text-yellow-400 mb-1 flex items-center gap-1">
                                                         <AlertTriangle className="h-3 w-3" />
@@ -1046,14 +1196,30 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                     <Button
                                         size="sm"
                                         onClick={handleBulkApproveVariants}
-                                        disabled={variantLoading}
-                                        className="bg-green-600 hover:bg-green-700 text-white"
+                                        disabled={variantLoading || !canBulkApprove}
+                                        className="bg-green-600 hover:bg-green-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                                        title={!canBulkApprove ? t("admin.approvals.bulkApprovalRequiresPrices") : undefined}
                                     >
                                         <CheckCircle className="h-4 w-4 mr-2" />
                                         {t("admin.approvals.approveAll")} ({pendingVariants.length})
                                     </Button>
                                 )}
                             </div>
+
+                            {/* Bulk Approval Error */}
+                            {bulkApprovalError && (
+                                <div className="mb-4 text-sm text-red-400 bg-red-900/20 border border-red-600/30 rounded p-3">
+                                    {bulkApprovalError}
+                                </div>
+                            )}
+
+                            {/* Bulk Approval Warning - when variants don't have prices */}
+                            {pendingVariants.length > 0 && pendingVariantsWithoutValidPrice.length > 0 && (
+                                <div className="mb-4 text-sm text-yellow-400 bg-yellow-900/20 border border-yellow-600/30 rounded p-3 flex items-center gap-2">
+                                    <AlertTriangle className="h-4 w-4" />
+                                    {t("admin.approvals.bulkApprovalPriceWarning")} ({pendingVariantsWithoutValidPrice.length} {pendingVariantsWithoutValidPrice.length === 1 ? 'variant' : 'variants'})
+                                </div>
+                            )}
 
                             <ScrollArea className="h-[calc(95vh-300px)] overflow-y-auto">
                                 <div className="space-y-4 pr-4">
@@ -1068,6 +1234,7 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                             isLoading={variantLoading}
                                             eventStartDate={event?.yeventdatedeb}
                                             eventEndDate={event?.yeventdatefin}
+                                            onPriceValidityChange={handlePriceValidityChange}
                                         />
                                     ))}
                                 </div>
@@ -1076,44 +1243,72 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                     </div>
                 </div>
 
-                <DialogFooter className="px-6 py-4 border-t border-gray-700 flex gap-2">
-                    <Button
-                        type="button"
-                        variant="outline"
-                        onClick={onClose}
-                        disabled={isLoading || variantLoading}
-                        className="border-gray-600 text-gray-300 hover:bg-gray-800/50"
-                    >
-                        {t("common.cancel")}
-                    </Button>
-                    <Button
-                        type="button"
-                        variant="outline"
-                        onClick={handleRejectProduct}
-                        disabled={isLoading || variantLoading}
-                        className="border-red-600 text-red-400 hover:bg-red-900/50"
-                    >
-                        <X className="h-4 w-4 mr-2" />
-                        {t("admin.approvals.rejectProduct")}
-                    </Button>
-                    <Button
-                        type="button"
-                        onClick={handleApproveProduct}
-                        disabled={isLoading || variantLoading}
-                        className="bg-green-600 hover:bg-green-700 text-white"
-                    >
-                        {isLoading || variantLoading ? (
-                            <div className="flex items-center gap-2">
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                                {t("admin.approvals.processing")}
+                <DialogFooter className="px-6 py-4 border-t border-gray-700 flex flex-col gap-3">
+                    {/* Product Approval Requirements Warning */}
+                    {product?.yprodstatut === "not_approved" && !canApproveProduct() && (
+                        <div className="text-sm text-yellow-400 bg-yellow-900/20 border border-yellow-600/30 rounded p-3 flex items-center gap-2">
+                            <AlertTriangle className="h-4 w-4" />
+                            <div>
+                                {t("admin.approvals.productApprovalRequirementsMessage")}:
+                                <ul className="list-disc list-inside mt-1 text-xs">
+                                    {!(selectedCategoryId || product?.xcategprodidfk) && (
+                                        <li>{t("admin.approvals.categoryRequired")}</li>
+                                    )}
+                                    {isAdmin && !selectedInfospotactionId && (
+                                        <li>{t("admin.approvals.placementRequired")}</li>
+                                    )}
+                                </ul>
                             </div>
-                        ) : (
-                            <>
-                                <CheckCircle className="h-4 w-4 mr-2" />
-                                {t("admin.approvals.approveProduct")}
-                            </>
-                        )}
-                    </Button>
+                        </div>
+                    )}
+
+                    {/* Product Approval Error */}
+                    {productApprovalError && (
+                        <div className="text-sm text-red-400 bg-red-900/20 border border-red-600/30 rounded p-3">
+                            {productApprovalError}
+                        </div>
+                    )}
+                    
+                    <div className="flex gap-2">
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={onClose}
+                            disabled={isLoading || variantLoading}
+                            className="border-gray-600 text-gray-300 hover:bg-gray-800/50"
+                        >
+                            {t("common.cancel")}
+                        </Button>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={handleRejectProduct}
+                            disabled={isLoading || variantLoading}
+                            className="border-red-600 text-red-400 hover:bg-red-900/50"
+                        >
+                            <X className="h-4 w-4 mr-2" />
+                            {t("admin.approvals.rejectProduct")}
+                        </Button>
+                        <Button
+                            type="button"
+                            onClick={handleApproveProduct}
+                            disabled={isLoading || variantLoading || !canApproveProduct()}
+                            className="bg-green-600 hover:bg-green-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                            title={!canApproveProduct() ? t("admin.approvals.productApprovalRequirements") : undefined}
+                        >
+                            {isLoading || variantLoading ? (
+                                <div className="flex items-center gap-2">
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                    {t("admin.approvals.processing")}
+                                </div>
+                            ) : (
+                                <>
+                                    <CheckCircle className="h-4 w-4 mr-2" />
+                                    {t("admin.approvals.approveProduct")}
+                                </>
+                            )}
+                        </Button>
+                    </div>
                 </DialogFooter>
             </DialogContent>
         </Dialog>

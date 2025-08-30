@@ -536,7 +536,17 @@ export const enTranslations = {
       "rejectProduct": "Reject Product",
       "processing": "Processing...",
       "approveProduct": "Approve Product",
-      "pendingApproval": "Pending Approval"
+      "pendingApproval": "Pending Approval",
+      "productPlacementRequired": "Product placement is required before approval",
+      "productApprovalError": "Error occurred while approving product",
+      "catalogPriceRequiredForApproval": "Catalog price is required before approval",
+      "bulkApprovalRequiresPrices": "All variants must have valid prices before bulk approval",
+      "bulkApprovalError": "Error occurred during bulk approval",
+      "bulkApprovalPriceWarning": "Some variants don't have prices set - please set prices before bulk approval",
+      "productApprovalRequirements": "Product cannot be approved - missing required information",
+      "productApprovalRequirementsMessage": "To approve this product, please complete the following",
+      "categoryRequired": "Select a product category",
+      "placementRequired": "Select a product placement"
     },
     "currencies": {
       "title": "Currency Management",

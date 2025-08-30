@@ -563,7 +563,17 @@ export const frTranslations = {
       "rejectProduct": "Rejeter le Produit",
       "processing": "Traitement...",
       "approveProduct": "Approuver le Produit",
-      "pendingApproval": "En Attente d'Approbation"
+      "pendingApproval": "En Attente d'Approbation",
+      "productPlacementRequired": "Le placement du produit est requis avant l'approbation",
+      "productApprovalError": "Une erreur s'est produite lors de l'approbation du produit",
+      "catalogPriceRequiredForApproval": "Le prix catalogue est requis avant l'approbation",
+      "bulkApprovalRequiresPrices": "Toutes les variantes doivent avoir des prix valides avant l'approbation en lot",
+      "bulkApprovalError": "Une erreur s'est produite lors de l'approbation en lot",
+      "bulkApprovalPriceWarning": "Certaines variantes n'ont pas de prix définis - veuillez définir les prix avant l'approbation en lot",
+      "productApprovalRequirements": "Le produit ne peut pas être approuvé - informations requises manquantes",
+      "productApprovalRequirementsMessage": "Pour approuver ce produit, veuillez compléter les éléments suivants",
+      "categoryRequired": "Sélectionner une catégorie de produit",
+      "placementRequired": "Sélectionner un placement de produit"
     },
     "currencies": {
       "title": "Gestion des Devises",
