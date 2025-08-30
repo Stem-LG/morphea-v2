@@ -117,21 +117,21 @@ export function ProductViewDialog({ isOpen, onClose, productId }: ProductViewDia
         switch (product?.yprodstatut) {
             case "not_approved":
                 return (
-                    <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30">
+                    <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 border-yellow-200">
                         <AlertTriangle className="h-4 w-4 mr-1" />
                         {t("admin.productView.pendingApproval")}
                     </Badge>
                 );
             case "approved":
                 return (
-                    <Badge variant="secondary" className="bg-green-500/20 text-green-300 border-green-500/30">
+                    <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-200">
                         <CheckCircle className="h-4 w-4 mr-1" />
                         {t("admin.approved")}
                     </Badge>
                 );
             case "rejected":
                 return (
-                    <Badge variant="secondary" className="bg-red-500/20 text-red-300 border-red-500/30">
+                    <Badge variant="secondary" className="bg-red-100 text-red-800 border-red-200">
                         <X className="h-4 w-4 mr-1" />
                         {t("admin.rejected")}
                     </Badge>
@@ -146,10 +146,10 @@ export function ProductViewDialog({ isOpen, onClose, productId }: ProductViewDia
     if (productLoading) {
         return (
             <Dialog open={isOpen} onOpenChange={onClose}>
-                <DialogTitle className="text-white flex items-center gap-2">{t("admin.productView.productDetails")}</DialogTitle>
-                <DialogContent className="max-w-6xl max-h-[90vh] bg-gray-900 border-gray-700">
+                <DialogTitle className="text-gray-900 flex items-center gap-2">{t("admin.productView.productDetails")}</DialogTitle>
+                <DialogContent className="max-w-6xl max-h-[90vh] bg-white border-gray-300">
                     <div className="flex items-center justify-center py-12">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400"></div>
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
                     </div>
                 </DialogContent>
             </Dialog>
@@ -162,14 +162,14 @@ export function ProductViewDialog({ isOpen, onClose, productId }: ProductViewDia
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="max-w-7xl max-h-[95vh] bg-gray-900 border-gray-700 p-0">
-                <DialogHeader className="px-6 py-4 border-b border-gray-700">
+            <DialogContent className="max-w-7xl max-h-[95vh] bg-white border-gray-300 p-0">
+                <DialogHeader className="px-6 py-4 border-b border-gray-200">
                     <div className="flex items-center justify-between">
                         <div>
-                            <DialogTitle className="text-xl text-white">
+                            <DialogTitle className="text-xl text-gray-900">
                                 {t("admin.productView.productDetails")}: {product.yprodintitule}
                             </DialogTitle>
-                            <p className="text-sm text-gray-400 font-mono mt-1">{product.yprodcode}</p>
+                            <p className="text-sm text-gray-600 font-mono mt-1">{product.yprodcode}</p>
                         </div>
                         {getProductStatusBadge()}
                     </div>
@@ -177,41 +177,41 @@ export function ProductViewDialog({ isOpen, onClose, productId }: ProductViewDia
 
                 <div className="flex h-[calc(95vh-120px)]">
                     {/* Left Panel - Product Information */}
-                    <div className="w-1/2 border-r border-gray-700">
+                    <div className="w-1/2 border-r border-gray-200">
                         <ScrollArea className="h-full">
                             <div className="p-6 space-y-6">
                                 {/* Basic Product Info */}
-                                <Card className="bg-gray-800/50 border-gray-700">
+                                <Card className="bg-gray-50 border-gray-200">
                                     <CardHeader>
-                                        <CardTitle className="text-white text-lg flex items-center gap-2">
-                                            <Package className="h-5 w-5" />
+                                        <CardTitle className="text-gray-900 text-lg flex items-center gap-2">
+                                            <Package className="h-5 w-5 text-blue-600" />
                                             {t("admin.productInformation")}
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent className="space-y-4">
                                         <div>
-                                            <Label className="text-gray-300 text-sm">{t("admin.productName")}</Label>
-                                            <div className="text-white font-medium">{product.yprodintitule}</div>
+                                            <Label className="text-gray-700 text-sm">{t("admin.productName")}</Label>
+                                            <div className="text-gray-900 font-medium">{product.yprodintitule}</div>
                                         </div>
                                         <div>
-                                            <Label className="text-gray-300 text-sm">{t("admin.productCode")}</Label>
-                                            <div className="text-white font-mono text-sm">{product.yprodcode}</div>
+                                            <Label className="text-gray-700 text-sm">{t("admin.productCode")}</Label>
+                                            <div className="text-gray-900 font-mono text-sm">{product.yprodcode}</div>
                                         </div>
                                         <div>
-                                            <Label className="text-gray-300 text-sm">{t("admin.category")}</Label>
-                                            <div className="text-white">
+                                            <Label className="text-gray-700 text-sm">{t("admin.category")}</Label>
+                                            <div className="text-gray-900">
                                                 {category?.xcategprodintitule || t("admin.unknown")}
                                             </div>
                                         </div>
                                         <div>
-                                            <Label className="text-gray-300 text-sm">{t("admin.technicalDetails")}</Label>
-                                            <div className="text-gray-300 text-sm bg-gray-800 p-3 rounded border border-gray-600">
+                                            <Label className="text-gray-700 text-sm">{t("admin.technicalDetails")}</Label>
+                                            <div className="text-gray-700 text-sm bg-gray-100 p-3 rounded border border-gray-200">
                                                 {product.yproddetailstech || t("admin.productView.noTechnicalDetails")}
                                             </div>
                                         </div>
                                         <div>
-                                            <Label className="text-gray-300 text-sm">{t("admin.productView.infoBubble")}</Label>
-                                            <div className="text-gray-300 text-sm bg-gray-800 p-3 rounded border border-gray-600">
+                                            <Label className="text-gray-700 text-sm">{t("admin.productView.infoBubble")}</Label>
+                                            <div className="text-gray-700 text-sm bg-gray-100 p-3 rounded border border-gray-200">
                                                 {product.yprodinfobulle || t("admin.productView.noInfoBubble")}
                                             </div>
                                         </div>
@@ -219,20 +219,20 @@ export function ProductViewDialog({ isOpen, onClose, productId }: ProductViewDia
                                 </Card>
 
                                 {/* Context Information */}
-                                <Card className="bg-gray-800/50 border-gray-700">
+                                <Card className="bg-gray-50 border-gray-200">
                                     <CardHeader>
-                                        <CardTitle className="text-white text-lg flex items-center gap-2">
-                                            <MapPin className="h-5 w-5" />
+                                        <CardTitle className="text-gray-900 text-lg flex items-center gap-2">
+                                            <MapPin className="h-5 w-5 text-blue-600" />
                                             {t("admin.productView.contextInformation")}
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent className="space-y-4">
                                         {designer && (
                                             <div className="flex items-center gap-3">
-                                                <User className="h-4 w-4 text-gray-400" />
+                                                <User className="h-4 w-4 text-gray-500" />
                                                 <div>
-                                                    <Label className="text-gray-300 text-sm">{t("admin.productView.designer")}</Label>
-                                                    <div className="text-white">
+                                                    <Label className="text-gray-700 text-sm">{t("admin.productView.designer")}</Label>
+                                                    <div className="text-gray-900">
                                                         {designer.ydesignnom} ({designer.ydesignmarque})
                                                     </div>
                                                 </div>
@@ -240,10 +240,10 @@ export function ProductViewDialog({ isOpen, onClose, productId }: ProductViewDia
                                         )}
                                         {store && (
                                             <div className="flex items-center gap-3">
-                                                <Store className="h-4 w-4 text-gray-400" />
+                                                <Store className="h-4 w-4 text-gray-500" />
                                                 <div>
-                                                    <Label className="text-gray-300 text-sm">{t("admin.productView.store")}</Label>
-                                                    <div className="text-white">
+                                                    <Label className="text-gray-700 text-sm">{t("admin.productView.store")}</Label>
+                                                    <div className="text-gray-900">
                                                         {store.yboutiqueintitule || store.yboutiquecode}
                                                     </div>
                                                 </div>
@@ -251,20 +251,20 @@ export function ProductViewDialog({ isOpen, onClose, productId }: ProductViewDia
                                         )}
                                         {mall && (
                                             <div className="flex items-center gap-3">
-                                                <MapPin className="h-4 w-4 text-gray-400" />
+                                                <MapPin className="h-4 w-4 text-gray-500" />
                                                 <div>
-                                                    <Label className="text-gray-300 text-sm">{t("admin.productView.mall")}</Label>
-                                                    <div className="text-white">{mall.ymallintitule}</div>
+                                                    <Label className="text-gray-700 text-sm">{t("admin.productView.mall")}</Label>
+                                                    <div className="text-gray-900">{mall.ymallintitule}</div>
                                                 </div>
                                             </div>
                                         )}
                                         {event && (
                                             <div className="flex items-center gap-3">
-                                                <Calendar className="h-4 w-4 text-gray-400" />
+                                                <Calendar className="h-4 w-4 text-gray-500" />
                                                 <div>
-                                                    <Label className="text-gray-300 text-sm">{t("admin.productView.event")}</Label>
-                                                    <div className="text-white">{event.yeventintitule}</div>
-                                                    <div className="text-gray-400 text-xs">
+                                                    <Label className="text-gray-700 text-sm">{t("admin.productView.event")}</Label>
+                                                    <div className="text-gray-900">{event.yeventintitule}</div>
+                                                    <div className="text-gray-600 text-xs">
                                                         {event.yeventdatedeb} {t("admin.productView.to")} {event.yeventdatefin}
                                                     </div>
                                                 </div>
@@ -274,29 +274,29 @@ export function ProductViewDialog({ isOpen, onClose, productId }: ProductViewDia
                                 </Card>
 
                                 {/* Variant Summary */}
-                                <Card className="bg-gray-800/50 border-gray-700">
+                                <Card className="bg-gray-50 border-gray-200">
                                     <CardHeader>
-                                        <CardTitle className="text-white text-lg">{t("admin.productView.variantSummary")}</CardTitle>
+                                        <CardTitle className="text-gray-900 text-lg">{t("admin.productView.variantSummary")}</CardTitle>
                                     </CardHeader>
                                     <CardContent>
                                         <div className="grid grid-cols-3 gap-4 text-center">
                                             <div>
-                                                <div className="text-2xl font-bold text-yellow-400">
+                                                <div className="text-2xl font-bold text-yellow-600">
                                                     {pendingVariants.length}
                                                 </div>
-                                                <div className="text-xs text-gray-400">{t("admin.pending")}</div>
+                                                <div className="text-xs text-gray-600">{t("admin.pending")}</div>
                                             </div>
                                             <div>
-                                                <div className="text-2xl font-bold text-green-400">
+                                                <div className="text-2xl font-bold text-green-600">
                                                     {approvedVariants.length}
                                                 </div>
-                                                <div className="text-xs text-gray-400">{t("admin.approved")}</div>
+                                                <div className="text-xs text-gray-600">{t("admin.approved")}</div>
                                             </div>
                                             <div>
-                                                <div className="text-2xl font-bold text-red-400">
+                                                <div className="text-2xl font-bold text-red-600">
                                                     {rejectedVariants.length}
                                                 </div>
-                                                <div className="text-xs text-gray-400">{t("admin.rejected")}</div>
+                                                <div className="text-xs text-gray-600">{t("admin.rejected")}</div>
                                             </div>
                                         </div>
                                     </CardContent>
@@ -309,10 +309,10 @@ export function ProductViewDialog({ isOpen, onClose, productId }: ProductViewDia
                     <div className="w-1/2">
                         <div className="p-6">
                             <div className="flex items-center justify-between mb-4">
-                                <h3 className="text-lg font-semibold text-white">
+                                <h3 className="text-lg font-semibold text-gray-900">
                                     {t("admin.productView.productVariants")} ({product.yvarprod?.length || 0})
                                 </h3>
-                                
+
                                 {/* Bulk Visibility Actions for Variants */}
                                 {product.yvarprod?.length > 0 && (
                                     <div className="flex items-center gap-2">
@@ -321,7 +321,7 @@ export function ProductViewDialog({ isOpen, onClose, productId }: ProductViewDia
                                             size="sm"
                                             onClick={handleBulkMakeVariantsVisible}
                                             disabled={isBulkUpdating}
-                                            className="border-green-600 text-green-400 hover:bg-green-600/20 text-xs"
+                                            className="border-green-300 text-green-600 hover:bg-green-50 text-xs"
                                         >
                                             <Eye className="h-3 w-3 mr-1" />
                                             {t("admin.makeAllVariantsVisible") || "Show All"}
@@ -331,7 +331,7 @@ export function ProductViewDialog({ isOpen, onClose, productId }: ProductViewDia
                                             size="sm"
                                             onClick={handleBulkMakeVariantsInvisible}
                                             disabled={isBulkUpdating}
-                                            className="border-gray-600 text-gray-400 hover:bg-gray-600/20 text-xs"
+                                            className="border-gray-300 text-gray-600 hover:bg-gray-50 text-xs"
                                         >
                                             <EyeOff className="h-3 w-3 mr-1" />
                                             {t("admin.makeAllVariantsInvisible") || "Hide All"}
@@ -351,12 +351,12 @@ export function ProductViewDialog({ isOpen, onClose, productId }: ProductViewDia
                     </div>
                 </div>
 
-                <div className="px-6 py-4 border-t border-gray-700 flex justify-end">
+                <div className="px-6 py-4 border-t border-gray-200 flex justify-end">
                     <Button
                         type="button"
                         variant="outline"
                         onClick={onClose}
-                        className="border-gray-600 text-gray-300 hover:bg-gray-800/50"
+                        className="border-gray-300 text-gray-700 hover:bg-gray-50"
                     >
                         {t("common.close")}
                     </Button>
@@ -396,21 +396,21 @@ function VariantViewCard({ variant, t }: { variant: any; t: (key: string) => str
         switch (variant.yvarprodstatut) {
             case "not_approved":
                 return (
-                    <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30">
+                    <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 border-yellow-200">
                         <AlertTriangle className="h-3 w-3 mr-1" />
                         {t("admin.pending")}
                     </Badge>
                 );
             case "approved":
                 return (
-                    <Badge variant="secondary" className="bg-green-500/20 text-green-300 border-green-500/30">
+                    <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-200">
                         <CheckCircle className="h-3 w-3 mr-1" />
                         {t("admin.approved")}
                     </Badge>
                 );
             case "rejected":
                 return (
-                    <Badge variant="secondary" className="bg-red-500/20 text-red-300 border-red-500/30">
+                    <Badge variant="secondary" className="bg-red-100 text-red-800 border-red-200">
                         <X className="h-3 w-3 mr-1" />
                         {t("admin.rejected")}
                     </Badge>
@@ -425,7 +425,7 @@ function VariantViewCard({ variant, t }: { variant: any; t: (key: string) => str
 
         if (!hasAnyMedia) {
             return (
-                <div className="aspect-video bg-gray-800 rounded-lg flex items-center justify-center">
+                <div className="aspect-video bg-gray-100 rounded-lg flex items-center justify-center">
                     <ImageIcon className="h-8 w-8 text-gray-400" />
                 </div>
             );
@@ -436,7 +436,7 @@ function VariantViewCard({ variant, t }: { variant: any; t: (key: string) => str
                 {/* 3D Models */}
                 {models3d.length > 0 && (
                     <div className="space-y-1">
-                        <div className="text-xs text-purple-400 font-medium">{t("admin.productView.threeDModels")} ({models3d.length})</div>
+                        <div className="text-xs text-purple-600 font-medium">{t("admin.productView.threeDModels")} ({models3d.length})</div>
                         <div className="grid gap-2">
                             {models3d.map((modelUrl, index) => (
                                 <Model3DViewer
@@ -454,12 +454,12 @@ function VariantViewCard({ variant, t }: { variant: any; t: (key: string) => str
                 {/* Images */}
                 {images.length > 0 && (
                     <div className="space-y-1">
-                        <div className="text-xs text-blue-400 font-medium">{t("admin.productView.images")} ({images.length})</div>
+                        <div className="text-xs text-blue-600 font-medium">{t("admin.productView.images")} ({images.length})</div>
                         <div className="grid gap-2">
                             {images.map((image) => (
                                 <div
                                     key={image.ymediaid}
-                                    className="aspect-video bg-gray-800 rounded-lg overflow-hidden"
+                                    className="aspect-video bg-gray-100 rounded-lg overflow-hidden"
                                 >
                                     <img
                                         src={image.ymediaurl}
@@ -486,12 +486,12 @@ function VariantViewCard({ variant, t }: { variant: any; t: (key: string) => str
                 {/* Videos */}
                 {videos.length > 0 && (
                     <div className="space-y-1">
-                        <div className="text-xs text-green-400 font-medium">{t("admin.productView.videos")} ({videos.length})</div>
+                        <div className="text-xs text-green-600 font-medium">{t("admin.productView.videos")} ({videos.length})</div>
                         <div className="grid gap-2">
                             {videos.map((video) => (
                                 <div
                                     key={video.ymediaid}
-                                    className="aspect-video bg-gray-800 rounded-lg overflow-hidden"
+                                    className="aspect-video bg-gray-100 rounded-lg overflow-hidden"
                                 >
                                     <video
                                         src={video.ymediaurl}
@@ -509,12 +509,12 @@ function VariantViewCard({ variant, t }: { variant: any; t: (key: string) => str
     };
 
     return (
-        <Card className="bg-gray-800/50 border-gray-700">
+        <Card className="bg-gray-50 border-gray-200">
             <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
                     <div className="flex-1">
-                        <CardTitle className="text-white text-sm font-medium">{variant.yvarprodintitule}</CardTitle>
-                        <div className="flex items-center gap-2 mt-1 text-xs text-gray-400">
+                        <CardTitle className="text-gray-900 text-sm font-medium">{variant.yvarprodintitule}</CardTitle>
+                        <div className="flex items-center gap-2 mt-1 text-xs text-gray-600">
                             <span>{variant.xcouleur?.xcouleurintitule}</span>
                             <span>•</span>
                             <span>{variant.xtaille?.xtailleintitule}</span>
@@ -526,17 +526,17 @@ function VariantViewCard({ variant, t }: { variant: any; t: (key: string) => str
 
             <CardContent className="space-y-3">
                 {/* Visibility Toggle */}
-                <div className="flex items-center justify-between text-xs bg-gray-700/30 p-2 rounded">
-                    <span className="text-gray-400 flex items-center gap-1">
+                <div className="flex items-center justify-between text-xs bg-gray-100 p-2 rounded">
+                    <span className="text-gray-600 flex items-center gap-1">
                         {variant.yestvisible ? (
-                            <Eye className="h-3 w-3 text-green-400" />
+                            <Eye className="h-3 w-3 text-green-600" />
                         ) : (
-                            <EyeOff className="h-3 w-3 text-gray-400" />
+                            <EyeOff className="h-3 w-3 text-gray-500" />
                         )}
                         {t("admin.visibility") || "Visibility"}:
                     </span>
                     <div className="flex items-center gap-2">
-                        <span className={`text-xs ${variant.yestvisible ? 'text-green-400' : 'text-gray-400'}`}>
+                        <span className={`text-xs ${variant.yestvisible ? 'text-green-600' : 'text-gray-600'}`}>
                             {variant.yestvisible ? (t("admin.visible") || "Visible") : (t("admin.hidden") || "Hidden")}
                         </span>
                         <Switch
@@ -548,7 +548,7 @@ function VariantViewCard({ variant, t }: { variant: any; t: (key: string) => str
                                     yestvisible: checked,
                                 });
                             }}
-                            className="data-[state=checked]:bg-green-500 data-[state=unchecked]:bg-gray-600 scale-75"
+                            className="data-[state=checked]:bg-green-500 data-[state=unchecked]:bg-gray-400 scale-75"
                         />
                     </div>
                 </div>
@@ -559,21 +559,21 @@ function VariantViewCard({ variant, t }: { variant: any; t: (key: string) => str
                 {/* Variant Details */}
                 <div className="space-y-2 text-xs">
                     <div className="flex justify-between">
-                        <span className="text-gray-400">{t("admin.productView.price")}:</span>
-                        <span className="text-white">
+                        <span className="text-gray-600">{t("admin.productView.price")}:</span>
+                        <span className="text-gray-900">
                             {variant.yvarprodprixcatalogue
                                 ? `${variant.yvarprodprixcatalogue} ${variant.xdevise?.xdevisecodealpha || ""}`
                                 : t("admin.productView.notSet")}
                         </span>
                     </div>
                     <div className="flex justify-between">
-                        <span className="text-gray-400">{t("admin.productView.delivery")}:</span>
-                        <span className="text-white">{variant.yvarprodnbrjourlivraison || 0} {t("admin.productView.days")}</span>
+                        <span className="text-gray-600">{t("admin.productView.delivery")}:</span>
+                        <span className="text-gray-900">{variant.yvarprodnbrjourlivraison || 0} {t("admin.productView.days")}</span>
                     </div>
                     {variant.yvarprodprixpromotion && (
                         <div className="flex justify-between">
-                            <span className="text-gray-400">{t("admin.productView.promo")}:</span>
-                            <span className="text-green-400">
+                            <span className="text-gray-600">{t("admin.productView.promo")}:</span>
+                            <span className="text-green-600">
                                 {variant.yvarprodprixpromotion} {variant.xdevise?.xdevisecodealpha || ""}
                             </span>
                         </div>
@@ -586,7 +586,7 @@ function VariantViewCard({ variant, t }: { variant: any; t: (key: string) => str
                         {models3d?.length > 0 && (
                             <Badge
                                 variant="secondary"
-                                className="bg-purple-500/20 text-purple-300 border-purple-500/30 text-xs"
+                                className="bg-purple-100 text-purple-800 border-purple-200 text-xs"
                             >
                                 {models3d.length} 3D
                             </Badge>
@@ -594,7 +594,7 @@ function VariantViewCard({ variant, t }: { variant: any; t: (key: string) => str
                         {images?.length > 0 && (
                             <Badge
                                 variant="secondary"
-                                className="bg-blue-500/20 text-blue-300 border-blue-500/30 text-xs"
+                                className="bg-blue-100 text-blue-800 border-blue-200 text-xs"
                             >
                                 {images.length} img
                             </Badge>
@@ -602,7 +602,7 @@ function VariantViewCard({ variant, t }: { variant: any; t: (key: string) => str
                         {videos?.length > 0 && (
                             <Badge
                                 variant="secondary"
-                                className="bg-green-500/20 text-green-300 border-green-500/30 text-xs"
+                                className="bg-green-100 text-green-800 border-green-200 text-xs"
                             >
                                 {videos.length} vid
                             </Badge>

@@ -92,7 +92,7 @@ export function DesignerSelectionDialog({
                         checked={selectedDesigner?.ydesignid === row.original.ydesignid}
                         onChange={() => !row.original.isAssigned && setSelectedDesigner(row.original)}
                         disabled={row.original.isAssigned}
-                        className={`h-4 w-4 text-morpheus-gold-light focus:ring-morpheus-gold-light ${row.original.isAssigned ? 'opacity-50 cursor-not-allowed' : ''
+                        className={`h-4 w-4 text-blue-600 focus:ring-blue-500 ${row.original.isAssigned ? 'opacity-50 cursor-not-allowed' : ''
                             }`}
                     />
                 </div>
@@ -103,20 +103,20 @@ export function DesignerSelectionDialog({
             header: t("admin.designerAssignments.designer"),
             cell: ({ row }) => (
                 <div className={`flex items-center gap-3 ${row.original.isAssigned ? 'opacity-50' : ''}`}>
-                    <div className={`h-10 w-10 rounded-full bg-gradient-to-r from-morpheus-purple to-morpheus-blue flex items-center justify-center ${row.original.isAssigned ? 'opacity-60' : ''
+                    <div className={`h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center ${row.original.isAssigned ? 'opacity-60' : ''
                         }`}>
                         <User className="h-5 w-5 text-white" />
                     </div>
                     <div>
-                        <div className={`font-medium ${row.original.isAssigned ? 'text-gray-400' : 'text-white'}`}>
+                        <div className={`font-medium ${row.original.isAssigned ? 'text-gray-500' : 'text-gray-900'}`}>
                             {row.original.ydesignnom}
                             {row.original.isAssigned && (
-                                <span className="ml-2 text-xs bg-yellow-500/20 text-yellow-300 px-2 py-1 rounded">
+                                <span className="ml-2 text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded border border-gray-300">
                                     {t("admin.designerAssignments.alreadyAssigned")}
                                 </span>
                             )}
                         </div>
-                        <div className="text-sm text-gray-400">{row.original.ydesigncontactpersonne}</div>
+                        <div className="text-sm text-gray-500">{row.original.ydesigncontactpersonne}</div>
                     </div>
                 </div>
             ),
@@ -126,10 +126,10 @@ export function DesignerSelectionDialog({
             header: t("admin.designerAssignments.brand"),
             cell: ({ row }) => (
                 <div className={`flex flex-col ${row.original.isAssigned ? 'opacity-50' : ''}`}>
-                    <span className={`font-medium ${row.original.isAssigned ? 'text-gray-400' : 'text-white'}`}>
+                    <span className={`font-medium ${row.original.isAssigned ? 'text-gray-500' : 'text-gray-900'}`}>
                         {row.original.ydesignmarque}
                     </span>
-                    <span className="text-sm text-gray-400">{row.original.ydesignspecialite}</span>
+                    <span className="text-sm text-gray-500">{row.original.ydesignspecialite}</span>
                 </div>
             ),
         },
@@ -138,8 +138,8 @@ export function DesignerSelectionDialog({
             header: t("admin.designerAssignments.location"),
             cell: ({ row }) => (
                 <div className={`flex items-center gap-2 ${row.original.isAssigned ? 'opacity-50' : ''}`}>
-                    <MapPin className="h-4 w-4 text-gray-400" />
-                    <span className={`${row.original.isAssigned ? 'text-gray-400' : 'text-white'}`}>
+                    <MapPin className="h-4 w-4 text-gray-500" />
+                    <span className={`${row.original.isAssigned ? 'text-gray-500' : 'text-gray-900'}`}>
                         {row.original.ydesignpays}
                     </span>
                 </div>
@@ -151,13 +151,13 @@ export function DesignerSelectionDialog({
             cell: ({ row }) => (
                 <div className={`flex flex-col gap-1 ${row.original.isAssigned ? 'opacity-50' : ''}`}>
                     <div className="flex items-center gap-2">
-                        <Mail className="h-4 w-4 text-gray-400" />
-                        <span className={`text-sm ${row.original.isAssigned ? 'text-gray-400' : 'text-white'}`}>
+                        <Mail className="h-4 w-4 text-gray-500" />
+                        <span className={`text-sm ${row.original.isAssigned ? 'text-gray-500' : 'text-gray-900'}`}>
                             {row.original.ydesigncontactemail}
                         </span>
                     </div>
                     {row.original.ydesigncontacttelephone && (
-                        <div className="text-sm text-gray-400">
+                        <div className="text-sm text-gray-500">
                             {row.original.ydesigncontacttelephone}
                         </div>
                     )}
@@ -171,13 +171,13 @@ export function DesignerSelectionDialog({
             <CredenzaTrigger asChild>
                 {children}
             </CredenzaTrigger>
-            <CredenzaContent className="max-w-4xl max-h-[90vh] bg-gradient-to-br from-morpheus-blue-dark to-morpheus-blue-light">
+            <CredenzaContent className="max-w-4xl max-h-[90vh] bg-white">
                 <CredenzaHeader>
-                    <CredenzaTitle className="text-white flex items-center gap-2">
-                        <Palette className="h-5 w-5 text-morpheus-gold-light" />
+                    <CredenzaTitle className="text-gray-900 flex items-center gap-2">
+                        <Palette className="h-5 w-5 text-blue-600" />
                         {t("admin.designerAssignments.selectDesignerFor")} {boutiqueName}
                     </CredenzaTitle>
-                    <CredenzaDescription className="text-gray-300">
+                    <CredenzaDescription className="text-gray-600">
                         {t("admin.designerAssignments.chooseDesignerToAssign")}
                     </CredenzaDescription>
                 </CredenzaHeader>
@@ -204,7 +204,7 @@ export function DesignerSelectionDialog({
                 <CredenzaFooter className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         {selectedDesigner && (
-                            <Badge className="bg-morpheus-gold-light/20 text-morpheus-gold-light">
+                            <Badge className="bg-blue-100 text-blue-800 border border-blue-200">
                                 <CheckCircle className="h-3 w-3 mr-1" />
                                 {selectedDesigner.ydesignnom} {t("admin.designerAssignments.selected")}
                             </Badge>
@@ -212,14 +212,14 @@ export function DesignerSelectionDialog({
                     </div>
                     <div className="flex gap-2">
                         <CredenzaClose asChild>
-                            <Button variant="outline" className="border-gray-600 text-gray-300">
+                            <Button variant="outline" className="border-gray-300 text-gray-700 hover:bg-gray-50">
                                 {t("admin.designerAssignments.cancel")}
                             </Button>
                         </CredenzaClose>
                         <Button
                             onClick={handleAssignDesigner}
                             disabled={!selectedDesigner || isAssigning}
-                            className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-morpheus-gold-dark hover:to-morpheus-gold-light text-white"
+                            className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white"
                         >
                             {isAssigning ? t("admin.designerAssignments.assigning") : t("admin.designerAssignments.assignDesignerButton")}
                         </Button>

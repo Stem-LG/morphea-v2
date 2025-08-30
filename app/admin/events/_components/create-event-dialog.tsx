@@ -182,10 +182,10 @@ export function CreateEventDialog({ children }: CreateEventDialogProps) {
     return (
         <Dialog open={isOpen} onOpenChange={handleDialogChange}>
             <DialogTrigger asChild>{children}</DialogTrigger>
-            <DialogContent className="bg-gradient-to-br from-morpheus-blue-dark to-morpheus-blue-light max-w-7xl max-h-[95vh] overflow-hidden">
+            <DialogContent className="bg-gradient-to-br from-gray-50/95 to-white/95 max-w-7xl max-h-[95vh] overflow-hidden shadow-xl">
                 <DialogHeader>
-                    <DialogTitle className="text-white flex items-center gap-2">
-                        <Calendar className="h-5 w-5 text-morpheus-gold-light" />
+                    <DialogTitle className="text-gray-900 flex items-center gap-2">
+                        <Calendar className="h-5 w-5 text-blue-500" />
                         {t('admin.events.createNewEvent')}
                     </DialogTitle>
                 </DialogHeader>
@@ -197,23 +197,23 @@ export function CreateEventDialog({ children }: CreateEventDialogProps) {
                         <div className="space-y-4">
                             <div className="grid grid-cols-1 gap-4">
                                 <div className="space-y-2">
-                                    <Label className="text-gray-300">{t('admin.events.eventCodeOptional')}</Label>
+                                    <Label className="text-gray-700">{t('admin.events.eventCodeOptional')}</Label>
                                     <Input
                                         value={formData.code}
                                         onChange={(e) => handleInputChange("code", e.target.value)}
                                         placeholder={t('admin.events.eventCodePlaceholder')}
-                                        className="bg-gray-800/50 border-gray-600 text-white placeholder-gray-400"
+                                        className="bg-white border-gray-300 text-gray-900 placeholder-gray-500"
                                         disabled={isSubmitting}
                                     />
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label className="text-gray-300">{t('admin.events.eventName')}</Label>
+                                    <Label className="text-gray-700">{t('admin.events.eventName')}</Label>
                                     <Input
                                         value={formData.name}
                                         onChange={(e) => handleInputChange("name", e.target.value)}
                                         placeholder={t('admin.events.eventNamePlaceholder')}
-                                        className="bg-gray-800/50 border-gray-600 text-white placeholder-gray-400"
+                                        className="bg-white border-gray-300 text-gray-900 placeholder-gray-500"
                                         disabled={isSubmitting}
                                     />
                                 </div>
@@ -222,7 +222,7 @@ export function CreateEventDialog({ children }: CreateEventDialogProps) {
                             {/* Date Range */}
                             <div className="grid grid-cols-1 gap-4">
                                 <div className="space-y-2">
-                                    <Label className="text-gray-300">{t('admin.events.startDate')}</Label>
+                                    <Label className="text-gray-700">{t('admin.events.startDate')}</Label>
                                     <Input
                                         type="datetime-local"
                                         value={formData.startDate}
@@ -239,13 +239,13 @@ export function CreateEventDialog({ children }: CreateEventDialogProps) {
                                             checkDateOverlap(value, formData.endDate);
                                         }}
                                         max={formData.endDate || undefined}
-                                        className="bg-gray-800/50 border-gray-600 text-white"
+                                        className="bg-white border-gray-300 text-gray-900"
                                         disabled={isSubmitting}
                                     />
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label className="text-gray-300">{t('admin.events.endDate')}</Label>
+                                    <Label className="text-gray-700">{t('admin.events.endDate')}</Label>
                                     <Input
                                         type="datetime-local"
                                         value={formData.endDate}
@@ -255,7 +255,7 @@ export function CreateEventDialog({ children }: CreateEventDialogProps) {
                                             checkDateOverlap(formData.startDate, value);
                                         }}
                                         min={formData.startDate || undefined}
-                                        className="bg-gray-800/50 border-gray-600 text-white"
+                                        className="bg-white border-gray-300 text-gray-900"
                                         disabled={isSubmitting}
                                     />
                                 </div>
@@ -263,8 +263,8 @@ export function CreateEventDialog({ children }: CreateEventDialogProps) {
                             
                             {/* Date Overlap Warning */}
                             {dateOverlapWarning && (
-                                <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-3">
-                                    <p className="text-red-400 text-sm font-medium">⚠️ {dateOverlapWarning}</p>
+                                <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                                    <p className="text-red-700 text-sm font-medium">⚠️ {dateOverlapWarning}</p>
                                 </div>
                             )}
                         </div>
@@ -272,14 +272,14 @@ export function CreateEventDialog({ children }: CreateEventDialogProps) {
                         {/* Image Upload Section */}
                         <div className="space-y-4">
                             <div className="flex items-center justify-between">
-                                <Label className="text-gray-300">{t('admin.events.eventImagesOptional')}</Label>
+                                <Label className="text-gray-700">{t('admin.events.eventImagesOptional')}</Label>
                                 {selectedFiles.length > 0 && (
                                     <Button
                                         type="button"
                                         variant="ghost"
                                         size="sm"
                                         onClick={removeAllFiles}
-                                        className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
                                         disabled={isSubmitting}
                                     >
                                         {t('admin.events.clearAll')}
@@ -288,17 +288,17 @@ export function CreateEventDialog({ children }: CreateEventDialogProps) {
                             </div>
 
                             {/* Upload Area */}
-                            <Card className="bg-gray-800/30 border-gray-600 border-dashed">
+                            <Card className="bg-gray-50 border-gray-300 border-dashed">
                                 <CardContent className="flex flex-col items-center justify-center py-6">
                                     <Upload className="h-8 w-8 text-gray-400 mb-2" />
                                     <div className="text-center">
                                         <Label
                                             htmlFor="image-upload"
-                                            className="text-morpheus-gold-light hover:text-morpheus-gold-dark cursor-pointer text-sm"
+                                            className="text-blue-500 hover:text-blue-600 cursor-pointer text-sm"
                                         >
                                             {t('admin.events.clickToUpload')}
                                         </Label>
-                                        <p className="text-xs text-gray-400 mt-1">
+                                        <p className="text-xs text-gray-500 mt-1">
                                             {t('admin.events.fileSupport')}
                                         </p>
                                     </div>
@@ -317,16 +317,16 @@ export function CreateEventDialog({ children }: CreateEventDialogProps) {
                             {/* Image Previews */}
                             {selectedFiles.length > 0 && (
                                 <div className="space-y-2">
-                                    <Label className="text-gray-300 text-sm">
+                                    <Label className="text-gray-700 text-sm">
                                         {t('admin.events.selectedImages')} ({selectedFiles.length})
                                     </Label>
                                     <ScrollArea className="h-40">
                                         <div className="grid grid-cols-1 gap-2 pr-2">
                                             {selectedFiles.map((file, index) => (
-                                                <Card key={index} className="bg-gray-800/30 border-gray-600">
+                                                <Card key={index} className="bg-white border-gray-200 shadow-sm">
                                                     <CardContent className="p-2">
                                                         <div className="flex items-center gap-2">
-                                                            <div className="w-12 h-12 rounded overflow-hidden bg-gray-700 flex-shrink-0">
+                                                            <div className="w-12 h-12 rounded overflow-hidden bg-gray-100 flex-shrink-0">
                                                                 <img
                                                                     src={imagePreviews[index]}
                                                                     alt={`Preview ${index + 1}`}
@@ -334,8 +334,8 @@ export function CreateEventDialog({ children }: CreateEventDialogProps) {
                                                                 />
                                                             </div>
                                                             <div className="flex-1 min-w-0">
-                                                                <p className="text-white text-sm font-medium truncate">{file.name}</p>
-                                                                <p className="text-xs text-gray-400">
+                                                                <p className="text-gray-900 text-sm font-medium truncate">{file.name}</p>
+                                                                <p className="text-xs text-gray-600">
                                                                     {(file.size / 1024 / 1024).toFixed(2)} MB
                                                                 </p>
                                                             </div>
@@ -344,7 +344,7 @@ export function CreateEventDialog({ children }: CreateEventDialogProps) {
                                                                 variant="ghost"
                                                                 size="sm"
                                                                 onClick={() => removeSelectedFile(index)}
-                                                                className="text-red-400 hover:text-red-300 hover:bg-red-900/20 flex-shrink-0 h-8 w-8 p-0"
+                                                                className="text-red-600 hover:text-red-700 hover:bg-red-50 flex-shrink-0 h-8 w-8 p-0"
                                                                 disabled={isSubmitting}
                                                             >
                                                                 <X className="h-3 w-3" />
@@ -360,20 +360,20 @@ export function CreateEventDialog({ children }: CreateEventDialogProps) {
                         </div>
 
                         {/* Form Actions */}
-                        <div className="flex gap-3 pt-4 sticky bottom-0">
+                        <div className="flex gap-3 pt-4 sticky bottom-0 bg-white">
                             <Button
                                 type="button"
                                 variant="outline"
                                 onClick={() => setIsOpen(false)}
                                 disabled={isSubmitting}
-                                className="flex-1 border-gray-600 text-gray-300 hover:bg-gray-800/50"
+                                className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50"
                             >
                                 {t('common.cancel')}
                             </Button>
                             <Button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className="flex-1 bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light hover:from-morpheus-gold-dark hover:to-morpheus-gold-light text-white font-semibold transition-all duration-300 hover:scale-105"
+                                className="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold transition-all duration-300 hover:scale-105"
                             >
                                 {isSubmitting ? t('admin.events.creating') : t('admin.events.createEvent')}
                             </Button>
@@ -384,8 +384,8 @@ export function CreateEventDialog({ children }: CreateEventDialogProps) {
                     <div className="flex-1 space-y-6 overflow-y-auto pl-2">
                         {/* Mall Selection */}
                         <div className="space-y-3">
-                            <Label className="text-white flex items-center gap-2">
-                                <MapPin className="h-4 w-4 text-morpheus-gold-light" />
+                            <Label className="text-gray-700 flex items-center gap-2">
+                                <MapPin className="h-4 w-4 text-blue-500" />
                                 {t('admin.events.malls.selectMalls')}
                             </Label>
                             <MallMultiSelect
@@ -397,8 +397,8 @@ export function CreateEventDialog({ children }: CreateEventDialogProps) {
 
                         {/* Boutique Selection */}
                         <div className="space-y-3">
-                            <Label className="text-white flex items-center gap-2">
-                                <Store className="h-4 w-4 text-morpheus-gold-light" />
+                            <Label className="text-gray-700 flex items-center gap-2">
+                                <Store className="h-4 w-4 text-blue-500" />
                                 {t('admin.events.boutiques.selectBoutiques')}
                             </Label>
                             <BoutiqueMultiSelect

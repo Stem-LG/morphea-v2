@@ -36,28 +36,28 @@ export function DeleteConfirmationDialog({
 
     return (
         <Dialog open={isOpen} onOpenChange={handleClose}>
-            <DialogContent className="bg-gradient-to-br from-gray-900/95 to-gray-800/95 backdrop-blur-sm border-red-700/50 text-white sm:max-w-md">
+            <DialogContent className="bg-white border-red-200 text-gray-900 sm:max-w-md">
                 <DialogHeader>
                     <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-lg bg-red-900/50 flex items-center justify-center">
-                            <AlertTriangle className="h-5 w-5 text-red-400" />
+                        <div className="h-10 w-10 rounded-lg bg-red-100 flex items-center justify-center">
+                            <AlertTriangle className="h-5 w-5 text-red-600" />
                         </div>
-                        <DialogTitle className="text-xl font-semibold text-white">
+                        <DialogTitle className="text-xl font-semibold text-gray-900">
                             {t("admin.deleteStore")}
                         </DialogTitle>
                     </div>
                 </DialogHeader>
 
                 <div className="space-y-4">
-                    <p className="text-white">
+                    <p className="text-gray-900">
                         {t("admin.confirmDeleteStore")}
                     </p>
-                    <div className="bg-red-900/20 border border-red-700/30 rounded-lg p-4">
-                        <p className="text-red-300 font-medium text-center">
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                        <p className="text-red-700 font-medium text-center">
                             &ldquo;{storeName}&rdquo;
                         </p>
                     </div>
-                    <p className="text-gray-300 text-sm">
+                    <p className="text-gray-600 text-sm">
                         {t("admin.deleteStoreWarning")}
                     </p>
                 </div>
@@ -68,7 +68,7 @@ export function DeleteConfirmationDialog({
                         variant="outline"
                         onClick={handleClose}
                         disabled={isLoading}
-                        className="flex-1 border-gray-600 text-gray-300 hover:bg-gray-800/50 hover:text-white"
+                        className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50"
                     >
                         {t("common.cancel")}
                     </Button>

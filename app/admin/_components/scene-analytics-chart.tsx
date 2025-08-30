@@ -52,12 +52,12 @@ interface SceneAnalyticsChartProps {
     className?: string
 }
 
-// Enhanced color palette using morpheus theme colors
+// Enhanced color palette using blue theme colors
 const MORPHEUS_COLORS = [
-    '#e8d07a', // morpheus-gold-light
-    '#785730', // morpheus-gold-dark
-    '#063846', // morpheus-blue-light
-    '#05141d', // morpheus-blue-dark
+    '#3b82f6', // blue-500
+    '#1d4ed8', // blue-700
+    '#60a5fa', // blue-400
+    '#2563eb', // blue-600
     '#3b82f6', // blue-500
     '#10b981', // emerald-500
     '#f59e0b', // amber-500
@@ -144,8 +144,8 @@ const CustomTooltip = ({ active, payload, label, t }: any) => {
     if (active && payload && payload.length) {
         const data = payload[0].payload
         return (
-            <div className="border-morpheus-gold-light/20 rounded-lg border bg-white/95 p-4 shadow-xl backdrop-blur-sm">
-                <p className="text-morpheus-gold-light mb-2 font-medium">
+            <div className="rounded-lg border border-blue-200 bg-white/95 p-4 shadow-xl backdrop-blur-sm">
+                <p className="mb-2 font-medium text-blue-600">
                     {data.isOther
                         ? `Other - Multiple ${t('admin.analytics.scenes')}`
                         : `${data.fullName || label}`}
@@ -160,7 +160,7 @@ const CustomTooltip = ({ active, payload, label, t }: any) => {
                     {t('admin.analytics.views')}
                 </p>
                 {payload[0].payload.percentage && (
-                    <p className="text-morpheus-gold-light/80 text-sm">
+                    <p className="text-sm text-blue-500">
                         {(payload[0].payload.percentage * 100).toFixed(1)}%
                     </p>
                 )}
@@ -209,8 +209,8 @@ export function SceneAnalyticsChart({ className }: SceneAnalyticsChartProps) {
                 title: t('admin.analytics.totalViews'),
                 value: stats.totalViews.toLocaleString(),
                 icon: Eye,
-                color: 'text-morpheus-gold-light',
-                bgColor: 'bg-morpheus-gold-light/10',
+                color: 'text-blue-600',
+                bgColor: 'bg-blue-100',
                 change: '+12.5%',
                 changeType: 'positive' as const,
             },
@@ -239,7 +239,7 @@ export function SceneAnalyticsChart({ className }: SceneAnalyticsChartProps) {
                 {summaryData.map((item) => (
                     <Card
                         key={item.title}
-                        className="border-morpheus-gold-light/20 hover:border-morpheus-gold-light/40 hover:shadow-morpheus-gold-light/10 bg-gradient-to-br from-gray-50/50 to-white/50 transition-all duration-300 hover:shadow-lg"
+                        className="border-blue-200 bg-gradient-to-br from-gray-50/50 to-white/50 transition-all duration-300 hover:border-blue-300 hover:shadow-lg hover:shadow-blue-100"
                     >
                         <CardContent className="p-6">
                             <div className="flex items-center justify-between">
@@ -279,9 +279,9 @@ export function SceneAnalyticsChart({ className }: SceneAnalyticsChartProps) {
                 <div className="flex h-80 items-center justify-center">
                     <div className="text-center">
                         <div className="relative">
-                            <div className="border-morpheus-gold-light/20 border-t-morpheus-gold-light mx-auto mb-4 h-16 w-16 animate-spin rounded-full border-4"></div>
+                            <div className="mx-auto mb-4 h-16 w-16 animate-spin rounded-full border-4 border-blue-200 border-t-blue-500"></div>
                             <div className="absolute inset-0 animate-pulse">
-                                <div className="bg-morpheus-gold-light/10 mx-auto h-16 w-16 rounded-full"></div>
+                                <div className="mx-auto h-16 w-16 rounded-full bg-blue-100"></div>
                             </div>
                         </div>
                         <p className="font-medium text-gray-900">
@@ -311,7 +311,7 @@ export function SceneAnalyticsChart({ className }: SceneAnalyticsChartProps) {
                         <Button
                             onClick={() => refetch()}
                             variant="outline"
-                            className="border-morpheus-gold-light/30 text-morpheus-gold-light hover:bg-morpheus-gold-light/10 hover:border-morpheus-gold-light/50 transition-all duration-200"
+                            className="border-blue-300 text-blue-600 transition-all duration-200 hover:border-blue-400 hover:bg-blue-50"
                         >
                             <RefreshCw className="mr-2 h-4 w-4" />
                             {t('common.retry')}
@@ -328,10 +328,10 @@ export function SceneAnalyticsChart({ className }: SceneAnalyticsChartProps) {
                         <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-gray-500/10 p-6">
                             <Eye className="h-12 w-12 text-gray-400" />
                         </div>
-                        <h3 className="mb-2 text-xl font-semibold text-white">
+                        <h3 className="mb-2 text-xl font-semibold text-gray-900">
                             {t('admin.analytics.noSceneData')}
                         </h3>
-                        <p className="mb-4 text-gray-300">
+                        <p className="mb-4 text-gray-600">
                             {selectedBoutique || selectedScene
                                 ? t('admin.analytics.noScenesMatchingFilters')
                                 : t('admin.analytics.noSceneViewData')}
@@ -340,7 +340,7 @@ export function SceneAnalyticsChart({ className }: SceneAnalyticsChartProps) {
                             <Button
                                 onClick={handleClearFilters}
                                 variant="outline"
-                                className="border-morpheus-gold-light/30 text-morpheus-gold-light hover:bg-morpheus-gold-light/10"
+                                className="border-blue-300 text-blue-600 hover:bg-blue-50"
                             >
                                 <X className="mr-2 h-4 w-4" />
                                 {t('admin.analytics.clearFilters')}
@@ -580,14 +580,14 @@ export function SceneAnalyticsChart({ className }: SceneAnalyticsChartProps) {
             {renderSummaryCards()}
 
             {/* Main Chart */}
-            <Card className="from-morpheus-blue-dark/60 to-morpheus-blue-light/40 border-morpheus-gold-light/20 shadow-morpheus-blue-dark/20 bg-gradient-to-br shadow-xl">
+            <Card className="border-gray-200 bg-gradient-to-br from-gray-50/50 to-white/50 shadow-xl shadow-gray-200/20">
                 <CardHeader className="pb-4">
                     <div className="flex flex-col space-y-4">
                         {/* Header with title and main controls */}
                         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                            <CardTitle className="flex items-center gap-3 text-white">
-                                <div className="bg-morpheus-gold-light/20 rounded-lg p-2">
-                                    <BarChart3 className="text-morpheus-gold-light h-6 w-6" />
+                            <CardTitle className="flex items-center gap-3 text-gray-900">
+                                <div className="rounded-lg bg-blue-100 p-2">
+                                    <BarChart3 className="h-6 w-6 text-blue-600" />
                                 </div>
                                 <div>
                                     <h2 className="text-xl font-bold">
@@ -595,7 +595,7 @@ export function SceneAnalyticsChart({ className }: SceneAnalyticsChartProps) {
                                             'admin.analytics.sceneViewAnalytics'
                                         )}
                                     </h2>
-                                    <p className="mt-1 text-sm font-normal text-gray-300">
+                                    <p className="mt-1 text-sm font-normal text-gray-600">
                                         Analyze performance across scenes and
                                         boutiques
                                     </p>
@@ -605,10 +605,10 @@ export function SceneAnalyticsChart({ className }: SceneAnalyticsChartProps) {
                             <div className="flex flex-wrap items-center gap-3">
                                 {/* Data View Selector */}
                                 <div className="flex items-center gap-2">
-                                    <span className="text-sm font-medium text-gray-300">
+                                    <span className="text-sm font-medium text-gray-700">
                                         View:
                                     </span>
-                                    <div className="bg-morpheus-blue-dark/40 border-morpheus-gold-light/20 flex items-center rounded-lg border p-1">
+                                    <div className="flex items-center rounded-lg border border-gray-300 bg-gray-100 p-1">
                                         <Button
                                             variant={
                                                 dataView === 'scenes'
@@ -621,8 +621,8 @@ export function SceneAnalyticsChart({ className }: SceneAnalyticsChartProps) {
                                             }
                                             className={`px-3 py-1.5 text-xs font-medium transition-all duration-200 ${
                                                 dataView === 'scenes'
-                                                    ? 'bg-morpheus-gold-light text-morpheus-blue-dark shadow-sm'
-                                                    : 'hover:bg-morpheus-gold-light/10 text-gray-300 hover:text-white'
+                                                    ? 'bg-blue-500 text-white shadow-sm'
+                                                    : 'text-gray-700 hover:bg-blue-100 hover:text-gray-900'
                                             }`}
                                         >
                                             <Camera className="mr-1 h-3 w-3" />
@@ -640,8 +640,8 @@ export function SceneAnalyticsChart({ className }: SceneAnalyticsChartProps) {
                                             }
                                             className={`px-3 py-1.5 text-xs font-medium transition-all duration-200 ${
                                                 dataView === 'boutiques'
-                                                    ? 'bg-morpheus-gold-light text-morpheus-blue-dark shadow-sm'
-                                                    : 'hover:bg-morpheus-gold-light/10 text-gray-300 hover:text-white'
+                                                    ? 'bg-blue-500 text-white shadow-sm'
+                                                    : 'text-gray-700 hover:bg-blue-100 hover:text-gray-900'
                                             }`}
                                         >
                                             <Store className="mr-1 h-3 w-3" />
@@ -651,7 +651,7 @@ export function SceneAnalyticsChart({ className }: SceneAnalyticsChartProps) {
                                 </div>
 
                                 {/* Chart Type Selector */}
-                                <div className="bg-morpheus-blue-dark/40 border-morpheus-gold-light/20 flex items-center rounded-lg border p-1">
+                                <div className="flex items-center rounded-lg border border-gray-300 bg-gray-100 p-1">
                                     <Button
                                         variant={
                                             chartType === 'bar'
@@ -662,8 +662,8 @@ export function SceneAnalyticsChart({ className }: SceneAnalyticsChartProps) {
                                         onClick={() => setChartType('bar')}
                                         className={`px-3 py-1.5 transition-all duration-200 ${
                                             chartType === 'bar'
-                                                ? 'bg-morpheus-gold-light text-morpheus-blue-dark shadow-sm'
-                                                : 'hover:bg-morpheus-gold-light/10 text-gray-300 hover:text-white'
+                                                ? 'bg-blue-500 text-white shadow-sm'
+                                                : 'text-gray-700 hover:bg-blue-100 hover:text-gray-900'
                                         }`}
                                     >
                                         <BarChart3 className="h-4 w-4" />
@@ -678,8 +678,8 @@ export function SceneAnalyticsChart({ className }: SceneAnalyticsChartProps) {
                                         onClick={() => setChartType('pie')}
                                         className={`px-3 py-1.5 transition-all duration-200 ${
                                             chartType === 'pie'
-                                                ? 'bg-morpheus-gold-light text-morpheus-blue-dark shadow-sm'
-                                                : 'hover:bg-morpheus-gold-light/10 text-gray-300 hover:text-white'
+                                                ? 'bg-blue-500 text-white shadow-sm'
+                                                : 'text-gray-700 hover:bg-blue-100 hover:text-gray-900'
                                         }`}
                                     >
                                         <PieChartIcon className="h-4 w-4" />
@@ -694,8 +694,8 @@ export function SceneAnalyticsChart({ className }: SceneAnalyticsChartProps) {
                                         onClick={() => setChartType('line')}
                                         className={`px-3 py-1.5 transition-all duration-200 ${
                                             chartType === 'line'
-                                                ? 'bg-morpheus-gold-light text-morpheus-blue-dark shadow-sm'
-                                                : 'hover:bg-morpheus-gold-light/10 text-gray-300 hover:text-white'
+                                                ? 'bg-blue-500 text-white shadow-sm'
+                                                : 'text-gray-700 hover:bg-blue-100 hover:text-gray-900'
                                         }`}
                                     >
                                         <LineChartIcon className="h-4 w-4" />
@@ -706,7 +706,7 @@ export function SceneAnalyticsChart({ className }: SceneAnalyticsChartProps) {
 
                         {/* Filters Row */}
                         <div className="flex flex-wrap items-center gap-3">
-                            <div className="flex items-center gap-2 text-gray-300">
+                            <div className="flex items-center gap-2 text-gray-700">
                                 <Filter className="h-4 w-4" />
                                 <span className="text-sm font-medium">
                                     Filters:
@@ -727,17 +727,17 @@ export function SceneAnalyticsChart({ className }: SceneAnalyticsChartProps) {
                                     )
                                 }
                             >
-                                <SelectTrigger className="bg-morpheus-blue-dark/40 border-morpheus-gold-light/20 hover:border-morpheus-gold-light/40 w-48 text-white transition-colors">
+                                <SelectTrigger className="w-48 border-gray-300 bg-white text-gray-900 transition-colors hover:border-blue-400">
                                     <SelectValue
                                         placeholder={t(
                                             'admin.analytics.allBoutiques'
                                         )}
                                     />
                                 </SelectTrigger>
-                                <SelectContent className="bg-morpheus-blue-dark border-morpheus-gold-light/20">
+                                <SelectContent className="border-gray-200 bg-white">
                                     <SelectItem
                                         value="all-boutiques"
-                                        className="hover:bg-morpheus-gold-light/10 text-white"
+                                        className="text-gray-900 hover:bg-blue-50"
                                     >
                                         {t('admin.analytics.allBoutiques')}
                                     </SelectItem>
@@ -745,7 +745,7 @@ export function SceneAnalyticsChart({ className }: SceneAnalyticsChartProps) {
                                         <SelectItem
                                             key={boutique.value}
                                             value={boutique.value.toString()}
-                                            className="hover:bg-morpheus-gold-light/10 text-white"
+                                            className="text-gray-900 hover:bg-blue-50"
                                         >
                                             {boutique.label}
                                         </SelectItem>
@@ -766,17 +766,17 @@ export function SceneAnalyticsChart({ className }: SceneAnalyticsChartProps) {
                                     )
                                 }
                             >
-                                <SelectTrigger className="bg-morpheus-blue-dark/40 border-morpheus-gold-light/20 hover:border-morpheus-gold-light/40 w-48 text-white transition-colors">
+                                <SelectTrigger className="w-48 border-gray-300 bg-white text-gray-900 transition-colors hover:border-blue-400">
                                     <SelectValue
                                         placeholder={t(
                                             'admin.analytics.allScenes'
                                         )}
                                     />
                                 </SelectTrigger>
-                                <SelectContent className="bg-morpheus-blue-dark border-morpheus-gold-light/20">
+                                <SelectContent className="border-gray-200 bg-white">
                                     <SelectItem
                                         value="all-scenes"
-                                        className="hover:bg-morpheus-gold-light/10 text-white"
+                                        className="text-gray-900 hover:bg-blue-50"
                                     >
                                         {t('admin.analytics.allScenes')}
                                     </SelectItem>
@@ -784,7 +784,7 @@ export function SceneAnalyticsChart({ className }: SceneAnalyticsChartProps) {
                                         <SelectItem
                                             key={scene.value}
                                             value={scene.value.toString()}
-                                            className="hover:bg-morpheus-gold-light/10 text-white"
+                                            className="text-gray-900 hover:bg-blue-50"
                                         >
                                             {scene.label}
                                         </SelectItem>
@@ -797,7 +797,7 @@ export function SceneAnalyticsChart({ className }: SceneAnalyticsChartProps) {
                                     onClick={handleClearFilters}
                                     variant="outline"
                                     size="sm"
-                                    className="border-morpheus-gold-light/30 text-morpheus-gold-light hover:bg-morpheus-gold-light/10 hover:border-morpheus-gold-light/50 transition-all duration-200"
+                                    className="border-blue-300 text-blue-600 transition-all duration-200 hover:border-blue-400 hover:bg-blue-50"
                                 >
                                     <X className="mr-1 h-3 w-3" />
                                     Clear
@@ -809,7 +809,7 @@ export function SceneAnalyticsChart({ className }: SceneAnalyticsChartProps) {
                         {(selectedBoutique || selectedScene) && (
                             <div className="flex flex-wrap gap-2">
                                 {selectedBoutique && (
-                                    <Badge className="border-blue-500/30 bg-blue-500/20 text-blue-300 transition-colors hover:bg-blue-500/30">
+                                    <Badge className="border-blue-300 bg-blue-100 text-blue-700 transition-colors hover:bg-blue-200">
                                         <Store className="mr-1 h-3 w-3" />
                                         {
                                             boutiqueOptions?.find(
@@ -820,7 +820,7 @@ export function SceneAnalyticsChart({ className }: SceneAnalyticsChartProps) {
                                     </Badge>
                                 )}
                                 {selectedScene && (
-                                    <Badge className="border-emerald-500/30 bg-emerald-500/20 text-emerald-300 transition-colors hover:bg-emerald-500/30">
+                                    <Badge className="border-emerald-300 bg-emerald-100 text-emerald-700 transition-colors hover:bg-emerald-200">
                                         <Camera className="mr-1 h-3 w-3" />
                                         {
                                             sceneOptions?.find(
@@ -835,7 +835,7 @@ export function SceneAnalyticsChart({ className }: SceneAnalyticsChartProps) {
                 </CardHeader>
 
                 <CardContent className="pt-0">
-                    <div className="bg-morpheus-blue-dark/20 border-morpheus-gold-light/10 rounded-lg border p-4">
+                    <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
                         {renderChart()}
                     </div>
                 </CardContent>
@@ -843,17 +843,17 @@ export function SceneAnalyticsChart({ className }: SceneAnalyticsChartProps) {
 
             {/* Top Boutiques by Views */}
             {stats?.viewsByBoutique.length > 0 && (
-                <Card className="from-morpheus-blue-dark/60 to-morpheus-blue-light/40 border-morpheus-gold-light/20 shadow-morpheus-blue-dark/20 bg-gradient-to-br shadow-xl">
+                <Card className="border-gray-200 bg-gradient-to-br from-gray-50/50 to-white/50 shadow-xl shadow-gray-200/20">
                     <CardHeader>
-                        <CardTitle className="flex items-center gap-3 text-white">
-                            <div className="bg-morpheus-gold-light/20 rounded-lg p-2">
-                                <Store className="text-morpheus-gold-light h-6 w-6" />
+                        <CardTitle className="flex items-center gap-3 text-gray-900">
+                            <div className="rounded-lg bg-blue-100 p-2">
+                                <Store className="h-6 w-6 text-blue-600" />
                             </div>
                             <div>
                                 <h3 className="text-lg font-bold">
                                     {t('admin.analytics.viewsByBoutique')}
                                 </h3>
-                                <p className="mt-1 text-sm font-normal text-gray-300">
+                                <p className="mt-1 text-sm font-normal text-gray-600">
                                     Top performing boutiques by total views
                                 </p>
                             </div>
@@ -866,19 +866,19 @@ export function SceneAnalyticsChart({ className }: SceneAnalyticsChartProps) {
                                 .map((boutique, index) => (
                                     <div
                                         key={boutique.boutiqueId}
-                                        className="bg-morpheus-blue-dark/30 border-morpheus-gold-light/10 hover:border-morpheus-gold-light/20 hover:bg-morpheus-blue-dark/40 flex items-center justify-between rounded-lg border p-4 transition-all duration-200"
+                                        className="flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 p-4 transition-all duration-200 hover:border-blue-300 hover:bg-gray-100"
                                     >
                                         <div className="flex items-center gap-4">
-                                            <div className="from-morpheus-gold-light/20 to-morpheus-gold-dark/20 border-morpheus-gold-light/30 flex h-10 w-10 items-center justify-center rounded-full border bg-gradient-to-br">
-                                                <span className="text-morpheus-gold-light text-sm font-bold">
+                                            <div className="flex h-10 w-10 items-center justify-center rounded-full border border-blue-300 bg-gradient-to-br from-blue-100 to-blue-200">
+                                                <span className="text-sm font-bold text-blue-600">
                                                     #{index + 1}
                                                 </span>
                                             </div>
                                             <div>
-                                                <p className="text-base font-semibold text-white">
+                                                <p className="text-base font-semibold text-gray-900">
                                                     {boutique.boutiqueName}
                                                 </p>
-                                                <p className="text-sm text-gray-400">
+                                                <p className="text-sm text-gray-600">
                                                     {boutique.sceneCount}{' '}
                                                     {boutique.sceneCount === 1
                                                         ? t(
@@ -891,10 +891,10 @@ export function SceneAnalyticsChart({ className }: SceneAnalyticsChartProps) {
                                             </div>
                                         </div>
                                         <div className="text-right">
-                                            <p className="text-lg font-bold text-white">
+                                            <p className="text-lg font-bold text-gray-900">
                                                 {boutique.totalViews.toLocaleString()}
                                             </p>
-                                            <p className="text-sm text-gray-400">
+                                            <p className="text-sm text-gray-600">
                                                 {t('admin.analytics.views')}
                                             </p>
                                         </div>
