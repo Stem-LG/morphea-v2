@@ -23,9 +23,17 @@ interface NotificationsDialogProps {
     onClose: () => void
 }
 
-export function NotificationsDialog({ isOpen, onClose }: NotificationsDialogProps) {
-    const { currentUser } = useAuth()
+export function NotificationsDialog({
+    isOpen,
+    onClose,
+}: NotificationsDialogProps) {
+    const { data: currentUser } = useAuth()
     const router = useRouter()
+
+    // Debug logging
+    console.log('NotificationsDialog - currentUser:', currentUser)
+    console.log('NotificationsDialog - userId:', currentUser?.id)
+
     const {
         notifications,
         unreadCount,
@@ -89,7 +97,10 @@ export function NotificationsDialog({ isOpen, onClose }: NotificationsDialogProp
                                 Notifications
                             </span>
                             {unreadCount > 0 && (
-                                <Badge variant="destructive" className="rounded-full">
+                                <Badge
+                                    variant="destructive"
+                                    className="rounded-full"
+                                >
                                     {unreadCount}
                                 </Badge>
                             )}
@@ -112,7 +123,9 @@ export function NotificationsDialog({ isOpen, onClose }: NotificationsDialogProp
                     {notifications.length === 0 ? (
                         <div className="p-6 text-center text-gray-500">
                             <Bell className="mx-auto mb-3 h-12 w-12 text-gray-300" />
-                            <p className="text-lg font-medium">Aucune notification</p>
+                            <p className="text-lg font-medium">
+                                Aucune notification
+                            </p>
                             <p className="text-sm">Vous êtes à jour !</p>
                         </div>
                     ) : (
@@ -121,9 +134,15 @@ export function NotificationsDialog({ isOpen, onClose }: NotificationsDialogProp
                                 <div key={notification.ynotificationid}>
                                     <div
                                         className={`cursor-pointer rounded-lg p-3 transition-colors hover:bg-gray-50 ${
-                                            !notification.yest_lu ? 'bg-blue-50' : ''
+                                            !notification.yest_lu
+                                                ? 'bg-blue-50'
+                                                : ''
                                         }`}
-                                        onClick={() => handleNotificationClick(notification)}
+                                        onClick={() =>
+                                            handleNotificationClick(
+                                                notification
+                                            )
+                                        }
                                     >
                                         <div className="flex items-start gap-3">
                                             {!notification.yest_lu && (
@@ -139,10 +158,15 @@ export function NotificationsDialog({ isOpen, onClose }: NotificationsDialogProp
                                                     </p>
                                                 )}
                                                 <p className="mt-2 text-xs text-gray-400">
-                                                    {formatDistanceToNow(new Date(notification.sysdate), {
-                                                        addSuffix: true,
-                                                        locale: fr,
-                                                    })}
+                                                    {formatDistanceToNow(
+                                                        new Date(
+                                                            notification.sysdate
+                                                        ),
+                                                        {
+                                                            addSuffix: true,
+                                                            locale: fr,
+                                                        }
+                                                    )}
                                                 </p>
                                             </div>
                                         </div>

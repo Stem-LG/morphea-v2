@@ -69,6 +69,8 @@ export default function NavBar() {
     // const wishlistItemCount = wishlistItems.length
 
     // Notifications - only get unreadCount for the badge
+    console.log('NavBar - currentUser:', currentUser)
+    console.log('NavBar - userId:', currentUser?.id)
     const { unreadCount } = useNotifications(currentUser?.id || '')
 
     // // Intersection Observer for infinite scroll
