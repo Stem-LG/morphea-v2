@@ -1555,7 +1555,7 @@ export const frTranslations = {
     "products": "produits",
     "noProductsFound": "Aucun produit trouvé",
     "viewDetails": "Voir les détails",
-    "quickView": "Aperçu rapide",
+    "quickView": "Découvrir",
     "addToWishlist": "Ajouter aux favoris",
     "removeFromWishlist": "Retirer des favoris",
     "addToCart": "Ajouter au panier",
