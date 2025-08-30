@@ -5,12 +5,13 @@ import { useLanguage } from '@/hooks/useLanguage'
 import { CurrencySwitcher } from '@/app/_components/nav_bar/currency-switcher'
 import { CartDialog } from '@/app/_components/cart-dialog'
 import { WishlistDialog } from '@/app/_components/wishlist-dialog'
+import { NotificationsDialog } from '@/app/_components/notifications-dialog'
 // import { useCart } from '@/app/_hooks/cart/useCart'
 // import { useWishlist } from '@/app/_hooks/wishlist/useWishlist'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState, Fragment, useMemo } from 'react'
-// import { useNotifications } from '@/app/_hooks/use-notifications'
+import { useNotifications } from '@/app/_hooks/use-notifications'
 import { ProductDetailsPage } from '../../main/_components/product-details-page'
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
@@ -20,6 +21,7 @@ import { WishlistIcon } from '../../_icons/wishlist_icon'
 import { CartIcon } from '../../_icons/cart_icon'
 import { SearchIcon } from '../../_icons/search_icon'
 import { AccountIcon } from '../../_icons/account_icon'
+import { NotificationIcon } from '../../_icons/notification_icon'
 import {
     Sheet,
     SheetClose,
@@ -48,7 +50,7 @@ export default function NavBar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false)
     const [isCartOpen, setIsCartOpen] = useState(false)
     const [isWishlistOpen, setIsWishlistOpen] = useState(false)
-    // const [isNotificationsOpen, setIsNotificationsOpen] = useState(false)
+    const [isNotificationsOpen, setIsNotificationsOpen] = useState(false)
     const [selectedProduct, setSelectedProduct] = useState(null)
     const { t } = useLanguage()
     const router = useRouter()
@@ -66,31 +68,8 @@ export default function NavBar() {
     // const cartItemCount = cartItems.length
     // const wishlistItemCount = wishlistItems.length
 
-    // Notifications
-    // const {
-    //     notifications,
-    //     unreadCount,
-    //     hasNextPage,
-    //     fetchNextPage,
-    //     isLoading: notifLoading,
-    //     isFetchingNextPage: notifFetchingNext,
-    //     isError: notifError,
-    //     markAsSeen,
-    //     markAllAsSeen,
-    // } = useNotifications(currentUser?.id || '')
-
-    // const handleNotificationClick = (notification: any) => {
-    //     // Mark notification as read if it's unread
-    //     if (!notification.yest_lu) {
-    //         markAsSeen(notification.ynotificationid)
-    //     }
-
-    //     // Navigate to the link if it exists
-    //     if (notification.ylien) {
-    //         router.push(notification.ylien)
-    //         setIsNotificationsOpen(false) // Close the notification dropdown
-    //     }
-    // }
+    // Notifications - only get unreadCount for the badge
+    const { unreadCount } = useNotifications(currentUser?.id || '')
 
     // // Intersection Observer for infinite scroll
     // useEffect(() => {
@@ -133,9 +112,11 @@ export default function NavBar() {
                     </NavBarIconButton>
                 </div>
                 <div className="flex flex-1 items-center justify-center">
-                    <Link href={{
-                        pathname:"/"
-                    }}>
+                    <Link
+                        href={{
+                            pathname: '/',
+                        }}
+                    >
                         <Image
                             src="/images/morph_logo.webp"
                             alt="Morph Logo"
@@ -150,6 +131,20 @@ export default function NavBar() {
                         <NavBarIconButton onClick={() => router.push('/admin')}>
                             <AdminIcon />
                         </NavBarIconButton>
+                    )}
+                    {currentUser && !currentUser.is_anonymous && (
+                        <div className="relative">
+                            <NavBarIconButton
+                                onClick={() => setIsNotificationsOpen(true)}
+                            >
+                                <NotificationIcon />
+                            </NavBarIconButton>
+                            {unreadCount > 0 && (
+                                <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-medium text-white">
+                                    {unreadCount > 9 ? '9+' : unreadCount}
+                                </span>
+                            )}
+                        </div>
                     )}
                     <NavBarIconButton onClick={() => setIsWishlistOpen(true)}>
                         <WishlistIcon />
@@ -184,12 +179,18 @@ export default function NavBar() {
                             {currentUser && !currentUser.is_anonymous ? (
                                 <>
                                     <DropdownMenuItem asChild>
-                                        <Link href="/profile" className='w-full'>
+                                        <Link
+                                            href="/profile"
+                                            className="w-full"
+                                        >
                                             {t('profile')}
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem asChild>
-                                        <Link href="/my-orders" className='w-full'>
+                                        <Link
+                                            href="/my-orders"
+                                            className="w-full"
+                                        >
                                             {t('orders')}
                                         </Link>
                                     </DropdownMenuItem>
@@ -205,12 +206,18 @@ export default function NavBar() {
                             ) : (
                                 <>
                                     <DropdownMenuItem asChild>
-                                        <Link href="/auth/sign-up" className='w-full'>
+                                        <Link
+                                            href="/auth/sign-up"
+                                            className="w-full"
+                                        >
                                             {t('register')}
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem asChild>
-                                        <Link href="/auth/login" className='w-full'>
+                                        <Link
+                                            href="/auth/login"
+                                            className="w-full"
+                                        >
                                             {' '}
                                             {t('login')}{' '}
                                         </Link>
@@ -229,6 +236,10 @@ export default function NavBar() {
             <WishlistDialog
                 isOpen={isWishlistOpen}
                 onClose={() => setIsWishlistOpen(false)}
+            />
+            <NotificationsDialog
+                isOpen={isNotificationsOpen}
+                onClose={() => setIsNotificationsOpen(false)}
             />
 
             {selectedProduct && (
@@ -385,8 +396,20 @@ function NavBarSheet({
         if (!isAuthenticated) {
             // For anonymous users: show cart, favourites, login and register
             return [
-                { name: 'Favoris', onclick: () => { setIsWishlistOpen(true); setIsMenuOpen(false); } },
-                { name: 'Panier', onclick: () => { setIsCartOpen(true); setIsMenuOpen(false); } },
+                {
+                    name: 'Favoris',
+                    onclick: () => {
+                        setIsWishlistOpen(true)
+                        setIsMenuOpen(false)
+                    },
+                },
+                {
+                    name: 'Panier',
+                    onclick: () => {
+                        setIsCartOpen(true)
+                        setIsMenuOpen(false)
+                    },
+                },
                 { name: t('login'), href: '/auth/login' },
                 { name: t('register'), href: '/auth/sign-up' },
             ]
@@ -394,11 +417,31 @@ function NavBarSheet({
             // For authenticated users: show all account-related items
             return [
                 { name: 'Mon Compte', href: '/profile' },
-                { name: 'Favoris', onclick: () => { setIsWishlistOpen(true); setIsMenuOpen(false); } },
-                { name: 'Panier', onclick: () => { setIsCartOpen(true); setIsMenuOpen(false); } },
+                {
+                    name: 'Favoris',
+                    onclick: () => {
+                        setIsWishlistOpen(true)
+                        setIsMenuOpen(false)
+                    },
+                },
+                {
+                    name: 'Panier',
+                    onclick: () => {
+                        setIsCartOpen(true)
+                        setIsMenuOpen(false)
+                    },
+                },
                 { name: 'Mes Commandes', href: '/orders' },
-                ...(hasAdminAccess ? [{ name: 'Administration', href: '/admin' }] : []),
-                { name: t('logout'), onclick: () => { logout(); setIsMenuOpen(false); } },
+                ...(hasAdminAccess
+                    ? [{ name: 'Administration', href: '/admin' }]
+                    : []),
+                {
+                    name: t('logout'),
+                    onclick: () => {
+                        logout()
+                        setIsMenuOpen(false)
+                    },
+                },
             ]
         }
     }, [currentUser, hasAdminAccess, t])
