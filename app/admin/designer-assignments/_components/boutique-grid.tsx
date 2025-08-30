@@ -139,6 +139,7 @@ export function BoutiqueGrid({ eventId, mallId, boutiques, assignments, isLoadin
                                 )}
                             </div>
                         </CardHeader>
+
                         <CardContent className="space-y-4">
                             {hasDesigner && assignment?.ydesign ? (
                                 <div className="space-y-3">

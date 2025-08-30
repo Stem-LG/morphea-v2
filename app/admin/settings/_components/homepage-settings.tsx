@@ -1235,7 +1235,7 @@ export function HomepageSettings() {
                                             )
                                         }
                                         className="border-slate-600 bg-slate-700 text-white"
-                                        placeholder="Découvrez Nos Défilé"
+                                        placeholder="Découvrez nos défilés"
                                     />
                                     <Button
                                         size="sm"

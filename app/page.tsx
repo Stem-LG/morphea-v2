@@ -66,7 +66,7 @@ export default function Home() {
             mainText:
                 homeSettings?.hero.video1.mainText[language] ||
                 t('homepage.hero.preCollection'),
-            discoverLink: homeSettings?.hero.video1.discoverLink || '#',
+            discoverLink: homeSettings?.hero.video1.discoverLink || '/main',
         },
         side2: {
             src: homeSettings?.hero.video2.url || '/v2.mp4',
@@ -76,7 +76,7 @@ export default function Home() {
             mainText:
                 homeSettings?.hero.video2.mainText[language] ||
                 t('homepage.hero.summerCollection'),
-            discoverLink: homeSettings?.hero.video2.discoverLink || '#',
+            discoverLink: homeSettings?.hero.video2.discoverLink || '/main',
         },
     }
 
@@ -289,7 +289,7 @@ export default function Home() {
             {/* Second Section - Collection Cards - Mobile Responsive */}
             <section className="relative z-20 bg-white pt-12 md:pt-20">
                 <div className="mx-auto max-w-7xl px-4 md:px-8">
-                    <div className="mb-12 text-center md:mb-16">
+                    <div className="mb-12 text-center md:mb-16" id='collections'>
                         <h2 className="font-recia mb-8 text-3xl leading-tight font-extrabold text-[#053340] md:mb-14 md:text-5xl">
                             {collectionData.title}
                         </h2>

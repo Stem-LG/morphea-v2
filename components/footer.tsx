@@ -157,7 +157,7 @@ export default function Footer() {
                                     <a
                                         href={
                                             homeSettings?.footer.links.origin ||
-                                            '#'
+                                            '/a-lorigine-de-morphea'
                                         }
                                         className="block touch-manipulation py-1 text-base text-neutral-700 transition-colors hover:text-black md:text-lg"
                                     >
@@ -178,7 +178,7 @@ export default function Footer() {
                                     <a
                                         href={
                                             homeSettings?.footer.links.events ||
-                                            '#'
+                                            '#collections'
                                         }
                                         className="block touch-manipulation py-1 text-base text-neutral-700 transition-colors hover:text-black md:text-lg"
                                     >
@@ -207,7 +207,7 @@ export default function Footer() {
                                     <a
                                         href={
                                             homeSettings?.footer.links
-                                                .myAccount || '#'
+                                                .myAccount || '/profile'
                                         }
                                         className="block touch-manipulation py-1 text-base text-neutral-700 transition-colors hover:text-black md:text-lg"
                                     >
@@ -218,7 +218,7 @@ export default function Footer() {
                                     <a
                                         href={
                                             homeSettings?.footer.links
-                                                .ordersDelivery || '#'
+                                                .ordersDelivery || '/my-orders'
                                         }
                                         className="block touch-manipulation py-1 text-base text-neutral-700 transition-colors hover:text-black md:text-lg"
                                     >
@@ -231,7 +231,7 @@ export default function Footer() {
                                     <a
                                         href={
                                             homeSettings?.footer.links
-                                                .cookiesPrivacy || '#'
+                                                .cookiesPrivacy || '/privacy-policy'
                                         }
                                         className="block touch-manipulation py-1 text-base text-neutral-700 transition-colors hover:text-black md:text-lg"
                                     >
@@ -252,7 +252,7 @@ export default function Footer() {
                                     <a
                                         href={
                                             homeSettings?.footer.links.terms ||
-                                            '#'
+                                            '/terms-and-conditions'
                                         }
                                         className="block touch-manipulation py-1 text-base text-neutral-700 transition-colors hover:text-black md:text-lg"
                                     >

@@ -130,7 +130,7 @@ export const frTranslations = {
     "productApprovals": "Approbations de produits",
     "pendingProducts": "Produits en Attente",
     "approvedProducts": "Produits Approuvés",
-    "rejectedProducts": "Produits Rejetés",
+    "rejectedProducts": "Produits rejetés",
     "manageApprovedProductsDesc": "Voir et gérer tous les produits approuvés",
     "manageRejectedProductsDesc": "Voir et gérer tous les produits rejetés",
     "approvedProductsList": "Liste des Produits Approuvés",
@@ -329,9 +329,11 @@ export const frTranslations = {
     "totalProducts": "Nombre de produits",
     "totalVisitors": "Nombre de visiteurs",
     "pendingApprovals": "Approbations en attente",
-    "productsPendingApproval": "Produits en attente d'approbation",
-    "approvedVisibleProducts": "Produits approuvés visibles",
-    "approvedInvisibleProducts": "Produits approuvés invisibles",
+    "productsPendingApproval": "Produits en attente",
+    // Produits approuvés visibles = Produits visibles
+    "approvedVisibleProducts": "Produits visibles",
+    // Produits approuvés invisibles = Produits invisibles
+    "approvedInvisibleProducts": "Produits invisibles",
     "totalViews": "Total des vues",
     "totalScenes": "Total des scènes",
     "averageViews": "Vues moyennes",
@@ -1588,7 +1590,7 @@ export const frTranslations = {
       "unmuteVideo": "Activer le son"
     },
     "collections": {
-      "title": "Découvrez Nos Défilé",
+      "title": "Découvrez nos défilés",
       "subtitle": "Plongez dans l'univers exclusif de nos collections à travers des présentations exceptionnelles",
       "autumnCollection": "Collection Automne 2025",
       "autumnSubtitle": "Une symphonie de couleurs automnales"
@@ -1614,7 +1616,7 @@ export const frTranslations = {
   },
   "footer": {
     "newsletter": {
-      "description": "Recevez En Avant-Première Nos Nouvelles Collections Et Événements Exclusifs",
+      "description": "Recevez en avant-première nos nouvelles collections et événements exclusifs",
       "emailPlaceholder": "person@email.com",
       "subscribe": "S'abonner",
       "emailRequired": "Veuillez entrer votre adresse email",

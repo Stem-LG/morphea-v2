@@ -18,22 +18,21 @@ export function StoreCard({ store, onEdit, onDelete }: StoreCardProps) {
     const { data: user } = useAuth();
 
     const isAdmin = user?.app_metadata?.roles?.includes("admin");
-    
+
     // Get current URL state to pass to store page
     const [{ eventId, mallId }] = useQueryStates({
         eventId: parseAsInteger,
         mallId: parseAsInteger
     });
-    
+
     // Build URL with current filters
-    const storeUrl = `/admin/stores/${store.yboutiqueid}${
-        eventId || mallId
+    const storeUrl = `/admin/stores/${store.yboutiqueid}${eventId || mallId
             ? `?${new URLSearchParams({
                 ...(eventId && { eventId: eventId.toString() }),
                 ...(mallId && { mallId: mallId.toString() })
             }).toString()}`
             : ''
-    }`;
+        }`;
 
     const handleEdit = (e: React.MouseEvent) => {
         e.preventDefault();

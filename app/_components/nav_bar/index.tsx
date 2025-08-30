@@ -183,13 +183,13 @@ export default function NavBar() {
 
                             {currentUser && !currentUser.is_anonymous ? (
                                 <>
-                                    <DropdownMenuItem>
-                                        <Link href="/profile">
+                                    <DropdownMenuItem asChild>
+                                        <Link href="/profile" className='w-full'>
                                             {t('profile')}
                                         </Link>
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem>
-                                        <Link href="/my-orders">
+                                    <DropdownMenuItem asChild>
+                                        <Link href="/my-orders" className='w-full'>
                                             {t('orders')}
                                         </Link>
                                     </DropdownMenuItem>
@@ -204,13 +204,13 @@ export default function NavBar() {
                                 </>
                             ) : (
                                 <>
-                                    <DropdownMenuItem>
-                                        <Link href="/auth/sign-up">
+                                    <DropdownMenuItem asChild>
+                                        <Link href="/auth/sign-up" className='w-full'>
                                             {t('register')}
                                         </Link>
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem>
-                                        <Link href="/auth/login">
+                                    <DropdownMenuItem asChild>
+                                        <Link href="/auth/login" className='w-full'>
                                             {' '}
                                             {t('login')}{' '}
                                         </Link>

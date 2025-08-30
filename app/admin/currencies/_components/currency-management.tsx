@@ -277,10 +277,14 @@ export function CurrencyManagement() {
     };
 
     const handleSetAsPivot = (currency: Currency) => {
-        if (!currencies) return;
+        if (!currencies) {
+            return;
+        }
         
         // Prevent multiple clicks by checking if already loading
-        if (pivotChangeHook.isLoading) return;
+        if (pivotChangeHook.isLoading) {
+            return;
+        }
         
         // Ensure we have fresh data
         openPivotChangeDialog(currency, currencies);
@@ -548,13 +552,24 @@ export function CurrencyManagement() {
                                         <Label className="text-gray-300">Exchange Rate</Label>
                                         <Input
                                             type="number"
-                                            step="0.0000000001"
+                                            step="any"
                                             min="0.0000000001"
                                             value={formData.xtauxechange}
-                                            onChange={(e) => setFormData(prev => ({
-                                                ...prev,
-                                                xtauxechange: parseFloat(e.target.value) || 1.0
-                                            }))}
+                                            onChange={(e) => {
+                                                const inputValue = e.target.value;
+                                                const maxDecimals = formData.xdevisenbrdec;
+                                                
+                                                // Check decimal places
+                                                const decimalIndex = inputValue.indexOf('.');
+                                                const actualDecimals = decimalIndex === -1 ? 0 : inputValue.length - decimalIndex - 1;
+                                                
+                                                if (actualDecimals <= maxDecimals) {
+                                                    setFormData(prev => ({
+                                                        ...prev,
+                                                        xtauxechange: parseFloat(inputValue) || 1.0
+                                                    }));
+                                                }
+                                            }}
                                             className="bg-morpheus-blue-dark/30 border-slate-600 text-white"
                                             placeholder="1.0000000000"
                                             required
@@ -565,18 +580,31 @@ export function CurrencyManagement() {
 
                             {!formData.xispivot && (
                                 <div>
-                                    <Label className="text-gray-300">Exchange Rate (relative to pivot currency)</Label>
+                                    <Label className="text-gray-300">
+                                        1 {currentPivotCurrency?.xdevisecodealpha || 'Pivot'} = {formData.xtauxechange || 1.0} {formData.xdeviseintitule || 'This Currency'}
+                                    </Label>
                                     <div className="flex items-center gap-2">
                                         <TrendingUp className="h-4 w-4 text-blue-400" />
                                         <Input
                                             type="number"
-                                            step="0.0000000001"
+                                            step="any"
                                             min="0.0000000001"
                                             value={formData.xtauxechange}
-                                            onChange={(e) => setFormData(prev => ({
-                                                ...prev,
-                                                xtauxechange: parseFloat(e.target.value) || 1.0
-                                            }))}
+                                            onChange={(e) => {
+                                                const inputValue = e.target.value;
+                                                const maxDecimals = formData.xdevisenbrdec;
+                                                
+                                                // Check decimal places
+                                                const decimalIndex = inputValue.indexOf('.');
+                                                const actualDecimals = decimalIndex === -1 ? 0 : inputValue.length - decimalIndex - 1;
+                                                
+                                                if (actualDecimals <= maxDecimals) {
+                                                    setFormData(prev => ({
+                                                        ...prev,
+                                                        xtauxechange: parseFloat(inputValue) || 1.0
+                                                    }));
+                                                }
+                                            }}
                                             className="bg-morpheus-blue-dark/30 border-slate-600 text-white"
                                             placeholder="1.0000000000"
                                             required
