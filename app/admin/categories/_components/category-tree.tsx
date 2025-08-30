@@ -17,11 +17,11 @@ export function CategoryTree({ categories, originalCategories, searchTerm }: Cat
     if (categories.length === 0) {
         return (
             <div className="text-center py-12">
-                <Tag className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-xl font-medium text-white mb-2">
+                <Tag className="h-16 w-16 text-gray-600 mx-auto mb-4" />
+                <h3 className="text-xl font-medium text-gray-900 mb-2">
                     {searchTerm ? t("admin.categories.noMatchingCategories") : t("admin.categories.noCategoriesFound")}
                 </h3>
-                <p className="text-gray-300">
+                <p className="text-gray-600">
                     {searchTerm
                         ? t("admin.categories.adjustSearchCriteria")
                         : t("admin.categories.addFirstCategory")

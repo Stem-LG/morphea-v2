@@ -169,10 +169,10 @@ export function UpdateCategoryDialog({
     return (
         <Credenza open={isOpen} onOpenChange={handleDialogChange}>
             <CredenzaTrigger asChild>{children}</CredenzaTrigger>
-            <CredenzaContent className="from-morpheus-blue-dark to-morpheus-blue-light max-w-2xl border-slate-700/50 bg-gradient-to-br">
+            <CredenzaContent className="max-w-2xl border-gray-200 bg-white">
                 <CredenzaHeader>
-                    <CredenzaTitle className="flex items-center gap-2 text-white">
-                        <Tag className="text-morpheus-gold-light h-5 w-5" />
+                    <CredenzaTitle className="flex items-center gap-2 text-gray-900">
+                        <Tag className="text-blue-600 h-5 w-5" />
                         {t('admin.categories.editCategory')}
                     </CredenzaTitle>
                 </CredenzaHeader>
@@ -181,7 +181,7 @@ export function UpdateCategoryDialog({
                     <CredenzaBody className="space-y-6">
                         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                             <div className="space-y-2">
-                                <Label className="text-gray-300">
+                                <Label className="text-gray-700">
                                     {t('admin.categories.categoryName')} *
                                 </Label>
                                 <Input
@@ -192,7 +192,7 @@ export function UpdateCategoryDialog({
                                             xcategprodintitule: e.target.value,
                                         }))
                                     }
-                                    className="bg-morpheus-blue-dark/30 border-slate-600 text-white"
+                                    className="border-gray-300 text-gray-900"
                                     placeholder={t(
                                         'admin.categories.categoryNamePlaceholder'
                                     )}
@@ -201,7 +201,7 @@ export function UpdateCategoryDialog({
                                 />
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-gray-300">
+                                <Label className="text-gray-700">
                                     {t('admin.categories.categoryCode')} *
                                 </Label>
                                 <Input
@@ -213,7 +213,7 @@ export function UpdateCategoryDialog({
                                                 e.target.value.toUpperCase(),
                                         }))
                                     }
-                                    className="bg-morpheus-blue-dark/30 border-slate-600 text-white"
+                                    className="border-gray-300 text-gray-900"
                                     placeholder={t(
                                         'admin.categories.categoryCodePlaceholder'
                                     )}
@@ -224,7 +224,7 @@ export function UpdateCategoryDialog({
                         </div>
 
                         <div className="space-y-2">
-                            <Label className="text-gray-300">
+                            <Label className="text-gray-700">
                                 {t('admin.categories.description')} *
                             </Label>
                             <Textarea
@@ -235,7 +235,7 @@ export function UpdateCategoryDialog({
                                         xcategprodinfobulle: e.target.value,
                                     }))
                                 }
-                                className="bg-morpheus-blue-dark/30 border-slate-600 text-white"
+                                className="border-gray-300 text-gray-900"
                                 placeholder={t(
                                     'admin.categories.descriptionPlaceholder'
                                 )}
@@ -247,7 +247,7 @@ export function UpdateCategoryDialog({
 
                         {/* Category Image Upload */}
                         <div className="space-y-2">
-                            <Label className="text-gray-300">
+                            <Label className="text-gray-700">
                                 {t('admin.categories.categoryImage')}
                             </Label>
 
@@ -300,19 +300,19 @@ export function UpdateCategoryDialog({
                                     )}
                                 </div>
                             ) : (
-                                <Card className="border-dashed border-gray-600 bg-gray-800/30">
+                                <Card className="border-dashed border-gray-300 bg-gray-50">
                                     <CardContent className="flex flex-col items-center justify-center py-6">
-                                        <Upload className="mb-2 h-8 w-8 text-gray-400" />
+                                        <Upload className="mb-2 h-8 w-8 text-gray-600" />
                                         <div className="text-center">
                                             <Label
                                                 htmlFor="category-image-upload-update"
-                                                className="text-morpheus-gold-light hover:text-morpheus-gold-dark cursor-pointer text-sm"
+                                                className="text-blue-600 hover:text-blue-700 cursor-pointer text-sm"
                                             >
                                                 {t(
                                                     'admin.categories.clickToUploadImage'
                                                 )}
                                             </Label>
-                                            <p className="mt-1 text-xs text-gray-400">
+                                            <p className="mt-1 text-xs text-gray-500">
                                                 PNG, JPG, JPEG up to 10MB
                                             </p>
                                         </div>
@@ -332,7 +332,7 @@ export function UpdateCategoryDialog({
                         </div>
 
                         <div className="space-y-2">
-                            <Label className="text-gray-300">
+                            <Label className="text-gray-700">
                                 {t('admin.categories.parentCategory')}
                             </Label>
                             <SuperSelect
@@ -387,7 +387,7 @@ export function UpdateCategoryDialog({
                             variant="outline"
                             onClick={() => setIsOpen(false)}
                             disabled={updateCategoryMutation.isPending}
-                            className="flex-1 border-slate-600 text-gray-300 hover:bg-slate-700/50"
+                            className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50"
                         >
                             <X className="mr-2 h-4 w-4" />
                             {t('common.cancel')}

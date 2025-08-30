@@ -101,17 +101,17 @@ export function CategoryManagement() {
 
                 {/* Stats */}
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                    <Card className="border-gray-200/50 bg-gradient-to-br from-gray-50/50 to-white/50">
+                    <Card className="border-gray-200 bg-white shadow-sm">
                         <CardContent className="p-4">
                             <div className="flex items-center gap-3">
-                                <div className="bg-morpheus-gold-light/20 rounded-lg p-2">
-                                    <Tag className="text-morpheus-gold-light h-5 w-5" />
+                                <div className="bg-blue-100 rounded-lg p-2">
+                                    <Tag className="text-blue-600 h-5 w-5" />
                                 </div>
                                 <div>
-                                    <p className="text-sm text-gray-400">
+                                    <p className="text-sm text-gray-600">
                                         {t('admin.categories.totalCategories')}
                                     </p>
-                                    <p className="text-2xl font-bold text-white">
+                                    <p className="text-2xl font-bold text-gray-900">
                                         {stats.totalCategories}
                                     </p>
                                 </div>
@@ -119,17 +119,17 @@ export function CategoryManagement() {
                         </CardContent>
                     </Card>
 
-                    <Card className="from-morpheus-blue-dark/40 to-morpheus-blue-light/40 border-slate-700/50 bg-gradient-to-br">
+                    <Card className="border-gray-200 bg-white shadow-sm">
                         <CardContent className="p-4">
                             <div className="flex items-center gap-3">
-                                <div className="rounded-lg bg-green-500/20 p-2">
-                                    <Package className="h-5 w-5 text-green-400" />
+                                <div className="rounded-lg bg-green-100 p-2">
+                                    <Package className="h-5 w-5 text-green-600" />
                                 </div>
                                 <div>
-                                    <p className="text-sm text-gray-400">
+                                    <p className="text-sm text-gray-600">
                                         {t('admin.categories.categoriesInUse')}
                                     </p>
-                                    <p className="text-2xl font-bold text-white">
+                                    <p className="text-2xl font-bold text-gray-900">
                                         {stats.categoriesInUse}
                                     </p>
                                 </div>
@@ -137,17 +137,17 @@ export function CategoryManagement() {
                         </CardContent>
                     </Card>
 
-                    <Card className="from-morpheus-blue-dark/40 to-morpheus-blue-light/40 border-slate-700/50 bg-gradient-to-br">
+                    <Card className="border-gray-200 bg-white shadow-sm">
                         <CardContent className="p-4">
                             <div className="flex items-center gap-3">
-                                <div className="rounded-lg bg-blue-500/20 p-2">
-                                    <Search className="h-5 w-5 text-blue-400" />
+                                <div className="rounded-lg bg-blue-100 p-2">
+                                    <Search className="h-5 w-5 text-blue-600" />
                                 </div>
                                 <div>
-                                    <p className="text-sm text-gray-400">
+                                    <p className="text-sm text-gray-600">
                                         {t('admin.categories.searchResults')}
                                     </p>
-                                    <p className="text-2xl font-bold text-white">
+                                    <p className="text-2xl font-bold text-gray-900">
                                         {stats.searchResults}
                                     </p>
                                 </div>
@@ -158,20 +158,20 @@ export function CategoryManagement() {
 
                 {/* Search */}
                 <div className="relative max-w-md">
-                    <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
+                    <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-gray-600" />
                     <Input
                         placeholder={t('admin.categories.searchPlaceholder')}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="bg-morpheus-blue-dark/30 border-slate-600 pl-10 text-white placeholder-gray-400"
+                        className="border-gray-300 pl-10 text-gray-900 placeholder-gray-500"
                     />
                 </div>
 
                 {/* Categories Tree */}
-                <div className="from-morpheus-blue-dark/20 to-morpheus-blue-light/20 rounded-lg border border-slate-700/50 bg-gradient-to-br p-6">
+                <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
                     <div className="mb-4 flex items-center gap-2">
-                        <TreePine className="text-morpheus-gold-light h-5 w-5" />
-                        <h2 className="text-lg font-semibold text-white">
+                        <TreePine className="text-blue-600 h-5 w-5" />
+                        <h2 className="text-lg font-semibold text-gray-900">
                             {t('admin.categories.hierarchicalView')}
                         </h2>
                     </div>

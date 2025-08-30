@@ -64,7 +64,7 @@ export function CategoryTreeItem({
 
     return (
         <div className={`ml-${level * 4}`}>
-            <Card className="from-morpheus-blue-dark/40 to-morpheus-blue-light/40 mb-2 border-slate-700/50 bg-gradient-to-br shadow-xl transition-all duration-300 hover:shadow-2xl">
+            <Card className="border-gray-200 bg-white mb-2 shadow-sm transition-all duration-300 hover:shadow-md">
                 <CardContent className="px-4">
                     <div className="flex items-center justify-between">
                         <div className="flex min-w-0 flex-1 items-center gap-2">
@@ -74,17 +74,17 @@ export function CategoryTreeItem({
                                     variant="ghost"
                                     size="sm"
                                     onClick={() => setIsOpen(!isOpen)}
-                                    className="h-6 w-6 flex-shrink-0 p-0 hover:bg-slate-700/50"
+                                    className="h-6 w-6 flex-shrink-0 p-0 hover:bg-gray-100"
                                 >
                                     {isOpen ? (
-                                        <ChevronDown className="h-4 w-4 text-gray-300" />
+                                        <ChevronDown className="h-4 w-4 text-gray-600" />
                                     ) : (
-                                        <ChevronRight className="h-4 w-4 text-gray-300" />
+                                        <ChevronRight className="h-4 w-4 text-gray-600" />
                                     )}
                                 </Button>
                             ) : (
                                 <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center">
-                                    <Tag className="h-3 w-3 text-gray-400" />
+                                    <Tag className="h-3 w-3 text-gray-600" />
                                 </div>
                             )}
 
@@ -98,7 +98,7 @@ export function CategoryTreeItem({
                                                     .ymediaurl
                                             }
                                             alt={category.xcategprodintitule}
-                                            className="h-8 w-8 rounded border border-slate-600 object-cover"
+                                            className="h-8 w-8 rounded border border-gray-300 object-cover"
                                         />
                                         <div className="absolute -top-1 -right-1 rounded-full bg-green-500 p-0.5">
                                             <ImageIcon className="h-2 w-2 text-white" />
@@ -106,26 +106,26 @@ export function CategoryTreeItem({
                                     </div>
                                 ) : hasChildren ? (
                                     isOpen ? (
-                                        <FolderOpen className="text-morpheus-gold-light h-4 w-4" />
+                                        <FolderOpen className="text-blue-600 h-4 w-4" />
                                     ) : (
-                                        <Folder className="text-morpheus-gold-light h-4 w-4" />
+                                        <Folder className="text-blue-600 h-4 w-4" />
                                     )
                                 ) : (
-                                    <Tag className="h-4 w-4 text-blue-400" />
+                                    <Tag className="h-4 w-4 text-blue-600" />
                                 )}
                             </div>
 
                             {/* Category info - name, code, and description in one line */}
                             <div className="flex min-w-0 flex-1 flex-col gap-1 sm:flex-row sm:items-center sm:gap-3">
-                                <h3 className="truncate text-sm font-medium text-white">
+                                <h3 className="truncate text-sm font-medium text-gray-900">
                                     {category.xcategprodintitule}
                                 </h3>
-                                <div className="flex items-center gap-3 text-xs text-gray-400">
+                                <div className="flex items-center gap-3 text-xs text-gray-600">
                                     <span className="flex-shrink-0">
                                         <span className="font-medium">
                                             {t('admin.categories.code')}:
                                         </span>
-                                        <span className="ml-1 text-white">
+                                        <span className="ml-1 text-gray-900">
                                             {category.xcategprodcode}
                                         </span>
                                     </span>
@@ -137,7 +137,7 @@ export function CategoryTreeItem({
                                                 )}
                                                 :
                                             </span>
-                                            <span className="ml-1 text-white">
+                                            <span className="ml-1 text-gray-900">
                                                 {category.xcategprodinfobulle}
                                             </span>
                                         </span>
@@ -149,12 +149,12 @@ export function CategoryTreeItem({
                         <div className="flex flex-shrink-0 items-center gap-2">
                             {/* Product count badge */}
                             {totalProductCount > 0 && (
-                                <Badge className="flex items-center gap-1 border border-green-400/20 bg-green-400/10 px-2 py-1 text-xs font-medium text-green-400">
+                                <Badge className="flex items-center gap-1 border border-green-200 bg-green-100 px-2 py-1 text-xs font-medium text-green-800">
                                     <Package className="h-3 w-3" />
                                     {totalProductCount}
                                     {hasChildren &&
                                         productCount !== totalProductCount && (
-                                            <span className="text-gray-400">
+                                            <span className="text-gray-600">
                                                 ({productCount})
                                             </span>
                                         )}
@@ -171,7 +171,7 @@ export function CategoryTreeItem({
                                     <Button
                                         variant="ghost"
                                         size="sm"
-                                        className="hover:text-morpheus-gold-light hover:bg-morpheus-gold-light/10 h-6 w-6 p-1 text-gray-400"
+                                        className="hover:text-blue-600 hover:bg-blue-50 h-6 w-6 p-1 text-gray-600"
                                         title={t(
                                             'admin.categories.addSubcategory'
                                         )}
@@ -188,7 +188,7 @@ export function CategoryTreeItem({
                                     <Button
                                         variant="ghost"
                                         size="sm"
-                                        className="h-6 w-6 p-1 text-gray-400 hover:bg-blue-400/10 hover:text-blue-400"
+                                        className="h-6 w-6 p-1 text-gray-600 hover:bg-blue-50 hover:text-blue-600"
                                         title={t('common.edit')}
                                     >
                                         <Edit className="h-3 w-3" />
@@ -213,8 +213,8 @@ export function CategoryTreeItem({
                                         }
                                         className={`h-6 w-6 p-1 ${
                                             isInUse
-                                                ? 'cursor-not-allowed text-gray-500'
-                                                : 'text-gray-400 hover:bg-red-400/10 hover:text-red-400'
+                                                ? 'cursor-not-allowed text-gray-400'
+                                                : 'text-gray-600 hover:bg-red-50 hover:text-red-600'
                                         }`}
                                         title={
                                             isInUse
@@ -239,7 +239,7 @@ export function CategoryTreeItem({
                     {hasChildren && (
                         <Collapsible open={isOpen} onOpenChange={setIsOpen}>
                             <CollapsibleContent className="mt-3">
-                                <div className="space-y-1 border-l-2 border-slate-600/50 pl-3">
+                                <div className="space-y-1 border-l-2 border-gray-300 pl-3">
                                     {category.children.map((child) => (
                                         <CategoryTreeItem
                                             key={child.xcategprodid}
