@@ -846,6 +846,7 @@ export const frTranslations = {
       "anonymousUser": "Utilisateur Anonyme",
       "insufficientPermissions": "Permissions insuffisantes pour assigner des boutiques",
       "designer": {
+        "title":"designer",
         "nameRequired": "Nom du Designer *",
         "namePlaceholder": "Entrez le nom du designer",
         "brandRequired": "Nom de la Marque *",
