@@ -259,7 +259,7 @@ export default function OrderPage() {
 
     if (isLoading) {
         return (
-            <div className="flex min-h-screen items-center justify-center bg-white">
+            <div className="flex min-h-screen items-center justify-center bg-background">
                 <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#053340] border-t-transparent"></div>
             </div>
         )
@@ -267,16 +267,16 @@ export default function OrderPage() {
 
     if (cartItems.length === 0) {
         return (
-            <div className="flex min-h-screen items-center justify-center bg-white">
-                <Card className="mx-auto max-w-md border border-gray-200 bg-white shadow-xl">
+            <div className="flex min-h-screen items-center justify-center bg-background">
+                <Card className="mx-auto max-w-md border-border bg-card shadow-xl">
                     <CardContent className="py-12 text-center">
-                        <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gray-50 p-4">
-                            <ShoppingCart className="h-10 w-10 text-gray-400" />
+                        <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-muted p-4">
+                            <ShoppingCart className="h-10 w-10 text-muted-foreground" />
                         </div>
-                        <h2 className="font-recia mb-3 text-2xl font-extrabold text-[#053340]">
+                        <h2 className="font-recia mb-3 text-2xl font-extrabold text-foreground">
                             {t('cart.yourCartIsEmpty')}
                         </h2>
-                        <p className="font-supreme mb-6 text-lg text-gray-600">
+                        <p className="font-supreme mb-6 text-lg text-muted-foreground">
                             {t('order.addItemsToCheckout')}
                         </p>
                         <Button
@@ -308,11 +308,11 @@ export default function OrderPage() {
     }
 
     const renderCartConfirmation = () => (
-        <Card className="border border-gray-200 bg-white shadow-lg">
-            <CardHeader className="border-b border-gray-100 pb-4">
-                <CardTitle className="flex items-center gap-3 text-[#053340]">
-                    <div className="rounded-lg bg-gray-50 p-2">
-                        <ShoppingCart className="h-5 w-5 text-[#053340]" />
+        <Card className="border-border bg-card shadow-lg">
+            <CardHeader className="border-b border-border pb-4">
+                <CardTitle className="flex items-center gap-3 text-card-foreground">
+                    <div className="rounded-lg bg-muted p-2">
+                        <ShoppingCart className="h-5 w-5 text-foreground" />
                     </div>
                     <span className="font-recia text-2xl font-extrabold">
                         {t('order.orderItems')} ({cartItems.length})
@@ -323,10 +323,10 @@ export default function OrderPage() {
                 {cartItems.map((item) => (
                     <div
                         key={item.ypanierid}
-                        className="flex items-center gap-4 rounded-xl border border-gray-200 bg-gray-50/50 p-4 transition-colors hover:bg-gray-50"
+                        className="flex items-center gap-4 rounded-xl border-border bg-muted/50 p-4 transition-colors hover:bg-muted"
                     >
                         {/* Product Image */}
-                        <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
+                        <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg border-border bg-card shadow-sm">
                             {(item.yvarprod as any)?.yvarprodmedia?.[0]?.ymedia
                                 ?.ymediaurl ? (
                                 <Image
@@ -343,7 +343,7 @@ export default function OrderPage() {
                                     className="h-full w-full object-cover"
                                 />
                             ) : (
-                                <div className="flex h-full w-full items-center justify-center text-gray-400">
+                                <div className="flex h-full w-full items-center justify-center text-muted-foreground">
                                     <ShoppingCart className="h-6 w-6" />
                                 </div>
                             )}
@@ -351,11 +351,11 @@ export default function OrderPage() {
 
                         {/* Product Details */}
                         <div className="min-w-0 flex-1">
-                            <h4 className="font-supreme truncate text-lg font-semibold text-[#053340]">
+                            <h4 className="font-supreme truncate text-lg font-semibold text-foreground">
                                 {item.yvarprod?.yvarprodintitule ||
                                     'Unknown Product'}
                             </h4>
-                            <div className="mt-1 flex items-center gap-2 text-sm text-gray-500">
+                            <div className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
                                 {item.yvarprod?.xcouleur && (
                                     <span className="flex items-center gap-1">
                                         <div
@@ -411,11 +411,11 @@ export default function OrderPage() {
     )
 
     const renderShippingAddress = () => (
-        <Card className="border border-gray-200 bg-white shadow-lg">
-            <CardHeader className="border-b border-gray-100 pb-4">
-                <CardTitle className="flex items-center gap-3 text-[#053340]">
-                    <div className="rounded-lg bg-gray-50 p-2">
-                        <MapPin className="h-5 w-5 text-[#053340]" />
+        <Card className="border-border bg-card shadow-lg">
+            <CardHeader className="border-b border-border pb-4">
+                <CardTitle className="flex items-center gap-3 text-card-foreground">
+                    <div className="rounded-lg bg-muted p-2">
+                        <MapPin className="h-5 w-5 text-foreground" />
                     </div>
                     <span className="font-recia text-2xl font-extrabold">
                         {t('order.shippingAddress')}
@@ -575,11 +575,11 @@ export default function OrderPage() {
     )
 
     const renderPaymentInfo = () => (
-        <Card className="border border-gray-200 bg-white shadow-lg">
-            <CardHeader className="border-b border-gray-100 pb-4">
-                <CardTitle className="flex items-center gap-3 text-[#053340]">
-                    <div className="rounded-lg bg-gray-50 p-2">
-                        <CreditCard className="h-5 w-5 text-[#053340]" />
+        <Card className="border-border bg-card shadow-lg">
+            <CardHeader className="border-b border-border pb-4">
+                <CardTitle className="flex items-center gap-3 text-card-foreground">
+                    <div className="rounded-lg bg-muted p-2">
+                        <CreditCard className="h-5 w-5 text-foreground" />
                     </div>
                     <span className="font-recia text-2xl font-extrabold">
                         {t('order.paymentInformation')}
@@ -714,8 +714,8 @@ export default function OrderPage() {
     )
 
     const renderOrderReview = () => (
-        <Card className="border border-gray-200 bg-white shadow-lg">
-            <CardHeader className="border-b border-gray-100 pb-4">
+        <Card className="border-border bg-card shadow-lg">
+            <CardHeader className="border-b border-border pb-4">
                 <CardTitle className="font-recia text-2xl font-extrabold text-[#053340]">
                     {t('order.orderSummary')}
                 </CardTitle>
@@ -950,7 +950,7 @@ export default function OrderPage() {
     )
 
     return (
-        <div className="min-h-screen bg-white">
+        <div className="min-h-screen bg-background">
             <div className="container mx-auto px-4 py-8">
                 {/* Header */}
                 <div className="mb-8 flex items-center gap-4">
@@ -976,8 +976,8 @@ export default function OrderPage() {
 
                     {/* Order Summary Sidebar */}
                     <div className="lg:col-span-1">
-                        <Card className="sticky top-8 border border-gray-200 bg-white shadow-lg">
-                            <CardHeader className="border-b border-gray-100 pb-4">
+                        <Card className="sticky top-8 border-border bg-card shadow-lg">
+                            <CardHeader className="border-b border-border pb-4">
                                 <CardTitle className="font-recia text-2xl font-extrabold text-[#053340]">
                                     {t('cart.orderSummary')}
                                 </CardTitle>

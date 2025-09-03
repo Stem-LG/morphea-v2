@@ -108,8 +108,10 @@ export default function StoresManagement() {
     }
 
     const handleDeleteStore = (store: Store) => {
+        console.log('handleDeleteStore called with:', store.yboutiqueintitule);
         setStoreToDelete(store)
         setIsDeleteDialogOpen(true)
+        console.log('Dialog should be open now');
     }
 
     const handleStoreSubmit = async (storeData: {

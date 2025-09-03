@@ -43,7 +43,12 @@ export function StoreCard({ store, onEdit, onDelete }: StoreCardProps) {
     const handleDelete = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
-        onDelete?.(store);
+        console.log('Delete button clicked!', store.yboutiqueintitule);
+        if (onDelete) {
+            onDelete(store);
+        } else {
+            console.log('onDelete function not available');
+        }
     };
 
     return (
