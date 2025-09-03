@@ -507,6 +507,8 @@ function NavBarSheet({
                                                 onClick={
                                                     hasAction
                                                         ? item.action
+                                                        : hasHref
+                                                        ? () => setIsMenuOpen(false)
                                                         : undefined
                                                 }
                                             >
@@ -564,7 +566,10 @@ function NavBarSheet({
                                                     hasOnClick &&
                                                         'w-full text-left'
                                                 )}
-                                                onClick={item.onclick}
+                                                onClick={
+                                                    item.onclick ||
+                                                    (hasHref ? () => setIsMenuOpen(false) : undefined)
+                                                }
                                                 asChild={hasHref}
                                             >
                                                 {hasHref ? (

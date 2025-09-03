@@ -846,6 +846,7 @@ export const frTranslations = {
       "anonymousUser": "Utilisateur Anonyme",
       "insufficientPermissions": "Permissions insuffisantes pour assigner des boutiques",
       "designer": {
+        "title":"designer",
         "nameRequired": "Nom du Designer *",
         "namePlaceholder": "Entrez le nom du designer",
         "brandRequired": "Nom de la Marque *",
@@ -920,8 +921,8 @@ export const frTranslations = {
       "deliveryFeeCurrencyDescription": "La devise dans laquelle les frais de livraison sont définis",
       "poweredBy": "Powered by",
       "poweredByDescription": "Texte à afficher dans le pied de page 'Powered by'",
-      "mellimeUrl": "URL Mellime",
-      "mellimeUrlDescription": "URL de base pour l'intégration Mellime",
+      "mellimeUrl": "URL Millime",
+      "mellimeUrlDescription": "URL de base pour l'intégration Millime",
       "selectDefaultCurrency": "Sélectionner la devise par défaut...",
       "pivotCurrency": "- Devise Pivot",
       "settingSet": "Configuré",
