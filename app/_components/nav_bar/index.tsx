@@ -12,6 +12,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState, Fragment, useMemo } from 'react'
 import { useNotifications } from '@/app/_hooks/use-notifications'
+import { useScrollDirection } from '@/hooks/use-scroll-direction'
 import { ProductDetailsPage } from '../../main/_components/product-details-page'
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
@@ -54,6 +55,7 @@ export default function NavBar() {
     const [selectedProduct, setSelectedProduct] = useState(null)
     const { t } = useLanguage()
     const router = useRouter()
+    const { isVisible } = useScrollDirection()
     // const loadMoreRef = useRef<HTMLDivElement>(null)
 
     const {
@@ -104,7 +106,11 @@ export default function NavBar() {
 
     return (
         <>
-            <nav className="fixed top-0 z-50 flex h-18 w-full bg-white/40 px-4 md:h-24 md:px-6 lg:px-12">
+            <nav
+                className={`fixed top-0 z-50 flex h-18 w-full bg-white/40 px-4 transition-transform duration-300 ease-in-out md:h-24 md:px-6 lg:px-12 ${
+                    isVisible ? 'translate-y-0' : '-translate-y-full'
+                }`}
+            >
                 <div className="flex flex-1 items-center justify-start">
                     <NavBarIconButton
                         variant="leading"
