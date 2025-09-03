@@ -134,7 +134,7 @@ export default function NavBar() {
                     </Link>
                 </div>
                 <div className="flex flex-1 md:hidden" />
-                <div className="hidden flex-1 items-center justify-end gap-4 md:flex">
+                <div className="hidden flex-1 items-center justify-end gap-2 md:flex">
                     {hasAdminAccess && (
                         <NavBarIconButton onClick={() => router.push('/admin')}>
                             <AdminIcon />

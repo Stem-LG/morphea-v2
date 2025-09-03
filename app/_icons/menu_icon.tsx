@@ -2,7 +2,7 @@
 export function MenuIcon({ className = '' }: { className?: string }) {
     return (
         <svg
-            width="39"
+            width="33"
             height="21"
             viewBox="0 0 39 21"
             fill="none"

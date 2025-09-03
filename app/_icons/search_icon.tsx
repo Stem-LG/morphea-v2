@@ -2,8 +2,8 @@
 export function SearchIcon({ className = '' }: { className?: string }) {
     return (
         <svg
-            width="23"
-            height="22"
+            width="20"
+            height="20"
             viewBox="0 0 23 22"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
