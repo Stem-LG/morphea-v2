@@ -250,7 +250,7 @@ export default function Home() {
                     onTouchStart={() => setHovered('right')}
                 />
                 {/* Video Control Buttons - Mobile Responsive */}
-                <div className="absolute bottom-20 left-0 z-50 flex w-full justify-between px-6 sm:bottom-32 md:bottom-24 md:px-14">
+                <div className="absolute bottom-24 left-0 z-50 flex w-full justify-between px-2 sm:bottom-32 md:bottom-24 md:px-4">
                     <button
                         onClick={togglePlayPause}
                         className="flex h-12 w-12 touch-manipulation items-center justify-center rounded-full bg-black/20 backdrop-blur-sm transition-colors hover:bg-black/40 md:h-12 md:w-12"
