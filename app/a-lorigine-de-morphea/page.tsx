@@ -714,7 +714,7 @@ export default function OriginePage() {
                                 <div className="from-morpheus-gold-dark to-morpheus-gold-light mx-auto h-1 w-24 bg-gradient-to-r"></div>
                             </div>
 
-                            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+                            <div className="flex flex-wrap justify-center gap-8">
                                 {[
                                     'Exposer vos créations à une audience internationale.',
                                     'Participer à des événements immersifs et workshops.',
@@ -722,9 +722,12 @@ export default function OriginePage() {
                                     'Rejoindre une communauté dynamique de professionnels et de passionnés.',
                                     'Concevoir et organiser vos événements, stratégies marketing et campagnes de communication.',
                                 ].map((benefit, index) => (
-                                    <div key={index} className="group">
+                                    <div
+                                        key={index}
+                                        className="group max-w-[350px] min-w-[280px] flex-1"
+                                    >
                                         <div className="h-full rounded-lg border border-gray-100 bg-gradient-to-br from-white to-gray-50 p-8 shadow-lg transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl">
-                                            <div className="from-morpheus-gold-dark to-morpheus-gold-light mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br text-lg font-bold text-white">
+                                            <div className="from-morpheus-blue-light to-morpheus-blue-dark mb-4 inline-block h-12 w-12 bg-gradient-to-r bg-clip-text text-2xl font-bold text-transparent">
                                                 {index + 1}
                                             </div>
                                             <p className="font-supreme leading-relaxed font-medium text-gray-700">
