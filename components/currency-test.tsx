@@ -1,83 +1,119 @@
-"use client";
+'use client'
 
-import { useCurrency } from '@/hooks/useCurrency';
+import { useCurrency } from '@/hooks/useCurrency'
+import { useLanguage } from '@/hooks/useLanguage'
 
 export const CurrencyTest = () => {
-  const {
-    currencies,
-    currentCurrency,
-    pivotCurrency,
-    isLoading,
-    error,
-    setCurrency,
-    formatPrice
-  } = useCurrency();
+    const {
+        currencies,
+        currentCurrency,
+        pivotCurrency,
+        isLoading,
+        error,
+        setCurrency,
+        formatPrice,
+    } = useCurrency()
 
-  if (isLoading) return <div>Loading currencies...</div>;
-  if (error) return <div>Error: {error.message}</div>;
+    const { language } = useLanguage()
 
-  const testPrice = 100; // Test with 100 units in pivot currency
+    // Helper function to get currency name based on language
+    const getCurrencyName = (currency: any) => {
+        if (language === 'fr' && currency.xdeviseintitulefr) {
+            return currency.xdeviseintitulefr
+        }
+        return currency.xdeviseintitule
+    }
 
-  return (
-    <div className="p-4 border rounded-lg bg-gray-50">
-      <h3 className="text-lg font-semibold mb-4">Currency System Test</h3>
-      
-      <div className="space-y-2 mb-4">
-        <p><strong>Total Currencies:</strong> {currencies.length}</p>
-        <p><strong>Pivot Currency:</strong> {pivotCurrency?.xdeviseintitule} ({pivotCurrency?.xdevisecodealpha})</p>
-        <p><strong>Current Currency:</strong> {currentCurrency?.xdeviseintitule} ({currentCurrency?.xdevisecodealpha})</p>
-      </div>
+    if (isLoading) return <div>Loading currencies...</div>
+    if (error) return <div>Error: {error.message}</div>
 
-      <div className="mb-4">
-        <h4 className="font-medium mb-2">Price Conversion Test (Base: {testPrice} {pivotCurrency?.xdevisecodealpha})</h4>
-        <div className="space-y-1">
-          {currencies.map((currency) => (
-            <div key={currency.xdeviseid} className="flex justify-between">
-              <span>{currency.xdeviseintitule}:</span>
-              <span>{formatPrice(testPrice, currency)}</span>
+    const testPrice = 100 // Test with 100 units in pivot currency
+
+    return (
+        <div className="rounded-lg border bg-gray-50 p-4">
+            <h3 className="mb-4 text-lg font-semibold">Currency System Test</h3>
+
+            <div className="mb-4 space-y-2">
+                <p>
+                    <strong>Total Currencies:</strong> {currencies.length}
+                </p>
+                <p>
+                    <strong>Pivot Currency:</strong>{' '}
+                    {pivotCurrency && getCurrencyName(pivotCurrency)} (
+                    {pivotCurrency?.xdevisecodealpha})
+                </p>
+                <p>
+                    <strong>Current Currency:</strong>{' '}
+                    {currentCurrency && getCurrencyName(currentCurrency)} (
+                    {currentCurrency?.xdevisecodealpha})
+                </p>
             </div>
-          ))}
-        </div>
-      </div>
 
-      <div className="mb-4">
-        <h4 className="font-medium mb-2">Currency Selector</h4>
-        <select 
-          value={currentCurrency?.xdeviseid || ''} 
-          onChange={(e) => {
-            const selectedCurrency = currencies.find(c => c.xdeviseid.toString() === e.target.value);
-            if (selectedCurrency) setCurrency(selectedCurrency);
-          }}
-          className="w-full p-2 border rounded"
-        >
-          {currencies.map((currency) => (
-            <option key={currency.xdeviseid} value={currency.xdeviseid}>
-              {currency.xdeviseintitule} ({currency.xdevisecodealpha})
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div className="mb-4">
-        <h4 className="font-medium mb-2">Current Price Display</h4>
-        <p className="text-xl font-bold">{formatPrice(testPrice)}</p>
-      </div>
-
-      <div>
-        <h4 className="font-medium mb-2">Currency Details</h4>
-        <div className="text-sm space-y-1">
-          {currencies.map((currency) => (
-            <div key={currency.xdeviseid} className="flex justify-between">
-              <span>{currency.xdevisecodealpha}:</span>
-              <span>
-                Rate: {currency.xtauxechange}, 
-                Decimals: {currency.xdevisenbrdec}, 
-                {currency.xispivot ? 'PIVOT' : 'Regular'}
-              </span>
+            <div className="mb-4">
+                <h4 className="mb-2 font-medium">
+                    Price Conversion Test (Base: {testPrice}{' '}
+                    {pivotCurrency?.xdevisecodealpha})
+                </h4>
+                <div className="space-y-1">
+                    {currencies.map((currency) => (
+                        <div
+                            key={currency.xdeviseid}
+                            className="flex justify-between"
+                        >
+                            <span>{currency.xdeviseintitule}:</span>
+                            <span>{formatPrice(testPrice, currency)}</span>
+                        </div>
+                    ))}
+                </div>
             </div>
-          ))}
+
+            <div className="mb-4">
+                <h4 className="mb-2 font-medium">Currency Selector</h4>
+                <select
+                    value={currentCurrency?.xdeviseid || ''}
+                    onChange={(e) => {
+                        const selectedCurrency = currencies.find(
+                            (c) => c.xdeviseid.toString() === e.target.value
+                        )
+                        if (selectedCurrency) setCurrency(selectedCurrency)
+                    }}
+                    className="w-full rounded border p-2"
+                >
+                    {currencies.map((currency) => (
+                        <option
+                            key={currency.xdeviseid}
+                            value={currency.xdeviseid}
+                        >
+                            {getCurrencyName(currency)} (
+                            {currency.xdevisecodealpha})
+                        </option>
+                    ))}
+                </select>
+            </div>
+
+            <div className="mb-4">
+                <h4 className="mb-2 font-medium">Current Price Display</h4>
+                <p className="text-xl font-bold">{formatPrice(testPrice)}</p>
+            </div>
+
+            <div>
+                <h4 className="mb-2 font-medium">Currency Details</h4>
+                <div className="space-y-1 text-sm">
+                    {currencies.map((currency) => (
+                        <div
+                            key={currency.xdeviseid}
+                            className="flex justify-between"
+                        >
+                            <span>{currency.xdevisecodealpha}:</span>
+                            <span>
+                                Rate: {currency.xtauxechange}, Decimals:{' '}
+                                {currency.xdevisenbrdec},
+                                {currency.xispivot ? 'PIVOT' : 'Regular'}
+                            </span>
+                        </div>
+                    ))}
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  );
-};
+    )
+}

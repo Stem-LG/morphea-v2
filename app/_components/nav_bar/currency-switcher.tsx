@@ -12,7 +12,15 @@ import {
 
 export const CurrencySwitcher = () => {
     const { currencies, currentCurrency, setCurrency } = useCurrency()
-    const { t } = useLanguage()
+    const { t, language } = useLanguage()
+
+    // Helper function to get currency name based on language
+    const getCurrencyName = (currency: any) => {
+        if (language === 'fr' && currency.xdeviseintitulefr) {
+            return currency.xdeviseintitulefr
+        }
+        return currency.xdeviseintitule
+    }
 
     return (
         <DropdownMenuSub>
@@ -30,7 +38,9 @@ export const CurrencySwitcher = () => {
                 <DropdownMenuRadioGroup
                     value={currentCurrency?.xdeviseid.toString()}
                     onValueChange={(value) => {
-                        const currency = currencies.find(c => c.xdeviseid.toString() === value)
+                        const currency = currencies.find(
+                            (c) => c.xdeviseid.toString() === value
+                        )
                         if (currency) {
                             setCurrency(currency)
                         }
@@ -46,7 +56,7 @@ export const CurrencySwitcher = () => {
                                     {currency.xdevisecodealpha}
                                 </span>
                                 <span className="max-w-[180px] truncate text-xs text-gray-400">
-                                    {currency.xdeviseintitule}
+                                    {getCurrencyName(currency)}
                                 </span>
                             </div>
                         </DropdownMenuRadioItem>

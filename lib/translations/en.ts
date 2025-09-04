@@ -561,6 +561,8 @@ export const enTranslations = {
       "addNewCurrency": "Add New Currency",
       "currencyNameRequired": "Currency Name *",
       "currencyNamePlaceholder": "e.g., US Dollar",
+      "currencyNameFrench": "Currency Name in French",
+      "currencyNameFrenchPlaceholder": "e.g., Dollar Américain",
       "alphaCodeRequired": "Alpha Code *",
       "alphaCodePlaceholder": "e.g., USD",
       "numericCodeRequired": "Numeric Code *",

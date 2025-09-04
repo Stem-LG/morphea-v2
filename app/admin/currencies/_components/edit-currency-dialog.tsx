@@ -1,10 +1,10 @@
-"use client";
-import React, { useState, useEffect } from "react";
-import { useLanguage } from "@/hooks/useLanguage";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
+'use client'
+import React, { useState, useEffect } from 'react'
+import { useLanguage } from '@/hooks/useLanguage'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Switch } from '@/components/ui/switch'
 import {
     Dialog,
     DialogContent,
@@ -12,136 +12,150 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-} from "@/components/ui/dialog";
-import { Separator } from "@/components/ui/separator";
-import {
-    DollarSign,
-    Save,
-    X,
-    TrendingUp,
-    AlertCircle,
-} from "lucide-react";
-import { useUpdateCurrency } from "../_hooks/use-update-currency";
-import { useCurrenciesWithStats } from "../_hooks/use-currencies-with-stats";
-import type { Database } from "@/lib/supabase";
+} from '@/components/ui/dialog'
+import { Separator } from '@/components/ui/separator'
+import { DollarSign, Save, X, TrendingUp, AlertCircle } from 'lucide-react'
+import { useUpdateCurrency } from '../_hooks/use-update-currency'
+import { useCurrenciesWithStats } from '../_hooks/use-currencies-with-stats'
+import type { Database } from '@/lib/supabase'
 
 type Currency = Database['morpheus']['Tables']['xdevise']['Row'] & {
     yvarprod: { count: number }[]
-};
+}
 
 interface CurrencyFormData {
-    xdeviseintitule: string;
-    xdevisecodealpha: string;
-    xdevisecodenum: string;
-    xdevisenbrdec: number;
-    xdeviseboolautorisepaiement: string;
-    xtauxechange: number;
+    xdeviseintitule: string
+    xdeviseintitulefr: string
+    xdevisecodealpha: string
+    xdevisecodenum: string
+    xdevisenbrdec: number
+    xdeviseboolautorisepaiement: string
+    xtauxechange: number
 }
 
 interface EditCurrencyDialogProps {
-    currency: Currency | null;
-    isOpen: boolean;
-    onClose: () => void;
+    currency: Currency | null
+    isOpen: boolean
+    onClose: () => void
 }
 
-export function EditCurrencyDialog({ currency, isOpen, onClose }: EditCurrencyDialogProps) {
-    const { t } = useLanguage();
-    const updateCurrencyMutation = useUpdateCurrency();
-    const { data: currencies } = useCurrenciesWithStats();
-    
-    // Get current pivot currency
-    const currentPivotCurrency = currencies?.find(curr => curr.xispivot);
-    
-    const [formData, setFormData] = useState<CurrencyFormData>({
-        xdeviseintitule: "",
-        xdevisecodealpha: "",
-        xdevisecodenum: "",
-        xdevisenbrdec: 2,
-        xdeviseboolautorisepaiement: "false",
-        xtauxechange: 1.0
-    });
+export function EditCurrencyDialog({
+    currency,
+    isOpen,
+    onClose,
+}: EditCurrencyDialogProps) {
+    const { t } = useLanguage()
+    const updateCurrencyMutation = useUpdateCurrency()
+    const { data: currencies } = useCurrenciesWithStats()
 
-    const [errors, setErrors] = useState<Record<string, string>>({});
+    // Get current pivot currency
+    const currentPivotCurrency = currencies?.find((curr) => curr.xispivot)
+
+    const [formData, setFormData] = useState<CurrencyFormData>({
+        xdeviseintitule: '',
+        xdeviseintitulefr: '',
+        xdevisecodealpha: '',
+        xdevisecodenum: '',
+        xdevisenbrdec: 2,
+        xdeviseboolautorisepaiement: 'false',
+        xtauxechange: 1.0,
+    })
+
+    const [errors, setErrors] = useState<Record<string, string>>({})
 
     // Reset form when currency changes or dialog opens
     useEffect(() => {
         if (currency && isOpen) {
             setFormData({
-                xdeviseintitule: currency.xdeviseintitule || "",
-                xdevisecodealpha: currency.xdevisecodealpha || "",
-                xdevisecodenum: currency.xdevisecodenum || "",
+                xdeviseintitule: currency.xdeviseintitule || '',
+                xdeviseintitulefr: currency.xdeviseintitulefr || '',
+                xdevisecodealpha: currency.xdevisecodealpha || '',
+                xdevisecodenum: currency.xdevisecodenum || '',
                 xdevisenbrdec: currency.xdevisenbrdec ?? 2,
-                xdeviseboolautorisepaiement: currency.xdeviseboolautorisepaiement === "Y" ? "true" : "false",
-                xtauxechange: currency.xtauxechange || 1.0
-            });
-            setErrors({});
+                xdeviseboolautorisepaiement:
+                    currency.xdeviseboolautorisepaiement === 'Y'
+                        ? 'true'
+                        : 'false',
+                xtauxechange: currency.xtauxechange || 1.0,
+            })
+            setErrors({})
         }
-    }, [currency, isOpen]);
+    }, [currency, isOpen])
 
     const validateForm = (): boolean => {
-        const newErrors: Record<string, string> = {};
+        const newErrors: Record<string, string> = {}
 
         // Required fields
         if (!formData.xdeviseintitule.trim()) {
-            newErrors.xdeviseintitule = t('admin.currencies.validationRequired');
+            newErrors.xdeviseintitule = t('admin.currencies.validationRequired')
         }
 
         if (!formData.xdevisecodealpha.trim()) {
-            newErrors.xdevisecodealpha = t('admin.currencies.validationRequired');
+            newErrors.xdevisecodealpha = t(
+                'admin.currencies.validationRequired'
+            )
         } else if (formData.xdevisecodealpha.length !== 3) {
-            newErrors.xdevisecodealpha = t('admin.currencies.validationAlphaCode');
+            newErrors.xdevisecodealpha = t(
+                'admin.currencies.validationAlphaCode'
+            )
         }
 
         if (!formData.xdevisecodenum.trim()) {
-            newErrors.xdevisecodenum = t('admin.currencies.validationRequired');
+            newErrors.xdevisecodenum = t('admin.currencies.validationRequired')
         } else if (!/^\d{3}$/.test(formData.xdevisecodenum)) {
-            newErrors.xdevisecodenum = t('admin.currencies.validationNumericCode');
+            newErrors.xdevisecodenum = t(
+                'admin.currencies.validationNumericCode'
+            )
         }
 
         if (formData.xdevisenbrdec < 0 || formData.xdevisenbrdec > 4) {
-            newErrors.xdevisenbrdec = t('admin.currencies.validationDecimalPlaces');
+            newErrors.xdevisenbrdec = t(
+                'admin.currencies.validationDecimalPlaces'
+            )
         }
 
         if (formData.xtauxechange <= 0) {
-            newErrors.xtauxechange = t('admin.currencies.validationExchangeRate');
+            newErrors.xtauxechange = t(
+                'admin.currencies.validationExchangeRate'
+            )
         }
 
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
+        setErrors(newErrors)
+        return Object.keys(newErrors).length === 0
+    }
 
     const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        
+        e.preventDefault()
+
         if (!currency || !validateForm()) {
-            return;
+            return
         }
 
         try {
             await updateCurrencyMutation.mutateAsync({
                 currencyId: currency.xdeviseid,
-                updates: formData
-            });
-            onClose();
+                updates: formData,
+            })
+            onClose()
         } catch {
             // Error handling is done by the mutation hook
         }
-    };
+    }
 
     const handleClose = () => {
-        setErrors({});
-        onClose();
-    };
+        setErrors({})
+        onClose()
+    }
 
-    if (!currency) return null;
+    if (!currency) return null
 
-    const hasErrors = Object.keys(errors).length > 0;
+    const hasErrors = Object.keys(errors).length > 0
 
     return (
         <Dialog open={isOpen} onOpenChange={handleClose}>
-            <DialogContent className="sm:max-w-[600px] bg-white border-gray-200">
+            <DialogContent className="border-gray-200 bg-white sm:max-w-[600px]">
                 <DialogHeader>
-                    <DialogTitle className="text-gray-900 flex items-center gap-2">
+                    <DialogTitle className="flex items-center gap-2 text-gray-900">
                         <DollarSign className="h-5 w-5 text-blue-600" />
                         {t('admin.currencies.editCurrencyDialog')}
                     </DialogTitle>
@@ -151,12 +165,14 @@ export function EditCurrencyDialog({ currency, isOpen, onClose }: EditCurrencyDi
                 </DialogHeader>
 
                 {hasErrors && (
-                    <div className="p-4 border border-red-200 bg-red-50 rounded-lg">
-                        <div className="flex items-center gap-2 mb-2">
+                    <div className="rounded-lg border border-red-200 bg-red-50 p-4">
+                        <div className="mb-2 flex items-center gap-2">
                             <AlertCircle className="h-4 w-4 text-red-600" />
-                            <p className="text-red-600 font-medium">{t('admin.currencies.formErrors')}</p>
+                            <p className="font-medium text-red-600">
+                                {t('admin.currencies.formErrors')}
+                            </p>
                         </div>
-                        <ul className="list-disc list-inside space-y-1 text-sm text-red-600">
+                        <ul className="list-inside list-disc space-y-1 text-sm text-red-600">
                             {Object.values(errors).map((error, index) => (
                                 <li key={index}>{error}</li>
                             ))}
@@ -173,36 +189,75 @@ export function EditCurrencyDialog({ currency, isOpen, onClose }: EditCurrencyDi
                                 {t('admin.currencies.currencyInformation')}
                             </h3>
                         </div>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                             <div>
                                 <Label className="text-gray-900">
                                     {t('admin.currencies.currencyNameRequired')}
                                 </Label>
                                 <Input
                                     value={formData.xdeviseintitule}
-                                    onChange={(e) => setFormData(prev => ({ ...prev, xdeviseintitule: e.target.value }))}
-                                    className={`bg-white border-gray-300 text-gray-900 ${
-                                        errors.xdeviseintitule ? 'border-red-500' : ''
+                                    onChange={(e) =>
+                                        setFormData((prev) => ({
+                                            ...prev,
+                                            xdeviseintitule: e.target.value,
+                                        }))
+                                    }
+                                    className={`border-gray-300 bg-white text-gray-900 ${
+                                        errors.xdeviseintitule
+                                            ? 'border-red-500'
+                                            : ''
                                     }`}
-                                    placeholder={t('admin.currencies.currencyNamePlaceholder')}
+                                    placeholder={t(
+                                        'admin.currencies.currencyNamePlaceholder'
+                                    )}
                                 />
                             </div>
-                            
+
+                            <div>
+                                <Label className="text-gray-900">
+                                    {t('admin.currencies.currencyNameFrench')}
+                                </Label>
+                                <Input
+                                    value={formData.xdeviseintitulefr}
+                                    onChange={(e) =>
+                                        setFormData((prev) => ({
+                                            ...prev,
+                                            xdeviseintitulefr: e.target.value,
+                                        }))
+                                    }
+                                    className={`border-gray-300 bg-white text-gray-900 ${
+                                        errors.xdeviseintitulefr
+                                            ? 'border-red-500'
+                                            : ''
+                                    }`}
+                                    placeholder={t(
+                                        'admin.currencies.currencyNameFrenchPlaceholder'
+                                    )}
+                                />
+                            </div>
+
                             <div>
                                 <Label className="text-gray-900">
                                     {t('admin.currencies.alphaCodeRequired')}
                                 </Label>
                                 <Input
                                     value={formData.xdevisecodealpha}
-                                    onChange={(e) => setFormData(prev => ({
-                                        ...prev,
-                                        xdevisecodealpha: e.target.value.toUpperCase()
-                                    }))}
-                                    className={`bg-white border-gray-300 text-gray-900 ${
-                                        errors.xdevisecodealpha ? 'border-red-500' : ''
+                                    onChange={(e) =>
+                                        setFormData((prev) => ({
+                                            ...prev,
+                                            xdevisecodealpha:
+                                                e.target.value.toUpperCase(),
+                                        }))
+                                    }
+                                    className={`border-gray-300 bg-white text-gray-900 ${
+                                        errors.xdevisecodealpha
+                                            ? 'border-red-500'
+                                            : ''
                                     }`}
-                                    placeholder={t('admin.currencies.alphaCodePlaceholder')}
+                                    placeholder={t(
+                                        'admin.currencies.alphaCodePlaceholder'
+                                    )}
                                     maxLength={3}
                                 />
                             </div>
@@ -213,30 +268,46 @@ export function EditCurrencyDialog({ currency, isOpen, onClose }: EditCurrencyDi
                                 </Label>
                                 <Input
                                     value={formData.xdevisecodenum}
-                                    onChange={(e) => setFormData(prev => ({ ...prev, xdevisecodenum: e.target.value }))}
-                                    className={`bg-white border-gray-300 text-gray-900 ${
-                                        errors.xdevisecodenum ? 'border-red-500' : ''
+                                    onChange={(e) =>
+                                        setFormData((prev) => ({
+                                            ...prev,
+                                            xdevisecodenum: e.target.value,
+                                        }))
+                                    }
+                                    className={`border-gray-300 bg-white text-gray-900 ${
+                                        errors.xdevisecodenum
+                                            ? 'border-red-500'
+                                            : ''
                                     }`}
-                                    placeholder={t('admin.currencies.numericCodePlaceholder')}
+                                    placeholder={t(
+                                        'admin.currencies.numericCodePlaceholder'
+                                    )}
                                     maxLength={3}
                                 />
                             </div>
-                            
+
                             <div>
                                 <Label className="text-gray-900">
-                                    {t('admin.currencies.decimalPlacesRequired')}
+                                    {t(
+                                        'admin.currencies.decimalPlacesRequired'
+                                    )}
                                 </Label>
                                 <Input
                                     type="number"
                                     min="0"
                                     max="4"
                                     value={formData.xdevisenbrdec}
-                                    onChange={(e) => setFormData(prev => ({
-                                        ...prev,
-                                        xdevisenbrdec: parseInt(e.target.value) || 0
-                                    }))}
-                                    className={`bg-white border-gray-300 text-gray-900 ${
-                                        errors.xdevisenbrdec ? 'border-red-500' : ''
+                                    onChange={(e) =>
+                                        setFormData((prev) => ({
+                                            ...prev,
+                                            xdevisenbrdec:
+                                                parseInt(e.target.value) || 0,
+                                        }))
+                                    }
+                                    className={`border-gray-300 bg-white text-gray-900 ${
+                                        errors.xdevisenbrdec
+                                            ? 'border-red-500'
+                                            : ''
                                     }`}
                                 />
                             </div>
@@ -254,14 +325,24 @@ export function EditCurrencyDialog({ currency, isOpen, onClose }: EditCurrencyDi
                         <div className="flex items-center gap-3">
                             <Switch
                                 id="allowPayment"
-                                checked={formData.xdeviseboolautorisepaiement === "true"}
-                                onCheckedChange={(checked) => setFormData(prev => ({
-                                    ...prev,
-                                    xdeviseboolautorisepaiement: checked ? "true" : "false"
-                                }))}
+                                checked={
+                                    formData.xdeviseboolautorisepaiement ===
+                                    'true'
+                                }
+                                onCheckedChange={(checked) =>
+                                    setFormData((prev) => ({
+                                        ...prev,
+                                        xdeviseboolautorisepaiement: checked
+                                            ? 'true'
+                                            : 'false',
+                                    }))
+                                }
                                 className="data-[state=checked]:bg-green-500"
                             />
-                            <Label htmlFor="allowPayment" className="text-gray-900">
+                            <Label
+                                htmlFor="allowPayment"
+                                className="text-gray-900"
+                            >
                                 {t('admin.currencies.allowPayments')}
                             </Label>
                         </div>
@@ -277,9 +358,13 @@ export function EditCurrencyDialog({ currency, isOpen, onClose }: EditCurrencyDi
 
                         <div>
                             <Label className="text-gray-900">
-                                1 {currentPivotCurrency?.xdevisecodealpha || 'Pivot'} = {formData.xtauxechange || 1.0} {formData.xdeviseintitule || 'This Currency'}
+                                1{' '}
+                                {currentPivotCurrency?.xdevisecodealpha ||
+                                    'Pivot'}{' '}
+                                = {formData.xtauxechange || 1.0}{' '}
+                                {formData.xdeviseintitule || 'This Currency'}
                             </Label>
-                            <div className="flex items-center gap-2 mt-1">
+                            <div className="mt-1 flex items-center gap-2">
                                 <TrendingUp className="h-4 w-4 text-blue-600" />
                                 <Input
                                     type="number"
@@ -287,27 +372,39 @@ export function EditCurrencyDialog({ currency, isOpen, onClose }: EditCurrencyDi
                                     min="0.0000000001"
                                     value={formData.xtauxechange}
                                     onChange={(e) => {
-                                        const inputValue = e.target.value;
-                                        const maxDecimals = formData.xdevisenbrdec;
+                                        const inputValue = e.target.value
+                                        const maxDecimals =
+                                            formData.xdevisenbrdec
 
                                         // Check decimal places
-                                        const decimalIndex = inputValue.indexOf('.');
-                                        const actualDecimals = decimalIndex === -1 ? 0 : inputValue.length - decimalIndex - 1;
+                                        const decimalIndex =
+                                            inputValue.indexOf('.')
+                                        const actualDecimals =
+                                            decimalIndex === -1
+                                                ? 0
+                                                : inputValue.length -
+                                                  decimalIndex -
+                                                  1
 
                                         if (actualDecimals <= maxDecimals) {
-                                            setFormData(prev => ({
+                                            setFormData((prev) => ({
                                                 ...prev,
-                                                xtauxechange: parseFloat(inputValue) || 0
-                                            }));
+                                                xtauxechange:
+                                                    parseFloat(inputValue) || 0,
+                                            }))
                                         }
                                     }}
-                                    className={`bg-white border-gray-300 text-gray-900 ${
-                                        errors.xtauxechange ? 'border-red-500' : ''
+                                    className={`border-gray-300 bg-white text-gray-900 ${
+                                        errors.xtauxechange
+                                            ? 'border-red-500'
+                                            : ''
                                     }`}
-                                    placeholder={t('admin.currencies.exchangeRatePlaceholder')}
+                                    placeholder={t(
+                                        'admin.currencies.exchangeRatePlaceholder'
+                                    )}
                                 />
                             </div>
-                            <p className="text-xs text-gray-500 mt-1">
+                            <p className="mt-1 text-xs text-gray-500">
                                 {t('admin.currencies.exchangeRateHelp')}
                             </p>
                         </div>
@@ -320,23 +417,22 @@ export function EditCurrencyDialog({ currency, isOpen, onClose }: EditCurrencyDi
                             onClick={handleClose}
                             className="border-gray-300 text-gray-700 hover:bg-gray-50"
                         >
-                            <X className="h-4 w-4 mr-2" />
+                            <X className="mr-2 h-4 w-4" />
                             {t('common.cancel')}
                         </Button>
                         <Button
                             type="submit"
                             disabled={updateCurrencyMutation.isPending}
-                            className="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white"
+                            className="bg-gradient-to-r from-green-600 to-green-500 text-white hover:from-green-700 hover:to-green-600"
                         >
-                            <Save className="h-4 w-4 mr-2" />
+                            <Save className="mr-2 h-4 w-4" />
                             {updateCurrencyMutation.isPending
                                 ? t('admin.currencies.updating')
-                                : t('admin.currencies.updateCurrency')
-                            }
+                                : t('admin.currencies.updateCurrency')}
                         </Button>
                     </DialogFooter>
                 </form>
             </DialogContent>
         </Dialog>
-    );
+    )
 }
