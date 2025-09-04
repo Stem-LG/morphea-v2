@@ -46,8 +46,9 @@ export function useCreateStore() {
             return data;
         },
         onSuccess: () => {
-            // Invalidate and refetch stores
+            // Invalidate and refetch stores with all possible query keys
             queryClient.invalidateQueries({ queryKey: ["stores"] });
+            queryClient.invalidateQueries({ queryKey: ["filtered-stores"] });
         },
         onError: (error) => {
             console.error("Failed to create store:", error);
@@ -82,8 +83,9 @@ export function useUpdateStore() {
             return data;
         },
         onSuccess: () => {
-            // Invalidate and refetch stores
+            // Invalidate and refetch stores with all possible query keys
             queryClient.invalidateQueries({ queryKey: ["stores"] });
+            queryClient.invalidateQueries({ queryKey: ["filtered-stores"] });
         },
         onError: (error) => {
             console.error("Failed to update store:", error);
@@ -110,8 +112,9 @@ export function useDeleteStore() {
             return storeId;
         },
         onSuccess: () => {
-            // Invalidate and refetch stores
+            // Invalidate and refetch stores with all possible query keys
             queryClient.invalidateQueries({ queryKey: ["stores"] });
+            queryClient.invalidateQueries({ queryKey: ["filtered-stores"] });
         },
         onError: (error) => {
             console.error("Failed to delete store:", error);

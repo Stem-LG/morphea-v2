@@ -273,17 +273,17 @@ export default function AdminOrdersPage() {
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 {/* Customer Info */}
-                                <div className="flex items-center gap-4 rounded-lg bg-white/5 p-4">
+                                <div className="flex items-center gap-4 rounded-lg bg-gray-50 dark:bg-white/5 p-4">
                                     <User className="text-morpheus-gold-light h-5 w-5" />
                                     <div>
-                                        <p className="font-medium text-white">
+                                        <p className="font-medium text-gray-900 dark:text-white">
                                             {orderGroup.yvisiteur
                                                 ?.yvisiteurnom ||
                                                 t(
                                                     'admin.orders.unknownCustomer'
                                                 )}
                                         </p>
-                                        <p className="text-sm text-gray-300">
+                                        <p className="text-sm text-gray-600 dark:text-gray-300">
                                             {orderGroup.yvisiteur
                                                 ?.yvisiteuremail ||
                                                 t('admin.orders.noEmail')}
@@ -293,24 +293,24 @@ export default function AdminOrdersPage() {
 
                                 {/* Order Items */}
                                 <div className="space-y-2">
-                                    <h4 className="font-medium text-white">
+                                    <h4 className="font-medium text-gray-900 dark:text-white">
                                         {t('admin.orders.orderItems')}
                                     </h4>
                                     {orderGroup.items.map(
                                         (item: any, index: number) => (
                                             <div
                                                 key={index}
-                                                className="flex items-center justify-between rounded-lg bg-white/5 p-3"
+                                                className="flex items-center justify-between rounded-lg bg-gray-50 dark:bg-white/5 p-3"
                                             >
                                                 <div className="flex-1">
-                                                    <p className="font-medium text-white">
+                                                    <p className="font-medium text-gray-900 dark:text-white">
                                                         {item.yvarprod
                                                             ?.yvarprodintitule ||
                                                             t(
                                                                 'admin.orders.unknownProduct'
                                                             )}
                                                     </p>
-                                                    <div className="flex items-center gap-2 text-sm text-gray-300">
+                                                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
                                                         {item.yvarprod
                                                             ?.xcouleur && (
                                                             <span className="flex items-center gap-1">
@@ -347,7 +347,7 @@ export default function AdminOrdersPage() {
                                                     </div>
                                                 </div>
                                                 <div className="text-right">
-                                                    <p className="font-medium text-white">
+                                                    <p className="font-medium text-gray-900 dark:text-white">
                                                         {t(
                                                             'admin.orders.quantity'
                                                         )}
@@ -370,13 +370,13 @@ export default function AdminOrdersPage() {
                                     )}
                                 </div>
 
-                                <Separator className="bg-morpheus-gold-dark/30" />
+                                <Separator className="bg-gray-200 dark:bg-morpheus-gold-dark/30" />
 
                                 {/* Order Total and Actions */}
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-2">
                                         <DollarSign className="text-morpheus-gold-light h-5 w-5" />
-                                        <span className="text-lg font-semibold text-white">
+                                        <span className="text-lg font-semibold text-gray-900 dark:text-white">
                                             {t('admin.orders.total')}: $
                                             {calculateOrderTotal(
                                                 orderGroup.items

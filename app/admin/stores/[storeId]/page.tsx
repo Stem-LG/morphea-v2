@@ -30,8 +30,11 @@ import { useLanguage } from "@/hooks/useLanguage";
 import { useStore } from "./_hooks/use-store";
 import { useProducts } from "./_hooks/use-products";
 import { useCategories } from "./_hooks/use-categories";
+import { useDeleteProduct } from "./_hooks/use-delete-product";
 import { CreateProductDialog } from "./_components/create-product-dialog";
 import { ProductViewDialog } from "./_components/product-view-dialog";
+import { DeleteProductDialog } from "./_components/delete-product-dialog";
+import { DeleteProductButton } from "./_components/delete-product-button";
 
 // Let Supabase infer the types automatically
 type Product = any;
@@ -61,6 +64,8 @@ export default function StoreDetails() {
     const [editingProductId, setEditingProductId] = useState<number | null>(null);
     const [isProductViewDialogOpen, setIsProductViewDialogOpen] = useState(false);
     const [viewingProductId, setViewingProductId] = useState<number | null>(null);
+    const [isDeleteProductDialogOpen, setIsDeleteProductDialogOpen] = useState(false);
+    const [productToDelete, setProductToDelete] = useState<Product | null>(null);
     
     const perPage = 10;
     const currentPage = page;
@@ -90,6 +95,9 @@ export default function StoreDetails() {
         sorting: sortingConfig
     });
     const { data: categories, isLoading: categoriesLoading } = useCategories();
+
+    // Mutations
+    const deleteProductMutation = useDeleteProduct();
 
     // Get the first store from the array (since the hook returns an array)
     const store = storeData?.[0];
@@ -157,8 +165,8 @@ export default function StoreDetails() {
     };
 
     const handleDeleteProduct = (product: Product) => {
-        console.log("Delete product:", product);
-        // TODO: Implement delete product functionality
+        setProductToDelete(product);
+        setIsDeleteProductDialogOpen(true);
     };
 
     const handleViewProduct = (product: Product) => {
@@ -169,6 +177,23 @@ export default function StoreDetails() {
     const handleCloseViewDialog = () => {
         setIsProductViewDialogOpen(false);
         setViewingProductId(null);
+    };
+
+    const handleConfirmDelete = async () => {
+        if (!productToDelete) return;
+
+        try {
+            await deleteProductMutation.mutateAsync(productToDelete.yprodid);
+            setIsDeleteProductDialogOpen(false);
+            setProductToDelete(null);
+        } catch (error) {
+            console.error('Error deleting product:', error);
+        }
+    };
+
+    const handleCloseDeleteDialog = () => {
+        setIsDeleteProductDialogOpen(false);
+        setProductToDelete(null);
     };
 
     // Helper function to get product status
@@ -379,20 +404,11 @@ export default function StoreDetails() {
                         >
                             <Edit className="h-3 w-3" />
                         </Button>
-                        <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => handleDeleteProduct(product)}
-                            disabled={!canDeleteProduct(product)}
-                            className={`h-8 w-8 p-0 ${
-                                canDeleteProduct(product)
-                                    ? "text-gray-600 hover:text-red-600 hover:bg-red-50"
-                                    : "text-gray-400 cursor-not-allowed"
-                            }`}
-                            title={canDeleteProduct(product) ? t('admin.deleteProduct') : t('admin.cannotDeleteProduct')}
-                        >
-                            <Trash2 className="h-3 w-3" />
-                        </Button>
+                        <DeleteProductButton
+                            product={product}
+                            onDelete={handleDeleteProduct}
+                            getProductStatus={getProductStatus}
+                        />
                     </div>
                 );
             },
@@ -589,6 +605,15 @@ export default function StoreDetails() {
                 isOpen={isProductViewDialogOpen}
                 onClose={handleCloseViewDialog}
                 productId={viewingProductId || undefined}
+            />
+
+            {/* Delete Product Dialog */}
+            <DeleteProductDialog
+                isOpen={isDeleteProductDialogOpen}
+                onClose={handleCloseDeleteDialog}
+                onConfirm={handleConfirmDelete}
+                productName={productToDelete?.yprodintitule || ''}
+                isLoading={deleteProductMutation.isPending}
             />
         </div>
     );
