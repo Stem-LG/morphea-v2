@@ -351,3 +351,120 @@ export function useShopSizes() {
         gcTime: 10 * 60 * 1000, // 10 minutes
     });
 }
+
+// Hook to get price range from current event products
+export function useShopPriceRange() {
+    const supabase = createClient();
+
+    return useQuery({
+        queryKey: ['shop-price-range'],
+        queryFn: async () => {
+            // Get current active event
+            const currentDate = new Date().toISOString().split('T')[0];
+
+            const { data: currentEvent, error: eventError } = await supabase
+                .schema("morpheus")
+                .from("yevent")
+                .select("*")
+                .lte("yeventdatedeb", currentDate)
+                .gte("yeventdatefin", currentDate)
+                .order("yeventdatedeb", { ascending: false })
+                .limit(1)
+                .single();
+
+            if (eventError || !currentEvent) {
+                console.error("No active event found:", eventError);
+                return { min: 0, max: 1000 };
+            }
+
+            // Get product IDs from current event
+            const { data: eventDetails, error: detailsError } = await supabase
+                .schema("morpheus")
+                .from("ydetailsevent")
+                .select("yprodidfk")
+                .eq("yeventidfk", currentEvent.yeventid)
+                .not("yprodidfk", "is", null);
+
+            if (detailsError || !eventDetails) {
+                console.error("Error fetching event details:", detailsError);
+                return { min: 0, max: 1000 };
+            }
+
+            const productIds = [...new Set(eventDetails.map(d => d.yprodidfk))];
+
+            if (productIds.length === 0) {
+                return { min: 0, max: 1000 };
+            }
+
+            // Get variants with prices and currency info for these products
+            const { data: variants, error: variantsError } = await supabase
+                .schema("morpheus")
+                .from("yvarprod")
+                .select(`
+                    yvarprodprixcatalogue,
+                    yvarprodprixpromotion,
+                    xdeviseidfk,
+                    xdevise:xdeviseidfk (
+                        xdeviseid,
+                        xdevisecodealpha,
+                        xdevisenbrdec,
+                        xtauxechange,
+                        xispivot
+                    )
+                `)
+                .in("yprodidfk", productIds)
+                .eq("yvarprodstatut", "approved");
+
+            if (variantsError || !variants || variants.length === 0) {
+                console.error("Error fetching variants:", variantsError);
+                return { min: 0, max: 1000 };
+            }
+
+            // Get all currencies for conversion
+            const { data: currencies, error: currenciesError } = await supabase
+                .schema("morpheus")
+                .from("xdevise")
+                .select("*");
+
+            if (currenciesError || !currencies) {
+                console.error("Error fetching currencies:", currenciesError);
+                return { min: 0, max: 1000 };
+            }
+
+            // Find pivot currency
+            const pivotCurrency = currencies.find(c => c.xispivot);
+            if (!pivotCurrency) {
+                console.error("No pivot currency found");
+                return { min: 0, max: 1000 };
+            }
+
+            // Convert all prices to pivot currency for comparison
+            const convertedPrices = variants.map(variant => {
+                const price = variant.yvarprodprixpromotion || variant.yvarprodprixcatalogue;
+                if (!price || price <= 0) return 0;
+
+                const variantCurrency = variant.xdevise;
+                if (!variantCurrency) return price; // Fallback to original price
+
+                // Convert to pivot currency
+                if (variantCurrency.xispivot) {
+                    return price;
+                } else if (variantCurrency.xtauxechange > 0) {
+                    return price / variantCurrency.xtauxechange;
+                }
+                return price;
+            }).filter(price => price > 0);
+
+            if (convertedPrices.length === 0) {
+                return { min: 0, max: 1000 };
+            }
+
+            const min = Math.floor(Math.min(...convertedPrices));
+            const max = Math.ceil(Math.max(...convertedPrices));
+
+            return { min, max };
+        },
+        staleTime: 5 * 60 * 1000, // 5 minutes
+        gcTime: 10 * 60 * 1000, // 10 minutes
+    });
+}
