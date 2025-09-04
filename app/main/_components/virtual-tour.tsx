@@ -1,299 +1,344 @@
-"use client";
+'use client'
 
-import { useEffect, useRef, useState, useCallback } from "react";
-import { Viewer } from "@photo-sphere-viewer/core";
-import { MarkersPlugin } from "@photo-sphere-viewer/markers-plugin";
-import ProductsListModal from "./products-list-modal";
-import { InfoSpotAction, getTourData, TourData, Scene } from "@/app/_consts/tourdata";
-import { useIncrementSceneView } from "../_hooks/use-increment-scene-view";
+import { useEffect, useRef, useState, useCallback } from 'react'
+import { Viewer } from '@photo-sphere-viewer/core'
+import { MarkersPlugin } from '@photo-sphere-viewer/markers-plugin'
+import ProductsListModal from './products-list-modal'
+import {
+    InfoSpotAction,
+    getTourData,
+    TourData,
+    Scene,
+} from '@/app/_consts/tourdata'
+import { useIncrementSceneView } from '../_hooks/use-increment-scene-view'
 
 interface VirtualTourProps {
-    className?: string;
-    height?: string;
-    width?: string;
-    startingScene?: string;
-    startingYaw?: number; // Default yaw angle in radians
-    startingPitch?: number; // Default pitch angle in radians
-    showNavbar?: boolean;
-    accountForNavbar?: boolean; // New prop to account for navbar height
+    className?: string
+    height?: string
+    width?: string
+    startingScene?: string
+    startingYaw?: number // Default yaw angle in radians
+    startingPitch?: number // Default pitch angle in radians
+    showNavbar?: boolean
+    accountForNavbar?: boolean // New prop to account for navbar height
 }
 
 export default function VirtualTour({
-    className = "",
-    height = "100vh",
-    width = "100%",
-    startingScene = "15",
+    className = '',
+    height = '100vh',
+    width = '100%',
+    startingScene = '15',
     startingYaw = -1.57, // Default to -1.57 radians (facing left)
     startingPitch = 0, // Default to 0 radians (horizontal)
     showNavbar = true,
     accountForNavbar = true, // Default to true to account for navbar
 }: VirtualTourProps) {
-    const containerRef = useRef<HTMLDivElement>(null);
-    const viewerRef = useRef<Viewer | null>(null);
-    const markersPluginRef = useRef<MarkersPlugin | null>(null);
-    
+    const containerRef = useRef<HTMLDivElement>(null)
+    const viewerRef = useRef<Viewer | null>(null)
+    const markersPluginRef = useRef<MarkersPlugin | null>(null)
+
     // Initialize the scene view increment hook
-    const incrementSceneView = useIncrementSceneView();
+    const incrementSceneView = useIncrementSceneView()
 
     // Get scene from URL on initial load only
     const getInitialScene = useCallback(() => {
-        if (typeof window !== "undefined") {
-            const params = new URLSearchParams(window.location.search);
-            return params.get("scene") || startingScene;
+        if (typeof window !== 'undefined') {
+            const params = new URLSearchParams(window.location.search)
+            return params.get('scene') || startingScene
         }
-        return startingScene;
-    }, [startingScene]);
+        return startingScene
+    }, [startingScene])
 
-    const [currentScene, setCurrentScene] = useState(getInitialScene);
-    const [productsList, setProductsList] = useState<string | null>(null);
-    const [isProductDetailsOpen, setIsProductDetailsOpen] = useState(false);
-    const [isProductsListOpen, setIsProductsListOpen] = useState(false);
-    const [isTransitioning, setIsTransitioning] = useState(false);
-    const [tourData, setTourData] = useState<TourData>({ scenes: [] });
-    const [isLoading, setIsLoading] = useState(true);
-    const [preloadedImages, setPreloadedImages] = useState<Set<string>>(new Set());
-    const [isInitialLoad, setIsInitialLoad] = useState(true);
-    const [, setCurrentZoom] = useState(60); // Default zoom level
-    const [currentPosition, setCurrentPosition] = useState({ yaw: startingYaw, pitch: startingPitch });
-    const [pressedKeys, setPressedKeys] = useState<Set<string>>(new Set());
-    const animationIntervalRef = useRef<NodeJS.Timeout | null>(null);
-    const isUpdatingUrlRef = useRef(false);
-    const isTransitioningRef = useRef(false);
-    
+    const [currentScene, setCurrentScene] = useState(getInitialScene)
+    const [productsList, setProductsList] = useState<string | null>(null)
+    const [isProductDetailsOpen, setIsProductDetailsOpen] = useState(false)
+    const [isProductsListOpen, setIsProductsListOpen] = useState(false)
+    const [isTransitioning, setIsTransitioning] = useState(false)
+    const [tourData, setTourData] = useState<TourData>({ scenes: [] })
+    const [isLoading, setIsLoading] = useState(true)
+    const [preloadedImages, setPreloadedImages] = useState<Set<string>>(
+        new Set()
+    )
+    const [isInitialLoad, setIsInitialLoad] = useState(true)
+    const [, setCurrentZoom] = useState(60) // Default zoom level
+    const [currentPosition, setCurrentPosition] = useState({
+        yaw: startingYaw,
+        pitch: startingPitch,
+    })
+    const [pressedKeys, setPressedKeys] = useState<Set<string>>(new Set())
+    const animationIntervalRef = useRef<NodeJS.Timeout | null>(null)
+    const isUpdatingUrlRef = useRef(false)
+    const isTransitioningRef = useRef(false)
+
     // Track viewed scenes to prevent duplicate increments
-    const [viewedScenes, setViewedScenes] = useState<Set<string>>(new Set());
+    const [viewedScenes, setViewedScenes] = useState<Set<string>>(new Set())
 
     // Calculate the actual height accounting for navbar
     const getActualHeight = () => {
-        if (accountForNavbar && height === "100vh") {
-            return "calc(100vh - 6rem)"; // 4rem is the navbar height (h-16)
+        if (accountForNavbar && height === '100vh') {
+            return 'calc(100vh - 4.5rem)' // 4rem is the navbar height (h-16)
         }
-        return height;
-    };
+        return height
+    }
 
-    const actualHeight = getActualHeight();
+    const actualHeight = getActualHeight()
 
     // Function to preload all scene images
     const preloadSceneImages = useCallback(async (scenes: Scene[]) => {
-        if (scenes.length === 0) return;
+        if (scenes.length === 0) return
 
         const imagePromises = scenes.map((scene) => {
             return new Promise<string>((resolve) => {
-                const img = new Image();
+                const img = new Image()
                 img.onload = () => {
-                    setPreloadedImages((prev) => new Set(prev).add(scene.panorama));
-                    resolve(scene.panorama);
-                };
+                    setPreloadedImages((prev) =>
+                        new Set(prev).add(scene.panorama)
+                    )
+                    resolve(scene.panorama)
+                }
                 img.onerror = () => {
-                    console.warn(`Failed to preload scene image: ${scene.panorama}`);
+                    console.warn(
+                        `Failed to preload scene image: ${scene.panorama}`
+                    )
                     // Still resolve to not block other images
-                    resolve(scene.panorama);
-                };
-                img.src = scene.panorama;
-            });
-        });
+                    resolve(scene.panorama)
+                }
+                img.src = scene.panorama
+            })
+        })
 
         try {
-            await Promise.all(imagePromises);
+            await Promise.all(imagePromises)
         } catch (error) {
-            console.error("Error preloading scene images:", error);
+            console.error('Error preloading scene images:', error)
         }
-    }, []);
+    }, [])
 
     // Helper function to normalize angle to [-π, π]
     const normalizeAngle = (angle: number): number => {
-        while (angle > Math.PI) angle -= 2 * Math.PI;
-        while (angle < -Math.PI) angle += 2 * Math.PI;
-        return angle;
-    };
+        while (angle > Math.PI) angle -= 2 * Math.PI
+        while (angle < -Math.PI) angle += 2 * Math.PI
+        return angle
+    }
 
     // Helper function to calculate angular distance between two angles
     const angularDistance = (a1: number, a2: number): number => {
-        const diff = normalizeAngle(a2 - a1);
-        return Math.abs(diff);
-    };
+        const diff = normalizeAngle(a2 - a1)
+        return Math.abs(diff)
+    }
 
     // Find closest scene in a given direction
     const findClosestSceneInDirection = useCallback(
-        (direction: "forward" | "backward" | "left" | "right"): string | null => {
-            const currentSceneData = tourData.scenes.find((scene) => scene.id === currentScene);
-            if (!currentSceneData || !currentSceneData.links.length) return null;
+        (
+            direction: 'forward' | 'backward' | 'left' | 'right'
+        ): string | null => {
+            const currentSceneData = tourData.scenes.find(
+                (scene) => scene.id === currentScene
+            )
+            if (!currentSceneData || !currentSceneData.links.length) return null
 
-            const currentYaw = currentPosition.yaw;
-            let targetYaw = currentYaw;
+            const currentYaw = currentPosition.yaw
+            let targetYaw = currentYaw
 
             switch (direction) {
-                case "forward":
-                    targetYaw = currentYaw; // Same direction
-                    break;
-                case "backward":
-                    targetYaw = normalizeAngle(currentYaw + Math.PI); // Opposite direction
-                    break;
-                case "left":
-                    targetYaw = normalizeAngle(currentYaw - Math.PI / 2); // 90 degrees left
-                    break;
-                case "right":
-                    targetYaw = normalizeAngle(currentYaw + Math.PI / 2); // 90 degrees right
-                    break;
+                case 'forward':
+                    targetYaw = currentYaw // Same direction
+                    break
+                case 'backward':
+                    targetYaw = normalizeAngle(currentYaw + Math.PI) // Opposite direction
+                    break
+                case 'left':
+                    targetYaw = normalizeAngle(currentYaw - Math.PI / 2) // 90 degrees left
+                    break
+                case 'right':
+                    targetYaw = normalizeAngle(currentYaw + Math.PI / 2) // 90 degrees right
+                    break
             }
 
             // Find the closest link in the target direction
-            let closestLink = null;
-            let minDistance = Infinity;
+            let closestLink = null
+            let minDistance = Infinity
 
             currentSceneData.links.forEach((link) => {
-                const linkYaw = link.position.yaw;
-                const distance = angularDistance(targetYaw, linkYaw);
+                const linkYaw = link.position.yaw
+                const distance = angularDistance(targetYaw, linkYaw)
 
                 if (distance < minDistance) {
-                    minDistance = distance;
-                    closestLink = link;
+                    minDistance = distance
+                    closestLink = link
                 }
-            });
+            })
 
-            return closestLink ? closestLink.nodeId : null;
+            return closestLink ? closestLink.nodeId : null
         },
         [currentScene, currentPosition.yaw, tourData.scenes, angularDistance]
-    );
+    )
 
     // Handle key press/release for smooth movement
     const handleKeyDown = useCallback(
         (event: KeyboardEvent) => {
-            if (!viewerRef.current || isTransitioning) return;
+            if (!viewerRef.current || isTransitioning) return
 
-            const key = event.key;
-            if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(key)) {
-                event.preventDefault();
-                setPressedKeys((prev) => new Set(prev).add(key));
+            const key = event.key
+            if (
+                ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(
+                    key
+                )
+            ) {
+                event.preventDefault()
+                setPressedKeys((prev) => new Set(prev).add(key))
             }
         },
         [isTransitioning]
-    );
+    )
 
     const handleKeyUp = useCallback((event: KeyboardEvent) => {
-        const key = event.key;
-        if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(key)) {
-            event.preventDefault();
+        const key = event.key
+        if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(key)) {
+            event.preventDefault()
             setPressedKeys((prev) => {
-                const newSet = new Set(prev);
-                newSet.delete(key);
-                return newSet;
-            });
+                const newSet = new Set(prev)
+                newSet.delete(key)
+                return newSet
+            })
         }
-    }, []);
+    }, [])
 
     // Start/stop animation loop based on pressed keys
     useEffect(() => {
-        if (pressedKeys.size > 0 && !animationIntervalRef.current && !isTransitioning) {
+        if (
+            pressedKeys.size > 0 &&
+            !animationIntervalRef.current &&
+            !isTransitioning
+        ) {
             // Start smooth animation
             animationIntervalRef.current = setInterval(() => {
-                if (!viewerRef.current || isTransitioning) return;
+                if (!viewerRef.current || isTransitioning) return
 
-                const viewer = viewerRef.current;
-                const minZoom = 40;
-                const maxZoom = 80;
-                const zoomSpeed = 0.8; // Smooth zoom speed
-                const rotationSpeed = 0.02; // Smooth rotation speed (radians per frame)
+                const viewer = viewerRef.current
+                const minZoom = 40
+                const maxZoom = 80
+                const zoomSpeed = 0.8 // Smooth zoom speed
+                const rotationSpeed = 0.02 // Smooth rotation speed (radians per frame)
 
                 // Handle zoom controls
-                if (pressedKeys.has("ArrowUp")) {
+                if (pressedKeys.has('ArrowUp')) {
                     setCurrentZoom((prev) => {
                         if (prev < maxZoom) {
-                            const newZoom = Math.min(prev + zoomSpeed, maxZoom);
-                            viewer.zoom(newZoom);
-                            return newZoom;
+                            const newZoom = Math.min(prev + zoomSpeed, maxZoom)
+                            viewer.zoom(newZoom)
+                            return newZoom
                         } else {
                             // Navigate to closest scene forward when at max zoom
-                            const currentSceneData = tourData.scenes.find((scene) => scene.id === currentScene);
-                            if (currentSceneData && currentSceneData.links.length > 0) {
-                                const nextScene = findClosestSceneInDirection("forward");
+                            const currentSceneData = tourData.scenes.find(
+                                (scene) => scene.id === currentScene
+                            )
+                            if (
+                                currentSceneData &&
+                                currentSceneData.links.length > 0
+                            ) {
+                                const nextScene =
+                                    findClosestSceneInDirection('forward')
                                 if (nextScene) {
-                                    setCurrentScene(nextScene);
-                                    viewer.zoom(60);
+                                    setCurrentScene(nextScene)
+                                    viewer.zoom(60)
                                     // Clear pressed keys to prevent continuous navigation
-                                    setPressedKeys(new Set());
-                                    return 60;
+                                    setPressedKeys(new Set())
+                                    return 60
                                 }
                             }
-                            return prev;
+                            return prev
                         }
-                    });
+                    })
                 }
 
-                if (pressedKeys.has("ArrowDown")) {
+                if (pressedKeys.has('ArrowDown')) {
                     setCurrentZoom((prev) => {
                         if (prev > minZoom) {
-                            const newZoom = Math.max(prev - zoomSpeed, minZoom);
-                            viewer.zoom(newZoom);
-                            return newZoom;
+                            const newZoom = Math.max(prev - zoomSpeed, minZoom)
+                            viewer.zoom(newZoom)
+                            return newZoom
                         } else {
                             // Navigate to closest scene backward when at min zoom
-                            const currentSceneData = tourData.scenes.find((scene) => scene.id === currentScene);
-                            if (currentSceneData && currentSceneData.links.length > 0) {
-                                const nextScene = findClosestSceneInDirection("backward");
+                            const currentSceneData = tourData.scenes.find(
+                                (scene) => scene.id === currentScene
+                            )
+                            if (
+                                currentSceneData &&
+                                currentSceneData.links.length > 0
+                            ) {
+                                const nextScene =
+                                    findClosestSceneInDirection('backward')
                                 if (nextScene) {
-                                    setCurrentScene(nextScene);
-                                    viewer.zoom(60);
+                                    setCurrentScene(nextScene)
+                                    viewer.zoom(60)
                                     // Clear pressed keys to prevent continuous navigation
-                                    setPressedKeys(new Set());
-                                    return 60;
+                                    setPressedKeys(new Set())
+                                    return 60
                                 }
                             }
-                            return prev;
+                            return prev
                         }
-                    });
+                    })
                 }
 
                 // Handle rotation controls
-                if (pressedKeys.has("ArrowLeft")) {
+                if (pressedKeys.has('ArrowLeft')) {
                     setCurrentPosition((prev) => {
-                        const newYaw = normalizeAngle(prev.yaw - rotationSpeed);
+                        const newYaw = normalizeAngle(prev.yaw - rotationSpeed)
                         viewer.rotate({
                             yaw: newYaw,
                             pitch: prev.pitch,
-                        });
-                        return { ...prev, yaw: newYaw };
-                    });
+                        })
+                        return { ...prev, yaw: newYaw }
+                    })
                 }
 
-                if (pressedKeys.has("ArrowRight")) {
+                if (pressedKeys.has('ArrowRight')) {
                     setCurrentPosition((prev) => {
-                        const newYaw = normalizeAngle(prev.yaw + rotationSpeed);
+                        const newYaw = normalizeAngle(prev.yaw + rotationSpeed)
                         viewer.rotate({
                             yaw: newYaw,
                             pitch: prev.pitch,
-                        });
-                        return { ...prev, yaw: newYaw };
-                    });
+                        })
+                        return { ...prev, yaw: newYaw }
+                    })
                 }
-            }, 16); // ~60fps (16ms interval)
+            }, 16) // ~60fps (16ms interval)
         } else if (pressedKeys.size === 0 && animationIntervalRef.current) {
-            clearInterval(animationIntervalRef.current);
-            animationIntervalRef.current = null;
+            clearInterval(animationIntervalRef.current)
+            animationIntervalRef.current = null
         }
 
         return () => {
             if (animationIntervalRef.current) {
-                clearInterval(animationIntervalRef.current);
-                animationIntervalRef.current = null;
+                clearInterval(animationIntervalRef.current)
+                animationIntervalRef.current = null
             }
-        };
-    }, [pressedKeys, isTransitioning, tourData.scenes, currentScene, findClosestSceneInDirection, normalizeAngle]);
+        }
+    }, [
+        pressedKeys,
+        isTransitioning,
+        tourData.scenes,
+        currentScene,
+        findClosestSceneInDirection,
+        normalizeAngle,
+    ])
 
     // Add keyboard event listeners
     useEffect(() => {
-        window.addEventListener("keydown", handleKeyDown);
-        window.addEventListener("keyup", handleKeyUp);
+        window.addEventListener('keydown', handleKeyDown)
+        window.addEventListener('keyup', handleKeyUp)
 
         return () => {
-            window.removeEventListener("keydown", handleKeyDown);
-            window.removeEventListener("keyup", handleKeyUp);
+            window.removeEventListener('keydown', handleKeyDown)
+            window.removeEventListener('keyup', handleKeyUp)
             if (animationIntervalRef.current) {
-                clearInterval(animationIntervalRef.current);
-                animationIntervalRef.current = null;
+                clearInterval(animationIntervalRef.current)
+                animationIntervalRef.current = null
             }
-        };
-    }, [handleKeyDown, handleKeyUp]);
+        }
+    }, [handleKeyDown, handleKeyUp])
 
     // Update URL when scene changes (handled in transition completion to avoid blocking navigation)
 
@@ -301,37 +346,42 @@ export default function VirtualTour({
     useEffect(() => {
         const fetchTourData = async () => {
             try {
-                setIsLoading(true);
-                const data = await getTourData();
-                setTourData(data);
+                setIsLoading(true)
+                const data = await getTourData()
+                setTourData(data)
 
                 // Update starting scene if the data has scenes and the default scene doesn't exist
                 if (data.scenes.length > 0) {
-                    const initialSceneId = getInitialScene();
-                    const sceneExists = data.scenes.some((scene) => scene.id === initialSceneId);
+                    const initialSceneId = getInitialScene()
+                    const sceneExists = data.scenes.some(
+                        (scene) => scene.id === initialSceneId
+                    )
                     if (!sceneExists) {
-                        setCurrentScene(data.scenes[0].id);
+                        setCurrentScene(data.scenes[0].id)
                     }
 
                     // Start preloading all scene images
-                    preloadSceneImages(data.scenes);
+                    preloadSceneImages(data.scenes)
                 }
             } catch (error) {
-                console.error("Failed to fetch tour data:", error);
+                console.error('Failed to fetch tour data:', error)
             } finally {
-                setIsLoading(false);
+                setIsLoading(false)
             }
-        };
+        }
 
-        fetchTourData();
-    }, [getInitialScene, preloadSceneImages]);
+        fetchTourData()
+    }, [getInitialScene, preloadSceneImages])
 
     useEffect(() => {
-        if (!containerRef.current || isLoading || !tourData.scenes.length) return;
+        if (!containerRef.current || isLoading || !tourData.scenes.length)
+            return
 
         const initializeViewer = () => {
-            const currentSceneData = tourData.scenes.find((scene) => scene.id === currentScene);
-            if (!currentSceneData) return;
+            const currentSceneData = tourData.scenes.find(
+                (scene) => scene.id === currentScene
+            )
+            if (!currentSceneData) return
 
             // Initialize Photo Sphere Viewer only once
             viewerRef.current = new Viewer({
@@ -339,9 +389,12 @@ export default function VirtualTour({
                 panorama: currentSceneData.panorama,
                 minFov: 30,
                 maxFov: 120,
-                loadingImg: "/logo.png", // Remove loading icon
-                loadingTxt: "", // Remove loading text
-                navbar: showNavbar && !isProductDetailsOpen && !isProductsListOpen ? ["zoom", "fullscreen"] : false,
+                loadingImg: '/logo.png', // Remove loading icon
+                loadingTxt: '', // Remove loading text
+                navbar:
+                    showNavbar && !isProductDetailsOpen && !isProductsListOpen
+                        ? ['zoom', 'fullscreen']
+                        : false,
                 plugins: [
                     [
                         MarkersPlugin,
@@ -350,236 +403,308 @@ export default function VirtualTour({
                         },
                     ],
                 ],
-            });
+            })
 
             // Store plugin references
-            markersPluginRef.current = viewerRef.current.getPlugin(MarkersPlugin) as MarkersPlugin;
+            markersPluginRef.current = viewerRef.current.getPlugin(
+                MarkersPlugin
+            ) as MarkersPlugin
 
             // Set up event listeners
-            viewerRef.current.addEventListener("ready", () => {
+            viewerRef.current.addEventListener('ready', () => {
                 // Set initial position when viewer is ready
                 if (viewerRef.current) {
                     viewerRef.current.rotate({
                         yaw: startingYaw,
                         pitch: startingPitch,
-                    });
+                    })
                 }
-                addMarkers();
-            });
-            markersPluginRef.current?.addEventListener("select-marker", handleMarkerClick);
+                addMarkers()
+            })
+            markersPluginRef.current?.addEventListener(
+                'select-marker',
+                handleMarkerClick
+            )
 
             // Listen for position changes
-            viewerRef.current.addEventListener("position-updated", (event: any) => {
-                setCurrentPosition({ yaw: event.position.yaw, pitch: event.position.pitch });
-            });
+            viewerRef.current.addEventListener(
+                'position-updated',
+                (event: any) => {
+                    setCurrentPosition({
+                        yaw: event.position.yaw,
+                        pitch: event.position.pitch,
+                    })
+                }
+            )
 
             // Listen for zoom changes
-            viewerRef.current.addEventListener("zoom-updated", (event: any) => {
-                setCurrentZoom(event.zoomLevel);
-            });
-        };
+            viewerRef.current.addEventListener('zoom-updated', (event: any) => {
+                setCurrentZoom(event.zoomLevel)
+            })
+        }
 
         // Only initialize viewer once
         if (!viewerRef.current) {
-            initializeViewer();
+            initializeViewer()
         }
 
         // Cleanup function
         return () => {
             if (viewerRef.current) {
-                viewerRef.current.destroy();
-                viewerRef.current = null;
+                viewerRef.current.destroy()
+                viewerRef.current = null
             }
-        };
-    }, [showNavbar, isProductDetailsOpen, isProductsListOpen, tourData, isLoading, startingYaw, startingPitch]);
+        }
+    }, [
+        showNavbar,
+        isProductDetailsOpen,
+        isProductsListOpen,
+        tourData,
+        isLoading,
+        startingYaw,
+        startingPitch,
+    ])
 
     // Separate effect for scene transitions
     useEffect(() => {
-        if (!viewerRef.current || !tourData.scenes.length) return;
+        if (!viewerRef.current || !tourData.scenes.length) return
 
-        const currentSceneData = tourData.scenes.find((scene) => scene.id === currentScene);
-        if (!currentSceneData) return;
+        const currentSceneData = tourData.scenes.find(
+            (scene) => scene.id === currentScene
+        )
+        if (!currentSceneData) return
 
         // Prevent multiple concurrent transitions
         if (isTransitioningRef.current) {
-            console.log("Transition already in progress, skipping");
-            return;
+            console.log('Transition already in progress, skipping')
+            return
         }
 
         const transitionToScene = async () => {
             try {
-                console.log("Starting transition to scene:", currentSceneData.id, "Initial load:", isInitialLoad);
+                console.log(
+                    'Starting transition to scene:',
+                    currentSceneData.id,
+                    'Initial load:',
+                    isInitialLoad
+                )
 
                 // Helper function to increment scene view count
                 const incrementViewCount = () => {
                     // Only increment if this scene hasn't been viewed yet in this session
                     if (!viewedScenes.has(currentSceneData.id)) {
-                        console.log("Incrementing view count for scene:", currentSceneData.id);
-                        
+                        console.log(
+                            'Incrementing view count for scene:',
+                            currentSceneData.id
+                        )
+
                         // Convert scene ID to number for the API call
-                        const sceneIdNumber = parseInt(currentSceneData.id, 10);
+                        const sceneIdNumber = parseInt(currentSceneData.id, 10)
                         if (!isNaN(sceneIdNumber)) {
-                            incrementSceneView.mutate(sceneIdNumber);
-                            
+                            incrementSceneView.mutate(sceneIdNumber)
+
                             // Mark this scene as viewed
-                            setViewedScenes(prev => new Set(prev).add(currentSceneData.id));
+                            setViewedScenes((prev) =>
+                                new Set(prev).add(currentSceneData.id)
+                            )
                         } else {
-                            console.warn("Invalid scene ID for view increment:", currentSceneData.id);
+                            console.warn(
+                                'Invalid scene ID for view increment:',
+                                currentSceneData.id
+                            )
                         }
                     } else {
-                        console.log("Scene already viewed in this session:", currentSceneData.id);
+                        console.log(
+                            'Scene already viewed in this session:',
+                            currentSceneData.id
+                        )
                     }
-                };
+                }
 
                 if (isInitialLoad) {
-                    await viewerRef.current!.setPanorama(currentSceneData.panorama, {
-                        transition: false, // Disable transition on initial load
-                        showLoader: false,
-                    });
+                    await viewerRef.current!.setPanorama(
+                        currentSceneData.panorama,
+                        {
+                            transition: false, // Disable transition on initial load
+                            showLoader: false,
+                        }
+                    )
 
                     setTimeout(() => {
-                        addMarkers();
+                        addMarkers()
                         // Increment view count for initial scene load
-                        incrementViewCount();
-                        
+                        incrementViewCount()
+
                         // Dispatch custom event for initial scene load
                         if (typeof window !== 'undefined') {
-                            const sceneChangeEvent = new CustomEvent('sceneChanged', {
-                                detail: {
-                                    sceneId: currentSceneData.id,
-                                    sceneName: currentSceneData.name,
-                                    isInitialLoad: true
+                            const sceneChangeEvent = new CustomEvent(
+                                'sceneChanged',
+                                {
+                                    detail: {
+                                        sceneId: currentSceneData.id,
+                                        sceneName: currentSceneData.name,
+                                        isInitialLoad: true,
+                                    },
                                 }
-                            });
-                            window.dispatchEvent(sceneChangeEvent);
+                            )
+                            window.dispatchEvent(sceneChangeEvent)
                         }
-                    }, 200);
+                    }, 200)
 
-                    setIsInitialLoad(false);
-                    return;
+                    setIsInitialLoad(false)
+                    return
                 }
 
                 // Normal transition for scene changes
-                isTransitioningRef.current = true;
-                setIsTransitioning(true);
+                isTransitioningRef.current = true
+                setIsTransitioning(true)
 
                 // Check if image is preloaded for faster transition
-                const isImagePreloaded = preloadedImages.has(currentSceneData.panorama);
+                const isImagePreloaded = preloadedImages.has(
+                    currentSceneData.panorama
+                )
 
                 // Use setPanorama for smooth transitions
-                await viewerRef.current!.setPanorama(currentSceneData.panorama, {
-                    transition: true, // Enable smooth transition
-                    showLoader: !isImagePreloaded, // Only show loader if image isn't preloaded
-                });
+                await viewerRef.current!.setPanorama(
+                    currentSceneData.panorama,
+                    {
+                        transition: true, // Enable smooth transition
+                        showLoader: !isImagePreloaded, // Only show loader if image isn't preloaded
+                    }
+                )
 
                 // Reset transition state immediately after setPanorama completes
-                console.log("Transition completed, resetting state");
-                isTransitioningRef.current = false;
-                
+                console.log('Transition completed, resetting state')
+                isTransitioningRef.current = false
+
                 // Force state update with a callback to ensure it's applied
                 setIsTransitioning((prev) => {
-                    console.log("Setting isTransitioning from", prev, "to false");
-                    return false;
-                });
+                    console.log(
+                        'Setting isTransitioning from',
+                        prev,
+                        'to false'
+                    )
+                    return false
+                })
 
                 // Update markers after transition with reduced delay for faster feel
-                const delay = isImagePreloaded ? 0 : 100; // Reduced delay from 200ms to 100ms
+                const delay = isImagePreloaded ? 0 : 100 // Reduced delay from 200ms to 100ms
                 setTimeout(() => {
-                    console.log("Adding markers after delay");
-                    addMarkers();
-                    
+                    console.log('Adding markers after delay')
+                    addMarkers()
+
                     // Increment view count after scene is fully loaded and visible
-                    incrementViewCount();
+                    incrementViewCount()
 
                     // Dispatch custom event for test page monitoring
                     if (typeof window !== 'undefined') {
-                        const sceneChangeEvent = new CustomEvent('sceneChanged', {
-                            detail: {
-                                sceneId: currentSceneData.id,
-                                sceneName: currentSceneData.name,
-                                viewCount: currentSceneData.id // We'll get the actual count from the database
+                        const sceneChangeEvent = new CustomEvent(
+                            'sceneChanged',
+                            {
+                                detail: {
+                                    sceneId: currentSceneData.id,
+                                    sceneName: currentSceneData.name,
+                                    viewCount: currentSceneData.id, // We'll get the actual count from the database
+                                },
                             }
-                        });
-                        window.dispatchEvent(sceneChangeEvent);
+                        )
+                        window.dispatchEvent(sceneChangeEvent)
                     }
 
                     // Update URL after transition is complete using simple history API
                     setTimeout(() => {
                         if (!isUpdatingUrlRef.current) {
-                            isUpdatingUrlRef.current = true;
-                            const currentUrl = new URL(window.location.href);
-                            const currentSceneParam = currentUrl.searchParams.get("scene");
+                            isUpdatingUrlRef.current = true
+                            const currentUrl = new URL(window.location.href)
+                            const currentSceneParam =
+                                currentUrl.searchParams.get('scene')
 
                             if (currentSceneParam !== currentSceneData.id) {
-                                currentUrl.searchParams.set("scene", currentSceneData.id);
-                                window.history.replaceState({ ...window.history.state }, "", currentUrl.toString());
+                                currentUrl.searchParams.set(
+                                    'scene',
+                                    currentSceneData.id
+                                )
+                                window.history.replaceState(
+                                    { ...window.history.state },
+                                    '',
+                                    currentUrl.toString()
+                                )
                             }
 
                             // Reset the flag after a short delay
                             setTimeout(() => {
-                                isUpdatingUrlRef.current = false;
-                            }, 100);
+                                isUpdatingUrlRef.current = false
+                            }, 100)
                         }
-                    }, 50);
-                }, delay);
+                    }, 50)
+                }, delay)
             } catch (error) {
-                console.error("Error transitioning to scene:", error);
-                isTransitioningRef.current = false;
-                setIsTransitioning(false);
+                console.error('Error transitioning to scene:', error)
+                isTransitioningRef.current = false
+                setIsTransitioning(false)
             }
-        };
+        }
 
-        transitionToScene();
-    }, [currentScene, tourData, preloadedImages, isInitialLoad]);
+        transitionToScene()
+    }, [currentScene, tourData, preloadedImages, isInitialLoad])
 
     // Effect to dynamically show/hide navbar based on modal states
     useEffect(() => {
-        if (!viewerRef.current) return;
+        if (!viewerRef.current) return
 
         // Get the navbar element and hide/show it with CSS
-        const navbarElement = viewerRef.current.container.querySelector(".psv-navbar");
+        const navbarElement =
+            viewerRef.current.container.querySelector('.psv-navbar')
         if (navbarElement) {
             if (isProductDetailsOpen || isProductsListOpen) {
-                (navbarElement as HTMLElement).style.display = "none";
+                ;(navbarElement as HTMLElement).style.display = 'none'
             } else {
-                (navbarElement as HTMLElement).style.display = "";
+                ;(navbarElement as HTMLElement).style.display = ''
             }
         }
-    }, [isProductDetailsOpen, isProductsListOpen]);
+    }, [isProductDetailsOpen, isProductsListOpen])
 
     // Add markers for navigation links and info spots
     const addMarkers = useCallback(() => {
-        if (!markersPluginRef.current || !tourData.scenes.length) return;
+        if (!markersPluginRef.current || !tourData.scenes.length) return
 
-        const currentSceneData = tourData.scenes.find((scene) => scene.id === currentScene);
-        if (!currentSceneData) return;
+        const currentSceneData = tourData.scenes.find(
+            (scene) => scene.id === currentScene
+        )
+        if (!currentSceneData) return
 
         // Clear existing markers
-        markersPluginRef.current.clearMarkers();
+        markersPluginRef.current.clearMarkers()
 
         // Add navigation link markers
         currentSceneData.links.forEach((link, index) => {
             markersPluginRef.current?.addMarker({
                 id: `link-${index}`,
-                position: { yaw: link.position.yaw, pitch: link.position.pitch },
-                image: "/explore.svg", // Using existing icon
+                position: {
+                    yaw: link.position.yaw,
+                    pitch: link.position.pitch,
+                },
+                image: '/explore.svg', // Using existing icon
                 size: { width: 40, height: 40 },
-                anchor: "center center",
+                anchor: 'center center',
                 tooltip: {
                     content: `${link.name}`,
-                    position: "top center",
+                    position: 'top center',
                 },
                 data: {
                     nodeId: link.nodeId,
                 },
-            });
-        });
+            })
+        })
 
         // Add info spot markers
         currentSceneData.infoSpots.forEach((info, index) => {
             markersPluginRef.current?.addMarker({
                 id: `info-${index}`,
-                position: { yaw: info.position.yaw, pitch: info.position.pitch },
+                position: {
+                    yaw: info.position.yaw,
+                    pitch: info.position.pitch,
+                },
                 html: `
           <div style="
             width: 32px; 
@@ -609,82 +734,104 @@ export default function VirtualTour({
             }
           </style>
         `,
-                anchor: "center center",
+                anchor: 'center center',
                 tooltip: {
                     content: info.title,
-                    position: "top center",
+                    position: 'top center',
                 },
                 data: {
-                    type: "info",
+                    type: 'info',
                     title: info.title,
                     text: info.text,
                     action: info.action,
                 },
-            });
-        });
-    }, [currentScene, tourData]);
+            })
+        })
+    }, [currentScene, tourData])
 
     // Handle different action types dynamically
-    const handleInfoSpotAction = (action: InfoSpotAction, title: string, text: string) => {
-        console.log("InfoSpot action triggered:", { action, title, text, currentScene });
+    const handleInfoSpotAction = (
+        action: InfoSpotAction,
+        title: string,
+        text: string
+    ) => {
+        console.log('InfoSpot action triggered:', {
+            action,
+            title,
+            text,
+            currentScene,
+        })
 
         switch (action.type) {
-            case "modal":
-                if (action.modalType === "products-list") {
+            case 'modal':
+                if (action.modalType === 'products-list') {
                     // Use the action ID to fetch products linked to this infospot action
-                    console.log("Opening products list for action ID:", action.id);
-                    setProductsList(action.id || currentScene);
-                    setIsProductsListOpen(true);
+                    console.log(
+                        'Opening products list for action ID:',
+                        action.id
+                    )
+                    setProductsList(action.id || currentScene)
+                    setIsProductsListOpen(true)
                 }
                 // Add other modal types here as needed
-                break;
+                break
 
-            case "alert":
-                alert(`${title}\n\n${text}`);
-                break;
+            case 'alert':
+                alert(`${title}\n\n${text}`)
+                break
 
-            case "custom":
+            case 'custom':
                 // Handle custom actions based on customHandler
-                console.log(`Custom action: ${action.customHandler}`);
-                break;
+                console.log(`Custom action: ${action.customHandler}`)
+                break
 
             default:
-                console.warn(`Unknown action type: ${action.type}`);
+                console.warn(`Unknown action type: ${action.type}`)
                 // Fallback to alert
-                alert(`${title}\n\n${text}`);
+                alert(`${title}\n\n${text}`)
         }
-    };
+    }
 
     // Handle marker clicks
     const handleMarkerClick = useCallback(
         (e: {
             marker: {
-                data?: { nodeId?: string; type?: string; title?: string; text?: string; action?: InfoSpotAction };
-            };
+                data?: {
+                    nodeId?: string
+                    type?: string
+                    title?: string
+                    text?: string
+                    action?: InfoSpotAction
+                }
+            }
         }) => {
-            console.log("Marker clicked:", e.marker);
-            console.log("Is transitioning (state):", isTransitioning);
-            console.log("Is transitioning (ref):", isTransitioningRef.current);
+            console.log('Marker clicked:', e.marker)
+            console.log('Is transitioning (state):', isTransitioning)
+            console.log('Is transitioning (ref):', isTransitioningRef.current)
 
             // Use only ref for transition checking since it's more reliable
             if (isTransitioningRef.current) {
-                console.log("Ignoring click - transitioning (ref check)");
-                return; // Prevent clicks during transitions
+                console.log('Ignoring click - transitioning (ref check)')
+                return // Prevent clicks during transitions
             }
 
-            const marker = e.marker;
+            const marker = e.marker
             if (marker.data?.nodeId) {
                 // Navigate to another scene
-                console.log("Navigating to scene:", marker.data.nodeId);
-                setCurrentScene(marker.data.nodeId);
-            } else if (marker.data?.type === "info" && marker.data.action) {
+                console.log('Navigating to scene:', marker.data.nodeId)
+                setCurrentScene(marker.data.nodeId)
+            } else if (marker.data?.type === 'info' && marker.data.action) {
                 // Handle info spot action dynamically
-                console.log("Handling info spot action");
-                handleInfoSpotAction(marker.data.action, marker.data.title || "", marker.data.text || "");
+                console.log('Handling info spot action')
+                handleInfoSpotAction(
+                    marker.data.action,
+                    marker.data.title || '',
+                    marker.data.text || ''
+                )
             }
         },
         [isTransitioning, handleInfoSpotAction, currentScene]
-    );
+    )
 
     if (isLoading) {
         return (
@@ -693,11 +840,17 @@ export default function VirtualTour({
                 style={{ height: actualHeight, width }}
             >
                 <div className="text-center">
-                    <img src="/logo.png" alt="Loading" className="h-12 w-12 mx-auto mb-4" />
-                    <p className="text-gray-600">Chargement de la visite virtuelle...</p>
+                    <img
+                        src="/logo.png"
+                        alt="Loading"
+                        className="mx-auto mb-4 h-12 w-12"
+                    />
+                    <p className="text-gray-600">
+                        Chargement de la visite virtuelle...
+                    </p>
                 </div>
             </div>
-        );
+        )
     }
 
     if (!tourData.scenes.length) {
@@ -707,19 +860,34 @@ export default function VirtualTour({
                 style={{ height: actualHeight, width }}
             >
                 <div className="text-center">
-                    <p className="text-gray-600">Aucune scène de visite disponible</p>
+                    <p className="text-gray-600">
+                        Aucune scène de visite disponible
+                    </p>
                 </div>
             </div>
-        );
+        )
     }
 
     return (
-        <div className={`relative ${className}`} style={{ height: actualHeight, width }}>
-            <div ref={containerRef} className="w-full h-full" style={{ height: actualHeight, width }} />
+        <div
+            className={`relative ${className}`}
+            style={{ height: actualHeight, width }}
+        >
+            <div
+                ref={containerRef}
+                className="h-full w-full"
+                style={{ height: actualHeight, width }}
+            />
 
             {/* Scene information overlay */}
-            <div className="absolute top-4 left-4 z-10 bg-black/70 text-white px-4 py-2 rounded-lg">
-                <h3 className="font-semibold">{tourData.scenes.find((scene) => scene.id === currentScene)?.name}</h3>
+            <div className="absolute top-4 left-4 z-10 rounded-lg bg-black/70 px-4 py-2 text-white">
+                <h3 className="font-supreme">
+                    {
+                        tourData.scenes.find(
+                            (scene) => scene.id === currentScene
+                        )?.name
+                    }
+                </h3>
                 {/* <p className="text-sm opacity-75">
                     {tourData.scenes.findIndex((scene) => scene.id === currentScene) + 1} sur {tourData.scenes.length}
                 </p> */}
@@ -765,11 +933,11 @@ export default function VirtualTour({
             <ProductsListModal
                 isOpen={productsList}
                 onClose={() => {
-                    setProductsList(null);
-                    setIsProductsListOpen(false);
+                    setProductsList(null)
+                    setIsProductsListOpen(false)
                 }}
                 onProductDetailsChange={setIsProductDetailsOpen}
             />
         </div>
-    );
+    )
 }
