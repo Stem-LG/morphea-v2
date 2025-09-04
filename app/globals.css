@@ -142,8 +142,23 @@
     * {
         @apply border-border outline-ring/50;
     }
+
     body {
         @apply bg-background text-foreground;
+    }
+
+    /* Hide Photo Sphere Viewer default loading circle */
+    .psv-loader-canvas,
+    .psv-loader svg,
+    .psv-loader .psv-loader-canvas,
+    svg.psv-loader-canvas {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+    }
+    
+    .psv-loader {
+        background: transparent !important;
     }
 }
 
@@ -180,29 +195,27 @@
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: linear-gradient(
-        to bottom right,
-        var(--morpheus-gold-dark),
-        var(--morpheus-gold-light)
-    );
+    background: linear-gradient(to bottom right,
+            var(--morpheus-gold-dark),
+            var(--morpheus-gold-light));
     border-radius: 4px;
     transition: background 0.3s ease;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(
-        to bottom,
-        var(--morpheus-gold-light),
-        var(--morpheus-gold-dark)
-    );
+    background: linear-gradient(to bottom,
+            var(--morpheus-gold-light),
+            var(--morpheus-gold-dark));
 }
 
 /* Custom animations for login page */
 @keyframes gradient-x {
+
     0%,
     100% {
         background-position: 0% 50%;
     }
+
     50% {
         background-position: 100% 50%;
     }
