@@ -65,6 +65,17 @@ const ALLOWED_SETTING_KEYS = [
   'homepage_collections_subtitle_fr',
   'homepage_collections_image1_url',
   'homepage_collections_image2_url',
+  // Homepage Collections Cards
+  'homepage_collections_card1_title_en',
+  'homepage_collections_card1_title_fr',
+  'homepage_collections_card1_subtitle_en',
+  'homepage_collections_card1_subtitle_fr',
+  'homepage_collections_card1_link',
+  'homepage_collections_card2_title_en',
+  'homepage_collections_card2_title_fr',
+  'homepage_collections_card2_subtitle_en',
+  'homepage_collections_card2_subtitle_fr',
+  'homepage_collections_card2_link',
   // Homepage Categories Section
   'homepage_categories_title_en',
   'homepage_categories_title_fr',

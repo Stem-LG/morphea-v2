@@ -32,6 +32,16 @@ interface HomeSettings {
     subtitle: { en: string | null; fr: string | null }
     image1Url: string | null
     image2Url: string | null
+    card1: {
+      title: { en: string | null; fr: string | null }
+      subtitle: { en: string | null; fr: string | null }
+      link: string | null
+    }
+    card2: {
+      title: { en: string | null; fr: string | null }
+      subtitle: { en: string | null; fr: string | null }
+      link: string | null
+    }
   }
   // Categories Section
   categories: {
@@ -199,7 +209,29 @@ export function useHomeSettings() {
             fr: getSetting('homepage_collections_subtitle_fr')
           },
           image1Url: getSetting('homepage_collections_image1_url'),
-          image2Url: getSetting('homepage_collections_image2_url')
+          image2Url: getSetting('homepage_collections_image2_url'),
+          card1: {
+            title: {
+              en: getSetting('homepage_collections_card1_title_en'),
+              fr: getSetting('homepage_collections_card1_title_fr')
+            },
+            subtitle: {
+              en: getSetting('homepage_collections_card1_subtitle_en'),
+              fr: getSetting('homepage_collections_card1_subtitle_fr')
+            },
+            link: getSetting('homepage_collections_card1_link')
+          },
+          card2: {
+            title: {
+              en: getSetting('homepage_collections_card2_title_en'),
+              fr: getSetting('homepage_collections_card2_title_fr')
+            },
+            subtitle: {
+              en: getSetting('homepage_collections_card2_subtitle_en'),
+              fr: getSetting('homepage_collections_card2_subtitle_fr')
+            },
+            link: getSetting('homepage_collections_card2_link')
+          }
         },
         categories: {
           title: {

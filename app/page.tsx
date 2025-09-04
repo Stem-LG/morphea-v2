@@ -90,13 +90,23 @@ export default function Home() {
             t('homepage.collections.subtitle'),
         card1: {
             image: homeSettings?.collections.image1Url || '/p1.jpg',
-            title: t('homepage.collections.autumnCollection'),
-            subtitle: t('homepage.collections.autumnSubtitle'),
+            title:
+                homeSettings?.collections.card1?.title[language] ||
+                t('homepage.collections.autumnCollection'),
+            subtitle:
+                homeSettings?.collections.card1?.subtitle[language] ||
+                t('homepage.collections.autumnSubtitle'),
+            link: homeSettings?.collections.card1?.link || '#',
         },
         card2: {
             image: homeSettings?.collections.image2Url || '/p2.jpg',
-            title: t('homepage.collections.autumnCollection'),
-            subtitle: t('homepage.collections.autumnSubtitle'),
+            title:
+                homeSettings?.collections.card2?.title[language] ||
+                t('homepage.collections.autumnCollection'),
+            subtitle:
+                homeSettings?.collections.card2?.subtitle[language] ||
+                t('homepage.collections.autumnSubtitle'),
+            link: homeSettings?.collections.card2?.link || '#',
         },
     }
 
@@ -307,7 +317,30 @@ export default function Home() {
 
                     <div className="flex flex-col justify-center gap-8 md:flex-row md:gap-16">
                         {collectionData.card1 && (
-                            <div className="group relative w-full cursor-pointer touch-manipulation overflow-hidden rounded-2xl md:w-[500px]">
+                            <div
+                                className="group relative w-full cursor-pointer touch-manipulation overflow-hidden rounded-2xl md:w-[500px]"
+                                onClick={() => {
+                                    if (
+                                        collectionData.card1.link &&
+                                        collectionData.card1.link !== '#'
+                                    ) {
+                                        if (
+                                            collectionData.card1.link.startsWith(
+                                                'http'
+                                            )
+                                        ) {
+                                            window.open(
+                                                collectionData.card1.link,
+                                                '_blank'
+                                            )
+                                        } else {
+                                            router.push(
+                                                collectionData.card1.link
+                                            )
+                                        }
+                                    }
+                                }}
+                            >
                                 <img
                                     src={collectionData.card1.image}
                                     alt={collectionData.card1.title}
@@ -326,7 +359,30 @@ export default function Home() {
                         )}
 
                         {collectionData.card2 && (
-                            <div className="group relative w-full cursor-pointer touch-manipulation overflow-hidden rounded-2xl md:w-[500px]">
+                            <div
+                                className="group relative w-full cursor-pointer touch-manipulation overflow-hidden rounded-2xl md:w-[500px]"
+                                onClick={() => {
+                                    if (
+                                        collectionData.card2.link &&
+                                        collectionData.card2.link !== '#'
+                                    ) {
+                                        if (
+                                            collectionData.card2.link.startsWith(
+                                                'http'
+                                            )
+                                        ) {
+                                            window.open(
+                                                collectionData.card2.link,
+                                                '_blank'
+                                            )
+                                        } else {
+                                            router.push(
+                                                collectionData.card2.link
+                                            )
+                                        }
+                                    }
+                                }}
+                            >
                                 <img
                                     src={collectionData.card2.image}
                                     alt={collectionData.card2.title}

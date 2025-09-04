@@ -13,7 +13,7 @@ export const enTranslations = {
   },
   "common": {
     "welcome": "Welcome",
-    "logout": "Logout",
+    "logout": "Se déconnecter",
     "language": "Language",
     "english": "English",
     "french": "French",
