@@ -1,15 +1,17 @@
 'use client'
 
-import { Suspense, useState, useCallback, useEffect } from 'react'
+import { Suspense, useState, useCallback, useEffect, useMemo } from 'react'
 import { X, ChevronDown } from 'lucide-react'
 import { useQueryStates, parseAsInteger, parseAsString } from 'nuqs'
 import { useLanguage } from '@/hooks/useLanguage'
+import { useCurrency } from '@/hooks/useCurrency'
 import { useShopProductsInfinite } from './_hooks/use-shop-products'
 import {
     useShopBoutiques,
     useShopCategories,
     useShopColors,
     useShopSizes,
+    useShopPriceRange,
 } from './_hooks/use-shop-filters'
 import { ProductCard } from './_components/product-card'
 import { ProductDetailsPage } from '@/app/main/_components/product-details-page'
@@ -23,6 +25,7 @@ import {
 } from '@/components/ui/sheet'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
+import { Slider } from '@/components/ui/slider'
 
 // Custom SVG Components
 const ThreeColumnIcon = ({
@@ -311,6 +314,7 @@ const SortIcon = ({ className }: { className?: string }) => (
 
 function ShopContent() {
     const { t } = useLanguage()
+    const { currentCurrency, convertPrice, formatPrice } = useCurrency()
 
     // URL state management for filters and view mode
     const [
@@ -391,6 +395,85 @@ function ShopContent() {
     )
     const { data: colors = [] } = useShopColors()
     const { data: sizes = [] } = useShopSizes()
+    const { data: priceRange = { min: 0, max: 1000 } } = useShopPriceRange()
+
+    // Convert price range to current currency and get decimal places
+    const convertedPriceRange = useMemo(() => {
+        if (!currentCurrency) return { min: 0, max: 1000, decimals: 2 }
+
+        const decimals = currentCurrency.xdevisenbrdec || 2
+
+        // If current currency is the pivot currency, no conversion needed
+        if (currentCurrency.xispivot) {
+            return {
+                min: Math.max(0, priceRange.min),
+                max: priceRange.max,
+                decimals,
+            }
+        }
+
+        // Convert from pivot currency to current currency
+        const convertedMin = convertPrice(priceRange.min)
+        const convertedMax = convertPrice(priceRange.max)
+
+        // Debug logging to see what's happening
+        console.log('Price Range Conversion Debug:', {
+            originalRange: priceRange,
+            currentCurrency: {
+                code: currentCurrency.xdevisecodealpha,
+                exchangeRate: currentCurrency.xtauxechange,
+                isPivot: currentCurrency.xispivot,
+                decimals: currentCurrency.xdevisenbrdec,
+            },
+            convertedMin,
+            convertedMax,
+            convertedMinFixed: Number(convertedMin.toFixed(decimals)),
+            convertedMaxFixed: Number(convertedMax.toFixed(decimals)),
+        })
+
+        // Ensure reasonable bounds
+        const safeMin = Math.max(0, Number(convertedMin.toFixed(decimals)))
+        const safeMax = Math.max(
+            safeMin,
+            Number(convertedMax.toFixed(decimals))
+        )
+
+        return {
+            min: safeMin,
+            max: safeMax,
+            decimals,
+        }
+    }, [priceRange, currentCurrency, convertPrice])
+
+    // Convert URL price params to current currency for display
+    const displayPrices = useMemo(() => {
+        const displayMin = minPrice
+            ? Number(
+                  convertPrice(minPrice).toFixed(convertedPriceRange.decimals)
+              )
+            : null
+        const displayMax = maxPrice
+            ? Number(
+                  convertPrice(maxPrice).toFixed(convertedPriceRange.decimals)
+              )
+            : null
+
+        return { min: displayMin, max: displayMax }
+    }, [minPrice, maxPrice, convertPrice, convertedPriceRange.decimals])
+
+    // Local state for input values (separate from slider to avoid conflicts)
+    const [inputValues, setInputValues] = useState({
+        min: displayPrices.min?.toString() || '',
+        max: displayPrices.max?.toString() || '',
+    })
+
+    // Update input values when display prices change
+    useEffect(() => {
+        setInputValues({
+            min: displayPrices.min?.toString() || '',
+            max: displayPrices.max?.toString() || '',
+        })
+    }, [displayPrices])
 
     // Handle filter changes (no pagination needed)
     const handleFilterChange = useCallback(
@@ -398,6 +481,109 @@ function ShopContent() {
             setQueryState({ [key]: value })
         },
         [setQueryState]
+    )
+
+    // Convert price from current currency to pivot currency for API
+    const convertToPivotCurrency = useCallback(
+        (price: number) => {
+            if (!currentCurrency) return price
+
+            // Convert from current currency to pivot currency
+            if (currentCurrency.xispivot) {
+                return price
+            } else if (currentCurrency.xtauxechange > 0) {
+                return price / currentCurrency.xtauxechange
+            }
+            return price
+        },
+        [currentCurrency]
+    )
+
+    // Handle slider changes
+    const handleSliderChange = useCallback(
+        (values: number[]) => {
+            const [newMin, newMax] = values
+
+            // Convert to pivot currency for API
+            const pivotMin = convertToPivotCurrency(newMin)
+            const pivotMax = convertToPivotCurrency(newMax)
+
+            setQueryState({
+                minPrice: newMin === convertedPriceRange.min ? null : pivotMin,
+                maxPrice: newMax === convertedPriceRange.max ? null : pivotMax,
+            })
+        },
+        [
+            setQueryState,
+            convertedPriceRange.min,
+            convertedPriceRange.max,
+            convertToPivotCurrency,
+        ]
+    )
+
+    // Validate decimal places for currency
+    const validateDecimalPlaces = useCallback(
+        (value: string, maxDecimals: number): boolean => {
+            if (value === '' || value === '.') return true
+
+            const decimalIndex = value.indexOf('.')
+            if (decimalIndex === -1) return true // No decimal point
+
+            const actualDecimals = value.length - decimalIndex - 1
+            return actualDecimals <= maxDecimals
+        },
+        []
+    )
+
+    // Handle manual input changes
+    const handleMinInputChange = useCallback(
+        (value: string) => {
+            // Validate decimal places before allowing the input
+            if (!validateDecimalPlaces(value, convertedPriceRange.decimals)) {
+                return // Don't update if too many decimal places
+            }
+
+            setInputValues((prev) => ({ ...prev, min: value }))
+
+            const numValue = parseFloat(value)
+            if (!isNaN(numValue) && numValue >= 0) {
+                const pivotValue = convertToPivotCurrency(numValue)
+                setQueryState({ minPrice: pivotValue })
+            } else if (value === '') {
+                setQueryState({ minPrice: null })
+            }
+        },
+        [
+            setQueryState,
+            convertToPivotCurrency,
+            validateDecimalPlaces,
+            convertedPriceRange.decimals,
+        ]
+    )
+
+    const handleMaxInputChange = useCallback(
+        (value: string) => {
+            // Validate decimal places before allowing the input
+            if (!validateDecimalPlaces(value, convertedPriceRange.decimals)) {
+                return // Don't update if too many decimal places
+            }
+
+            setInputValues((prev) => ({ ...prev, max: value }))
+
+            const numValue = parseFloat(value)
+            if (!isNaN(numValue) && numValue >= 0) {
+                const pivotValue = convertToPivotCurrency(numValue)
+                setQueryState({ maxPrice: pivotValue })
+            } else if (value === '') {
+                setQueryState({ maxPrice: null })
+            }
+        },
+        [
+            setQueryState,
+            convertToPivotCurrency,
+            validateDecimalPlaces,
+            convertedPriceRange.decimals,
+        ]
     )
 
     const hasActiveFilters = Boolean(boutiqueId || categoryId || search)
@@ -539,7 +725,9 @@ function ShopContent() {
                     {/* Header */}
                     <div className="flex-shrink-0">
                         <div className="flex items-center justify-center py-4 text-3xl">
-                            <h1 className="font-recia font-medium">Filtrer & Trier</h1>
+                            <h1 className="font-recia font-medium">
+                                Filtrer & Trier
+                            </h1>
                         </div>
                         <Separator />
                     </div>
@@ -563,9 +751,11 @@ function ShopContent() {
                                             sort: !prev.sort,
                                         }))
                                     }
-                                    className="h-12 w-full justify-between rounded-none text-lg text-neutral-400 hover:bg-morpheus-blue-lighter hover:text-white flex items-center p-4"
+                                    className="hover:bg-morpheus-blue-lighter flex h-12 w-full items-center justify-between rounded-none p-4 text-lg text-neutral-400 hover:text-white"
                                 >
-                                    <span className="flex-1 text-left">Trier Par</span>
+                                    <span className="flex-1 text-left">
+                                        Trier Par
+                                    </span>
                                     <ChevronDown
                                         className={cn(
                                             'size-5 transition-transform',
@@ -585,7 +775,7 @@ function ShopContent() {
                                                 )
                                             }
                                             className={cn(
-                                                'h-12 w-full justify-start rounded-none text-lg hover:bg-morpheus-blue-lighter hover:text-white flex items-center p-4',
+                                                'hover:bg-morpheus-blue-lighter flex h-12 w-full items-center justify-start rounded-none p-4 text-lg hover:text-white',
                                                 sortBy === 'newest'
                                                     ? 'text-morpheus-blue-dark bg-gray-50'
                                                     : 'text-neutral-400'
@@ -601,7 +791,7 @@ function ShopContent() {
                                                 )
                                             }
                                             className={cn(
-                                                'h-12 w-full justify-start rounded-none text-lg hover:bg-morpheus-blue-lighter hover:text-white flex items-center p-4',
+                                                'hover:bg-morpheus-blue-lighter flex h-12 w-full items-center justify-start rounded-none p-4 text-lg hover:text-white',
                                                 sortBy === 'price_asc'
                                                     ? 'text-morpheus-blue-dark bg-gray-50'
                                                     : 'text-neutral-400'
@@ -617,7 +807,7 @@ function ShopContent() {
                                                 )
                                             }
                                             className={cn(
-                                                'h-12 w-full justify-start rounded-none text-lg hover:bg-morpheus-blue-lighter hover:text-white flex items-center p-4',
+                                                'hover:bg-morpheus-blue-lighter flex h-12 w-full items-center justify-start rounded-none p-4 text-lg hover:text-white',
                                                 sortBy === 'price_desc'
                                                     ? 'text-morpheus-blue-dark bg-gray-50'
                                                     : 'text-neutral-400'
@@ -633,7 +823,7 @@ function ShopContent() {
                                                 )
                                             }
                                             className={cn(
-                                                'h-12 w-full justify-start rounded-none text-lg hover:bg-morpheus-blue-lighter hover:text-white flex items-center p-4',
+                                                'hover:bg-morpheus-blue-lighter flex h-12 w-full items-center justify-start rounded-none p-4 text-lg hover:text-white',
                                                 sortBy === 'alphabetical'
                                                     ? 'text-morpheus-blue-dark bg-gray-50'
                                                     : 'text-neutral-400'
@@ -659,9 +849,11 @@ function ShopContent() {
                                                         !prev.categories,
                                                 }))
                                             }
-                                            className="h-12 w-full justify-between rounded-none text-lg text-neutral-400 hover:bg-morpheus-blue-lighter hover:text-white flex items-center p-4"
+                                            className="hover:bg-morpheus-blue-lighter flex h-12 w-full items-center justify-between rounded-none p-4 text-lg text-neutral-400 hover:text-white"
                                         >
-                                            <span className="flex-1 text-left">Catégories</span>
+                                            <span className="flex-1 text-left">
+                                                Catégories
+                                            </span>
                                             <ChevronDown
                                                 className={cn(
                                                     'size-5 transition-transform',
@@ -675,7 +867,11 @@ function ShopContent() {
                                         {expandedSections.categories && (
                                             <div className="mt-2 space-y-0 px-2">
                                                 {categories.map((category) => (
-                                                    <div key={category.xcategprodid}>
+                                                    <div
+                                                        key={
+                                                            category.xcategprodid
+                                                        }
+                                                    >
                                                         <button
                                                             onClick={() =>
                                                                 handleFilterChange(
@@ -685,7 +881,7 @@ function ShopContent() {
                                                                 )
                                                             }
                                                             className={cn(
-                                                                'h-12 w-full justify-start rounded-none text-lg hover:bg-morpheus-blue-lighter hover:text-white flex items-center p-4',
+                                                                'hover:bg-morpheus-blue-lighter flex h-12 w-full items-center justify-start rounded-none p-4 text-lg hover:text-white',
                                                                 categoryId ===
                                                                     category.xcategprodid
                                                                     ? 'text-morpheus-blue-dark bg-gray-50'
@@ -714,9 +910,11 @@ function ShopContent() {
                                                     creators: !prev.creators,
                                                 }))
                                             }
-                                            className="h-12 w-full justify-between rounded-none text-lg text-neutral-400 hover:bg-morpheus-blue-lighter hover:text-white flex items-center p-4"
+                                            className="hover:bg-morpheus-blue-lighter flex h-12 w-full items-center justify-between rounded-none p-4 text-lg text-neutral-400 hover:text-white"
                                         >
-                                            <span className="flex-1 text-left">Créateurs</span>
+                                            <span className="flex-1 text-left">
+                                                Créateurs
+                                            </span>
                                             <ChevronDown
                                                 className={cn(
                                                     'size-5 transition-transform',
@@ -730,7 +928,11 @@ function ShopContent() {
                                         {expandedSections.creators && (
                                             <div className="mt-2 space-y-0 px-2">
                                                 {boutiques.map((boutique) => (
-                                                    <div key={boutique.yboutiqueid}>
+                                                    <div
+                                                        key={
+                                                            boutique.yboutiqueid
+                                                        }
+                                                    >
                                                         <button
                                                             onClick={() =>
                                                                 handleFilterChange(
@@ -740,7 +942,7 @@ function ShopContent() {
                                                                 )
                                                             }
                                                             className={cn(
-                                                                'h-12 w-full justify-start rounded-none text-lg hover:bg-morpheus-blue-lighter hover:text-white flex items-center p-4',
+                                                                'hover:bg-morpheus-blue-lighter flex h-12 w-full items-center justify-start rounded-none p-4 text-lg hover:text-white',
                                                                 boutiqueId ===
                                                                     boutique.yboutiqueid
                                                                     ? 'text-morpheus-blue-dark bg-gray-50'
@@ -768,9 +970,11 @@ function ShopContent() {
                                                     colors: !prev.colors,
                                                 }))
                                             }
-                                            className="h-12 w-full justify-between rounded-none text-lg text-neutral-400 hover:bg-morpheus-blue-lighter hover:text-white flex items-center p-4"
+                                            className="hover:bg-morpheus-blue-lighter flex h-12 w-full items-center justify-between rounded-none p-4 text-lg text-neutral-400 hover:text-white"
                                         >
-                                            <span className="flex-1 text-left">Couleurs</span>
+                                            <span className="flex-1 text-left">
+                                                Couleurs
+                                            </span>
                                             <ChevronDown
                                                 className={cn(
                                                     'size-5 transition-transform',
@@ -789,10 +993,12 @@ function ShopContent() {
                                                             onClick={() =>
                                                                 handleFilterChange(
                                                                     'colorId'
-                                                                )(color.xcouleurid)
+                                                                )(
+                                                                    color.xcouleurid
+                                                                )
                                                             }
                                                             className={cn(
-                                                                'h-12 w-full justify-start rounded-none text-lg hover:bg-morpheus-blue-lighter hover:text-white flex items-center gap-3 p-4',
+                                                                'hover:bg-morpheus-blue-lighter flex h-12 w-full items-center justify-start gap-3 rounded-none p-4 text-lg hover:text-white',
                                                                 colorId ===
                                                                     color.xcouleurid
                                                                     ? 'text-morpheus-blue-dark bg-gray-50'
@@ -823,9 +1029,11 @@ function ShopContent() {
                                                     sizes: !prev.sizes,
                                                 }))
                                             }
-                                            className="h-12 w-full justify-between rounded-none text-lg text-neutral-400 hover:bg-morpheus-blue-lighter hover:text-white flex items-center p-4"
+                                            className="hover:bg-morpheus-blue-lighter flex h-12 w-full items-center justify-between rounded-none p-4 text-lg text-neutral-400 hover:text-white"
                                         >
-                                            <span className="flex-1 text-left">Tailles</span>
+                                            <span className="flex-1 text-left">
+                                                Tailles
+                                            </span>
                                             <ChevronDown
                                                 className={cn(
                                                     'size-5 transition-transform',
@@ -844,10 +1052,12 @@ function ShopContent() {
                                                             onClick={() =>
                                                                 handleFilterChange(
                                                                     'sizeId'
-                                                                )(size.xtailleid)
+                                                                )(
+                                                                    size.xtailleid
+                                                                )
                                                             }
                                                             className={cn(
-                                                                'h-12 w-full justify-start rounded-none text-lg hover:bg-morpheus-blue-lighter hover:text-white flex items-center p-4',
+                                                                'hover:bg-morpheus-blue-lighter flex h-12 w-full items-center justify-start rounded-none p-4 text-lg hover:text-white',
                                                                 sizeId ===
                                                                     size.xtailleid
                                                                     ? 'text-morpheus-blue-dark bg-gray-50'
@@ -877,68 +1087,181 @@ function ShopContent() {
                                                 priceRange: !prev.priceRange,
                                             }))
                                         }
-                                        className="flex w-full items-center justify-between py-3 text-left"
+                                        className="hover:bg-morpheus-blue-lighter flex h-12 w-full items-center justify-between rounded-none p-4 text-lg text-neutral-400 hover:text-white"
                                     >
-                                        <h3 className="text-lg font-medium text-gray-900">
+                                        <span className="flex-1 text-left">
                                             Prix
-                                        </h3>
+                                        </span>
                                         <ChevronDown
                                             className={cn(
-                                                'h-5 w-5 text-gray-400 transition-transform',
+                                                'size-5 transition-transform',
                                                 expandedSections.priceRange
                                                     ? 'rotate-180'
                                                     : ''
                                             )}
                                         />
                                     </button>
+                                    <Separator />
                                     {expandedSections.priceRange && (
-                                        <div className="mt-2 space-y-3">
+                                        <div className="mt-2 space-y-4 px-2">
+                                            {/* Price Range Display
+                                            <div className="flex items-center justify-between text-sm text-gray-600">
+                                                <span>
+                                                    {displayPrices.min !== null
+                                                        ? formatPrice(
+                                                              displayPrices.min
+                                                          )
+                                                        : formatPrice(
+                                                              convertedPriceRange.min
+                                                          )}
+                                                </span>
+                                                <span>-</span>
+                                                <span>
+                                                    {displayPrices.max !== null
+                                                        ? formatPrice(
+                                                              displayPrices.max
+                                                          )
+                                                        : formatPrice(
+                                                              convertedPriceRange.max
+                                                          )}
+                                                </span>
+                                            </div> */}
+
+                                            {/* Slider */}
+                                            <div className="px-2">
+                                                {/* <Slider
+                                                    value={[
+                                                        Math.max(
+                                                            convertedPriceRange.min,
+                                                            Math.min(
+                                                                convertedPriceRange.max
+                                                            )
+                                                        ),
+                                                       ,
+                                                    ]}
+                                                    onValueChange={
+                                                        handleSliderChange
+                                                    }
+                                                    min={
+                                                        convertedPriceRange.min
+                                                    }
+                                                    max={
+                                                        convertedPriceRange.max
+                                                    }
+                                                    step={
+                                                        convertedPriceRange.decimals ===
+                                                        0
+                                                            ? 1
+                                                            : Math.pow(
+                                                                  10,
+                                                                  -convertedPriceRange.decimals
+                                                              )
+                                                    }
+                                                    className="w-full"
+                                                /> */}
+                                            </div>
+
+                                            {/* Manual Input Fields */}
                                             <div className="grid grid-cols-2 gap-3">
                                                 <div>
                                                     <label className="mb-1 block text-sm font-medium text-gray-700">
-                                                        Prix min
+                                                        Prix min (
+                                                        {currentCurrency?.xdevisecodealpha ||
+                                                            'EUR'}
+                                                        )
                                                     </label>
                                                     <input
                                                         type="number"
-                                                        placeholder="0"
-                                                        value={minPrice || ''}
-                                                        onChange={(e) => {
-                                                            const value = e
-                                                                .target.value
-                                                                ? parseInt(
-                                                                      e.target
-                                                                          .value
-                                                                  )
-                                                                : null
-                                                            setQueryState({
-                                                                minPrice: value,
-                                                            })
-                                                        }}
-                                                        className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-400 focus:outline-none"
+                                                        step={
+                                                            convertedPriceRange.decimals ===
+                                                            0
+                                                                ? '1'
+                                                                : Math.pow(
+                                                                      10,
+                                                                      -convertedPriceRange.decimals
+                                                                  ).toString()
+                                                        }
+                                                        placeholder={convertedPriceRange.min.toString()}
+                                                        value={inputValues.min}
+                                                        onChange={(e) =>
+                                                            handleMinInputChange(
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                        className={cn(
+                                                            'w-full rounded-lg border px-3 py-2 text-sm focus:outline-none',
+                                                            displayPrices.min !==
+                                                                null &&
+                                                                displayPrices.max !==
+                                                                    null &&
+                                                                displayPrices.min >
+                                                                    displayPrices.max
+                                                                ? 'border-red-300 focus:border-red-400'
+                                                                : 'border-gray-300 focus:border-gray-400'
+                                                        )}
                                                     />
+                                                    {displayPrices.min !==
+                                                        null &&
+                                                        displayPrices.max !==
+                                                            null &&
+                                                        displayPrices.min >
+                                                            displayPrices.max && (
+                                                            <p className="mt-1 text-xs text-red-500">
+                                                                Le prix min doit
+                                                                être inférieur
+                                                                au prix max
+                                                            </p>
+                                                        )}
                                                 </div>
                                                 <div>
                                                     <label className="mb-1 block text-sm font-medium text-gray-700">
-                                                        Prix max
+                                                        Prix max (
+                                                        {currentCurrency?.xdevisecodealpha ||
+                                                            'EUR'}
+                                                        )
                                                     </label>
                                                     <input
                                                         type="number"
-                                                        placeholder="1000"
-                                                        value={maxPrice || ''}
-                                                        onChange={(e) => {
-                                                            const value = e
-                                                                .target.value
-                                                                ? parseInt(
-                                                                      e.target
-                                                                          .value
-                                                                  )
-                                                                : null
-                                                            setQueryState({
-                                                                maxPrice: value,
-                                                            })
-                                                        }}
-                                                        className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-400 focus:outline-none"
+                                                        step={
+                                                            convertedPriceRange.decimals ===
+                                                            0
+                                                                ? '1'
+                                                                : Math.pow(
+                                                                      10,
+                                                                      -convertedPriceRange.decimals
+                                                                  ).toString()
+                                                        }
+                                                        placeholder={convertedPriceRange.max.toString()}
+                                                        value={inputValues.max}
+                                                        onChange={(e) =>
+                                                            handleMaxInputChange(
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                        className={cn(
+                                                            'w-full rounded-lg border px-3 py-2 text-sm focus:outline-none',
+                                                            displayPrices.min !==
+                                                                null &&
+                                                                displayPrices.max !==
+                                                                    null &&
+                                                                displayPrices.max <
+                                                                    displayPrices.min
+                                                                ? 'border-red-300 focus:border-red-400'
+                                                                : 'border-gray-300 focus:border-gray-400'
+                                                        )}
                                                     />
+                                                    {displayPrices.min !==
+                                                        null &&
+                                                        displayPrices.max !==
+                                                            null &&
+                                                        displayPrices.max <
+                                                            displayPrices.min && (
+                                                            <p className="mt-1 text-xs text-red-500">
+                                                                Le prix max doit
+                                                                être supérieur
+                                                                au prix min
+                                                            </p>
+                                                        )}
                                                 </div>
                                             </div>
                                         </div>
@@ -951,7 +1274,7 @@ function ShopContent() {
                     {/* Footer */}
                     <div className="mt-2 px-6 pb-4">
                         <Separator className="mb-4" />
-                        <div className="flex flex-col px-2 gap-3">
+                        <div className="flex flex-col gap-3 px-2">
                             <button
                                 onClick={() => {
                                     setQueryState({
@@ -965,14 +1288,14 @@ function ShopContent() {
                                         maxPrice: null,
                                     })
                                 }}
-                                className="h-12 w-full justify-start rounded-none text-lg text-neutral-400 hover:bg-morpheus-blue-lighter hover:text-white flex items-center p-4"
+                                className="hover:bg-morpheus-blue-lighter flex h-12 w-full items-center justify-start rounded-none p-4 text-lg text-neutral-400 hover:text-white"
                             >
                                 Effacer tout
                             </button>
                             <Separator />
                             <button
                                 onClick={() => setShowFilterSheet(false)}
-                                className="h-12 w-full justify-start rounded-none text-lg text-neutral-400 hover:bg-morpheus-blue-lighter hover:text-white flex items-center p-4"
+                                className="hover:bg-morpheus-blue-lighter flex h-12 w-full items-center justify-start rounded-none p-4 text-lg text-neutral-400 hover:text-white"
                             >
                                 Appliquer
                             </button>

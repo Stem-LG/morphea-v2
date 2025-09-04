@@ -240,6 +240,22 @@ export function useShopProducts({
                 return { products: [], totalCount: 0, currentEvent };
             }
 
+            // Get currencies for price conversion if price filters are applied
+            let currencies: any[] = [];
+            let pivotCurrency: any = null;
+
+            if (minPrice || maxPrice) {
+                const { data: currencyData, error: currencyError } = await supabase
+                    .schema("morpheus")
+                    .from("xdevise")
+                    .select("*");
+
+                if (!currencyError && currencyData) {
+                    currencies = currencyData;
+                    pivotCurrency = currencies.find(c => c.xispivot);
+                }
+            }
+
             // Filter approved variants and apply color, size, and price filters
             const productsWithApprovedVariants = products?.map(product => ({
                 ...product,
@@ -248,10 +264,27 @@ export function useShopProducts({
                     const matchesColor = !colorId || v.xcouleur.xcouleurid === colorId;
                     const matchesSize = !sizeId || v.xtaille.xtailleid === sizeId;
 
-                    // Price filtering - use promotion price if available, otherwise catalog price
-                    const price = v.yvarprodprixpromotion || v.yvarprodprixcatalogue;
-                    const matchesMinPrice = !minPrice || price >= minPrice;
-                    const matchesMaxPrice = !maxPrice || price <= maxPrice;
+                    // Price filtering with currency conversion
+                    let matchesMinPrice = true;
+                    let matchesMaxPrice = true;
+
+                    if ((minPrice || maxPrice) && pivotCurrency) {
+                        const rawPrice = v.yvarprodprixpromotion || v.yvarprodprixcatalogue;
+                        if (rawPrice && rawPrice > 0) {
+                            // Find variant's currency
+                            const variantCurrency = currencies.find(c => c.xdeviseid === v.xdeviseidfk);
+
+                            // Convert variant price to pivot currency for comparison
+                            let priceInPivot = rawPrice;
+                            if (variantCurrency && !variantCurrency.xispivot && variantCurrency.xtauxechange > 0) {
+                                priceInPivot = rawPrice / variantCurrency.xtauxechange;
+                            }
+
+                            // Compare with filter values (which are already in pivot currency)
+                            matchesMinPrice = !minPrice || priceInPivot >= minPrice;
+                            matchesMaxPrice = !maxPrice || priceInPivot <= maxPrice;
+                        }
+                    }
 
                     return isApproved && matchesColor && matchesSize && matchesMinPrice && matchesMaxPrice;
                 }) || []
@@ -457,6 +490,22 @@ export function useShopProductsInfinite({
                 return { products: [], totalCount: 0, currentEvent, hasNextPage: false };
             }
 
+            // Get currencies for price conversion if price filters are applied
+            let currencies: any[] = [];
+            let pivotCurrency: any = null;
+
+            if (minPrice || maxPrice) {
+                const { data: currencyData, error: currencyError } = await supabase
+                    .schema("morpheus")
+                    .from("xdevise")
+                    .select("*");
+
+                if (!currencyError && currencyData) {
+                    currencies = currencyData;
+                    pivotCurrency = currencies.find(c => c.xispivot);
+                }
+            }
+
             // Filter approved variants and apply color, size, and price filters
             const productsWithApprovedVariants = products?.map(product => ({
                 ...product,
@@ -465,10 +514,27 @@ export function useShopProductsInfinite({
                     const matchesColor = !colorId || variant.xcouleur.xcouleurid === colorId;
                     const matchesSize = !sizeId || variant.xtaille.xtailleid === sizeId;
 
-                    // Price filtering - use promotion price if available, otherwise catalog price
-                    const price = variant.yvarprodprixpromotion || variant.yvarprodprixcatalogue;
-                    const matchesMinPrice = !minPrice || price >= minPrice;
-                    const matchesMaxPrice = !maxPrice || price <= maxPrice;
+                    // Price filtering with currency conversion
+                    let matchesMinPrice = true;
+                    let matchesMaxPrice = true;
+
+                    if ((minPrice || maxPrice) && pivotCurrency) {
+                        const rawPrice = variant.yvarprodprixpromotion || variant.yvarprodprixcatalogue;
+                        if (rawPrice && rawPrice > 0) {
+                            // Find variant's currency
+                            const variantCurrency = currencies.find(c => c.xdeviseid === variant.xdeviseidfk);
+
+                            // Convert variant price to pivot currency for comparison
+                            let priceInPivot = rawPrice;
+                            if (variantCurrency && !variantCurrency.xispivot && variantCurrency.xtauxechange > 0) {
+                                priceInPivot = rawPrice / variantCurrency.xtauxechange;
+                            }
+
+                            // Compare with filter values (which are already in pivot currency)
+                            matchesMinPrice = !minPrice || priceInPivot >= minPrice;
+                            matchesMaxPrice = !maxPrice || priceInPivot <= maxPrice;
+                        }
+                    }
 
                     return isApproved && matchesColor && matchesSize && matchesMinPrice && matchesMaxPrice;
                 }) || []
