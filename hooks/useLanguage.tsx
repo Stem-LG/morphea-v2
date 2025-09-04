@@ -16,6 +16,7 @@ interface LanguageContextType {
   translations: Translations;
   setLanguage: (lang: Language) => void;
   t: (key: string) => string;
+  isLoading: boolean;
 }
 
 // Create context
@@ -38,9 +39,17 @@ interface LanguageProviderProps {
 export const LanguageProvider = ({ children }: LanguageProviderProps) => {
   const [language, setLanguageState] = useState<Language>('fr'); // Default to French
   const [translations, setTranslations] = useState<Translations>({});
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  // Loading messages in both languages
+  const loadingMessages = {
+    en: 'Loading...',
+    fr: 'Chargement...'
+  };
 
   // Load translations
   const loadTranslations = (lang: Language) => {
+    setIsLoading(true);
     try {
       // Use imported translations directly
       if (lang === 'en') {
@@ -48,8 +57,10 @@ export const LanguageProvider = ({ children }: LanguageProviderProps) => {
       } else {
         setTranslations(frTranslations);
       }
+      setIsLoading(false);
     } catch (error) {
       console.error(`Failed to load translations for ${lang}:`, error);
+      setIsLoading(false);
     }
   };
 
@@ -65,6 +76,11 @@ export const LanguageProvider = ({ children }: LanguageProviderProps) => {
 
   // Translation function with nested key support
   const t = (key: string): string => {
+    // Return loading message if translations are still loading
+    if (isLoading) {
+      return loadingMessages[language];
+    }
+
     const keys = key.split('.');
     let value: any = translations;
     
@@ -94,7 +110,7 @@ export const LanguageProvider = ({ children }: LanguageProviderProps) => {
   }, []);
 
   return (
-    <LanguageContext.Provider value={{ language, translations, setLanguage, t }}>
+    <LanguageContext.Provider value={{ language, translations, setLanguage, t, isLoading }}>
       {children}
     </LanguageContext.Provider>
   );
