@@ -71,7 +71,7 @@ export default function UsersPage() {
               {role === 'admin' && <Shield className="w-3 h-3 mr-1" />}
               {role === 'store_admin' && <UserPlus className="w-3 h-3 mr-1" />}
               {role === 'user' && <User className="w-3 h-3 mr-1" />}
-              {role === 'store_admin' ? t("admin.users.designer") : role === 'admin' ? t("admin.users.admin") : t("admin.users.user")}
+              {role === 'store_admin' ? t("admin.users.roleDesigner") : role === 'admin' ? t("admin.users.admin") : t("admin.users.user")}
             </Badge>
           ))}
         </div>
@@ -125,7 +125,7 @@ export default function UsersPage() {
   const roleOptions = [
     { value: '', label: t("admin.users.allRoles") },
     { value: 'user', label: t("admin.users.user") },
-    { value: 'store_admin', label: t("admin.users.designer") },
+    { value: 'store_admin', label: t("admin.users.roleDesigner") },
     { value: 'admin', label: t("admin.users.admin") }
   ]
 
