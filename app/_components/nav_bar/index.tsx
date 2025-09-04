@@ -215,7 +215,7 @@ export default function NavBar() {
                                             href="/profile"
                                             className="w-full"
                                         >
-                                            {t('profile')}
+                                            {t('common.profile')}
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem asChild>
@@ -223,7 +223,7 @@ export default function NavBar() {
                                             href="/my-orders"
                                             className="w-full"
                                         >
-                                            {t('orders')}
+                                            {t('common.orders')}
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem>
@@ -242,7 +242,7 @@ export default function NavBar() {
                                             href="/auth/sign-up"
                                             className="w-full"
                                         >
-                                            {t('register')}
+                                            {t('common.register')}
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem asChild>
@@ -251,7 +251,7 @@ export default function NavBar() {
                                             className="w-full"
                                         >
                                             {' '}
-                                            {t('login')}{' '}
+                                            {t('common.login')}{' '}
                                         </Link>
                                     </DropdownMenuItem>
                                 </>
@@ -474,8 +474,8 @@ function NavBarSheet({
                         setIsMenuOpen(false)
                     },
                 },
-                { name: t('login'), href: '/auth/login' },
-                { name: t('register'), href: '/auth/sign-up' },
+                { name: t('common.login'), href: '/auth/login' },
+                { name: t('common.register'), href: '/auth/sign-up' },
             ]
         } else {
             // For authenticated users: show all account-related items
@@ -500,7 +500,7 @@ function NavBarSheet({
                     ? [{ name: 'Administration', href: '/admin' }]
                     : []),
                 {
-                    name: t('logout'),
+                    name: t('common.logout'),
                     onclick: () => {
                         logout()
                         setIsMenuOpen(false)

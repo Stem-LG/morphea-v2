@@ -33,7 +33,11 @@ export const enTranslations = {
     "retry": "Retry",
     "none": "None",
     "actions": "Actions",
-    "poweredBy": "Powered by"
+    "poweredBy": "Powered by",
+    "profile": "Profile",
+    "orders": "Orders",
+    "register": "Register",
+    "login": "Login"
   },
   "auth": {
     "name": "Name",

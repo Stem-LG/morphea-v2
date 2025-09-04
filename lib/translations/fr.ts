@@ -33,7 +33,11 @@ export const frTranslations = {
     "retry": "Réessayer",
     "none": "Aucun",
     "actions": "Actions",
-    "poweredBy": "Powered by"
+    "poweredBy": "Powered by",
+    "profile": "Profil",
+    "orders": "Commandes",
+    "register": "S'inscrire",
+    "login": "Connexion"
   },
   "auth": {
     "name": "Nom",
