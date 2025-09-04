@@ -135,10 +135,6 @@ export default function OriginePage() {
                                         <div className="from-morpheus-gold-dark to-morpheus-gold-light absolute top-0 -left-4 h-24 w-1 bg-gradient-to-b"></div>
                                         <h3 className="font-recia text-4xl leading-tight font-bold text-gray-900 lg:text-5xl xl:text-6xl">
                                             Notre identité
-                                            <br />
-                                            <span className="text-morpheus-blue-dark">
-                                                et notre ADN
-                                            </span>
                                         </h3>
                                     </div>
 
@@ -397,7 +393,6 @@ export default function OriginePage() {
                                         }}
                                     >
                                         <div className="h-full rounded-lg border border-gray-100 bg-gradient-to-br from-white to-gray-50 p-8 shadow-lg transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl">
-                                         
                                             <h4 className="font-recia mb-4 text-xl font-semibold text-gray-900">
                                                 {mission.title}
                                             </h4>
@@ -504,7 +499,6 @@ export default function OriginePage() {
                                         }}
                                     >
                                         <div className="h-full rounded-lg border border-gray-100 bg-white p-8 shadow-lg transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl">
-                                           
                                             <h4 className="font-recia mb-4 text-xl font-semibold text-gray-900">
                                                 {value.title}
                                             </h4>
