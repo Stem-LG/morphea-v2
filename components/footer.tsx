@@ -8,6 +8,7 @@ import { createClient } from '@/lib/client'
 import { toast } from 'sonner'
 import { useHomeSettings } from '@/hooks/use-home-settings'
 import { useCategories } from '@/hooks/useCategories'
+import { PoweredBy } from './powered-by'
 
 export default function Footer() {
     const [email, setEmail] = useState('')
@@ -636,8 +637,8 @@ export default function Footer() {
                 )}
 
                 {/* Bottom language row - Mobile Responsive */}
-                <div className="font-supreme py-3 text-base text-stone-500 md:py-4 md:text-lg">
-                    <div className="relative inline-block" ref={dropdownRef}>
+                <div className="font-supreme flex justify-between py-3 text-base text-stone-500 md:py-4 md:text-lg">
+                    <div className="relative inline-block flex-1" ref={dropdownRef}>
                         <button
                             onClick={() =>
                                 setIsLanguageDropdownOpen(
@@ -678,6 +679,8 @@ export default function Footer() {
                             </div>
                         )}
                     </div>
+                    <PoweredBy />
+                    <div className='flex-1'></div>
                 </div>
             </div>
         </footer>

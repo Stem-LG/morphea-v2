@@ -374,7 +374,6 @@ export default function Home() {
             </section>
 
             <Footer />
-            <PoweredBy />
         </div>
     )
 }
