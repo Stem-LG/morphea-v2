@@ -196,7 +196,7 @@ export default function NavBar() {
                         <DropdownMenuContent
                             side="bottom"
                             align="end"
-                            className="w-48"
+                            className="w-48 z-[90]"
                         >
                             <DropdownMenuLabel>
                                 {currentUser && !currentUser.is_anonymous
