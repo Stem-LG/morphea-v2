@@ -45,7 +45,7 @@ export default function VideoAnimation() {
         homeSettings?.videoAnimation.buttonLink || 'https://morpheus-sa.com/'
 
     return (
-        <section className="relative z-20 bg-white">
+        <section className="relative z-20 bg-white pt-48">
             <div className="mx-auto max-w-7xl px-4 md:px-8">
                 <div className="relative min-h-[500px] overflow-hidden bg-white md:min-h-[50vh]">
                     {/* Container that slides to the right - Mobile: less movement */}
