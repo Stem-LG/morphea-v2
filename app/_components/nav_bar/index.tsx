@@ -290,7 +290,7 @@ export default function NavBar() {
                 setIsWishlistOpen={setIsWishlistOpen}
             />
 
-            <div className="h-24 bg-white" />
+            <div className="h-18 bg-white" />
         </>
     )
 }

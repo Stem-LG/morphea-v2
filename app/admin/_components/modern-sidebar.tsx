@@ -197,7 +197,7 @@ export function ModernSidebar({
 
             {/* Sidebar */}
             <div
-                className={`fixed top-16 left-0 z-50 lg:sticky ${isCollapsed ? 'w-16' : 'w-64'} h-[calc(100vh-6rem)] transform border-r border-gray-200/50 bg-gradient-to-b from-white to-gray-50 shadow-2xl ${isOpen ? 'translate-x-0' : '-translate-x-full'} transition-all duration-300 ease-in-out lg:translate-x-0`}
+                className={`fixed top-16 left-0 z-50 lg:sticky ${isCollapsed ? 'w-16' : 'w-64'} mh-[calc(100vh-6rem)] transform border-r border-gray-200/50 bg-gradient-to-b from-white to-gray-50 shadow-2xl ${isOpen ? 'translate-x-0' : '-translate-x-full'} transition-all duration-300 ease-in-out lg:translate-x-0`}
             >
                 {/* Header */}
                 <div className="border-b border-gray-200/50 p-4">

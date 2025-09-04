@@ -13,7 +13,7 @@ export function useCurrencies() {
                 .schema("morpheus")
                 .from("xdevise")
                 .select("*")
-                .order("xdeviseintitule");
+                .order("xdevisecodealpha");
 
             if (error) {
                 throw new Error(`Failed to fetch currencies: ${error.message}`);
