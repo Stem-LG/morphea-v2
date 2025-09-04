@@ -9,6 +9,11 @@ interface ThreeDPhotoCarouselProps {
     autoRotateSpeed?: number
     height?: number
     cylinderWidth?: number
+    // New prop for creators with links
+    creators?: Array<{
+        image: string
+        link: string
+    }>
 }
 
 function ThreeDPhotoCarousel({
@@ -16,11 +21,16 @@ function ThreeDPhotoCarousel({
     autoRotateSpeed = 0.5,
     height = 500,
     cylinderWidth = 1400,
+    creators = [], // New prop for creators with links
 }: ThreeDPhotoCarouselProps) {
     const { t } = useLanguage()
     const [selectedImage, setSelectedImage] = useState<string | null>(null)
     const [isHovered, setIsHovered] = useState<boolean>(false)
     const [isMobile, setIsMobile] = useState<boolean>(false)
+
+    // Prioritize creators over legacy images
+    const displayItems = creators.length > 0 ? creators.map(c => c.image) : images
+    const hasCreatorLinks = creators.length > 0
 
     // Detect mobile screen size
     useEffect(() => {
@@ -33,7 +43,7 @@ function ThreeDPhotoCarousel({
         return () => window.removeEventListener('resize', checkMobile)
     }, [])
 
-    const faceCount = images.length
+    const faceCount = displayItems.length
 
     // Responsive cylinder width based on screen size
     const responsiveCylinderWidth = isMobile
@@ -61,16 +71,22 @@ function ThreeDPhotoCarousel({
         return () => clearInterval(interval)
     }, [rotation, autoRotateSpeed, isHovered])
 
-    const handleImageClick = (image: string) => {
-        setSelectedImage(image)
+    const handleImageClick = (image: string, index: number) => {
+        if (hasCreatorLinks && creators[index]?.link) {
+            // If we have creator links, navigate to the link
+            window.open(creators[index].link, '_blank')
+        } else {
+            // Fallback to modal for legacy images
+            setSelectedImage(image)
+        }
     }
 
     const handleCloseModal = () => {
         setSelectedImage(null)
     }
 
-    // Early return if no images
-    if (!images || images.length === 0) {
+    // Early return if no items
+    if (!displayItems || displayItems.length === 0) {
         return (
             <div className="flex h-96 items-center justify-center text-gray-500">
                 {t('homepage.carousel.noImages')}
@@ -106,7 +122,7 @@ function ThreeDPhotoCarousel({
                         maxWidth: '100%', // Ensure it doesn't overflow container
                     }}
                 >
-                    {images.map((image, index) => (
+                    {displayItems.map((image, index) => (
                         <motion.div
                             key={`carousel-image-${index}`}
                             className="group absolute flex origin-center cursor-pointer items-center justify-center"
@@ -122,7 +138,7 @@ function ThreeDPhotoCarousel({
                                 }deg) translateZ(${radius}px)`,
                                 transformOrigin: 'center center',
                             }}
-                            onClick={() => handleImageClick(image)}
+                            onClick={() => handleImageClick(image, index)}
                             onMouseEnter={() => setIsHovered(true)}
                             onMouseLeave={() => setIsHovered(false)}
                         >
@@ -140,8 +156,8 @@ function ThreeDPhotoCarousel({
                 </motion.div>
             </div>
 
-            {/* Modal for selected image - Mobile Responsive */}
-            {selectedImage && (
+            {/* Modal for selected image - Only shows for legacy images without links */}
+            {selectedImage && !hasCreatorLinks && (
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}

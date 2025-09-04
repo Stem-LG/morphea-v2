@@ -89,6 +89,7 @@ const ALLOWED_SETTING_KEYS = [
   'homepage_creators_subtitle_en',
   'homepage_creators_subtitle_fr',
   'homepage_creators_images', // JSON array of image URLs
+  'homepage_creators_data',
   // Homepage Video Animation Section
   'homepage_video_animation_title_en',
   'homepage_video_animation_title_fr',

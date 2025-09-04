@@ -357,6 +357,7 @@ export default function Home() {
                     </div>
                     <ThreeDPhotoCarousel
                         images={creatorsData.images}
+                        creators={homeSettings?.creators.creators || []}
                         autoRotateSpeed={0.05}
                         height={300}
                         cylinderWidth={2000}
