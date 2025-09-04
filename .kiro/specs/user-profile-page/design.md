@@ -2,7 +2,7 @@
 
 ## Overview
 
-The user profile page will be implemented as a comprehensive dashboard that allows authenticated users to view and manage their personal information, account settings, and preferences. The design follows the existing application's visual language with the Morpheus Mall theme, utilizing the established color palette (morpheus-blue-dark/light, morpheus-gold-dark/light) and component patterns.
+The user profile page will be implemented as a comprehensive dashboard that allows authenticated users to view and manage their personal information, account settings, and preferences. The design follows the existing application's visual language with the Morphea theme, utilizing the established color palette (morpheus-blue-dark/light, morpheus-gold-dark/light) and component patterns.
 
 The profile page will be accessible through the navigation bar and will be protected by authentication middleware to ensure only logged-in users can access it. The page will integrate seamlessly with the existing Supabase authentication system and maintain consistency with the current UI/UX patterns.
 

@@ -12,7 +12,7 @@
     --font-recia: var(--font-recia);
     --font-supreme: var(--font-supreme);
 
-    /* Morpheus Mall Brand Colors */
+    /* Morphea Brand Colors */
     --color-morpheus-gold-dark: var(--morpheus-gold-dark);
     --color-morpheus-gold-light: var(--morpheus-gold-light);
     --color-morpheus-blue-dark: var(--morpheus-blue-dark);
@@ -57,7 +57,7 @@
 :root {
     --radius: 0.625rem;
 
-    /* Morpheus Mall Brand Colors */
+    /* Morphea Brand Colors */
     --morpheus-gold-dark: #785730;
     --morpheus-gold-light: #e8d07a;
     --morpheus-blue-dark: #05141d;
@@ -98,7 +98,7 @@
 }
 
 .dark {
-    /* Morpheus Mall Brand Colors */
+    /* Morphea Brand Colors */
     --morpheus-gold-dark: #785730;
     --morpheus-gold-light: #e8d07a;
     --morpheus-blue-dark: #05141d;
@@ -148,6 +148,20 @@
     body {
         @apply bg-background text-foreground;
     }
+
+    /* Hide Photo Sphere Viewer default loading circle */
+    .psv-loader-canvas,
+    .psv-loader svg,
+    .psv-loader .psv-loader-canvas,
+    svg.psv-loader-canvas {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+    }
+    
+    .psv-loader {
+        background: transparent !important;
+    }
 }
 
 /* Mobile-responsive utilities */
@@ -183,29 +197,27 @@
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: linear-gradient(
-        to bottom right,
-        var(--morpheus-gold-dark),
-        var(--morpheus-gold-light)
-    );
+    background: linear-gradient(to bottom right,
+            var(--morpheus-gold-dark),
+            var(--morpheus-gold-light));
     border-radius: 4px;
     transition: background 0.3s ease;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(
-        to bottom,
-        var(--morpheus-gold-light),
-        var(--morpheus-gold-dark)
-    );
+    background: linear-gradient(to bottom,
+            var(--morpheus-gold-light),
+            var(--morpheus-gold-dark));
 }
 
 /* Custom animations for login page */
 @keyframes gradient-x {
+
     0%,
     100% {
         background-position: 0% 50%;
     }
+
     50% {
         background-position: 100% 50%;
     }

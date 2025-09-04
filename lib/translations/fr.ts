@@ -92,16 +92,16 @@ export const frTranslations = {
     "termsAndConditionsRequired": "Vous devez accepter les conditions générales",
     "pleaseCompleteAllFields": "Veuillez compléter tous les champs requis et accepter les conditions générales",
     "termsOfService": "Conditions d'Utilisation",
-    "welcomeToMorpheusMall": "Bienvenue chez Morpheus Mall. En utilisant nos services, vous acceptez ces conditions générales.",
+    "welcomeToMorpheusMall": "Bienvenue chez Morphea. En utilisant nos services, vous acceptez ces conditions générales.",
     "termsContentPlaceholder": "Le contenu des conditions générales sera ajouté ici.",
     "developmentPlaceholder": "Ceci est une page de développement temporaire.",
     "backToSignUp": "Retour à l'inscription",
-    "backToMorpheusMall": "Retour à Morpheus Mall",
-    "morpheusMall": "Morpheus Mall",
+    "backToMorpheusMall": "Retour à Morphea",
+    "morpheusMall": "Morphea",
     "signOut": "Déconnexion"
   },
   "landing": {
-    "title": "Bienvenue chez Morpheus Mall",
+    "title": "Bienvenue chez Morphea",
     "subtitle": "Découvrez l'avenir du shopping en ligne avec notre mall virtuel 3D immersif",
     "cta": "Explorer Maintenant",
     "welcomeTo": "Bienvenue à",
@@ -1439,7 +1439,7 @@ export const frTranslations = {
     "added": "Ajouté"
   },
   "visitorForm": {
-    "title": "Bienvenue chez Morpheus Mall",
+    "title": "Bienvenue chez Morphea",
     "subtitle": "Aidez-nous à personnaliser votre expérience en partageant quelques informations sur vous.",
     "basicInformation": "Vos informations",
     "additionalInfo": "Informations supplémentaires",
