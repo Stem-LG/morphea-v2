@@ -563,19 +563,15 @@ export default function Footer() {
                                             ),
                                             href: '/shop',
                                         },
+                                        {
+                                            name: t(
+                                                'footer.planDeMorphea.categories'
+                                            ),
+                                            href: '/#categories',
+                                        },
                                     ]
 
-                                    const categoryPages = categories.map(
-                                        (category) => ({
-                                            name: category.xcategprodintitule,
-                                            href: `/shop?category=${category.xcategprodid}`,
-                                        })
-                                    )
-
-                                    const allLinks = [
-                                        ...mainPages,
-                                        ...categoryPages,
-                                    ]
+                                    const allLinks = [...mainPages]
 
                                     // Split links into columns of max 6 items each
                                     const columns = []
