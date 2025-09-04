@@ -708,7 +708,10 @@ export const enTranslations = {
       "updatingProduct": "Updating Product...",
       "creatingProduct": "Creating Product...",
       "updateProduct": "Update Product",
-      "createProduct": "Create Product"
+      "createProduct": "Create Product",
+      "confirmDeleteVariant": "Confirm Delete Variant",
+      "deleteVariantWarning": "Are you sure you want to delete this variant?",
+      "deleteVariant": "Delete Variant"
     },
     "productView": {
       "productDetails": "Product Details",
@@ -829,7 +832,6 @@ export const enTranslations = {
         "countryPlaceholder": "Enter country",
         "specialtyRequired": "Specialty *",
         "specialtyPlaceholder": "Enter specialty",
-        "requiredFields": "* Required fields"
       }
     },
     "virtualTourAdmin": "Virtual Tour",

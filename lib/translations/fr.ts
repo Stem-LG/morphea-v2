@@ -735,7 +735,10 @@ export const frTranslations = {
       "updatingProduct": "Mise à jour du produit...",
       "creatingProduct": "Création du produit...",
       "updateProduct": "Mettre à jour le Produit",
-      "createProduct": "Créer le Produit"
+      "createProduct": "Créer le Produit",
+      "confirmDeleteVariant": "Confirmer la Suppression de la Variante",
+      "deleteVariantWarning": "Êtes-vous sûr de vouloir supprimer cette variante ?",
+      "deleteVariant": "Supprimer la Variante"
     },
     "productView": {
       "productDetails": "Détails du Produit",
@@ -864,7 +867,6 @@ export const frTranslations = {
         "countryPlaceholder": "Entrez le pays",
         "specialtyRequired": "Spécialité *",
         "specialtyPlaceholder": "Entrez la spécialité",
-        "requiredFields": "* Champs requis"
       },
     },
     "designerAssignments": {

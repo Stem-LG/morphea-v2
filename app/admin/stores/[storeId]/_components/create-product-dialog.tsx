@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/hooks/useLanguage";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -132,6 +132,17 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [progress, setProgress] = useState(0);
     const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+    // Delete confirmation dialog state
+    const [deleteConfirmation, setDeleteConfirmation] = useState<{
+        isOpen: boolean;
+        variantId: string | null;
+        variantName: string;
+    }>({
+        isOpen: false,
+        variantId: null,
+        variantName: "",
+    });
 
     // Determine if we're in edit mode
     const isEditMode = !!productId;
@@ -298,8 +309,32 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
 
     const handleRemoveVariant = (variantId: string) => {
         if (variants.length > 1) {
-            setVariants(variants.filter((v) => v.id !== variantId));
+            const variant = variants.find(v => v.id === variantId);
+            setDeleteConfirmation({
+                isOpen: true,
+                variantId,
+                variantName: variant?.name || `Variant ${variants.findIndex(v => v.id === variantId) + 1}`,
+            });
         }
+    };
+
+    const confirmDeleteVariant = () => {
+        if (deleteConfirmation.variantId) {
+            setVariants(variants.filter((v) => v.id !== deleteConfirmation.variantId));
+        }
+        setDeleteConfirmation({
+            isOpen: false,
+            variantId: null,
+            variantName: "",
+        });
+    };
+
+    const cancelDeleteVariant = () => {
+        setDeleteConfirmation({
+            isOpen: false,
+            variantId: null,
+            variantName: "",
+        });
     };
 
     const handleVariantChange = (variantId: string, field: keyof ProductVariant, value: any) => {
@@ -678,7 +713,8 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
     };
 
     return (
-        <Dialog open={isOpen} onOpenChange={onClose}>
+        <>
+            <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent className="max-w-7xl max-h-[95vh] bg-white border-gray-200 text-gray-900">
                 <DialogHeader>
                     <DialogTitle className="text-2xl font-bold text-gray-900 flex items-center gap-2">
@@ -705,7 +741,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                         </Button>
                     </div>
                 ) : (
-                    <ScrollArea className="max-h-[80vh] pr-4">
+                    <ScrollArea className="max-h-[78vh] pr-4">
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             {/* Left Column - Product Information & Creation Forms */}
                             <div className="space-y-6">
@@ -1629,7 +1665,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                 )}
 
                 {/* Dialog Footer */}
-                <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
+                <div className="flex justify-end gap-3 border-t border-gray-200 p-2">
                     <Button
                         onClick={onClose}
                         variant="outline"
@@ -1666,5 +1702,36 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                 </div>
             </DialogContent>
         </Dialog>
+
+        {/* Delete Confirmation Dialog */}
+        <Dialog open={deleteConfirmation.isOpen} onOpenChange={cancelDeleteVariant}>
+            <DialogContent className="max-w-md bg-white border-gray-200 text-gray-900">
+                <DialogHeader>
+                    <DialogTitle className="text-lg font-semibold text-red-700 flex items-center gap-2">
+                        <Trash2 className="h-5 w-5" />
+                        {t("admin.createProduct.confirmDeleteVariant")}
+                    </DialogTitle>
+                    <DialogDescription className="text-gray-600 mt-2">
+                        {t("admin.createProduct.deleteVariantWarning")} {deleteConfirmation.variantName}
+                    </DialogDescription>
+                </DialogHeader>
+                <DialogFooter className="gap-2 mt-4">
+                    <Button
+                        onClick={cancelDeleteVariant}
+                        variant="outline"
+                        className="border-gray-300 text-gray-700 hover:bg-gray-50"
+                    >
+                        {t("common.cancel")}
+                    </Button>
+                    <Button
+                        onClick={confirmDeleteVariant}
+                        className="bg-red-600 hover:bg-red-700 text-white"
+                    >
+                        {t("admin.createProduct.deleteVariant")}
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+        </>
     );
 }
