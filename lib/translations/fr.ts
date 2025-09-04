@@ -588,6 +588,8 @@ export const frTranslations = {
       "addNewCurrency": "Ajouter une Nouvelle Devise",
       "currencyNameRequired": "Nom de la Devise *",
       "currencyNamePlaceholder": "ex: Dollar Américain",
+      "currencyNameFrench": "Nom de la Devise en Français",
+      "currencyNameFrenchPlaceholder": "ex: Dollar Américain",
       "alphaCodeRequired": "Code Alpha *",
       "alphaCodePlaceholder": "ex: USD",
       "numericCodeRequired": "Code Numérique *",
@@ -847,7 +849,7 @@ export const frTranslations = {
       "anonymousUser": "Utilisateur Anonyme",
       "insufficientPermissions": "Permissions insuffisantes pour assigner des boutiques",
       "designer": {
-        "title":"designer",
+        "title": "designer",
         "nameRequired": "Nom du Designer *",
         "namePlaceholder": "Entrez le nom du designer",
         "brandRequired": "Nom de la Marque *",

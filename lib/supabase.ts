@@ -837,6 +837,7 @@ export type Database = {
           xdevisecodenum: string
           xdeviseid: number
           xdeviseintitule: string
+          xdeviseintitulefr: string | null
           xdevisenbrdec: number
           xispivot: boolean
           xtauxechange: number
@@ -851,6 +852,7 @@ export type Database = {
           xdevisecodenum: string
           xdeviseid?: number
           xdeviseintitule: string
+          xdeviseintitulefr?: string | null
           xdevisenbrdec: number
           xispivot?: boolean
           xtauxechange?: number
@@ -865,6 +867,7 @@ export type Database = {
           xdevisecodenum?: string
           xdeviseid?: number
           xdeviseintitule?: string
+          xdeviseintitulefr?: string | null
           xdevisenbrdec?: number
           xispivot?: boolean
           xtauxechange?: number
@@ -1937,7 +1940,7 @@ export type Database = {
           yvarprodid?: number
           yvarprodintitule: string
           yvarprodnbrjourlivraison: number
-          yvarprodprixcatalogue?: number
+          yvarprodprixcatalogue: number
           yvarprodprixpromotion?: number | null
           yvarprodpromotiondatedeb?: string | null
           yvarprodpromotiondatefin?: string | null
@@ -2283,6 +2286,10 @@ export type Database = {
       apply_system_triggers: {
         Args: Record<PropertyKey, never>
         Returns: string
+      }
+      create_store_admin_notification: {
+        Args: { p_user_id: string }
+        Returns: undefined
       }
     }
     Enums: {

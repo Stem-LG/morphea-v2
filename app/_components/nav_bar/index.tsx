@@ -167,7 +167,7 @@ export default function NavBar() {
                     <NavBarIconButton>
                         <SearchIcon />
                     </NavBarIconButton>
-                    <DropdownMenu>
+                    <DropdownMenu modal={false}>
                         <DropdownMenuTrigger>
                             <NavBarIconButton>
                                 <AccountIcon />
