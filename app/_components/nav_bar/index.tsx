@@ -6,8 +6,8 @@ import { CurrencySwitcher } from '@/app/_components/nav_bar/currency-switcher'
 import { CartDialog } from '@/app/_components/cart-dialog'
 import { WishlistDialog } from '@/app/_components/wishlist-dialog'
 import { NotificationsDialog } from '@/app/_components/notifications-dialog'
-// import { useCart } from '@/app/_hooks/cart/useCart'
-// import { useWishlist } from '@/app/_hooks/wishlist/useWishlist'
+import { useCart } from '@/app/_hooks/cart/useCart'
+import { useWishlist } from '@/app/_hooks/wishlist/useWishlist'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState, Fragment, useMemo } from 'react'
@@ -68,11 +68,11 @@ export default function NavBar() {
     } = useAuth()
     const { logout } = useLogout()
     const { hasAdminAccess } = useUserRoles()
-    // const { data: cartItems = [] } = useCart()
-    // const { data: wishlistItems = [] } = useWishlist()
+    const { data: cartItems = [] } = useCart()
+    const { data: wishlistItems = [] } = useWishlist()
 
-    // const cartItemCount = cartItems.length
-    // const wishlistItemCount = wishlistItems.length
+    const cartItemCount = cartItems.length
+    const wishlistItemCount = wishlistItems.length
 
     // Notifications - only get unreadCount for the badge
     console.log('NavBar - currentUser:', currentUser)
@@ -158,12 +158,30 @@ export default function NavBar() {
                             )}
                         </div>
                     )}
-                    <NavBarIconButton onClick={() => setIsWishlistOpen(true)}>
-                        <WishlistIcon />
-                    </NavBarIconButton>
-                    <NavBarIconButton onClick={() => setIsCartOpen(true)}>
-                        <CartIcon />
-                    </NavBarIconButton>
+                    <div className="relative">
+                        <NavBarIconButton
+                            onClick={() => setIsWishlistOpen(true)}
+                        >
+                            <WishlistIcon />
+                        </NavBarIconButton>
+                        {wishlistItemCount > 0 && (
+                            <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-medium text-white">
+                                {wishlistItemCount > 9
+                                    ? '9+'
+                                    : wishlistItemCount}
+                            </span>
+                        )}
+                    </div>
+                    <div className="relative">
+                        <NavBarIconButton onClick={() => setIsCartOpen(true)}>
+                            <CartIcon />
+                        </NavBarIconButton>
+                        {cartItemCount > 0 && (
+                            <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-medium text-white">
+                                {cartItemCount > 9 ? '9+' : cartItemCount}
+                            </span>
+                        )}
+                    </div>
                     <NavBarIconButton>
                         <SearchIcon />
                     </NavBarIconButton>
