@@ -366,7 +366,7 @@ function CategoryNavigation({
                             asChild
                         >
                             <Link
-                                href={`/shop?category=${category.xcategprodid}`}
+                                href={`/shop?categoryId=${category.xcategprodid}`}
                                 onClick={onCategoryClick}
                             >
                                 {category.xcategprodintitule}
