@@ -88,7 +88,7 @@ export default function VideoAnimation() {
                             loop
                             muted
                             playsInline
-                            className="absolute top-[40px] max-w-[240px] md:top-[20px] md:max-w-[400px]"
+                            className="absolute top-[40px] max-w-[200px] md:top-[80px] md:max-w-[300px]"
                         />
                     </motion.div>
 
@@ -103,7 +103,7 @@ export default function VideoAnimation() {
                         animate={{
                             opacity: isTextInView ? 1 : 0,
                             x: isTextInView ? 0 : -50,
-                            y: isTextInView && isMobile ? 150 : 0,
+                            y: isTextInView && isMobile ? 120 : 0,
                         }}
                         transition={{
                             duration: 1.2,
