@@ -253,7 +253,7 @@ export default function OriginePage() {
                                             <div className="flex items-start space-x-4">
                                                 <div className="flex-1">
                                                     <p className="font-supreme text-lg leading-relaxed text-gray-700">
-                                                        <span className='uppercase text-morpheus-blue-dark text-xl font-semibold'>
+                                                        <span className="text-morpheus-blue-dark text-xl font-semibold uppercase">
                                                             Chaque création
                                                         </span>
                                                         , porteuse de durabilité
@@ -271,15 +271,11 @@ export default function OriginePage() {
                                 </div>
 
                                 {/* Visual Side - Takes 5 columns */}
-                                <div className="relative lg:col-span-5">
-                                    {/* Main Image with Modern Frame */}
+                                <div className="relative top-5 lg:col-span-5">
+                                    {/* Main Video with Modern Frame */}
                                     <div className="relative">
-                                        {/* Floating Elements */}
-                                        <div className="from-morpheus-gold-dark/20 to-morpheus-gold-light/20 absolute -top-8 -left-8 z-50 h-24 w-24 rounded-full bg-gradient-to-br blur-xl"></div>
-                                        <div className="from-morpheus-blue-dark/20 to-morpheus-blue-light/20 absolute -right-8 -bottom-8 z-50 h-32 w-32 rounded-full bg-gradient-to-br blur-xl"></div>
-
                                         {/* Main Video Container */}
-                                        <div className="from-morpheus-gold-dark/10 to-morpheus-blue-dark/10 relative aspect-[5/5] overflow-hidden rounded-3xl border border-white/50 bg-gradient-to-br via-white">
+                                        <div className="relative aspect-[5/5] overflow-hidden rounded-3xl border border-white/50">
                                             {/* Video */}
                                             <video
                                                 className="absolute inset-0 h-full w-full object-contain"
@@ -293,13 +289,6 @@ export default function OriginePage() {
                                                     type="video/mp4"
                                                 />
                                             </video>
-
-                                            {/* Glass Effect Overlay */}
-                                            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent"></div>
-
-                                            {/* Decorative Corner Elements */}
-                                            <div className="border-morpheus-gold-light/50 absolute top-4 left-4 h-8 w-8 rounded-tl-lg border-t-2 border-l-2"></div>
-                                            <div className="border-morpheus-gold-light/50 absolute right-4 bottom-4 h-8 w-8 rounded-br-lg border-r-2 border-b-2"></div>
                                         </div>
 
                                         {/* Side Accent */}
