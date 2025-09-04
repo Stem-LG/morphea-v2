@@ -28,7 +28,7 @@ export default function Page() {
             
             <Button asChild className="bg-gradient-to-r from-[#05141D] to-[#063846] hover:from-[#04111a] hover:to-[#052d37] text-white h-11 px-8 font-semibold shadow-lg transition-all duration-300 hover:shadow-xl rounded-md transform hover:scale-[1.02] active:scale-[0.98]">
               <Link href="/main">
-                Continue to Morpheus Mall
+                Continue to Morphea
               </Link>
             </Button>
           </div>
@@ -39,7 +39,7 @@ export default function Page() {
               href="/"
               className="text-slate-500 hover:text-[#05141D] transition-colors inline-flex items-center gap-2"
             >
-              {t("auth.backToMorpheusMall") || "← Back to Morpheus Mall"}
+              {t("auth.backToMorpheusMall") || "← Back to Morphea"}
             </Link>
           </div>
         </div>

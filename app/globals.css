@@ -12,7 +12,7 @@
     --font-recia: var(--font-recia);
     --font-supreme: var(--font-supreme);
 
-    /* Morpheus Mall Brand Colors */
+    /* Morphea Brand Colors */
     --color-morpheus-gold-dark: var(--morpheus-gold-dark);
     --color-morpheus-gold-light: var(--morpheus-gold-light);
     --color-morpheus-blue-dark: var(--morpheus-blue-dark);
@@ -57,7 +57,7 @@
 :root {
     --radius: 0.625rem;
 
-    /* Morpheus Mall Brand Colors */
+    /* Morphea Brand Colors */
     --morpheus-gold-dark: #785730;
     --morpheus-gold-light: #e8d07a;
     --morpheus-blue-dark: #05141d;
@@ -98,7 +98,7 @@
 }
 
 .dark {
-    /* Morpheus Mall Brand Colors */
+    /* Morphea Brand Colors */
     --morpheus-gold-dark: #785730;
     --morpheus-gold-light: #e8d07a;
     --morpheus-blue-dark: #05141d;

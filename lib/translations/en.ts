@@ -92,15 +92,15 @@ export const enTranslations = {
     "termsAndConditionsRequired": "You must agree to the terms and conditions",
     "pleaseCompleteAllFields": "Please complete all required fields and agree to the terms and conditions",
     "termsOfService": "Terms of Service",
-    "welcomeToMorpheusMall": "Welcome to Morpheus Mall. By using our services, you agree to these terms and conditions.",
+    "welcomeToMorpheusMall": "Welcome to Morphea. By using our services, you agree to these terms and conditions.",
     "termsContentPlaceholder": "Terms and conditions content will be added here.",
     "developmentPlaceholder": "This is a placeholder page for development purposes.",
     "backToSignUp": "← Back to Sign Up",
-    "backToMorpheusMall": "← Back to Morpheus Mall",
-    "morpheusMall": "Morpheus Mall"
+    "backToMorpheusMall": "← Back to Morphea",
+    "morpheusMall": "Morphea"
   },
   "landing": {
-    "title": "Welcome to Morpheus Mall",
+    "title": "Welcome to Morphea",
     "subtitle": "Experience the future of online shopping with our immersive 3D virtual mall",
     "cta": "Explore Now",
     "welcomeTo": "Welcome to",
@@ -1404,7 +1404,7 @@ export const enTranslations = {
     "added": "Added"
   },
   "visitorForm": {
-    "title": "Welcome to Morpheus Mall",
+    "title": "Welcome to Morphea",
     "subtitle": "Help us personalize your experience by sharing some information about yourself.",
     "basicInformation": "Your Information",
     "additionalInfo": "Additional Information",

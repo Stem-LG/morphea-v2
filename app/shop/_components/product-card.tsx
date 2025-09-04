@@ -39,6 +39,83 @@ const WishlistIcon = ({
         </defs>
     </svg>
 )
+
+// Sparks Animation Component
+const SparksAnimation = ({ show }: { show: boolean }) => {
+    if (!show) return null
+
+    const sparks = Array.from({ length: 8 }, (_, i) => {
+        const angle = (i * 45) * (Math.PI / 180)
+        const distance = 40 + Math.random() * 20
+        const x = Math.cos(angle) * distance
+        const y = Math.sin(angle) * distance
+        const delay = Math.random() * 200 // Random delay in ms
+        const duration = 800 + Math.random() * 400 // Random duration in ms
+
+        return (
+            <div
+                key={i}
+                className="absolute h-1.5 w-1.5 bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-500 rounded-full"
+                style={{
+                    left: '50%',
+                    top: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    animation: `sparkfly-${i} ${duration}ms ease-out ${delay}ms forwards`,
+                }}
+            />
+        )
+    })
+
+    return (
+        <>
+            <div className="absolute inset-0 pointer-events-none overflow-visible">
+                {sparks}
+            </div>
+            <style>{`
+                @keyframes sparkfly-0 {
+                    0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+                    50% { transform: translate(calc(-50% + 45px), calc(-50% + 0px)) scale(1); opacity: 1; }
+                    100% { transform: translate(calc(-50% + 45px), calc(-50% + 0px)) scale(0); opacity: 0; }
+                }
+                @keyframes sparkfly-1 {
+                    0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+                    50% { transform: translate(calc(-50% + 32px), calc(-50% + 32px)) scale(1); opacity: 1; }
+                    100% { transform: translate(calc(-50% + 32px), calc(-50% + 32px)) scale(0); opacity: 0; }
+                }
+                @keyframes sparkfly-2 {
+                    0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+                    50% { transform: translate(calc(-50% + 0px), calc(-50% + 45px)) scale(1); opacity: 1; }
+                    100% { transform: translate(calc(-50% + 0px), calc(-50% + 45px)) scale(0); opacity: 0; }
+                }
+                @keyframes sparkfly-3 {
+                    0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+                    50% { transform: translate(calc(-50% - 32px), calc(-50% + 32px)) scale(1); opacity: 1; }
+                    100% { transform: translate(calc(-50% - 32px), calc(-50% + 32px)) scale(0); opacity: 0; }
+                }
+                @keyframes sparkfly-4 {
+                    0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+                    50% { transform: translate(calc(-50% - 45px), calc(-50% + 0px)) scale(1); opacity: 1; }
+                    100% { transform: translate(calc(-50% - 45px), calc(-50% + 0px)) scale(0); opacity: 0; }
+                }
+                @keyframes sparkfly-5 {
+                    0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+                    50% { transform: translate(calc(-50% - 32px), calc(-50% - 32px)) scale(1); opacity: 1; }
+                    100% { transform: translate(calc(-50% - 32px), calc(-50% - 32px)) scale(0); opacity: 0; }
+                }
+                @keyframes sparkfly-6 {
+                    0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+                    50% { transform: translate(calc(-50% + 0px), calc(-50% - 45px)) scale(1); opacity: 1; }
+                    100% { transform: translate(calc(-50% + 0px), calc(-50% - 45px)) scale(0); opacity: 0; }
+                }
+                @keyframes sparkfly-7 {
+                    0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+                    50% { transform: translate(calc(-50% + 32px), calc(-50% - 32px)) scale(1); opacity: 1; }
+                    100% { transform: translate(calc(-50% + 32px), calc(-50% - 32px)) scale(0); opacity: 0; }
+                }
+            `}</style>
+        </>
+    )
+}
 import { useAddToWishlist } from '@/app/_hooks/wishlist/useAddToWishlist'
 import { useRemoveFromWishlist } from '@/app/_hooks/wishlist/useRemoveFromWishlist'
 import { useIsInWishlist } from '@/app/_hooks/wishlist/useIsInWishlist'
@@ -84,6 +161,7 @@ export function ProductCard({
     const [imageError, setImageError] = useState(false)
     const [hoveredColor, setHoveredColor] = useState<string | null>(null)
     const [isImageHovered, setIsImageHovered] = useState(false)
+    const [showSparks, setShowSparks] = useState(false)
 
     // Wishlist hooks
     const addToWishlistMutation = useAddToWishlist()
@@ -164,6 +242,10 @@ export function ProductCard({
     // Handle wishlist actions
     const handleWishlistClick = () => {
         if (!activeVariant) return
+
+        // Trigger spark animation
+        setShowSparks(true)
+        setTimeout(() => setShowSparks(false), 1200) // Reset after animation completes
 
         if (isInWishlist) {
             removeFromWishlistMutation.mutate({
@@ -365,11 +447,12 @@ export function ProductCard({
                         removeFromWishlistMutation.isPending
                     }
                     className={cn(
-                        'absolute top-4 right-4 z-10 rounded-full p-2 shadow-lg transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50',
-                        'bg-white text-gray-600 hover:bg-gray-50'
+                        'absolute top-4 right-4 z-10 rounded-full p-2 transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50',
+                        'text-white hover:text-yellow-300'
                     )}
                 >
                     <WishlistIcon className="h-5 w-5" filled={isInWishlist} />
+                    <SparksAnimation show={showSparks} />
                 </button>
 
                 {/* Quick View on Hover */}

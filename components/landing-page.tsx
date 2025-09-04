@@ -33,7 +33,7 @@ export default function LandingPage() {
                                     {t('landing.welcomeTo')}
                                 </span>{' '}
                                 <span className="bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light bg-clip-text text-transparent block md:inline md:px-4">
-                                    Morpheus Mall
+                                    Morphea
                                 </span>
                             </h1>
                             
