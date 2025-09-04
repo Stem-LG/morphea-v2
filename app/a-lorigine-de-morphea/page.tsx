@@ -164,7 +164,7 @@ export default function OriginePage() {
                                             <div className="flex items-start space-x-4">
                                                 <div className="flex-1">
                                                     <p className="font-supreme text-lg leading-relaxed text-gray-700">
-                                                        <span className="text-morpheus-blue-dark text-xl font-semibold">
+                                                        <span className="text-morpheus-blue-dark text-xl font-semibold uppercase">
                                                             Morpheus
                                                         </span>{' '}
                                                         est le créateur
@@ -209,7 +209,7 @@ export default function OriginePage() {
                                             <div className="flex items-start space-x-4">
                                                 <div className="flex-1">
                                                     <p className="font-supreme text-lg leading-relaxed text-gray-700">
-                                                        <span className="text-morpheus-blue-dark text-xl font-semibold">
+                                                        <span className="text-morpheus-blue-dark text-xl font-semibold uppercase">
                                                             Morphea
                                                         </span>
                                                         , née de l'expertise de
@@ -253,8 +253,10 @@ export default function OriginePage() {
                                             <div className="flex items-start space-x-4">
                                                 <div className="flex-1">
                                                     <p className="font-supreme text-lg leading-relaxed text-gray-700">
-                                                        Chaque création,
-                                                        porteuse de durabilité
+                                                        <span className='uppercase text-morpheus-blue-dark text-xl font-semibold'>
+                                                            Chaque création
+                                                        </span>
+                                                        , porteuse de durabilité
                                                         et de respect de
                                                         l'environnement, incarne
                                                         la transmission d'un
