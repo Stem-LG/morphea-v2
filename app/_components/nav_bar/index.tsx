@@ -107,7 +107,7 @@ export default function NavBar() {
     return (
         <>
             <nav
-                className={`fixed top-0 z-50 flex h-18 w-full bg-white/40 px-4 transition-transform duration-300 ease-in-out md:h-18 md:px-6 lg:px-12 ${
+                className={`fixed top-0 z-50 flex h-18 w-full bg-[#bbbbbb77] px-4 transition-transform duration-300 ease-in-out md:h-18 md:px-6 lg:px-12 ${
                     isVisible ? 'translate-y-0' : '-translate-y-full'
                 }`}
             >
