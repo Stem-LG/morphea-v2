@@ -1611,6 +1611,8 @@ export const enTranslations = {
       "login": "Login",
       "register": "Register",
       "shop": "Shop",
+      "events": "Events",
+      "creators": "Creators",
       "categories": "Categories"
     },
     "customerService": {

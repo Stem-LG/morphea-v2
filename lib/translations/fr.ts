@@ -1647,6 +1647,8 @@ export const frTranslations = {
       "login": "Connexion",
       "register": "Inscription",
       "shop": "Boutique",
+      "events": "Événements",
+      "creators": "Créateurs",
       "categories": "Catégories"
     },
     "customerService": {

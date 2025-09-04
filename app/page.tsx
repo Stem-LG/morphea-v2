@@ -288,7 +288,7 @@ export default function Home() {
             <VideoAnimation />
 
             {/* Second Section - Collection Cards - Mobile Responsive */}
-            <section className="relative z-20 bg-white pt-12 md:pt-20">
+            <section className="relative z-20 bg-white pt-12 md:pt-20" id='events'>
                 <div className="mx-auto max-w-7xl px-4 md:px-8">
                     <div className="mb-12 text-center md:mb-16" id='collections'>
                         <h2 className="font-recia mb-8 text-3xl leading-tight font-extrabold text-[#053340] md:mb-14 md:text-5xl">
@@ -345,7 +345,7 @@ export default function Home() {
             <ExpandableCategories data={categoriesData} />
 
             {/* Fourth Section - 3D Photo Carousel - Mobile Responsive */}
-            <section className="relative z-20 bg-white pt-12 pb-16 md:pt-16 md:pb-44">
+            <section className="relative z-20 bg-white pt-12 pb-16 md:pt-16 md:pb-44" id='creators'>
                 <div className="mx-auto max-w-7xl px-4 md:px-8">
                     <div className="mb-8 text-center md:mb-10">
                         <h2 className="font-recia mb-6 text-3xl leading-tight font-extrabold text-[#053340] md:mb-11 md:text-5xl">

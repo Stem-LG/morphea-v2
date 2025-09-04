@@ -16,8 +16,9 @@ import {
 } from '@/components/ui/credenza'
 import { Button } from '@/components/ui/button'
 import Image from 'next/image'
-import { Minus, Plus, Trash2, ShoppingCart } from 'lucide-react'
+import { Minus, Plus, Trash2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { CartIcon } from '../_icons/cart_icon'
 
 interface CartDialogProps {
     isOpen: boolean
@@ -114,7 +115,7 @@ export function CartDialog({ isOpen, onClose }: CartDialogProps) {
                 <CredenzaHeader className="border-b border-gray-100 pb-4">
                     <CredenzaTitle className="flex items-center gap-3 text-[#053340]">
                         <div className="rounded-lg bg-gray-50 p-2">
-                            <ShoppingCart className="h-5 w-5 text-[#053340]" />
+                            <CartIcon className="h-5 w-5 fill-[#053340]" />
                         </div>
                         <div className="flex items-center gap-3">
                             <span className="font-recia text-2xl font-extrabold">
@@ -137,7 +138,7 @@ export function CartDialog({ isOpen, onClose }: CartDialogProps) {
                     ) : cartItems.length === 0 ? (
                         <div className="py-12 text-center">
                             <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gray-50 p-4">
-                                <ShoppingCart className="h-10 w-10 text-gray-400" />
+                                <CartIcon className="h-10 w-10 fill-[#053340]" />
                             </div>
                             <h3 className="font-recia mb-3 text-xl font-extrabold text-[#053340]">
                                 {t('cart.empty') || 'Your cart is empty'}
@@ -176,7 +177,7 @@ export function CartDialog({ isOpen, onClose }: CartDialogProps) {
                                             />
                                         ) : (
                                             <div className="flex h-full w-full items-center justify-center text-gray-400">
-                                                <ShoppingCart className="h-6 w-6" />
+                                                <CartIcon className="h-6 w-6 fill-[#053340]" />
                                             </div>
                                         )}
                                     </div>
@@ -250,7 +251,7 @@ export function CartDialog({ isOpen, onClose }: CartDialogProps) {
                                                 updateCartMutation.isPending ||
                                                 deleteFromCartMutation.isPending
                                             }
-                                            className="h-8 w-8 border-gray-300 p-0 text-[#053340] hover:border-[#053340] hover:bg-gray-100 bg-white"
+                                            className="h-8 w-8 border-gray-300 bg-white p-0 text-[#053340] hover:border-[#053340] hover:bg-gray-100"
                                         >
                                             <Minus className="h-3 w-3" />
                                         </Button>
@@ -270,7 +271,7 @@ export function CartDialog({ isOpen, onClose }: CartDialogProps) {
                                                 updateCartMutation.isPending ||
                                                 deleteFromCartMutation.isPending
                                             }
-                                            className="h-8 w-8 border-gray-300 p-0 text-[#053340] hover:border-[#053340] hover:bg-gray-100 bg-white"
+                                            className="h-8 w-8 border-gray-300 bg-white p-0 text-[#053340] hover:border-[#053340] hover:bg-gray-100"
                                         >
                                             <Plus className="h-3 w-3" />
                                         </Button>
@@ -310,7 +311,7 @@ export function CartDialog({ isOpen, onClose }: CartDialogProps) {
                             <Button
                                 variant="outline"
                                 onClick={onClose}
-                                className="font-supreme flex-1 border-gray-300 font-medium text-[#053340] hover:border-[#053340] hover:bg-gray-50 bg-white"
+                                className="font-supreme flex-1 border-gray-300 bg-white font-medium text-[#053340] hover:border-[#053340] hover:bg-gray-50"
                             >
                                 {t('cart.continueShopping') ||
                                     'Continue Shopping'}

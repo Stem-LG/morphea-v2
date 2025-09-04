@@ -799,13 +799,6 @@ function ShopContent() {
                                                                     : 'text-neutral-400'
                                                             )}
                                                         >
-                                                            <div
-                                                                className="h-4 w-4 rounded-full border border-gray-300"
-                                                                style={{
-                                                                    backgroundColor:
-                                                                        color.xcouleurhexa,
-                                                                }}
-                                                            />
                                                             <span>
                                                                 {
                                                                     color.xcouleurintitule

@@ -135,10 +135,6 @@ export default function OriginePage() {
                                         <div className="from-morpheus-gold-dark to-morpheus-gold-light absolute top-0 -left-4 h-24 w-1 bg-gradient-to-b"></div>
                                         <h3 className="font-recia text-4xl leading-tight font-bold text-gray-900 lg:text-5xl xl:text-6xl">
                                             Notre identité
-                                            <br />
-                                            <span className="text-morpheus-blue-dark">
-                                                et notre ADN
-                                            </span>
                                         </h3>
                                     </div>
 
@@ -166,14 +162,9 @@ export default function OriginePage() {
                                         >
                                             <div className="from-morpheus-gold-dark to-morpheus-gold-light absolute top-0 left-0 h-1 w-full rounded-t-2xl bg-gradient-to-r"></div>
                                             <div className="flex items-start space-x-4">
-                                                <div className="from-morpheus-blue-dark to-morpheus-blue-light flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br">
-                                                    <span className="text-lg font-bold text-white">
-                                                        M
-                                                    </span>
-                                                </div>
                                                 <div className="flex-1">
                                                     <p className="font-supreme text-lg leading-relaxed text-gray-700">
-                                                        <span className="text-morpheus-blue-dark text-xl font-semibold">
+                                                        <span className="text-morpheus-blue-dark text-xl font-semibold uppercase">
                                                             Morpheus
                                                         </span>{' '}
                                                         est le créateur
@@ -216,14 +207,9 @@ export default function OriginePage() {
                                         >
                                             <div className="from-morpheus-gold-light to-morpheus-gold-dark absolute top-0 left-0 h-1 w-full rounded-t-2xl bg-gradient-to-r"></div>
                                             <div className="flex items-start space-x-4">
-                                                <div className="from-morpheus-gold-dark to-morpheus-gold-light flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br">
-                                                    <span className="text-lg font-bold text-white">
-                                                        M
-                                                    </span>
-                                                </div>
                                                 <div className="flex-1">
                                                     <p className="font-supreme text-lg leading-relaxed text-gray-700">
-                                                        <span className="text-morpheus-blue-dark text-xl font-semibold">
+                                                        <span className="text-morpheus-blue-dark text-xl font-semibold uppercase">
                                                             Morphea
                                                         </span>
                                                         , née de l'expertise de
@@ -265,25 +251,12 @@ export default function OriginePage() {
                                         >
                                             <div className="from-morpheus-blue-dark to-morpheus-blue-light absolute top-0 left-0 h-1 w-full rounded-t-2xl bg-gradient-to-r"></div>
                                             <div className="flex items-start space-x-4">
-                                                <div className="from-morpheus-blue-light to-morpheus-blue-dark flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br">
-                                                    <svg
-                                                        className="h-6 w-6 text-white"
-                                                        fill="none"
-                                                        stroke="currentColor"
-                                                        viewBox="0 0 24 24"
-                                                    >
-                                                        <path
-                                                            strokeLinecap="round"
-                                                            strokeLinejoin="round"
-                                                            strokeWidth={2}
-                                                            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                                                        />
-                                                    </svg>
-                                                </div>
                                                 <div className="flex-1">
                                                     <p className="font-supreme text-lg leading-relaxed text-gray-700">
-                                                        Chaque création,
-                                                        porteuse de durabilité
+                                                        <span className="text-morpheus-blue-dark text-xl font-semibold uppercase">
+                                                            Chaque création
+                                                        </span>
+                                                        , porteuse de durabilité
                                                         et de respect de
                                                         l'environnement, incarne
                                                         la transmission d'un
@@ -298,15 +271,11 @@ export default function OriginePage() {
                                 </div>
 
                                 {/* Visual Side - Takes 5 columns */}
-                                <div className="relative lg:col-span-5">
-                                    {/* Main Image with Modern Frame */}
+                                <div className="relative top-5 lg:col-span-5">
+                                    {/* Main Video with Modern Frame */}
                                     <div className="relative">
-                                        {/* Floating Elements */}
-                                        <div className="from-morpheus-gold-dark/20 to-morpheus-gold-light/20 absolute -top-8 -left-8 z-50 h-24 w-24 rounded-full bg-gradient-to-br blur-xl"></div>
-                                        <div className="from-morpheus-blue-dark/20 to-morpheus-blue-light/20 absolute -right-8 -bottom-8 z-50 h-32 w-32 rounded-full bg-gradient-to-br blur-xl"></div>
-
                                         {/* Main Video Container */}
-                                        <div className="from-morpheus-gold-dark/10 to-morpheus-blue-dark/10 relative aspect-[5/5] overflow-hidden rounded-3xl border border-white/50 bg-gradient-to-br via-white">
+                                        <div className="relative aspect-[5/5] overflow-hidden rounded-3xl border border-white/50">
                                             {/* Video */}
                                             <video
                                                 className="absolute inset-0 h-full w-full object-contain"
@@ -320,13 +289,6 @@ export default function OriginePage() {
                                                     type="video/mp4"
                                                 />
                                             </video>
-
-                                            {/* Glass Effect Overlay */}
-                                            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent"></div>
-
-                                            {/* Decorative Corner Elements */}
-                                            <div className="border-morpheus-gold-light/50 absolute top-4 left-4 h-8 w-8 rounded-tl-lg border-t-2 border-l-2"></div>
-                                            <div className="border-morpheus-gold-light/50 absolute right-4 bottom-4 h-8 w-8 rounded-br-lg border-r-2 border-b-2"></div>
                                         </div>
 
                                         {/* Side Accent */}
@@ -397,7 +359,6 @@ export default function OriginePage() {
                                         }}
                                     >
                                         <div className="h-full rounded-lg border border-gray-100 bg-gradient-to-br from-white to-gray-50 p-8 shadow-lg transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl">
-                                         
                                             <h4 className="font-recia mb-4 text-xl font-semibold text-gray-900">
                                                 {mission.title}
                                             </h4>
@@ -504,7 +465,6 @@ export default function OriginePage() {
                                         }}
                                     >
                                         <div className="h-full rounded-lg border border-gray-100 bg-white p-8 shadow-lg transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl">
-                                           
                                             <h4 className="font-recia mb-4 text-xl font-semibold text-gray-900">
                                                 {value.title}
                                             </h4>
@@ -754,7 +714,7 @@ export default function OriginePage() {
                                 <div className="from-morpheus-gold-dark to-morpheus-gold-light mx-auto h-1 w-24 bg-gradient-to-r"></div>
                             </div>
 
-                            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+                            <div className="flex flex-wrap justify-center gap-8">
                                 {[
                                     'Exposer vos créations à une audience internationale.',
                                     'Participer à des événements immersifs et workshops.',
@@ -762,9 +722,12 @@ export default function OriginePage() {
                                     'Rejoindre une communauté dynamique de professionnels et de passionnés.',
                                     'Concevoir et organiser vos événements, stratégies marketing et campagnes de communication.',
                                 ].map((benefit, index) => (
-                                    <div key={index} className="group">
+                                    <div
+                                        key={index}
+                                        className="group max-w-[350px] min-w-[280px] flex-1"
+                                    >
                                         <div className="h-full rounded-lg border border-gray-100 bg-gradient-to-br from-white to-gray-50 p-8 shadow-lg transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl">
-                                            <div className="from-morpheus-gold-dark to-morpheus-gold-light mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br text-lg font-bold text-white">
+                                            <div className="from-morpheus-blue-light to-morpheus-blue-dark mb-4 inline-block h-12 w-12 bg-gradient-to-r bg-clip-text text-2xl font-bold text-transparent">
                                                 {index + 1}
                                             </div>
                                             <p className="font-supreme leading-relaxed font-medium text-gray-700">
