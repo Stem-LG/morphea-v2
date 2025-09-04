@@ -745,6 +745,7 @@ export const enTranslations = {
       "allRoles": "All Roles",
       "user": "User",
       "admin": "Admin",
+      "roleDesigner": "Designer",
       "filterByRole": "Filter by role",
       "assignDesignerRole": "Assign Designer Role",
       "fillDesignerInfo": "Fill in the designer information for this user",

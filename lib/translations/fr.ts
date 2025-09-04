@@ -771,6 +771,7 @@ export const frTranslations = {
       "makeDesigner": "Faire Designer",
       "allRoles": "Tous les Rôles",
       "user": "Utilisateur",
+      "roleDesigner": "Designer",
       "admin": "Admin",
       "filterByRole": "Filtrer par rôle",
       "assignDesignerRole": "Assigner le Rôle de Designer",
