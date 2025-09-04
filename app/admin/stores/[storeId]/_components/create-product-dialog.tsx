@@ -144,6 +144,9 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
         variantName: "",
     });
 
+    // Exit confirmation dialog state
+    const [exitConfirmation, setExitConfirmation] = useState(false);
+
     // Determine if we're in edit mode
     const isEditMode = !!productId;
 
@@ -335,6 +338,54 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
             variantId: null,
             variantName: "",
         });
+    };
+
+    // Function to detect if there are unsaved changes
+    const hasUnsavedChanges = () => {
+        // For new products, check if any fields have been filled
+        if (!isEditMode) {
+            return (
+                productCode.trim() !== "" ||
+                productName.trim() !== "" ||
+                shortDescription.trim() !== "" ||
+                fullDescription.trim() !== "" ||
+                categoryId !== null ||
+                selectedInfospotactionId !== null ||
+                variants.some(variant => 
+                    variant.name.trim() !== "" ||
+                    variant.code?.trim() !== "" ||
+                    variant.colorId !== null ||
+                    variant.sizeId !== null ||
+                    variant.images.length > 0 ||
+                    variant.videos.length > 0 ||
+                    variant.models3d.length > 0 ||
+                    (variant.catalogPrice !== undefined && variant.catalogPrice > 0)
+                )
+            );
+        }
+
+        // For edit mode, we always consider there might be changes since we can't easily track initial state
+        return true;
+    };
+
+    // Handle close dialog with confirmation
+    const handleCloseDialog = () => {
+        if (hasUnsavedChanges() && !isSubmitting) {
+            setExitConfirmation(true);
+        } else {
+            onClose();
+        }
+    };
+
+    // Confirm exit without saving
+    const confirmExit = () => {
+        setExitConfirmation(false);
+        onClose();
+    };
+
+    // Cancel exit confirmation
+    const cancelExit = () => {
+        setExitConfirmation(false);
     };
 
     const handleVariantChange = (variantId: string, field: keyof ProductVariant, value: any) => {
@@ -714,7 +765,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
 
     return (
         <>
-            <Dialog open={isOpen} onOpenChange={onClose}>
+            <Dialog open={isOpen} onOpenChange={handleCloseDialog}>
             <DialogContent className="max-w-7xl max-h-[95vh] bg-white border-gray-200 text-gray-900">
                 <DialogHeader>
                     <DialogTitle className="text-2xl font-bold text-gray-900 flex items-center gap-2">
@@ -736,7 +787,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                             <span className="text-lg text-red-700 font-semibold">{t("admin.createProduct.failedToLoadProductDetails")}</span>
                         </div>
                         <span className="text-gray-500 mb-2">{t("admin.createProduct.tryAgainOrContactSupport")}</span>
-                        <Button onClick={onClose} className="bg-gray-100 text-gray-900 hover:bg-gray-200">
+                        <Button onClick={handleCloseDialog} className="bg-gray-100 text-gray-900 hover:bg-gray-200">
                             {t("common.close")}
                         </Button>
                     </div>
@@ -1667,7 +1718,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                 {/* Dialog Footer */}
                 <div className="flex justify-end gap-3 border-t border-gray-200 p-2">
                     <Button
-                        onClick={onClose}
+                        onClick={handleCloseDialog}
                         variant="outline"
                         className="border-gray-300 text-gray-700 hover:bg-gray-50"
                         disabled={isSubmitting || (isEditMode && productDetailsLoading) || (isEditMode && productDetailsError)}
@@ -1728,6 +1779,36 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                         className="bg-red-600 hover:bg-red-700 text-white"
                     >
                         {t("admin.createProduct.deleteVariant")}
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+
+        {/* Exit Confirmation Dialog */}
+        <Dialog open={exitConfirmation} onOpenChange={cancelExit}>
+            <DialogContent className="max-w-md bg-white border-gray-200 text-gray-900">
+                <DialogHeader>
+                    <DialogTitle className="text-lg font-semibold text-orange-700 flex items-center gap-2">
+                        <Info className="h-5 w-5" />
+                        {t("admin.createProduct.confirmExit")}
+                    </DialogTitle>
+                    <DialogDescription className="text-gray-600 mt-2">
+                        {t("admin.createProduct.exitWarning")}
+                    </DialogDescription>
+                </DialogHeader>
+                <DialogFooter className="gap-2 mt-4">
+                    <Button
+                        onClick={cancelExit}
+                        variant="outline"
+                        className="border-gray-300 text-gray-700 hover:bg-gray-50"
+                    >
+                        {t("common.cancel")}
+                    </Button>
+                    <Button
+                        onClick={confirmExit}
+                        className="bg-orange-600 hover:bg-orange-700 text-white"
+                    >
+                        {t("admin.createProduct.exitWithoutSaving")}
                     </Button>
                 </DialogFooter>
             </DialogContent>

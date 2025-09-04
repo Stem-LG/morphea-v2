@@ -711,7 +711,10 @@ export const enTranslations = {
       "createProduct": "Create Product",
       "confirmDeleteVariant": "Confirm Delete Variant",
       "deleteVariantWarning": "Are you sure you want to delete this variant?",
-      "deleteVariant": "Delete Variant"
+      "deleteVariant": "Delete Variant",
+      "confirmExit": "Confirm Exit",
+      "exitWarning": "You have unsaved changes. Are you sure you want to exit without saving?",
+      "exitWithoutSaving": "Exit Without Saving"
     },
     "productView": {
       "productDetails": "Product Details",

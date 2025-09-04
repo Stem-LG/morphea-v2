@@ -738,7 +738,10 @@ export const frTranslations = {
       "createProduct": "Créer le Produit",
       "confirmDeleteVariant": "Confirmer la Suppression de la Variante",
       "deleteVariantWarning": "Êtes-vous sûr de vouloir supprimer cette variante ?",
-      "deleteVariant": "Supprimer la Variante"
+      "deleteVariant": "Supprimer la Variante",
+      "confirmExit": "Confirmer la Sortie",
+      "exitWarning": "Vous avez des modifications non sauvegardées. Êtes-vous sûr de vouloir quitter sans sauvegarder ?",
+      "exitWithoutSaving": "Quitter Sans Sauvegarder"
     },
     "productView": {
       "productDetails": "Détails du Produit",
