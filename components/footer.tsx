@@ -17,6 +17,7 @@ export default function Footer() {
     const [isPlanDeMorpheaOpen, setIsPlanDeMorpheaOpen] = useState(false)
     const { language, setLanguage, t } = useLanguage()
     const dropdownRef = useRef<HTMLDivElement>(null)
+    const planSectionRef = useRef<HTMLDivElement>(null)
     const supabase = createClient()
     const { data: homeSettings } = useHomeSettings()
     const { data: categories = [] } = useCategories()
@@ -78,6 +79,16 @@ export default function Footer() {
             document.removeEventListener('mousedown', handleClickOutside)
         }
     }, [])
+
+    // Smooth scroll to plan section when it opens
+    useEffect(() => {
+        if (isPlanDeMorpheaOpen && planSectionRef.current) {
+            planSectionRef.current.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start',
+            })
+        }
+    }, [isPlanDeMorpheaOpen])
 
     const languages = [
         {
@@ -231,7 +242,8 @@ export default function Footer() {
                                     <a
                                         href={
                                             homeSettings?.footer.links
-                                                .cookiesPrivacy || '/privacy-policy'
+                                                .cookiesPrivacy ||
+                                            '/privacy-policy'
                                         }
                                         className="block touch-manipulation py-1 text-base text-neutral-700 transition-colors hover:text-black md:text-lg"
                                     >
@@ -499,7 +511,10 @@ export default function Footer() {
 
                 {/* Plan de Morphea section - Mobile Responsive - Conditionally rendered */}
                 {isPlanDeMorpheaOpen && (
-                    <div className="border-y border-gray-200 pt-3 pb-8 md:pt-4 md:pb-11">
+                    <div
+                        ref={planSectionRef}
+                        className="border-y border-gray-200 pt-3 pb-8 md:pt-4 md:pb-11"
+                    >
                         <div className="flex flex-col items-center justify-center gap-4 md:gap-6">
                             <div className="flex w-full items-center justify-between">
                                 <div className="size-8" />
