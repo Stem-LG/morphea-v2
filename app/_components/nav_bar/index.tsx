@@ -447,8 +447,11 @@ function NavBarSheet({
             name: 'Categories',
             action: () => setShowCategories(!showCategories),
         },
-        { name: 'A Propos', href: '/about' },
-        { name: 'Contactez-Nous', href: '/contact' },
+        {
+            name: 'A Propos',
+            href: '/a-lorigine-de-morphea',
+        },
+        { name: 'Contactez-Nous', href: 'mailto:contact@morpheus-sa.com' },
     ]
 
     const navbarFooterItems = useMemo(() => {
