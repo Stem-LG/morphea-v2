@@ -207,7 +207,7 @@ export default function NavBar() {
                                             onClick={logout}
                                             className="w-full text-left"
                                         >
-                                            {t('logout')}
+                                            {t('common.logout')}
                                         </button>
                                     </DropdownMenuItem>
                                 </>
@@ -503,7 +503,7 @@ function NavBarSheet({
                                         <Fragment key={item.name}>
                                             <Button
                                                 variant="ghost"
-                                                className="font-supreme hover:bg-morpheus-blue-lighter h-14 justify-between rounded-none text-xl text-neutral-400 hover:text-white"
+                                                className="font-supreme hover:bg-morpheus-blue-lighter h-14 justify-between rounded-none text-lg text-neutral-400 hover:text-white"
                                                 asChild={hasHref}
                                                 onClick={
                                                     hasAction
@@ -518,12 +518,18 @@ function NavBarSheet({
                                             >
                                                 {hasHref ? (
                                                     <Link href={item.href!}>
-                                                        {item.name}
+                                                        {item.name[0].toUpperCase() +
+                                                            item.name
+                                                                .toLowerCase()
+                                                                .slice(1)}
                                                     </Link>
                                                 ) : (
                                                     <>
                                                         <span className="ml-1">
-                                                            {item.name}
+                                                            {item.name[0] +
+                                                                item.name
+                                                                    .toLowerCase()
+                                                                    .slice(1)}
                                                         </span>
                                                         {isCategories &&
                                                             (showCategories ? (
@@ -559,7 +565,7 @@ function NavBarSheet({
                                         <Fragment key={item.name}>
                                             <Button
                                                 variant="ghost"
-                                                className="font-supreme hover:bg-morpheus-blue-lighter h-14 justify-start rounded-none text-xl text-neutral-400 hover:text-white"
+                                                className="font-supreme hover:bg-morpheus-blue-lighter h-14 justify-start rounded-none text-lg text-neutral-400 hover:text-white"
                                                 onClick={
                                                     item.onclick ||
                                                     (hasHref
@@ -573,10 +579,16 @@ function NavBarSheet({
                                             >
                                                 {hasHref ? (
                                                     <Link href={item.href!}>
-                                                        {item.name}
+                                                        {item.name[0].toUpperCase() +
+                                                            item.name
+                                                                .toLowerCase()
+                                                                .slice(1)}
                                                     </Link>
                                                 ) : (
+                                                    item.name[0].toUpperCase() +
                                                     item.name
+                                                        .toLowerCase()
+                                                        .slice(1)
                                                 )}
                                             </Button>
                                             <Separator />
