@@ -25,7 +25,6 @@ import {
 } from '@/components/ui/sheet'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
-import { Slider } from '@/components/ui/slider'
 
 // Custom SVG Components
 const ThreeColumnIcon = ({
@@ -721,7 +720,7 @@ function ShopContent() {
             {/* Filter Sheet */}
             <Sheet open={showFilterSheet} onOpenChange={setShowFilterSheet}>
                 <SheetTitle />
-                <SheetContent side="right" className="bg-white">
+                <SheetContent side="right" className="z-[80] bg-white">
                     {/* Header */}
                     <div className="flex-shrink-0">
                         <div className="flex items-center justify-center py-4 text-3xl">
@@ -1274,7 +1273,7 @@ function ShopContent() {
                     {/* Footer */}
                     <div className="mt-2 px-6 pb-4">
                         <Separator className="mb-4" />
-                        <div className="flex flex-col gap-3 px-2">
+                        <div className="flex gap-3">
                             <button
                                 onClick={() => {
                                     setQueryState({
@@ -1288,14 +1287,13 @@ function ShopContent() {
                                         maxPrice: null,
                                     })
                                 }}
-                                className="hover:bg-morpheus-blue-lighter flex h-12 w-full items-center justify-start rounded-none p-4 text-lg text-neutral-400 hover:text-white"
+                                className="outline-morpheus-blue-dark hover:from-morpheus-blue-light hover:to-morpheus-blue-dark text-morpheus-blue-dark flex-1 rounded-none bg-gradient-to-r p-4 text-lg outline transition-all duration-300 hover:text-white"
                             >
                                 Effacer tout
                             </button>
-                            <Separator />
                             <button
                                 onClick={() => setShowFilterSheet(false)}
-                                className="hover:bg-morpheus-blue-lighter flex h-12 w-full items-center justify-start rounded-none p-4 text-lg text-neutral-400 hover:text-white"
+                                className="from-morpheus-blue-light to-morpheus-blue-dark hover:border-morpheus-blue-dark hover:text-morpheus-blue-dark flex-1 rounded-none bg-gradient-to-r p-4 text-lg text-white transition-all duration-300 hover:border hover:from-white hover:to-white"
                             >
                                 Appliquer
                             </button>
