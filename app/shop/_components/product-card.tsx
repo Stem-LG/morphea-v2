@@ -227,11 +227,11 @@ export function ProductCard({
     // Get unique colors
     const uniqueColors = product.yvarprod?.reduce(
         (acc, variant) => {
-            const colorHex = variant.xcouleur.xcouleurhexa
+            const colorHex = variant.xcouleur?.xcouleurhexa
             if (!acc.some((c) => c.hex === colorHex)) {
                 acc.push({
                     hex: colorHex,
-                    name: variant.xcouleur.xcouleurintitule,
+                    name: variant.xcouleur?.xcouleurintitule,
                 })
             }
             return acc

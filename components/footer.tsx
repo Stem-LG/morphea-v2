@@ -346,7 +346,7 @@ export default function Footer() {
                                             return (
                                                 <li key={categoryId}>
                                                     <a
-                                                        href={`/categories/${categoryId}`}
+                                                        href={`/shop?categoryId=${categoryId}`}
                                                         className="block touch-manipulation py-1 text-base text-neutral-700 transition-colors hover:text-black md:text-lg"
                                                     >
                                                         {
