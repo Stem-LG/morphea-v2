@@ -15,7 +15,7 @@ import { useNotifications } from '@/app/_hooks/use-notifications'
 import { useScrollDirection } from '@/hooks/use-scroll-direction'
 import { ProductDetailsPage } from '../../main/_components/product-details-page'
 import Image from 'next/image'
-import { cn } from '@/lib/utils'
+
 import { MenuIcon } from '../../_icons/menu_icon'
 import { AdminIcon } from '../../_icons/admin_icon'
 import { WishlistIcon } from '../../_icons/wishlist_icon'
@@ -491,7 +491,8 @@ function NavBarSheet({
 
                         {/* Scrollable Content Area */}
                         <ScrollArea className="flex-1 overflow-hidden">
-                            <div className="flex flex-col px-6">
+                            <div className="flex flex-col px-6 pb-4">
+                                {/* Navbar Items */}
                                 {navbarItems.map((item) => {
                                     const hasHref = !!item.href
                                     const hasAction = !!item.action
@@ -508,8 +509,11 @@ function NavBarSheet({
                                                     hasAction
                                                         ? item.action
                                                         : hasHref
-                                                        ? () => setIsMenuOpen(false)
-                                                        : undefined
+                                                          ? () =>
+                                                                setIsMenuOpen(
+                                                                    false
+                                                                )
+                                                          : undefined
                                                 }
                                             >
                                                 {hasHref ? (
@@ -546,29 +550,24 @@ function NavBarSheet({
                                         </Fragment>
                                     )
                                 })}
-                            </div>
-                        </ScrollArea>
 
-                        {/* Footer Items within Scrollable Area */}
-                        <div className="mt-2 px-6 pb-4">
-                            <Separator className="mb-4" />
-                            <div className="flex flex-col px-2">
+                                {/* Footer Items - Combined with same styling */}
                                 {navbarFooterItems.map((item) => {
-                                    const hasOnClick = !!item.onclick
                                     const hasHref = !!item.href
 
                                     return (
                                         <Fragment key={item.name}>
                                             <Button
                                                 variant="ghost"
-                                                className={cn(
-                                                    'font-supreme h-12 justify-start rounded-none text-lg text-neutral-400',
-                                                    hasOnClick &&
-                                                        'w-full text-left'
-                                                )}
+                                                className="font-supreme hover:bg-morpheus-blue-lighter h-14 justify-start rounded-none text-xl text-neutral-400 hover:text-white"
                                                 onClick={
                                                     item.onclick ||
-                                                    (hasHref ? () => setIsMenuOpen(false) : undefined)
+                                                    (hasHref
+                                                        ? () =>
+                                                              setIsMenuOpen(
+                                                                  false
+                                                              )
+                                                        : undefined)
                                                 }
                                                 asChild={hasHref}
                                             >
@@ -585,7 +584,7 @@ function NavBarSheet({
                                     )
                                 })}
                             </div>
-                        </div>
+                        </ScrollArea>
                     </div>
 
                     {/* Subcategory Column - Only visible when a parent category is selected */}
