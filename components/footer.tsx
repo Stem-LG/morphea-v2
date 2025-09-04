@@ -537,16 +537,6 @@ export default function Footer() {
                                     const mainPages = [
                                         {
                                             name: t(
-                                                'footer.planDeMorphea.home'
-                                            ),
-                                            href: '/',
-                                        },
-                                        {
-                                            name: 'Visite Virtuelle',
-                                            href: '/main',
-                                        },
-                                        {
-                                            name: t(
                                                 'footer.planDeMorphea.login'
                                             ),
                                             href: '/auth/login',
@@ -559,9 +549,31 @@ export default function Footer() {
                                         },
                                         {
                                             name: t(
+                                                'footer.planDeMorphea.home'
+                                            ),
+                                            href: '/',
+                                        },
+                                        {
+                                            name: 'Visite Virtuelle',
+                                            href: '/main',
+                                        },
+                                        {
+                                            name: t(
                                                 'footer.planDeMorphea.shop'
                                             ),
                                             href: '/shop',
+                                        },
+                                        {
+                                            name: t(
+                                                'footer.planDeMorphea.events'
+                                            ),
+                                            href: '/#events',
+                                        },
+                                        {
+                                            name: t(
+                                                'footer.planDeMorphea.creators'
+                                            ),
+                                            href: '/#creators',
                                         },
                                         {
                                             name: t(
@@ -578,9 +590,9 @@ export default function Footer() {
                                     for (
                                         let i = 0;
                                         i < allLinks.length;
-                                        i += 6
+                                        i += 8
                                     ) {
-                                        columns.push(allLinks.slice(i, i + 6))
+                                        columns.push(allLinks.slice(i, i + 8))
                                     }
 
                                     return (
