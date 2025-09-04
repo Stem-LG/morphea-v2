@@ -6,14 +6,15 @@ import { CurrencySwitcher } from '@/app/_components/nav_bar/currency-switcher'
 import { CartDialog } from '@/app/_components/cart-dialog'
 import { WishlistDialog } from '@/app/_components/wishlist-dialog'
 import { NotificationsDialog } from '@/app/_components/notifications-dialog'
-// import { useCart } from '@/app/_hooks/cart/useCart'
-// import { useWishlist } from '@/app/_hooks/wishlist/useWishlist'
+import { useCart } from '@/app/_hooks/cart/useCart'
+import { useWishlist } from '@/app/_hooks/wishlist/useWishlist'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState, Fragment, useMemo } from 'react'
 import { useNotifications } from '@/app/_hooks/use-notifications'
 import { useScrollDirection } from '@/hooks/use-scroll-direction'
 import { ProductDetailsPage } from '../../main/_components/product-details-page'
+import { SearchDialog } from '@/app/_components/search-dialog'
 import Image from 'next/image'
 
 import { MenuIcon } from '../../_icons/menu_icon'
@@ -56,6 +57,7 @@ export default function NavBar() {
     const [isCartOpen, setIsCartOpen] = useState(false)
     const [isWishlistOpen, setIsWishlistOpen] = useState(false)
     const [isNotificationsOpen, setIsNotificationsOpen] = useState(false)
+    const [isSearchOpen, setIsSearchOpen] = useState(false)
     const [selectedProduct, setSelectedProduct] = useState(null)
     const { t } = useLanguage()
     const router = useRouter()
@@ -68,11 +70,11 @@ export default function NavBar() {
     } = useAuth()
     const { logout } = useLogout()
     const { hasAdminAccess } = useUserRoles()
-    // const { data: cartItems = [] } = useCart()
-    // const { data: wishlistItems = [] } = useWishlist()
+    const { data: cartItems = [] } = useCart()
+    const { data: wishlistItems = [] } = useWishlist()
 
-    // const cartItemCount = cartItems.length
-    // const wishlistItemCount = wishlistItems.length
+    const cartItemCount = cartItems.length
+    const wishlistItemCount = wishlistItems.length
 
     // Notifications - only get unreadCount for the badge
     console.log('NavBar - currentUser:', currentUser)
@@ -111,7 +113,7 @@ export default function NavBar() {
     return (
         <>
             <nav
-                className={`fixed top-0 z-50 flex h-18 w-full bg-[#bbbbbb77] px-4 transition-transform duration-300 ease-in-out md:h-18 md:px-6 lg:px-12 ${
+                className={`fixed top-0 z-[80] flex h-18 w-full bg-[#bbbbbb77] px-4 transition-transform duration-300 ease-in-out md:h-18 md:px-6 lg:px-12 ${
                     isVisible ? 'translate-y-0' : '-translate-y-full'
                 }`}
             >
@@ -158,13 +160,31 @@ export default function NavBar() {
                             )}
                         </div>
                     )}
-                    <NavBarIconButton onClick={() => setIsWishlistOpen(true)}>
-                        <WishlistIcon />
-                    </NavBarIconButton>
-                    <NavBarIconButton onClick={() => setIsCartOpen(true)}>
-                        <CartIcon />
-                    </NavBarIconButton>
-                    <NavBarIconButton>
+                    <div className="relative">
+                        <NavBarIconButton
+                            onClick={() => setIsWishlistOpen(true)}
+                        >
+                            <WishlistIcon />
+                        </NavBarIconButton>
+                        {wishlistItemCount > 0 && (
+                            <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-medium text-white">
+                                {wishlistItemCount > 9
+                                    ? '9+'
+                                    : wishlistItemCount}
+                            </span>
+                        )}
+                    </div>
+                    <div className="relative">
+                        <NavBarIconButton onClick={() => setIsCartOpen(true)}>
+                            <CartIcon />
+                        </NavBarIconButton>
+                        {cartItemCount > 0 && (
+                            <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-medium text-white">
+                                {cartItemCount > 9 ? '9+' : cartItemCount}
+                            </span>
+                        )}
+                    </div>
+                    <NavBarIconButton onClick={() => setIsSearchOpen(true)}>
                         <SearchIcon />
                     </NavBarIconButton>
                     <DropdownMenu modal={false}>
@@ -253,11 +273,17 @@ export default function NavBar() {
                 isOpen={isNotificationsOpen}
                 onClose={() => setIsNotificationsOpen(false)}
             />
+            <SearchDialog
+                isOpen={isSearchOpen}
+                onClose={() => setIsSearchOpen(false)}
+                onProductSelect={setSelectedProduct}
+            />
 
             {selectedProduct && (
                 <ProductDetailsPage
                     productData={selectedProduct}
                     onClose={() => setSelectedProduct(null)}
+                    extraTop
                 />
             )}
 
@@ -421,8 +447,11 @@ function NavBarSheet({
             name: 'Categories',
             action: () => setShowCategories(!showCategories),
         },
-        { name: 'A Propos', href: '/about' },
-        { name: 'Contactez-Nous', href: '/contact' },
+        {
+            name: 'A Propos',
+            href: '/a-lorigine-de-morphea',
+        },
+        { name: 'Contactez-Nous', href: 'mailto:contact@morpheus-sa.com' },
     ]
 
     const navbarFooterItems = useMemo(() => {

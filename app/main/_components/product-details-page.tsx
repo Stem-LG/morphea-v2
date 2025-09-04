@@ -503,13 +503,8 @@ export function ProductDetailsPage({
     }
 
     return (
-        <div
-            className={
-                'fixed inset-0 z-[70] bg-black/50 backdrop-blur-sm' +
-                (extraTop ? ' pt-24' : '')
-            }
-        >
-            <div className="relative h-full w-full overflow-y-auto bg-white shadow-2xl">
+        <div className={'fixed inset-0 z-[70] bg-black/50 backdrop-blur-sm'}>
+            <div className={"relative h-full w-full overflow-y-auto bg-white shadow-2xl " + (extraTop ? 'pt-18' : '')}>
                 {/* Close button - top right */}
                 <button
                     onClick={onClose}
