@@ -14,6 +14,7 @@ import { useState, Fragment, useMemo } from 'react'
 import { useNotifications } from '@/app/_hooks/use-notifications'
 import { useScrollDirection } from '@/hooks/use-scroll-direction'
 import { ProductDetailsPage } from '../../main/_components/product-details-page'
+import { SearchDialog } from '@/app/_components/search-dialog'
 import Image from 'next/image'
 
 import { MenuIcon } from '../../_icons/menu_icon'
@@ -56,6 +57,7 @@ export default function NavBar() {
     const [isCartOpen, setIsCartOpen] = useState(false)
     const [isWishlistOpen, setIsWishlistOpen] = useState(false)
     const [isNotificationsOpen, setIsNotificationsOpen] = useState(false)
+    const [isSearchOpen, setIsSearchOpen] = useState(false)
     const [selectedProduct, setSelectedProduct] = useState(null)
     const { t } = useLanguage()
     const router = useRouter()
@@ -111,7 +113,7 @@ export default function NavBar() {
     return (
         <>
             <nav
-                className={`fixed top-0 z-50 flex h-18 w-full bg-[#bbbbbb77] px-4 transition-transform duration-300 ease-in-out md:h-18 md:px-6 lg:px-12 ${
+                className={`fixed top-0 z-[80] flex h-18 w-full bg-[#bbbbbb77] px-4 transition-transform duration-300 ease-in-out md:h-18 md:px-6 lg:px-12 ${
                     isVisible ? 'translate-y-0' : '-translate-y-full'
                 }`}
             >
@@ -182,7 +184,7 @@ export default function NavBar() {
                             </span>
                         )}
                     </div>
-                    <NavBarIconButton>
+                    <NavBarIconButton onClick={() => setIsSearchOpen(true)}>
                         <SearchIcon />
                     </NavBarIconButton>
                     <DropdownMenu modal={false}>
@@ -271,11 +273,17 @@ export default function NavBar() {
                 isOpen={isNotificationsOpen}
                 onClose={() => setIsNotificationsOpen(false)}
             />
+            <SearchDialog
+                isOpen={isSearchOpen}
+                onClose={() => setIsSearchOpen(false)}
+                onProductSelect={setSelectedProduct}
+            />
 
             {selectedProduct && (
                 <ProductDetailsPage
                     productData={selectedProduct}
                     onClose={() => setSelectedProduct(null)}
+                    extraTop
                 />
             )}
 
