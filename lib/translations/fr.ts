@@ -102,7 +102,15 @@ export const frTranslations = {
     "backToSignUp": "Retour à l'inscription",
     "backToMorpheusMall": "Retour à Morphea",
     "morpheusMall": "Morphea",
-    "signOut": "Déconnexion"
+    "signOut": "Déconnexion",
+    "signInSubtitle": "Connectez-vous à votre compte pour continuer",
+    "signUpSubtitle": "Créez votre compte pour commencer votre voyage avec nous",
+    "firstName": "Prénom",
+    "firstNamePlaceholder": "Entrez votre prénom",
+    "firstNameRequired": "Le prénom est requis",
+    "lastName": "Nom de famille",
+    "lastNamePlaceholder": "Entrez votre nom de famille",
+    "lastNameRequired": "Le nom de famille est requis"
   },
   "landing": {
     "title": "Bienvenue chez Morphea",

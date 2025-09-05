@@ -20,7 +20,8 @@ type PasswordRequirement = {
 };
 
 export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutRef<"div">) {
-    const [name, setName] = useState("");
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [repeatPassword, setRepeatPassword] = useState("");
@@ -35,14 +36,20 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
     // Prefill form with visitor data when available
     useEffect(() => {
         if (visitorData && !isLoadingVisitor) {
-            if (visitorData.yvisiteurnom && !name) {
-                setName(visitorData.yvisiteurnom);
+            if (visitorData.yvisiteurnom && !firstName && !lastName) {
+                const nameParts = visitorData.yvisiteurnom.trim().split(' ');
+                if (nameParts.length >= 2) {
+                    setFirstName(nameParts[0]);
+                    setLastName(nameParts.slice(1).join(' '));
+                } else {
+                    setFirstName(visitorData.yvisiteurnom);
+                }
             }
             if (visitorData.yvisiteuremail && !email) {
                 setEmail(visitorData.yvisiteuremail);
             }
         }
-    }, [visitorData, isLoadingVisitor, name, email]);
+    }, [visitorData, isLoadingVisitor, firstName, lastName, email]);
 
     // Password validation
     const passwordRequirements = useMemo((): PasswordRequirement[] => {
@@ -68,7 +75,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
 
     const isPasswordValid = passwordRequirements.every((req) => req.met);
     const passwordsMatch = password === repeatPassword && repeatPassword.length > 0;
-    const isFormValid = name.trim() && email.trim() && isPasswordValid && passwordsMatch && acceptedTerms;
+    const isFormValid = firstName.trim() && lastName.trim() && email.trim() && isPasswordValid && passwordsMatch && acceptedTerms;
 
     const handleSignUp = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -76,8 +83,14 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
         setIsLoading(true);
         setError(null);
 
-        if (!name.trim()) {
-            setError(t("auth.nameRequired"));
+        if (!firstName.trim()) {
+            setError(t("auth.firstNameRequired"));
+            setIsLoading(false);
+            return;
+        }
+
+        if (!lastName.trim()) {
+            setError(t("auth.lastNameRequired"));
             setIsLoading(false);
             return;
         }
@@ -122,7 +135,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
                 options: {
                     emailRedirectTo: redirectUrl,
                     data: {
-                        full_name: name.trim(),
+                        full_name: `${firstName.trim()} ${lastName.trim()}`,
                     },
                 },
             });
@@ -137,7 +150,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
                         .from("yvisiteur")
                         .update({
                             yuseridfk: signUpData.user.id,
-                            yvisiteurnom: name.trim(),
+                            yvisiteurnom: `${firstName.trim()} ${lastName.trim()}`,
                             yvisiteuremail: email,
                         })
                         .eq("yvisiteurid", visitorData.yvisiteurid);
@@ -168,26 +181,42 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
                     {t("auth.joinTheFuture")}
                 </h1>
                 <p className="font-supreme text-lg text-[#063846] max-w-md mx-auto">
-                    Create your account to start your journey with us
+                    {t("auth.signUpSubtitle")}
                 </p>
             </div>
 
             {/* Form Card */}
             <div className="bg-white/80 backdrop-blur-sm border border-slate-200 rounded-lg p-8 shadow-xl">
                 <form onSubmit={handleSignUp} className="space-y-6">
-                    <div className="space-y-2">
-                        <Label htmlFor="name" className="text-[#05141D] text-sm font-medium">
-                            {t("auth.name")}
-                        </Label>
-                        <Input
-                            id="name"
-                            type="text"
-                            placeholder={t("auth.namePlaceholder")}
-                            required
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            className="bg-white border-slate-300 text-[#05141D] placeholder:text-slate-400 h-11 text-base focus:border-[#063846] focus:ring-[#063846] rounded-md"
-                        />
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="firstName" className="text-[#05141D] text-sm font-medium">
+                                {t("auth.firstName")}
+                            </Label>
+                            <Input
+                                id="firstName"
+                                type="text"
+                                placeholder={t("auth.firstNamePlaceholder")}
+                                required
+                                value={firstName}
+                                onChange={(e) => setFirstName(e.target.value)}
+                                className="bg-white border-slate-300 text-[#05141D] placeholder:text-slate-400 h-11 text-base focus:border-[#063846] focus:ring-[#063846] rounded-md"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="lastName" className="text-[#05141D] text-sm font-medium">
+                                {t("auth.lastName")}
+                            </Label>
+                            <Input
+                                id="lastName"
+                                type="text"
+                                placeholder={t("auth.lastNamePlaceholder")}
+                                required
+                                value={lastName}
+                                onChange={(e) => setLastName(e.target.value)}
+                                className="bg-white border-slate-300 text-[#05141D] placeholder:text-slate-400 h-11 text-base focus:border-[#063846] focus:ring-[#063846] rounded-md"
+                            />
+                        </div>
                     </div>
 
                     <div className="space-y-2">

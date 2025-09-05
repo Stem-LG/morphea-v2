@@ -57,7 +57,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
                     {t("auth.welcomeBack")}
                 </h1>
                 <p className="font-supreme text-lg text-[#063846] max-w-md mx-auto">
-                    Sign in to your account to continue
+                    {t("auth.signInSubtitle")}
                 </p>
             </div>
 
