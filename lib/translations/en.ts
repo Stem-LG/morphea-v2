@@ -445,7 +445,12 @@ export const enTranslations = {
       "addSubcategory": "Add Subcategory",
       "parentCategory": "Parent Category",
       "categoryImage": "Category Image",
-      "noParent": "No Parent Category"
+      "noParent": "No Parent Category",
+      "colorMandatory": "Color Required",
+      "sizeMandatory": "Size Required",
+      "clickToUploadImage": "Click to upload image",
+      "changeImage": "Change image",
+      "selectParentCategory": "Select parent category"
     },
     "approvals": {
       "title": "Product Approvals",

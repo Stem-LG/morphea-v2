@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Tag, Save, X, Upload, Image as ImageIcon } from 'lucide-react'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Tag, Save, X, Upload, Image as ImageIcon, Palette, Ruler } from 'lucide-react'
 import { toast } from 'sonner'
 import {
     Credenza,
@@ -29,6 +30,8 @@ interface CategoryFormData {
     xcategprodcode: string
     xcategprodinfobulle: string
     xcategparentid: number | null
+    xcategcolobl: boolean
+    xcategtailleobl: boolean
     imageFile?: File
 }
 
@@ -38,6 +41,8 @@ interface CategoryData {
     xcategprodcode: string
     xcategprodinfobulle: string
     xcategparentid: number | null
+    xcategcolobl: boolean
+    xcategtailleobl: boolean
 }
 
 interface UpdateCategoryDialogProps {
@@ -64,6 +69,8 @@ export function UpdateCategoryDialog({
         xcategprodcode: '',
         xcategprodinfobulle: '',
         xcategparentid: null,
+        xcategcolobl: false,
+        xcategtailleobl: false,
     })
     const [imagePreview, setImagePreview] = useState<string | null>(null)
     const [currentImageUrl, setCurrentImageUrl] = useState<string | null>(null)
@@ -78,6 +85,8 @@ export function UpdateCategoryDialog({
                 xcategprodcode: category.xcategprodcode || '',
                 xcategprodinfobulle: category.xcategprodinfobulle || '',
                 xcategparentid: category.xcategparentid || null,
+                xcategcolobl: category.xcategcolobl || false,
+                xcategtailleobl: category.xcategtailleobl || false,
             })
             // Set current image if category has media
             const categoryWithMedia = category as any
@@ -116,6 +125,8 @@ export function UpdateCategoryDialog({
                 xcategprodcode: category.xcategprodcode || '',
                 xcategprodinfobulle: category.xcategprodinfobulle || '',
                 xcategparentid: category.xcategparentid || null,
+                xcategcolobl: category.xcategcolobl || false,
+                xcategtailleobl: category.xcategtailleobl || false,
             })
             setImagePreview(null)
         }
@@ -243,6 +254,44 @@ export function UpdateCategoryDialog({
                                 required
                                 disabled={updateCategoryMutation.isPending}
                             />
+                        </div>
+
+                        {/* Boolean Fields */}
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                            <div className="flex items-center space-x-2">
+                                <Checkbox
+                                    id="xcategcolobl-edit"
+                                    checked={formData.xcategcolobl}
+                                    onCheckedChange={(checked) =>
+                                        setFormData((prev) => ({
+                                            ...prev,
+                                            xcategcolobl: !!checked,
+                                        }))
+                                    }
+                                    disabled={updateCategoryMutation.isPending}
+                                />
+                                <Label htmlFor="xcategcolobl-edit" className="text-gray-700 flex items-center gap-2">
+                                    <Palette className="h-4 w-4" />
+                                    {t('admin.categories.colorMandatory')}
+                                </Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <Checkbox
+                                    id="xcategtailleobl-edit"
+                                    checked={formData.xcategtailleobl}
+                                    onCheckedChange={(checked) =>
+                                        setFormData((prev) => ({
+                                            ...prev,
+                                            xcategtailleobl: !!checked,
+                                        }))
+                                    }
+                                    disabled={updateCategoryMutation.isPending}
+                                />
+                                <Label htmlFor="xcategtailleobl-edit" className="text-gray-700 flex items-center gap-2">
+                                    <Ruler className="h-4 w-4" />
+                                    {t('admin.categories.sizeMandatory')}
+                                </Label>
+                            </div>
                         </div>
 
                         {/* Category Image Upload */}

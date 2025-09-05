@@ -742,36 +742,42 @@ export type Database = {
           sysadresseip: string | null
           sysdate: string | null
           sysuser: string | null
+          xcategcolobl: boolean
           xcategparentid: number | null
           xcategprodcode: string
           xcategprodid: number
           xcategprodinfobulle: string
           xcategprodintitule: string
           xcategprodmediaid: number | null
+          xcategtailleobl: boolean
         }
         Insert: {
           sysaction?: string | null
           sysadresseip?: string | null
           sysdate?: string | null
           sysuser?: string | null
+          xcategcolobl?: boolean
           xcategparentid?: number | null
           xcategprodcode: string
           xcategprodid?: number
           xcategprodinfobulle: string
           xcategprodintitule: string
           xcategprodmediaid?: number | null
+          xcategtailleobl?: boolean
         }
         Update: {
           sysaction?: string | null
           sysadresseip?: string | null
           sysdate?: string | null
           sysuser?: string | null
+          xcategcolobl?: boolean
           xcategparentid?: number | null
           xcategprodcode?: string
           xcategprodid?: number
           xcategprodinfobulle?: string
           xcategprodintitule?: string
           xcategprodmediaid?: number | null
+          xcategtailleobl?: boolean
         }
         Relationships: [
           {

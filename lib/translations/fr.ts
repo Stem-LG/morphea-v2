@@ -472,7 +472,12 @@ export const frTranslations = {
       "addSubcategory": "Ajouter Sous-catégorie",
       "parentCategory": "Catégorie Parente",
       "categoryImage": "Image de la Catégorie",
-      "noParent": "Aucune Catégorie Parente"
+      "noParent": "Aucune Catégorie Parente",
+      "colorMandatory": "Couleur Obligatoire",
+      "sizeMandatory": "Taille Obligatoire",
+      "clickToUploadImage": "Cliquez pour télécharger une image",
+      "changeImage": "Changer l'image",
+      "selectParentCategory": "Sélectionner la catégorie parente"
     },
     "approvals": {
       "title": "Approbations de Produits",

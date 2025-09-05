@@ -21,6 +21,10 @@ import {
     FolderOpen,
     Plus,
     Image as ImageIcon,
+    Palette,
+    Ruler,
+    Check,
+    X,
 } from 'lucide-react'
 import { useDeleteCategory } from '@/hooks/useCategories'
 import { CreateCategoryDialog } from './create-category-dialog'
@@ -115,7 +119,7 @@ export function CategoryTreeItem({
                                 )}
                             </div>
 
-                            {/* Category info - name, code, and description in one line */}
+                            {/* Category info - name, code, description, and boolean fields */}
                             <div className="flex min-w-0 flex-1 flex-col gap-1 sm:flex-row sm:items-center sm:gap-3">
                                 <h3 className="truncate text-sm font-medium text-gray-900">
                                     {category.xcategprodintitule}
@@ -142,6 +146,41 @@ export function CategoryTreeItem({
                                             </span>
                                         </span>
                                     )}
+                                    
+                                    {/* Boolean field indicators */}
+                                    <div className="flex items-center gap-2">
+                                        <div 
+                                            className={`flex items-center gap-1 rounded px-1.5 py-0.5 ${
+                                                category.xcategcolobl 
+                                                    ? 'bg-green-100 text-green-700' 
+                                                    : 'bg-gray-100 text-gray-500'
+                                            }`}
+                                            title={t('admin.categories.colorMandatory')}
+                                        >
+                                            <Palette className="h-3 w-3" />
+                                            {category.xcategcolobl ? (
+                                                <Check className="h-3 w-3" />
+                                            ) : (
+                                                <X className="h-3 w-3" />
+                                            )}
+                                        </div>
+                                        
+                                        <div 
+                                            className={`flex items-center gap-1 rounded px-1.5 py-0.5 ${
+                                                category.xcategtailleobl 
+                                                    ? 'bg-green-100 text-green-700' 
+                                                    : 'bg-gray-100 text-gray-500'
+                                            }`}
+                                            title={t('admin.categories.sizeMandatory')}
+                                        >
+                                            <Ruler className="h-3 w-3" />
+                                            {category.xcategtailleobl ? (
+                                                <Check className="h-3 w-3" />
+                                            ) : (
+                                                <X className="h-3 w-3" />
+                                            )}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
