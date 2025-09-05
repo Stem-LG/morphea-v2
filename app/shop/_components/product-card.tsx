@@ -135,9 +135,14 @@ interface ProductCardProps {
             yvarprodprixcatalogue: number
             yvarprodprixpromotion: number | null
             xdeviseidfk: number | null
-            xcouleur: {
+            yvarprodcaract?: string | null
+            xcouleur?: {
                 xcouleurhexa: string
                 xcouleurintitule: string
+            }
+            xtaille?: {
+                xtailleid: number
+                xtailleintitule: string
             }
             yvarprodmedia?: Array<{
                 ymedia: {
@@ -160,6 +165,7 @@ export function ProductCard({
     const { t } = useLanguage()
     const [imageError, setImageError] = useState(false)
     const [hoveredColor, setHoveredColor] = useState<string | null>(null)
+    const [hoveredCharacteristic, setHoveredCharacteristic] = useState<string | null>(null)
     const [isImageHovered, setIsImageHovered] = useState(false)
     const [showSparks, setShowSparks] = useState(false)
 
@@ -169,11 +175,28 @@ export function ProductCard({
 
     // Get the first variant for pricing and media
     const firstVariant = product.yvarprod?.[0]
-    const activeVariant = hoveredColor
-        ? product.yvarprod?.find(
-              (v) => v.xcouleur.xcouleurhexa === hoveredColor
-          ) || firstVariant
-        : firstVariant
+    
+    // Advanced variant selection logic to handle all combinations
+    const activeVariant = (() => {
+        if (!product.yvarprod || product.yvarprod.length === 0) return null;
+        
+        // If hovering over color, prioritize color-based selection
+        if (hoveredColor) {
+            return product.yvarprod.find(
+                (v) => v.xcouleur?.xcouleurhexa === hoveredColor
+            ) || firstVariant;
+        }
+        
+        // If hovering over characteristic, prioritize characteristic-based selection
+        if (hoveredCharacteristic) {
+            return product.yvarprod.find(
+                (v) => v.yvarprodcaract === hoveredCharacteristic
+            ) || firstVariant;
+        }
+        
+        // Default to first variant
+        return firstVariant;
+    })()
 
     // Check if current variant is in wishlist
     const { data: isInWishlist = false } = useIsInWishlist(
@@ -224,19 +247,81 @@ export function ProductCard({
           }
         : null
 
-    // Get unique colors
+    // Get unique colors with availability info
     const uniqueColors = product.yvarprod?.reduce(
         (acc, variant) => {
-            const colorHex = variant.xcouleur.xcouleurhexa
-            if (!acc.some((c) => c.hex === colorHex)) {
-                acc.push({
-                    hex: colorHex,
-                    name: variant.xcouleur.xcouleurintitule,
-                })
+            if (variant.xcouleur?.xcouleurhexa && variant.xcouleur?.xcouleurintitule) {
+                const colorHex = variant.xcouleur.xcouleurhexa
+                const existingColor = acc.find((c) => c.hex === colorHex)
+                
+                if (!existingColor) {
+                    acc.push({
+                        hex: colorHex,
+                        name: variant.xcouleur.xcouleurintitule,
+                        hasSize: !!variant.xtaille?.xtailleid,
+                        hasCharacteristics: !!(variant.yvarprodcaract?.trim()),
+                        variantCount: 1
+                    })
+                } else {
+                    existingColor.variantCount++
+                    if (variant.xtaille?.xtailleid) existingColor.hasSize = true
+                    if (variant.yvarprodcaract?.trim()) existingColor.hasCharacteristics = true
+                }
             }
             return acc
         },
-        [] as Array<{ hex: string; name: string }>
+        [] as Array<{ hex: string; name: string; hasSize: boolean; hasCharacteristics: boolean; variantCount: number }>
+    )
+
+    // Get unique characteristics with availability info
+    const uniqueCharacteristics = product.yvarprod?.reduce(
+        (acc, variant) => {
+            if (variant.yvarprodcaract && variant.yvarprodcaract.trim()) {
+                const characteristic = variant.yvarprodcaract.trim()
+                const existing = acc.find(c => c.value === characteristic)
+                
+                if (!existing) {
+                    acc.push({
+                        value: characteristic,
+                        hasColor: !!(variant.xcouleur?.xcouleurhexa),
+                        hasSize: !!(variant.xtaille?.xtailleid),
+                        variantCount: 1
+                    })
+                } else {
+                    existing.variantCount++
+                    if (variant.xcouleur?.xcouleurhexa) existing.hasColor = true
+                    if (variant.xtaille?.xtailleid) existing.hasSize = true
+                }
+            }
+            return acc
+        },
+        [] as Array<{ value: string; hasColor: boolean; hasSize: boolean; variantCount: number }>
+    )
+    
+    // Get unique sizes with availability info
+    const uniqueSizes = product.yvarprod?.reduce(
+        (acc, variant) => {
+            if (variant.xtaille?.xtailleid && variant.xtaille?.xtailleintitule) {
+                const sizeId = variant.xtaille.xtailleid
+                const existing = acc.find(s => s.id === sizeId)
+                
+                if (!existing) {
+                    acc.push({
+                        id: sizeId,
+                        name: variant.xtaille.xtailleintitule,
+                        hasColor: !!(variant.xcouleur?.xcouleurhexa),
+                        hasCharacteristics: !!(variant.yvarprodcaract?.trim()),
+                        variantCount: 1
+                    })
+                } else {
+                    existing.variantCount++
+                    if (variant.xcouleur?.xcouleurhexa) existing.hasColor = true
+                    if (variant.yvarprodcaract?.trim()) existing.hasCharacteristics = true
+                }
+            }
+            return acc
+        },
+        [] as Array<{ id: number; name: string; hasColor: boolean; hasCharacteristics: boolean; variantCount: number }>
     )
 
     // Handle wishlist actions
@@ -308,19 +393,83 @@ export function ProductCard({
                                             .map((color, idx) => (
                                                 <div
                                                     key={idx}
-                                                    className="border-morpheus-gold-dark/40 h-6 w-6 rounded-full border-2 shadow-sm"
+                                                    className="relative border-morpheus-gold-dark/40 h-6 w-6 rounded-full border-2 shadow-sm cursor-pointer transition-all duration-200 hover:scale-110"
                                                     style={{
-                                                        backgroundColor:
-                                                            color.hex,
+                                                        backgroundColor: color.hex,
                                                     }}
-                                                    title={color.name}
-                                                />
+                                                    title={`${color.name} (${color.variantCount} variant${color.variantCount > 1 ? 's' : ''})`}
+                                                    onMouseEnter={() => setHoveredColor(color.hex)}
+                                                    onMouseLeave={() => setHoveredColor(null)}
+                                                >
+                                                    {/* Small indicators for additional options */}
+                                                    {(color.hasSize || color.hasCharacteristics) && (
+                                                        <div className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-morpheus-gold-light border border-white"></div>
+                                                    )}
+                                                </div>
                                             ))}
                                         {uniqueColors.length > 5 && (
                                             <span className="text-morpheus-gold-light/70 ml-1 self-center text-xs">
                                                 +{uniqueColors.length - 5}
                                             </span>
                                         )}
+                                    </div>
+                                )}
+
+                                {/* Characteristics */}
+                                {uniqueCharacteristics && uniqueCharacteristics.length > 0 && (
+                                    <div className="mt-3">
+                                        <p className="text-xs text-gray-500 mb-1">Characteristics:</p>
+                                        <div className="flex flex-wrap gap-1">
+                                            {uniqueCharacteristics
+                                                .slice(0, 3)
+                                                .map((characteristic, idx) => (
+                                                    <span
+                                                        key={idx}
+                                                        className="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded-md cursor-pointer transition-all duration-200 hover:bg-morpheus-gold-light/20 hover:text-morpheus-gold-dark"
+                                                        title={characteristic.value}
+                                                        onMouseEnter={() => setHoveredCharacteristic(characteristic.value)}
+                                                        onMouseLeave={() => setHoveredCharacteristic(null)}
+                                                    >
+                                                        {characteristic.value.length > 15 ? `${characteristic.value.substring(0, 15)}...` : characteristic.value}
+                                                        {characteristic.variantCount > 1 && (
+                                                            <span className="ml-1 text-xs text-gray-500">({characteristic.variantCount})</span>
+                                                        )}
+                                                    </span>
+                                                ))}
+                                            {uniqueCharacteristics.length > 3 && (
+                                                <span className="text-morpheus-gold-light/70 ml-1 self-center text-xs">
+                                                    +{uniqueCharacteristics.length - 3}
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Sizes (if available) */}
+                                {uniqueSizes && uniqueSizes.length > 0 && (
+                                    <div className="mt-3">
+                                        <p className="text-xs text-gray-500 mb-1">Sizes:</p>
+                                        <div className="flex flex-wrap gap-1">
+                                            {uniqueSizes
+                                                .slice(0, 4)
+                                                .map((size, idx) => (
+                                                    <span
+                                                        key={idx}
+                                                        className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-md cursor-pointer transition-all duration-200 hover:bg-blue-200"
+                                                        title={`${size.name} (${size.variantCount} variant${size.variantCount > 1 ? 's' : ''})`}
+                                                    >
+                                                        {size.name}
+                                                        {size.variantCount > 1 && (
+                                                            <span className="ml-1 text-xs text-blue-500">({size.variantCount})</span>
+                                                        )}
+                                                    </span>
+                                                ))}
+                                            {uniqueSizes.length > 4 && (
+                                                <span className="text-morpheus-gold-light/70 ml-1 self-center text-xs">
+                                                    +{uniqueSizes.length - 4}
+                                                </span>
+                                            )}
+                                        </div>
                                     </div>
                                 )}
                             </div>
@@ -489,6 +638,65 @@ export function ProductCard({
                                 {pricing.formattedCatalogPrice}
                             </span>
                         )}
+                    </div>
+                )}
+
+                {/* Colors */}
+                {uniqueColors && uniqueColors.length > 0 && (
+                    <div className="mt-3 flex justify-center gap-1">
+                        {uniqueColors
+                            .slice(0, 4)
+                            .map((color, idx) => (
+                                <div
+                                    key={idx}
+                                    className="relative h-4 w-4 rounded-full border border-gray-300 shadow-sm cursor-pointer transition-all duration-200 hover:scale-125"
+                                    style={{
+                                        backgroundColor: color.hex,
+                                    }}
+                                    title={`${color.name} (${color.variantCount} variant${color.variantCount > 1 ? 's' : ''})`}
+                                    onMouseEnter={() => setHoveredColor(color.hex)}
+                                    onMouseLeave={() => setHoveredColor(null)}
+                                >
+                                    {/* Small indicators for additional options */}
+                                    {(color.hasSize || color.hasCharacteristics) && (
+                                        <div className="absolute -top-0.5 -right-0.5 h-1.5 w-1.5 rounded-full bg-morpheus-gold-light border border-white"></div>
+                                    )}
+                                </div>
+                            ))}
+                        {uniqueColors.length > 4 && (
+                            <span className="text-xs text-gray-500 self-center ml-1">
+                                +{uniqueColors.length - 4}
+                            </span>
+                        )}
+                    </div>
+                )}
+
+                {/* Characteristics */}
+                {uniqueCharacteristics && uniqueCharacteristics.length > 0 && (
+                    <div className="mt-2">
+                        <div className="flex flex-wrap justify-center gap-1">
+                            {uniqueCharacteristics
+                                .slice(0, 2)
+                                .map((characteristic, idx) => (
+                                    <span
+                                        key={idx}
+                                        className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-md cursor-pointer transition-all duration-200 hover:bg-morpheus-gold-light/20 hover:text-morpheus-gold-dark"
+                                        title={characteristic.value}
+                                        onMouseEnter={() => setHoveredCharacteristic(characteristic.value)}
+                                        onMouseLeave={() => setHoveredCharacteristic(null)}
+                                    >
+                                        {characteristic.value.length > 10 ? `${characteristic.value.substring(0, 10)}...` : characteristic.value}
+                                        {characteristic.variantCount > 1 && (
+                                            <span className="ml-1 text-xs opacity-70">({characteristic.variantCount})</span>
+                                        )}
+                                    </span>
+                                ))}
+                            {uniqueCharacteristics.length > 2 && (
+                                <span className="text-xs text-gray-500 self-center">
+                                    +{uniqueCharacteristics.length - 2}
+                                </span>
+                            )}
+                        </div>
                     </div>
                 )}
             </div>

@@ -1915,11 +1915,12 @@ export type Database = {
           sysadresseip: string | null
           sysdate: string | null
           sysuser: string | null
-          xcouleuridfk: number
+          xcouleuridfk: number | null
           xdeviseidfk: number | null
-          xtailleidfk: number
+          xtailleidfk: number | null
           yestvisible: boolean | null
           yprodidfk: number | null
+          yvarprodcaract: string | null
           yvarprodcode: string
           yvarprodgenre: string
           yvarprodid: number
@@ -1936,11 +1937,12 @@ export type Database = {
           sysadresseip?: string | null
           sysdate?: string | null
           sysuser?: string | null
-          xcouleuridfk: number
+          xcouleuridfk?: number | null
           xdeviseidfk?: number | null
-          xtailleidfk: number
+          xtailleidfk?: number | null
           yestvisible?: boolean | null
           yprodidfk?: number | null
+          yvarprodcaract?: string | null
           yvarprodcode: string
           yvarprodgenre: string
           yvarprodid?: number
@@ -1957,11 +1959,12 @@ export type Database = {
           sysadresseip?: string | null
           sysdate?: string | null
           sysuser?: string | null
-          xcouleuridfk?: number
+          xcouleuridfk?: number | null
           xdeviseidfk?: number | null
-          xtailleidfk?: number
+          xtailleidfk?: number | null
           yestvisible?: boolean | null
           yprodidfk?: number | null
+          yvarprodcaract?: string | null
           yvarprodcode?: string
           yvarprodgenre?: string
           yvarprodid?: number

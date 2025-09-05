@@ -746,7 +746,11 @@ export const frTranslations = {
       "deleteVariant": "Supprimer la Variante",
       "confirmExit": "Confirmer la Sortie",
       "exitWarning": "Vous avez des modifications non sauvegardées. Êtes-vous sûr de vouloir quitter sans sauvegarder ?",
-      "exitWithoutSaving": "Quitter Sans Sauvegarder"
+      "exitWithoutSaving": "Quitter Sans Sauvegarder",
+      "colorRequired": "La couleur est obligatoire pour cette catégorie",
+      "sizeRequired": "La taille est obligatoire pour cette catégorie",
+      "characteristics": "Caractéristiques",
+      "characteristicsPlaceholder": "Entrez les caractéristiques du produit..."
     },
     "productView": {
       "productDetails": "Détails du Produit",
@@ -1284,6 +1288,7 @@ export const frTranslations = {
     "variant": "Variante",
     "color": "Couleur",
     "size": "Taille",
+    "characteristics": "Caractéristiques",
     "view": "Vue",
     "deliveryIn": "Livraison en",
     "days": "jours",

@@ -319,7 +319,8 @@ export function useShopProductsInfinite({
 
     return useInfiniteQuery({
         queryKey: ['shop-products-infinite', perPage, mallId, boutiqueId, categoryId, searchQuery, sortBy, colorId, sizeId, minPrice, maxPrice],
-        queryFn: async ({ pageParam = 1 }) => {
+        queryFn: async ({ pageParam }: { pageParam: number }) => {
+            const currentPage = pageParam || 1;
             // Step 1: Get the current active event
             const currentDate = new Date().toISOString().split('T')[0];
 
@@ -401,6 +402,7 @@ export function useShopProductsInfinite({
                         yvarprodpromotiondatefin,
                         yvarprodnbrjourlivraison,
                         yvarprodstatut,
+                        yvarprodcaract,
                         xdeviseidfk,
                         xcouleur:xcouleuridfk (
                             xcouleurid,
@@ -479,7 +481,7 @@ export function useShopProductsInfinite({
             }
 
             // Apply pagination
-            const from = (pageParam - 1) * perPage;
+            const from = (currentPage - 1) * perPage;
             const to = from + perPage - 1;
             productsQuery = productsQuery.range(from, to);
 
@@ -541,17 +543,18 @@ export function useShopProductsInfinite({
             })).filter(product => product.yvarprod.length > 0) || [];
 
             const totalCount = count || 0;
-            const hasNextPage = (pageParam * perPage) < totalCount;
+            const hasNextPage = (currentPage * perPage) < totalCount;
 
             return {
                 products: productsWithApprovedVariants,
                 totalCount,
                 currentEvent,
                 hasNextPage,
-                nextPage: hasNextPage ? pageParam + 1 : undefined
+                nextPage: hasNextPage ? currentPage + 1 : undefined
             };
         },
-        getNextPageParam: (lastPage) => lastPage.nextPage,
+        initialPageParam: 1,
+        getNextPageParam: (lastPage: any) => lastPage.nextPage,
         staleTime: 30 * 1000, // 30 seconds
         gcTime: 5 * 60 * 1000, // 5 minutes
     });

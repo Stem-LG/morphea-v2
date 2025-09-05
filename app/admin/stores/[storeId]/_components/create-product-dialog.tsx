@@ -53,6 +53,7 @@ interface ProductVariant {
     code?: string;
     colorId: number | null;
     sizeId: number | null;
+    yvarprodcaract?: string | null; // New characteristics field
     images: (File | { ymediaid: number; ymediaurl: string; ymediaintitule: string })[];
     videos: (File | { ymediaid: number; ymediaurl: string; ymediaintitule: string })[];
     models3d: (File | { yobjet3did: number; yobjet3durl: string; ycouleurarriereplan?: string })[];
@@ -102,6 +103,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
             name: "",
             colorId: null,
             sizeId: null,
+            yvarprodcaract: null,
             images: [],
             videos: [],
             models3d: [],
@@ -176,6 +178,11 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
     const createProductMutation = useCreateProduct();
     const updateProductMutation = useUpdateProduct();
 
+    // Determine if color and size are mandatory based on selected category
+    const selectedCategory = categories?.find(cat => cat.xcategprodid === categoryId);
+    const isColorMandatory = selectedCategory?.xcategcolobl || false;
+    const isSizeMandatory = selectedCategory?.xcategtailleobl || false;
+
     // Effect to populate form when editing
     useEffect(() => {
         if (isEditMode && productDetails && productDetails.product) {
@@ -204,6 +211,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                     code: variant.yvarprodcode || "",
                     colorId: variant.xcouleuridfk.xcouleurid || null,
                     sizeId: variant.xtailleidfk.xtailleid || null,
+                    yvarprodcaract: variant.yvarprodcaract || null,
                     images: variant.images || [],
                     videos: variant.videos || [],
                     models3d: variant.models3d || [],
@@ -227,6 +235,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                             name: "",
                             colorId: null,
                             sizeId: null,
+                            yvarprodcaract: null,
                             images: [],
                             videos: [],
                             models3d: [],
@@ -249,6 +258,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                     name: "",
                     colorId: null,
                     sizeId: null,
+                    yvarprodcaract: null,
                     images: [],
                     videos: [],
                     models3d: [],
@@ -296,6 +306,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
             name: "",
             colorId: null,
             sizeId: null,
+            yvarprodcaract: null,
             images: [],
             videos: [],
             models3d: [],
@@ -601,9 +612,24 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
         // Validate variants - only validate editable variants
         for (const variant of variants) {
             const canEdit = canEditVariant(variant);
-            if (canEdit && (!variant.name || !variant.colorId || !variant.sizeId)) {
-                toast.error(t("admin.createProduct.completeVariantInfo"));
-                return;
+            if (canEdit) {
+                // Check basic required fields
+                if (!variant.name) {
+                    toast.error(t("admin.createProduct.completeVariantInfo"));
+                    return;
+                }
+                
+                // Check color requirement based on category setting
+                if (isColorMandatory && !variant.colorId) {
+                    toast.error(t("admin.createProduct.colorRequired") || "Color is required for this category");
+                    return;
+                }
+                
+                // Check size requirement based on category setting
+                if (isSizeMandatory && !variant.sizeId) {
+                    toast.error(t("admin.createProduct.sizeRequired") || "Size is required for this category");
+                    return;
+                }
             }
             
             // Validate background color format
@@ -622,7 +648,23 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
         try {
             if (isEditMode && productId) {
                 // Update existing product
-                const formattedVariants = variants.map((v) => formatVariantForSubmission(v));
+                const formattedVariants = variants.map((v) => {
+                    const normalizedBgColor = normalizeBackgroundColor(v.backgroundColor);
+                    return {
+                        id: v.id,
+                        yvarprodid: v.yvarprodid,
+                        name: v.name,
+                        code: v.code,
+                        colorId: v.colorId!,
+                        sizeId: v.sizeId!,
+                        yvarprodcaract: v.yvarprodcaract,
+                        images: v.images.filter((img): img is File => img instanceof File),
+                        videos: v.videos.filter((vid): vid is File => vid instanceof File),
+                        models3d: v.models3d.filter((model): model is File => model instanceof File),
+                        backgroundColor: normalizedBgColor,
+                        ycouleurarriereplan: normalizedBgColor,
+                    };
+                });
                 console.log("Updating product with background colors:", formattedVariants.map(v => ({
                     name: v.name,
                     backgroundColor: v.backgroundColor,
@@ -652,6 +694,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                         code: v.code,
                         colorId: v.colorId!,
                         sizeId: v.sizeId!,
+                        yvarprodcaract: v.yvarprodcaract,
                         images: v.images.filter((img): img is File => img instanceof File),
                         videos: v.videos.filter((vid): vid is File => vid instanceof File),
                         models3d: v.models3d.filter((model): model is File => model instanceof File),
@@ -1193,7 +1236,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                             <div>
                                                                 <Label className="text-gray-700 flex items-center gap-1">
                                                                     <Palette className="h-3 w-3" />
-                                                                    {t("admin.color") || "Color"} <span className="text-red-600">*</span>
+                                                                    {t("admin.color") || "Color"} {isColorMandatory && <span className="text-red-600">*</span>}
                                                                 </Label>
                                                                 <div className="flex gap-2 mt-1">
                                                                     <SuperSelect
@@ -1227,7 +1270,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                             <div>
                                                                 <Label className="text-gray-700 flex items-center gap-1">
                                                                     <Ruler className="h-3 w-3" />
-                                                                    {t("admin.createProduct.size")} <span className="text-red-600">*</span>
+                                                                    {t("admin.createProduct.size")} {isSizeMandatory && <span className="text-red-600">*</span>}
                                                                 </Label>
                                                                 <div className="flex gap-2 mt-1">
                                                                     <SuperSelect
@@ -1252,6 +1295,28 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                                     )}
                                                                 </div>
                                                             </div>
+                                                        </div>
+
+                                                        {/* Product Characteristics */}
+                                                        <div>
+                                                            <Label className="text-gray-700 flex items-center gap-1">
+                                                                <FileText className="h-3 w-3" />
+                                                                {t("admin.createProduct.characteristics") || "Characteristics"}
+                                                                <span className="text-gray-500 text-sm">({t("common.optional")})</span>
+                                                            </Label>
+                                                            <Input
+                                                                value={variant.yvarprodcaract || ""}
+                                                                onChange={(e) =>
+                                                                    handleVariantChange(
+                                                                        variant.id,
+                                                                        "yvarprodcaract",
+                                                                        e.target.value || null
+                                                                    )
+                                                                }
+                                                                placeholder={t("admin.createProduct.characteristicsPlaceholder") || "Enter product characteristics..."}
+                                                                className="mt-1 bg-white border-gray-300 text-gray-900"
+                                                                disabled={!canEdit}
+                                                            />
                                                         </div>
 
                                                         {/* Pricing Section (Admin Only) */}

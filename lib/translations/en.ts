@@ -719,7 +719,11 @@ export const enTranslations = {
       "deleteVariant": "Delete Variant",
       "confirmExit": "Confirm Exit",
       "exitWarning": "You have unsaved changes. Are you sure you want to exit without saving?",
-      "exitWithoutSaving": "Exit Without Saving"
+      "exitWithoutSaving": "Exit Without Saving",
+      "colorRequired": "Color is required for this category",
+      "sizeRequired": "Size is required for this category",
+      "characteristics": "Characteristics",
+      "characteristicsPlaceholder": "Enter product characteristics..."
     },
     "productView": {
       "productDetails": "Product Details",
@@ -1249,6 +1253,7 @@ export const enTranslations = {
     "variant": "Variant",
     "color": "Color",
     "size": "Size",
+    "characteristics": "Characteristics",
     "view": "View",
     "deliveryIn": "Delivery in",
     "days": "days",
