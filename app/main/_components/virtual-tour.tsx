@@ -72,7 +72,6 @@ export default function VirtualTour({
     
     // Loading progress states
     const [loadingProgress, setLoadingProgress] = useState(0)
-    const [isLoadingScene, setIsLoadingScene] = useState(false)
     const [loadingText, setLoadingText] = useState('Chargement...')
 
     // Track viewed scenes to prevent duplicate increments
