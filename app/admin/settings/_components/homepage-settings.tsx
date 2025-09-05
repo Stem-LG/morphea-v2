@@ -53,6 +53,10 @@ export function HomepageSettings() {
     const [uploadingFiles, setUploadingFiles] = useState<
         Record<string, boolean>
     >({})
+    const [editingCreator, setEditingCreator] = useState<{
+        index: number
+        link: string
+    } | null>(null)
 
     // Helper function to get current value
     const getCurrentValue = (key: string): string => {
@@ -160,6 +164,8 @@ export function HomepageSettings() {
                 return homeSettings?.creators.subtitle.fr || ''
             case 'homepage_creators_images':
                 return JSON.stringify(homeSettings?.creators.images || [])
+            case 'homepage_creators_data':
+                return JSON.stringify(homeSettings?.creators.creators || [])
             case 'footer_social_facebook_url':
                 return homeSettings?.footer.social.facebook || ''
             case 'footer_social_instagram_url':
@@ -2849,12 +2855,12 @@ export function HomepageSettings() {
                             {/* Carousel Images Management */}
                             <div className="space-y-4 border-t border-gray-200 pt-6">
                                 <h4 className="text-lg font-semibold text-gray-900">
-                                    Carousel Images
+                                    Carousel Images (Legacy)
                                 </h4>
                                 <p className="text-sm text-gray-600">
                                     Upload multiple images for the 3D photo
                                     carousel. Images will be displayed in the
-                                    order they are uploaded.
+                                    order they are uploaded. (This is kept for backward compatibility)
                                 </p>
 
                                 <div className="space-y-2">
@@ -2904,9 +2910,9 @@ export function HomepageSettings() {
                                                     (imageUrl, index) => (
                                                         <div
                                                             key={index}
-                                                            className="flex items-center justify-between rounded bg-slate-700 p-2"
+                                                            className="flex items-center justify-between rounded-lg border border-gray-200 bg-white p-3 shadow-sm"
                                                         >
-                                                            <span className="truncate">
+                                                            <span className="truncate text-gray-700 text-sm">
                                                                 {imageUrl}
                                                             </span>
                                                             <Button
@@ -2932,6 +2938,7 @@ export function HomepageSettings() {
                                                                         'homepage_creators_images'
                                                                     )
                                                                 }}
+                                                                className="bg-red-600 hover:bg-red-700 text-white"
                                                             >
                                                                 <X className="h-4 w-4" />
                                                             </Button>
@@ -2940,10 +2947,233 @@ export function HomepageSettings() {
                                                 )}
                                             </div>
                                         ) : (
-                                            <p>
-                                                No images uploaded yet. Upload
-                                                images to populate the carousel.
-                                            </p>
+                                            <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 text-center">
+                                                <p className="text-gray-500">
+                                                    No images uploaded yet. Upload
+                                                    images to populate the carousel.
+                                                </p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* New Creators Management */}
+                            <div className="space-y-4 border-t border-gray-200 pt-6">
+                                <h4 className="text-lg font-semibold text-gray-900">
+                                    Creators with Links
+                                </h4>
+                                <p className="text-sm text-gray-600">
+                                    Manage creators with images and links. When users click on a creator image, they will be redirected to the specified link.
+                                </p>
+
+                                {/* Add New Creator */}
+                                <div className="rounded-lg border border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50 p-6 space-y-4">
+                                    <div className="flex items-center gap-2">
+                                        <Plus className="h-5 w-5 text-blue-600" />
+                                        <h5 className="text-lg font-semibold text-gray-900">
+                                            Add New Creator
+                                        </h5>
+                                    </div>
+                                    <p className="text-sm text-gray-600">
+                                        Upload an image and provide a link for a new creator.
+                                    </p>
+                                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                        <div className="space-y-2">
+                                            <Label className="text-gray-900 font-medium">
+                                                Creator Image
+                                            </Label>
+                                            <Input
+                                                type="file"
+                                                accept="image/*"
+                                                id="new-creator-image"
+                                                className="border-gray-300 bg-white text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label className="text-gray-900 font-medium">
+                                                Creator Link
+                                            </Label>
+                                            <Input
+                                                type="url"
+                                                id="new-creator-link"
+                                                placeholder="https://example.com/creator-profile"
+                                                className="border-gray-300 bg-white text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+                                            />
+                                        </div>
+                                    </div>
+                                    <Button
+                                        onClick={async () => {
+                                            const fileInput = document.getElementById('new-creator-image') as HTMLInputElement
+                                            const linkInput = document.getElementById('new-creator-link') as HTMLInputElement
+                                            
+                                            const file = fileInput?.files?.[0]
+                                            const link = linkInput?.value
+                                            
+                                            if (!file || !link) {
+                                                toast.error('Please provide both an image and a link')
+                                                return
+                                            }
+                                            
+                                            try {
+                                                // Upload the image
+                                                const imageUrl = await uploadFile.mutateAsync({ file, type: 'image' })
+                                                
+                                                // Add to existing creators array
+                                                const currentCreators = homeSettings?.creators.creators || []
+                                                const updatedCreators = [...currentCreators, { image: imageUrl, link }]
+                                                
+                                                // Save to settings
+                                                await updateSetting.mutateAsync({
+                                                    key: 'homepage_creators_data',
+                                                    value: JSON.stringify(updatedCreators)
+                                                })
+                                                
+                                                // Clear inputs
+                                                fileInput.value = ''
+                                                linkInput.value = ''
+                                                
+                                                toast.success('Creator added successfully')
+                                            } catch (error) {
+                                                console.error('Failed to add creator:', error)
+                                                toast.error('Failed to add creator')
+                                            }
+                                        }}
+                                        disabled={updateSetting.isPending || uploadFile.isPending}
+                                        className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
+                                    >
+                                        {updateSetting.isPending || uploadFile.isPending ? (
+                                            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                                        ) : (
+                                            <Plus className="h-4 w-4 mr-2" />
+                                        )}
+                                        Add Creator
+                                    </Button>
+                                </div>
+
+                                {/* Current Creators Display */}
+                                <div className="space-y-2">
+                                    <Label className="text-gray-900">
+                                        Current Creators
+                                    </Label>
+                                    <div className="text-sm text-gray-600">
+                                        {homeSettings?.creators.creators &&
+                                        homeSettings.creators.creators.length > 0 ? (
+                                            <div className="space-y-3">
+                                                {homeSettings.creators.creators.map(
+                                                    (creator, index) => (
+                                                        <div
+                                                            key={index}
+                                                            className="flex items-center justify-between rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition-all hover:shadow-md"
+                                                        >
+                                                            <div className="flex items-center gap-4">
+                                                                <img
+                                                                    src={creator.image}
+                                                                    alt={`Creator ${index + 1}`}
+                                                                    className="h-16 w-16 rounded-lg border border-gray-200 object-cover shadow-sm"
+                                                                />
+                                                                <div className="flex-1">
+                                                                    <p className="text-gray-900 font-semibold text-sm">
+                                                                        Creator {index + 1}
+                                                                    </p>
+                                                                    {editingCreator?.index === index ? (
+                                                                        <div className="mt-2 flex gap-2">
+                                                                            <Input
+                                                                                value={editingCreator.link}
+                                                                                onChange={(e) =>
+                                                                                    setEditingCreator({
+                                                                                        ...editingCreator,
+                                                                                        link: e.target.value
+                                                                                    })
+                                                                                }
+                                                                                className="text-xs h-8 border-gray-300 bg-white text-gray-900"
+                                                                                placeholder="https://example.com/creator-profile"
+                                                                            />
+                                                                            <Button
+                                                                                size="sm"
+                                                                                onClick={async () => {
+                                                                                    if (editingCreator.link !== creator.link) {
+                                                                                        const updatedCreators = homeSettings.creators.creators.map((c, i) =>
+                                                                                            i === index ? { ...c, link: editingCreator.link } : c
+                                                                                        )
+                                                                                        handleSettingChange(
+                                                                                            'homepage_creators_data',
+                                                                                            JSON.stringify(updatedCreators)
+                                                                                        )
+                                                                                        await handleSaveSetting('homepage_creators_data')
+                                                                                    }
+                                                                                    setEditingCreator(null)
+                                                                                }}
+                                                                                className="h-8 px-2 bg-green-600 hover:bg-green-700 text-white"
+                                                                                disabled={updateSetting.isPending}
+                                                                            >
+                                                                                {updateSetting.isPending ? (
+                                                                                    <Loader2 className="h-3 w-3 animate-spin" />
+                                                                                ) : (
+                                                                                    <Save className="h-3 w-3" />
+                                                                                )}
+                                                                            </Button>
+                                                                            <Button
+                                                                                size="sm"
+                                                                                variant="outline"
+                                                                                onClick={() => setEditingCreator(null)}
+                                                                                className="h-8 px-2 border-gray-300 text-gray-600 hover:bg-gray-50"
+                                                                            >
+                                                                                <X className="h-3 w-3" />
+                                                                            </Button>
+                                                                        </div>
+                                                                    ) : (
+                                                                        <p className="text-gray-500 text-xs mt-1 truncate max-w-64">
+                                                                            {creator.link}
+                                                                        </p>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                            {editingCreator?.index !== index && (
+                                                                <div className="flex gap-2">
+                                                                    <Button
+                                                                        size="sm"
+                                                                        variant="outline"
+                                                                        onClick={() => {
+                                                                            setEditingCreator({
+                                                                                index,
+                                                                                link: creator.link
+                                                                            })
+                                                                        }}
+                                                                        className="border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300"
+                                                                    >
+                                                                        Edit
+                                                                    </Button>
+                                                                    <Button
+                                                                        size="sm"
+                                                                        variant="destructive"
+                                                                        onClick={() => {
+                                                                            const updatedCreators =
+                                                                                homeSettings.creators.creators.filter(
+                                                                                    (_, i) => i !== index
+                                                                                )
+                                                                            handleSettingChange(
+                                                                                'homepage_creators_data',
+                                                                                JSON.stringify(updatedCreators)
+                                                                            )
+                                                                            handleSaveSetting('homepage_creators_data')
+                                                                        }}
+                                                                        className="bg-red-600 hover:bg-red-700 text-white"
+                                                                    >
+                                                                        <X className="h-4 w-4" />
+                                                                    </Button>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    )
+                                                )}
+                                            </div>
+                                        ) : (
+                                            <div className="rounded-lg border border-gray-200 bg-gray-50 p-6 text-center">
+                                                <p className="text-gray-500">
+                                                    No creators added yet. Add creators with images and links above.
+                                                </p>
+                                            </div>
                                         )}
                                     </div>
                                 </div>

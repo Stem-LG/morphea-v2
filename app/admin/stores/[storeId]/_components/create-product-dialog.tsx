@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/hooks/useLanguage";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -53,6 +53,7 @@ interface ProductVariant {
     code?: string;
     colorId: number | null;
     sizeId: number | null;
+    yvarprodcaract?: string | null; // New characteristics field
     images: (File | { ymediaid: number; ymediaurl: string; ymediaintitule: string })[];
     videos: (File | { ymediaid: number; ymediaurl: string; ymediaintitule: string })[];
     models3d: (File | { yobjet3did: number; yobjet3durl: string; ycouleurarriereplan?: string })[];
@@ -102,6 +103,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
             name: "",
             colorId: null,
             sizeId: null,
+            yvarprodcaract: null,
             images: [],
             videos: [],
             models3d: [],
@@ -133,6 +135,20 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
     const [progress, setProgress] = useState(0);
     const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
+    // Delete confirmation dialog state
+    const [deleteConfirmation, setDeleteConfirmation] = useState<{
+        isOpen: boolean;
+        variantId: string | null;
+        variantName: string;
+    }>({
+        isOpen: false,
+        variantId: null,
+        variantName: "",
+    });
+
+    // Exit confirmation dialog state
+    const [exitConfirmation, setExitConfirmation] = useState(false);
+
     // Determine if we're in edit mode
     const isEditMode = !!productId;
 
@@ -162,6 +178,11 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
     const createProductMutation = useCreateProduct();
     const updateProductMutation = useUpdateProduct();
 
+    // Determine if color and size are mandatory based on selected category
+    const selectedCategory = categories?.find(cat => cat.xcategprodid === categoryId);
+    const isColorMandatory = selectedCategory?.xcategcolobl || false;
+    const isSizeMandatory = selectedCategory?.xcategtailleobl || false;
+
     // Effect to populate form when editing
     useEffect(() => {
         if (isEditMode && productDetails && productDetails.product) {
@@ -190,6 +211,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                     code: variant.yvarprodcode || "",
                     colorId: variant.xcouleuridfk.xcouleurid || null,
                     sizeId: variant.xtailleidfk.xtailleid || null,
+                    yvarprodcaract: variant.yvarprodcaract || null,
                     images: variant.images || [],
                     videos: variant.videos || [],
                     models3d: variant.models3d || [],
@@ -213,6 +235,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                             name: "",
                             colorId: null,
                             sizeId: null,
+                            yvarprodcaract: null,
                             images: [],
                             videos: [],
                             models3d: [],
@@ -235,6 +258,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                     name: "",
                     colorId: null,
                     sizeId: null,
+                    yvarprodcaract: null,
                     images: [],
                     videos: [],
                     models3d: [],
@@ -282,6 +306,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
             name: "",
             colorId: null,
             sizeId: null,
+            yvarprodcaract: null,
             images: [],
             videos: [],
             models3d: [],
@@ -298,8 +323,80 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
 
     const handleRemoveVariant = (variantId: string) => {
         if (variants.length > 1) {
-            setVariants(variants.filter((v) => v.id !== variantId));
+            const variant = variants.find(v => v.id === variantId);
+            setDeleteConfirmation({
+                isOpen: true,
+                variantId,
+                variantName: variant?.name || `Variant ${variants.findIndex(v => v.id === variantId) + 1}`,
+            });
         }
+    };
+
+    const confirmDeleteVariant = () => {
+        if (deleteConfirmation.variantId) {
+            setVariants(variants.filter((v) => v.id !== deleteConfirmation.variantId));
+        }
+        setDeleteConfirmation({
+            isOpen: false,
+            variantId: null,
+            variantName: "",
+        });
+    };
+
+    const cancelDeleteVariant = () => {
+        setDeleteConfirmation({
+            isOpen: false,
+            variantId: null,
+            variantName: "",
+        });
+    };
+
+    // Function to detect if there are unsaved changes
+    const hasUnsavedChanges = () => {
+        // For new products, check if any fields have been filled
+        if (!isEditMode) {
+            return (
+                productCode.trim() !== "" ||
+                productName.trim() !== "" ||
+                shortDescription.trim() !== "" ||
+                fullDescription.trim() !== "" ||
+                categoryId !== null ||
+                selectedInfospotactionId !== null ||
+                variants.some(variant => 
+                    variant.name.trim() !== "" ||
+                    variant.code?.trim() !== "" ||
+                    variant.colorId !== null ||
+                    variant.sizeId !== null ||
+                    variant.images.length > 0 ||
+                    variant.videos.length > 0 ||
+                    variant.models3d.length > 0 ||
+                    (variant.catalogPrice !== undefined && variant.catalogPrice > 0)
+                )
+            );
+        }
+
+        // For edit mode, we always consider there might be changes since we can't easily track initial state
+        return true;
+    };
+
+    // Handle close dialog with confirmation
+    const handleCloseDialog = () => {
+        if (hasUnsavedChanges() && !isSubmitting) {
+            setExitConfirmation(true);
+        } else {
+            onClose();
+        }
+    };
+
+    // Confirm exit without saving
+    const confirmExit = () => {
+        setExitConfirmation(false);
+        onClose();
+    };
+
+    // Cancel exit confirmation
+    const cancelExit = () => {
+        setExitConfirmation(false);
     };
 
     const handleVariantChange = (variantId: string, field: keyof ProductVariant, value: any) => {
@@ -515,9 +612,24 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
         // Validate variants - only validate editable variants
         for (const variant of variants) {
             const canEdit = canEditVariant(variant);
-            if (canEdit && (!variant.name || !variant.colorId || !variant.sizeId)) {
-                toast.error(t("admin.createProduct.completeVariantInfo"));
-                return;
+            if (canEdit) {
+                // Check basic required fields
+                if (!variant.name) {
+                    toast.error(t("admin.createProduct.completeVariantInfo"));
+                    return;
+                }
+                
+                // Check color requirement based on category setting
+                if (isColorMandatory && !variant.colorId) {
+                    toast.error(t("admin.createProduct.colorRequired") || "Color is required for this category");
+                    return;
+                }
+                
+                // Check size requirement based on category setting
+                if (isSizeMandatory && !variant.sizeId) {
+                    toast.error(t("admin.createProduct.sizeRequired") || "Size is required for this category");
+                    return;
+                }
             }
             
             // Validate background color format
@@ -536,7 +648,23 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
         try {
             if (isEditMode && productId) {
                 // Update existing product
-                const formattedVariants = variants.map((v) => formatVariantForSubmission(v));
+                const formattedVariants = variants.map((v) => {
+                    const normalizedBgColor = normalizeBackgroundColor(v.backgroundColor);
+                    return {
+                        id: v.id,
+                        yvarprodid: v.yvarprodid,
+                        name: v.name,
+                        code: v.code,
+                        colorId: v.colorId!,
+                        sizeId: v.sizeId!,
+                        yvarprodcaract: v.yvarprodcaract,
+                        images: v.images.filter((img): img is File => img instanceof File),
+                        videos: v.videos.filter((vid): vid is File => vid instanceof File),
+                        models3d: v.models3d.filter((model): model is File => model instanceof File),
+                        backgroundColor: normalizedBgColor,
+                        ycouleurarriereplan: normalizedBgColor,
+                    };
+                });
                 console.log("Updating product with background colors:", formattedVariants.map(v => ({
                     name: v.name,
                     backgroundColor: v.backgroundColor,
@@ -566,6 +694,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                         code: v.code,
                         colorId: v.colorId!,
                         sizeId: v.sizeId!,
+                        yvarprodcaract: v.yvarprodcaract,
                         images: v.images.filter((img): img is File => img instanceof File),
                         videos: v.videos.filter((vid): vid is File => vid instanceof File),
                         models3d: v.models3d.filter((model): model is File => model instanceof File),
@@ -678,7 +807,8 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
     };
 
     return (
-        <Dialog open={isOpen} onOpenChange={onClose}>
+        <>
+            <Dialog open={isOpen} onOpenChange={handleCloseDialog}>
             <DialogContent className="max-w-7xl max-h-[95vh] bg-white border-gray-200 text-gray-900">
                 <DialogHeader>
                     <DialogTitle className="text-2xl font-bold text-gray-900 flex items-center gap-2">
@@ -700,12 +830,12 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                             <span className="text-lg text-red-700 font-semibold">{t("admin.createProduct.failedToLoadProductDetails")}</span>
                         </div>
                         <span className="text-gray-500 mb-2">{t("admin.createProduct.tryAgainOrContactSupport")}</span>
-                        <Button onClick={onClose} className="bg-gray-100 text-gray-900 hover:bg-gray-200">
+                        <Button onClick={handleCloseDialog} className="bg-gray-100 text-gray-900 hover:bg-gray-200">
                             {t("common.close")}
                         </Button>
                     </div>
                 ) : (
-                    <ScrollArea className="max-h-[80vh] pr-4">
+                    <ScrollArea className="max-h-[78vh] pr-4">
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             {/* Left Column - Product Information & Creation Forms */}
                             <div className="space-y-6">
@@ -1106,7 +1236,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                             <div>
                                                                 <Label className="text-gray-700 flex items-center gap-1">
                                                                     <Palette className="h-3 w-3" />
-                                                                    {t("admin.color") || "Color"} <span className="text-red-600">*</span>
+                                                                    {t("admin.color") || "Color"} {isColorMandatory && <span className="text-red-600">*</span>}
                                                                 </Label>
                                                                 <div className="flex gap-2 mt-1">
                                                                     <SuperSelect
@@ -1140,7 +1270,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                             <div>
                                                                 <Label className="text-gray-700 flex items-center gap-1">
                                                                     <Ruler className="h-3 w-3" />
-                                                                    {t("admin.createProduct.size")} <span className="text-red-600">*</span>
+                                                                    {t("admin.createProduct.size")} {isSizeMandatory && <span className="text-red-600">*</span>}
                                                                 </Label>
                                                                 <div className="flex gap-2 mt-1">
                                                                     <SuperSelect
@@ -1165,6 +1295,28 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                                     )}
                                                                 </div>
                                                             </div>
+                                                        </div>
+
+                                                        {/* Product Characteristics */}
+                                                        <div>
+                                                            <Label className="text-gray-700 flex items-center gap-1">
+                                                                <FileText className="h-3 w-3" />
+                                                                {t("admin.createProduct.characteristics") || "Characteristics"}
+                                                                <span className="text-gray-500 text-sm">({t("common.optional")})</span>
+                                                            </Label>
+                                                            <Input
+                                                                value={variant.yvarprodcaract || ""}
+                                                                onChange={(e) =>
+                                                                    handleVariantChange(
+                                                                        variant.id,
+                                                                        "yvarprodcaract",
+                                                                        e.target.value || null
+                                                                    )
+                                                                }
+                                                                placeholder={t("admin.createProduct.characteristicsPlaceholder") || "Enter product characteristics..."}
+                                                                className="mt-1 bg-white border-gray-300 text-gray-900"
+                                                                disabled={!canEdit}
+                                                            />
                                                         </div>
 
                                                         {/* Pricing Section (Admin Only) */}
@@ -1629,9 +1781,9 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                 )}
 
                 {/* Dialog Footer */}
-                <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
+                <div className="flex justify-end gap-3 border-t border-gray-200 p-2">
                     <Button
-                        onClick={onClose}
+                        onClick={handleCloseDialog}
                         variant="outline"
                         className="border-gray-300 text-gray-700 hover:bg-gray-50"
                         disabled={isSubmitting || (isEditMode && productDetailsLoading) || (isEditMode && productDetailsError)}
@@ -1666,5 +1818,66 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                 </div>
             </DialogContent>
         </Dialog>
+
+        {/* Delete Confirmation Dialog */}
+        <Dialog open={deleteConfirmation.isOpen} onOpenChange={cancelDeleteVariant}>
+            <DialogContent className="max-w-md bg-white border-gray-200 text-gray-900">
+                <DialogHeader>
+                    <DialogTitle className="text-lg font-semibold text-red-700 flex items-center gap-2">
+                        <Trash2 className="h-5 w-5" />
+                        {t("admin.createProduct.confirmDeleteVariant")}
+                    </DialogTitle>
+                    <DialogDescription className="text-gray-600 mt-2">
+                        {t("admin.createProduct.deleteVariantWarning")} {deleteConfirmation.variantName}
+                    </DialogDescription>
+                </DialogHeader>
+                <DialogFooter className="gap-2 mt-4">
+                    <Button
+                        onClick={cancelDeleteVariant}
+                        variant="outline"
+                        className="border-gray-300 text-gray-700 hover:bg-gray-50"
+                    >
+                        {t("common.cancel")}
+                    </Button>
+                    <Button
+                        onClick={confirmDeleteVariant}
+                        className="bg-red-600 hover:bg-red-700 text-white"
+                    >
+                        {t("admin.createProduct.deleteVariant")}
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+
+        {/* Exit Confirmation Dialog */}
+        <Dialog open={exitConfirmation} onOpenChange={cancelExit}>
+            <DialogContent className="max-w-md bg-white border-gray-200 text-gray-900">
+                <DialogHeader>
+                    <DialogTitle className="text-lg font-semibold text-orange-700 flex items-center gap-2">
+                        <Info className="h-5 w-5" />
+                        {t("admin.createProduct.confirmExit")}
+                    </DialogTitle>
+                    <DialogDescription className="text-gray-600 mt-2">
+                        {t("admin.createProduct.exitWarning")}
+                    </DialogDescription>
+                </DialogHeader>
+                <DialogFooter className="gap-2 mt-4">
+                    <Button
+                        onClick={cancelExit}
+                        variant="outline"
+                        className="border-gray-300 text-gray-700 hover:bg-gray-50"
+                    >
+                        {t("common.cancel")}
+                    </Button>
+                    <Button
+                        onClick={confirmExit}
+                        className="bg-orange-600 hover:bg-orange-700 text-white"
+                    >
+                        {t("admin.createProduct.exitWithoutSaving")}
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+        </>
     );
 }

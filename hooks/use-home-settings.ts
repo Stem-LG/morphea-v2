@@ -73,6 +73,11 @@ interface HomeSettings {
     title: { en: string | null; fr: string | null }
     subtitle: { en: string | null; fr: string | null }
     images: string[]
+    // New structure for individual creators with links
+    creators: Array<{
+      image: string
+      link: string
+    }>
   }
   // Footer Settings
   footer: {
@@ -281,7 +286,8 @@ export function useHomeSettings() {
             en: getSetting('homepage_creators_subtitle_en'),
             fr: getSetting('homepage_creators_subtitle_fr')
           },
-          images: parseJSON(getSetting('homepage_creators_images'), [])
+          images: parseJSON(getSetting('homepage_creators_images'), []),
+          creators: parseJSON(getSetting('homepage_creators_data'), [])
         },
         footer: {
           social: {

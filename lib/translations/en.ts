@@ -449,7 +449,12 @@ export const enTranslations = {
       "addSubcategory": "Add Subcategory",
       "parentCategory": "Parent Category",
       "categoryImage": "Category Image",
-      "noParent": "No Parent Category"
+      "noParent": "No Parent Category",
+      "colorMandatory": "Color Required",
+      "sizeMandatory": "Size Required",
+      "clickToUploadImage": "Click to upload image",
+      "changeImage": "Change image",
+      "selectParentCategory": "Select parent category"
     },
     "approvals": {
       "title": "Product Approvals",
@@ -712,7 +717,17 @@ export const enTranslations = {
       "updatingProduct": "Updating Product...",
       "creatingProduct": "Creating Product...",
       "updateProduct": "Update Product",
-      "createProduct": "Create Product"
+      "createProduct": "Create Product",
+      "confirmDeleteVariant": "Confirm Delete Variant",
+      "deleteVariantWarning": "Are you sure you want to delete this variant?",
+      "deleteVariant": "Delete Variant",
+      "confirmExit": "Confirm Exit",
+      "exitWarning": "You have unsaved changes. Are you sure you want to exit without saving?",
+      "exitWithoutSaving": "Exit Without Saving",
+      "colorRequired": "Color is required for this category",
+      "sizeRequired": "Size is required for this category",
+      "characteristics": "Characteristics",
+      "characteristicsPlaceholder": "Enter product characteristics..."
     },
     "productView": {
       "productDetails": "Product Details",
@@ -833,7 +848,6 @@ export const enTranslations = {
         "countryPlaceholder": "Enter country",
         "specialtyRequired": "Specialty *",
         "specialtyPlaceholder": "Enter specialty",
-        "requiredFields": "* Required fields"
       }
     },
     "virtualTourAdmin": "Virtual Tour",
@@ -1243,6 +1257,7 @@ export const enTranslations = {
     "variant": "Variant",
     "color": "Color",
     "size": "Size",
+    "characteristics": "Characteristics",
     "view": "View",
     "deliveryIn": "Delivery in",
     "days": "days",

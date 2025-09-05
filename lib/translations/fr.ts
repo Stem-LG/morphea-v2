@@ -476,7 +476,12 @@ export const frTranslations = {
       "addSubcategory": "Ajouter Sous-catégorie",
       "parentCategory": "Catégorie Parente",
       "categoryImage": "Image de la Catégorie",
-      "noParent": "Aucune Catégorie Parente"
+      "noParent": "Aucune Catégorie Parente",
+      "colorMandatory": "Couleur Obligatoire",
+      "sizeMandatory": "Taille Obligatoire",
+      "clickToUploadImage": "Cliquez pour télécharger une image",
+      "changeImage": "Changer l'image",
+      "selectParentCategory": "Sélectionner la catégorie parente"
     },
     "approvals": {
       "title": "Approbations de Produits",
@@ -739,7 +744,17 @@ export const frTranslations = {
       "updatingProduct": "Mise à jour du produit...",
       "creatingProduct": "Création du produit...",
       "updateProduct": "Mettre à jour le Produit",
-      "createProduct": "Créer le Produit"
+      "createProduct": "Créer le Produit",
+      "confirmDeleteVariant": "Confirmer la Suppression de la Variante",
+      "deleteVariantWarning": "Êtes-vous sûr de vouloir supprimer cette variante ?",
+      "deleteVariant": "Supprimer la Variante",
+      "confirmExit": "Confirmer la Sortie",
+      "exitWarning": "Vous avez des modifications non sauvegardées. Êtes-vous sûr de vouloir quitter sans sauvegarder ?",
+      "exitWithoutSaving": "Quitter Sans Sauvegarder",
+      "colorRequired": "La couleur est obligatoire pour cette catégorie",
+      "sizeRequired": "La taille est obligatoire pour cette catégorie",
+      "characteristics": "Caractéristiques",
+      "characteristicsPlaceholder": "Entrez les caractéristiques du produit..."
     },
     "productView": {
       "productDetails": "Détails du Produit",
@@ -868,7 +883,6 @@ export const frTranslations = {
         "countryPlaceholder": "Entrez le pays",
         "specialtyRequired": "Spécialité *",
         "specialtyPlaceholder": "Entrez la spécialité",
-        "requiredFields": "* Champs requis"
       },
     },
     "designerAssignments": {
@@ -1278,6 +1292,7 @@ export const frTranslations = {
     "variant": "Variante",
     "color": "Couleur",
     "size": "Taille",
+    "characteristics": "Caractéristiques",
     "view": "Vue",
     "deliveryIn": "Livraison en",
     "days": "jours",

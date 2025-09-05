@@ -69,6 +69,10 @@ export default function VirtualTour({
     const animationIntervalRef = useRef<NodeJS.Timeout | null>(null)
     const isUpdatingUrlRef = useRef(false)
     const isTransitioningRef = useRef(false)
+    
+    // Loading progress states
+    const [loadingProgress, setLoadingProgress] = useState(0)
+    const [loadingText, setLoadingText] = useState('Chargement...')
 
     // Track viewed scenes to prevent duplicate increments
     const [viewedScenes, setViewedScenes] = useState<Set<string>>(new Set())
@@ -347,7 +351,26 @@ export default function VirtualTour({
         const fetchTourData = async () => {
             try {
                 setIsLoading(true)
+                setLoadingProgress(0)
+                setLoadingText('Récupération des données...')
+                
+                // Simulate progress during data fetching
+                const progressInterval = setInterval(() => {
+                    setLoadingProgress(prev => {
+                        if (prev >= 50) {
+                            clearInterval(progressInterval)
+                            return 50
+                        }
+                        return prev + 10
+                    })
+                }, 100)
+                
                 const data = await getTourData()
+                
+                clearInterval(progressInterval)
+                setLoadingProgress(70)
+                setLoadingText('Traitement des scènes...')
+                
                 setTourData(data)
 
                 // Update starting scene if the data has scenes and the default scene doesn't exist
@@ -360,14 +383,25 @@ export default function VirtualTour({
                         setCurrentScene(data.scenes[0].id)
                     }
 
+                    setLoadingProgress(85)
+                    setLoadingText('Préchargement des images...')
+                    
                     // Start preloading all scene images
                     preloadSceneImages(data.scenes)
                 }
+                
+                setLoadingProgress(90)
+                setLoadingText('Initialisation du visualiseur...')
+                
+                // Trigger viewer initialization
+                setTimeout(() => {
+                    setIsLoading(false) // This will trigger the viewer initialization useEffect
+                }, 200)
             } catch (error) {
                 console.error('Failed to fetch tour data:', error)
-            } finally {
-                setIsLoading(false)
+                setIsLoading(false) // Make sure to hide loading on error
             }
+            // Don't set isLoading to false here - let the scene initialization handle it
         }
 
         fetchTourData()
@@ -376,6 +410,10 @@ export default function VirtualTour({
     useEffect(() => {
         if (!containerRef.current || isLoading || !tourData.scenes.length)
             return
+
+        // Continue from where data fetching left off (90%)
+        setLoadingProgress(95)
+        setLoadingText('Chargement du visualiseur...')
 
         const initializeViewer = () => {
             const currentSceneData = tourData.scenes.find(
@@ -389,7 +427,7 @@ export default function VirtualTour({
                 panorama: currentSceneData.panorama,
                 minFov: 30,
                 maxFov: 120,
-                loadingImg: '/logo.png', // Remove loading icon
+                // loadingImg: '/logo.png', 
                 loadingTxt: '', // Remove loading text
                 navbar:
                     showNavbar && !isProductDetailsOpen && !isProductsListOpen
@@ -419,8 +457,32 @@ export default function VirtualTour({
                         pitch: startingPitch,
                     })
                 }
-                addMarkers()
+                
+                // Complete the loading process
+                setLoadingProgress(100)
+                setLoadingText('Visite prête')
+                
+                setTimeout(() => {
+                    addMarkers()
+                    setIsLoading(false) // Only turn off initial loading
+                    
+                    // Dispatch custom event for initial scene load
+                    if (typeof window !== 'undefined') {
+                        const sceneChangeEvent = new CustomEvent(
+                            'sceneChanged',
+                            {
+                                detail: {
+                                    sceneId: currentSceneData.id,
+                                    sceneName: currentSceneData.name,
+                                    isInitialLoad: true,
+                                },
+                            }
+                        )
+                        window.dispatchEvent(sceneChangeEvent)
+                    }
+                }, 500)
             })
+
             markersPluginRef.current?.addEventListener(
                 'select-marker',
                 handleMarkerClick
@@ -522,35 +584,10 @@ export default function VirtualTour({
                 }
 
                 if (isInitialLoad) {
-                    await viewerRef.current!.setPanorama(
-                        currentSceneData.panorama,
-                        {
-                            transition: false, // Disable transition on initial load
-                            showLoader: false,
-                        }
-                    )
-
+                    // For initial load, just increment view count since viewer handles the loading
                     setTimeout(() => {
-                        addMarkers()
-                        // Increment view count for initial scene load
                         incrementViewCount()
-
-                        // Dispatch custom event for initial scene load
-                        if (typeof window !== 'undefined') {
-                            const sceneChangeEvent = new CustomEvent(
-                                'sceneChanged',
-                                {
-                                    detail: {
-                                        sceneId: currentSceneData.id,
-                                        sceneName: currentSceneData.name,
-                                        isInitialLoad: true,
-                                    },
-                                }
-                            )
-                            window.dispatchEvent(sceneChangeEvent)
-                        }
-                    }, 200)
-
+                    }, 1000)
                     setIsInitialLoad(false)
                     return
                 }
@@ -839,14 +876,30 @@ export default function VirtualTour({
                 className={`relative ${className} flex items-center justify-center bg-gray-100`}
                 style={{ height: actualHeight, width }}
             >
-                <div className="text-center">
+                <div className="text-center text-white max-w-md mx-auto px-6">
                     <img
                         src="/logo.png"
                         alt="Loading"
-                        className="mx-auto mb-4 h-12 w-12"
+                        className="mx-auto mb-6 h-16 w-16 animate-pulse"
                     />
-                    <p className="text-gray-600">
-                        Chargement de la visite virtuelle...
+                    <h3 className="text-xl font-supreme mb-4 text-gray-700">Chargement de la visite virtuelle...</h3>
+                    
+                    {/* Progress Bar */}
+                    <div className="w-full bg-gray-300 rounded-full h-3 mb-4 overflow-hidden">
+                        <div 
+                            className="h-full bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light transition-all duration-300 ease-out rounded-full"
+                            style={{ width: `${loadingProgress}%` }}
+                        />
+                    </div>
+                    
+                    {/* Progress Percentage */}
+                    <p className="text-sm text-gray-600">
+                        {Math.round(loadingProgress)}%
+                    </p>
+                    
+                    {/* Loading hint */}
+                    <p className="text-xs text-gray-500 mt-2">
+                        Préparation des données de la visite...
                     </p>
                 </div>
             </div>
@@ -878,6 +931,38 @@ export default function VirtualTour({
                 className="h-full w-full"
                 style={{ height: actualHeight, width }}
             />
+
+            {/* Loading Progress Bar Overlay - Only show during initial load */}
+            {isLoading && (
+                <div className="absolute inset-0 z-50 bg-black/80 flex items-center justify-center">
+                    <div className="text-center text-white max-w-md mx-auto px-6">
+                        <img
+                            src="/logo.png"
+                            alt="Loading"
+                            className="mx-auto mb-6 h-16 w-16 animate-pulse"
+                        />
+                        <h3 className="text-xl font-supreme mb-4">{loadingText}</h3>
+                        
+                        {/* Progress Bar */}
+                        <div className="w-full bg-gray-700 rounded-full h-3 mb-4 overflow-hidden">
+                            <div 
+                                className="h-full bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light transition-all duration-300 ease-out rounded-full"
+                                style={{ width: `${loadingProgress}%` }}
+                            />
+                        </div>
+                        
+                        {/* Progress Percentage */}
+                        <p className="text-sm text-gray-300">
+                            {Math.round(loadingProgress)}%
+                        </p>
+                        
+                        {/* Loading hint */}
+                        <p className="text-xs text-gray-400 mt-2">
+                            Initialisation de la visite virtuelle...
+                        </p>
+                    </div>
+                </div>
+            )}
 
             {/* Scene information overlay */}
             <div className="absolute top-4 left-4 z-10 rounded-lg bg-black/70 px-4 py-2 text-white">
