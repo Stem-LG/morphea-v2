@@ -7,10 +7,12 @@ import Footer from '@/components/footer'
 import NavBar from '../_components/nav_bar'
 import { cn } from '@/lib/utils'
 import Image from 'next/image'
+import { useHomeSettings } from '@/hooks/use-home-settings'
 
 export default function OriginePage() {
     const supabase = createClient()
     const router = useRouter()
+    const { data: homeSettings } = useHomeSettings()
     const [visibleCards, setVisibleCards] = useState<number[]>([])
     const [visibleMissionCards, setVisibleMissionCards] = useState<number[]>([])
     const [visibleValueCards, setVisibleValueCards] = useState<number[]>([])
@@ -390,16 +392,42 @@ export default function OriginePage() {
                             </p>
                         </div>
 
-                        {/* Vision Image Placeholder */}
+                        {/* Vision Images */}
                         <div className="relative mt-16">
-                            <Image
-                                className="w-full"
-                                src="/images/about/vision.png"
-                                about="vision"
-                                alt="vision"
-                                width={1000}
-                                height={1000}
-                            />
+                            {homeSettings?.morpheaOriginVision.images &&
+                            homeSettings.morpheaOriginVision.images.length >
+                                0 ? (
+                                <div className="flex h-[450px] gap-2">
+                                    {homeSettings.morpheaOriginVision.images.map(
+                                        (imageUrl, index) => (
+                                            <div
+                                                key={index}
+                                                className="relative flex-1"
+                                            >
+                                                <Image
+                                                    className="h-full w-full object-cover"
+                                                    src={imageUrl}
+                                                    alt={`Vision ${index + 1}`}
+                                                    width={1000}
+                                                    height={1000}
+                                                />
+                                            </div>
+                                        )
+                                    )}
+                                </div>
+                            ) : (
+                                <div className="flex h-96 gap-4">
+                                    <div className="relative flex-1">
+                                        <Image
+                                            className="h-full w-full rounded-lg object-cover"
+                                            src="/images/about/vision.png"
+                                            alt="Default vision"
+                                            width={1000}
+                                            height={1000}
+                                        />
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
 

@@ -61,6 +61,10 @@ const ALLOWED_SETTING_KEYS = [
   // Homepage Collections Section
   'homepage_collections_title_en',
   'homepage_collections_title_fr',
+  // Morphea Origin Vision Section
+  'morphea_origin_vision_image1_url',
+  'morphea_origin_vision_image2_url',
+  'morphea_origin_vision_image3_url',
   'homepage_collections_subtitle_en',
   'homepage_collections_subtitle_fr',
   'homepage_collections_image1_url',
