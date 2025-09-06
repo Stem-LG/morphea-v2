@@ -9,7 +9,18 @@ export const enTranslations = {
     "login": "Login",
     "signup": "Get Started",
     "loading": "Loading...",
-    "notifications": "Notifications"
+    "notifications": "Notifications",
+    "account": "My Account",
+    "guestAccount": "Guest Account",
+    "home": "Home",
+    "newProducts": "New Products",
+    "categories": "Categories",
+    "about": "About",
+    "contactUs": "Contact Us",
+    "favorites": "Favorites",
+    "cart": "Cart",
+    "myAccount": "My Account",
+    "myOrders": "My Orders"
   },
   "common": {
     "welcome": "Welcome",
@@ -130,6 +141,7 @@ export const enTranslations = {
     "securePayment": "Secure Payment"
   },
   "admin": {
+    "hidden": "Hidden",
     "dashboard": "Dashboard",
     "products": "Products",
     "management": "Management",

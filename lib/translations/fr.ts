@@ -9,7 +9,18 @@ export const frTranslations = {
     "login": "Connexion",
     "signup": "Commencer",
     "loading": "Chargement...",
-    "notifications": "Notifications"
+    "notifications": "Notifications",
+    "account": "Mon compte",
+    "guestAccount": "Compte invité",
+    "home": "Acceuil",
+    "newProducts": "Nouveauté",
+    "categories": "Categories",
+    "about": "A Propos",
+    "contactUs": "Contactez-Nous",
+    "favorites": "Favoris",
+    "cart": "Panier",
+    "myAccount": "Mon Compte",
+    "myOrders": "Mes Commandes"
   },
   "common": {
     "welcome": "Bienvenue",
@@ -131,6 +142,7 @@ export const frTranslations = {
     "securePayment": "Paiement Sécurisé"
   },
   "admin": {
+    "hidden": "Masqué",
     "dashboard": "Tableau de bord",
     "products": "Produits",
     "management": "Gestion",
@@ -1364,7 +1376,7 @@ export const frTranslations = {
     "emptyMessage": "Sauvegardez vos articles préférés pour plus tard"
   },
   "profile": {
-    "title": "Profil utilisateur",
+    "title": "Profile utilisateur",
     "subtitle": "Gérez les paramètres et préférences de votre compte",
     "profile": "Profil",
     "orders": "Commandes",

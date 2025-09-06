@@ -62,6 +62,76 @@ export function ProfileInfoDisplay({ user }: ProfileInfoDisplayProps) {
                     </div>
                 </div>
 
+                {/* First Name */}
+                {(() => {
+                    // Check for new firstName field first, then fall back to parsing full_name
+                    const firstName = user.user_metadata?.firstName || 
+                        (user.user_metadata?.full_name ? user.user_metadata.full_name.trim().split(' ')[0] : null);
+                    
+                    return firstName ? (
+                        <div className="space-y-2">
+                            <label className="font-supreme text-lg font-medium text-[#053340]">
+                                {t('profile.firstName')}
+                            </label>
+                            <div className="border border-gray-200 bg-gray-50 p-4 text-[#053340]">
+                                <div className="flex items-center gap-3">
+                                    <svg
+                                        className="h-5 w-5 text-[#053340]"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                                        />
+                                    </svg>
+                                    <span className="font-supreme text-lg">
+                                        {firstName}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    ) : null;
+                })()}
+
+                {/* Last Name */}
+                {(() => {
+                    // Check for new lastName field first, then fall back to parsing full_name
+                    const lastName = user.user_metadata?.lastName || 
+                        (user.user_metadata?.full_name ? user.user_metadata.full_name.trim().split(' ').slice(1).join(' ') : null);
+                    
+                    return lastName ? (
+                        <div className="space-y-2">
+                            <label className="font-supreme text-lg font-medium text-[#053340]">
+                                {t('profile.lastName')}
+                            </label>
+                            <div className="border border-gray-200 bg-gray-50 p-4 text-[#053340]">
+                                <div className="flex items-center gap-3">
+                                    <svg
+                                        className="h-5 w-5 text-[#053340]"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                                        />
+                                    </svg>
+                                    <span className="font-supreme text-lg">
+                                        {lastName}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    ) : null;
+                })()}
+
                 {/* Account Created */}
                 <div className="space-y-2">
                     <label className="font-supreme text-lg font-medium text-[#053340]">
@@ -115,33 +185,6 @@ export function ProfileInfoDisplay({ user }: ProfileInfoDisplayProps) {
                         </div>
                     </div>
                 </div>
-
-                {/* User ID (for reference) */}
-                <div className="space-y-2">
-                    <label className="font-supreme text-lg font-medium text-[#053340]">
-                        {t('profile.userId')}
-                    </label>
-                    <div className="border border-gray-200 bg-gray-50 p-4 text-[#053340]">
-                        <div className="flex items-center gap-3">
-                            <svg
-                                className="h-5 w-5 text-[#053340]"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"
-                                />
-                            </svg>
-                            <span className="font-mono text-sm break-all">
-                                {user.id}
-                            </span>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             {/* Additional User Metadata (if available) */}
@@ -153,29 +196,6 @@ export function ProfileInfoDisplay({ user }: ProfileInfoDisplayProps) {
                         </label>
                         <div className="border border-gray-200 bg-gray-50 p-4 text-[#053340]">
                             <div className="space-y-2">
-                                {user.user_metadata.full_name && (
-                                    <div className="flex items-center gap-3">
-                                        <svg
-                                            className="h-5 w-5 text-[#053340]"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24"
-                                        >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth={2}
-                                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                                            />
-                                        </svg>
-                                        <span>
-                                            <span className="font-supreme text-gray-600">
-                                                {t('profile.name')}:
-                                            </span>{' '}
-                                            {user.user_metadata.full_name}
-                                        </span>
-                                    </div>
-                                )}
                                 {user.user_metadata.avatar_url && (
                                     <div className="flex items-center gap-3">
                                         <svg

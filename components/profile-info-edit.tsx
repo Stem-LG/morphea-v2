@@ -15,12 +15,14 @@ interface ProfileInfoEditProps {
 }
 
 interface ProfileUpdateData {
-    name?: string
+    firstName?: string
+    lastName?: string
     email?: string
 }
 
 interface ValidationErrors {
-    name?: string
+    firstName?: string
+    lastName?: string
     email?: string
 }
 
@@ -33,9 +35,23 @@ export function ProfileInfoEdit({
     const { t } = useLanguage()
 
     // Form state
-    const [formData, setFormData] = useState<ProfileUpdateData>({
-        name: user.user_metadata?.full_name || '',
-        email: user.email || '',
+    const [formData, setFormData] = useState<ProfileUpdateData>(() => {
+        // Try to get from separate fields first, fall back to parsing full_name
+        let firstName = user.user_metadata?.firstName || '';
+        let lastName = user.user_metadata?.lastName || '';
+        
+        // If no separate fields exist but full_name does, parse it
+        if (!firstName && !lastName && user.user_metadata?.full_name) {
+            const nameParts = user.user_metadata.full_name.trim().split(' ');
+            firstName = nameParts[0] || '';
+            lastName = nameParts.slice(1).join(' ') || '';
+        }
+        
+        return {
+            firstName,
+            lastName,
+            email: user.email || '',
+        };
     })
 
     // Validation state
@@ -44,8 +60,20 @@ export function ProfileInfoEdit({
 
     // Reset form when user changes
     useEffect(() => {
+        // Try to get from separate fields first, fall back to parsing full_name
+        let firstName = user.user_metadata?.firstName || '';
+        let lastName = user.user_metadata?.lastName || '';
+        
+        // If no separate fields exist but full_name does, parse it
+        if (!firstName && !lastName && user.user_metadata?.full_name) {
+            const nameParts = user.user_metadata.full_name.trim().split(' ');
+            firstName = nameParts[0] || '';
+            lastName = nameParts.slice(1).join(' ') || '';
+        }
+        
         setFormData({
-            name: user.user_metadata?.full_name || '',
+            firstName,
+            lastName,
             email: user.email || '',
         })
         setErrors({})
@@ -58,10 +86,13 @@ export function ProfileInfoEdit({
     const validateForm = (): boolean => {
         const newErrors: ValidationErrors = {}
 
-        // Name validation - required field
-        if (!formData.name?.trim()) {
-            newErrors.name = t('profile.nameIsRequired')
+        // First name validation - required field
+        if (!formData.firstName?.trim()) {
+            newErrors.firstName = t('auth.firstNameRequired')
         }
+
+        // Last name validation - optional but warn if empty
+        // No validation for lastName as it can be optional
 
         // Email validation - required and format
         if (!formData.email?.trim()) {
@@ -104,7 +135,12 @@ export function ProfileInfoEdit({
         setIsSubmitting(true)
 
         try {
-            await onSave(formData)
+            // Save firstName and lastName as separate fields in metadata
+            await onSave({
+                firstName: formData.firstName?.trim() || '',
+                lastName: formData.lastName?.trim() || '',
+                email: formData.email
+            })
         } catch (error) {
             console.error('Error saving profile:', error)
         } finally {
@@ -114,9 +150,20 @@ export function ProfileInfoEdit({
 
     // Handle cancel
     const handleCancel = () => {
-        // Reset form to original values
+        // Try to get from separate fields first, fall back to parsing full_name
+        let firstName = user.user_metadata?.firstName || '';
+        let lastName = user.user_metadata?.lastName || '';
+        
+        // If no separate fields exist but full_name does, parse it
+        if (!firstName && !lastName && user.user_metadata?.full_name) {
+            const nameParts = user.user_metadata.full_name.trim().split(' ');
+            firstName = nameParts[0] || '';
+            lastName = nameParts.slice(1).join(' ') || '';
+        }
+        
         setFormData({
-            name: user.user_metadata?.full_name || '',
+            firstName,
+            lastName,
             email: user.email || '',
         })
         setErrors({})
@@ -138,27 +185,27 @@ export function ProfileInfoEdit({
             {/* Edit Form */}
             <div className="border border-gray-200 bg-white p-8 shadow-lg">
                 <form onSubmit={handleSubmit} className="space-y-6">
-                    {/* Name Field */}
+                    {/* First Name Field */}
                     <div className="space-y-2">
                         <Label
-                            htmlFor="name"
+                            htmlFor="firstName"
                             className="font-supreme text-lg font-medium text-[#053340]"
                         >
-                            {t('profile.fullName')}
+                            {t('profile.firstName')}
                         </Label>
                         <Input
-                            id="name"
+                            id="firstName"
                             type="text"
-                            placeholder={t('profile.enterYourFullName')}
+                            placeholder={t('auth.firstNamePlaceholder')}
                             required
-                            value={formData.name || ''}
+                            value={formData.firstName || ''}
                             onChange={(e) =>
-                                handleInputChange('name', e.target.value)
+                                handleInputChange('firstName', e.target.value)
                             }
                             className="h-12 border-gray-300 bg-white text-lg text-[#053340] placeholder:text-gray-400 focus:border-[#053340] focus:ring-[#053340]/20"
                             disabled={isSubmitting || isLoading}
                         />
-                        {errors.name && (
+                        {errors.firstName && (
                             <div className="mt-1 flex items-center gap-2 text-sm text-red-600">
                                 <svg
                                     className="h-4 w-4"
@@ -173,7 +220,46 @@ export function ProfileInfoEdit({
                                         d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                                     />
                                 </svg>
-                                {errors.name}
+                                {errors.firstName}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Last Name Field */}
+                    <div className="space-y-2">
+                        <Label
+                            htmlFor="lastName"
+                            className="font-supreme text-lg font-medium text-[#053340]"
+                        >
+                            {t('profile.lastName')}
+                        </Label>
+                        <Input
+                            id="lastName"
+                            type="text"
+                            placeholder={t('auth.lastNamePlaceholder')}
+                            value={formData.lastName || ''}
+                            onChange={(e) =>
+                                handleInputChange('lastName', e.target.value)
+                            }
+                            className="h-12 border-gray-300 bg-white text-lg text-[#053340] placeholder:text-gray-400 focus:border-[#053340] focus:ring-[#053340]/20"
+                            disabled={isSubmitting || isLoading}
+                        />
+                        {errors.lastName && (
+                            <div className="mt-1 flex items-center gap-2 text-sm text-red-600">
+                                <svg
+                                    className="h-4 w-4"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                    />
+                                </svg>
+                                {errors.lastName}
                             </div>
                         )}
                     </div>

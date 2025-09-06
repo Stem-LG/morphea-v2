@@ -94,13 +94,13 @@ export default function Footer() {
     const languages = [
         {
             code: 'fr' as const,
-            name: 'Français',
+            name: t('common.french'),
             flag: '🇫🇷',
             shortName: 'FR',
         },
         {
             code: 'en' as const,
-            name: 'English',
+            name: t('common.english'),
             flag: '🇺🇸',
             shortName: 'EN',
         },
@@ -555,7 +555,7 @@ export default function Footer() {
                                             href: '/',
                                         },
                                         {
-                                            name: 'Visite Virtuelle',
+                                            name: t('nav.virtualTours'),
                                             href: '/main',
                                         },
                                         {
@@ -647,7 +647,7 @@ export default function Footer() {
                             }
                             className="-m-2 flex touch-manipulation items-center gap-2 p-2 transition-colors hover:text-black"
                         >
-                            <span>Langue :</span>
+                            <span>{t('common.language')} :</span>
                             <span className="flex items-center gap-1">
                                 <span>{currentLanguage.flag}</span>
                                 <span>{currentLanguage.shortName}</span>

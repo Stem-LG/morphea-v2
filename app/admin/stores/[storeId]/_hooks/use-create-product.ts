@@ -14,6 +14,7 @@ interface ProductVariant {
     code?: string;
     colorId: number;
     sizeId: number;
+    yvarprodcaract?: string | null; // Product characteristics
     images: File[];
     videos: File[];
     models3d: File[];
@@ -146,6 +147,7 @@ export function useCreateProduct() {
                             yvarprodgenre: size?.xtaillecode || 'S', // Set genre to size code as requested
                             xcouleuridfk: variant.colorId,
                             xtailleidfk: variant.sizeId,
+                            yvarprodcaract: variant.yvarprodcaract, // Product characteristics
                             yprodidfk: product.yprodid,
                             yvarprodnbrjourlivraison: 7, // Default delivery days
                             yvarprodprixcatalogue: 0, // Default price

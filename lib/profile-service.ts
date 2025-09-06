@@ -3,6 +3,8 @@ import { User } from '@supabase/supabase-js';
 
 export interface ProfileUpdateData {
   name?: string;
+  firstName?: string;
+  lastName?: string;
   email?: string;
 }
 
@@ -49,7 +51,40 @@ export class ProfileService {
       let requiresEmailConfirmation = false;
 
       // Handle name update (user metadata)
-      if (data.name !== undefined && data.name !== currentUser.user.user_metadata?.full_name) {
+      // Support both legacy name field and new firstName/lastName fields
+      if (data.firstName !== undefined || data.lastName !== undefined) {
+        // New separate fields approach
+        const updateData: { [key: string]: any } = {};
+        
+        if (data.firstName !== undefined) {
+          updateData.firstName = data.firstName;
+        }
+        if (data.lastName !== undefined) {
+          updateData.lastName = data.lastName;
+        }
+        
+        // Also update full_name for backward compatibility
+        const firstName = data.firstName || currentUser.user.user_metadata?.firstName || '';
+        const lastName = data.lastName || currentUser.user.user_metadata?.lastName || '';
+        const fullName = `${firstName} ${lastName}`.trim();
+        if (fullName) {
+          updateData.full_name = fullName;
+        }
+
+        const { error: nameError } = await this.supabase.auth.updateUser({
+          data: updateData
+        });
+
+        if (nameError) {
+          return {
+            success: false,
+            message: 'Failed to update name',
+            error: nameError.message
+          };
+        }
+        nameUpdated = true;
+      } else if (data.name !== undefined && data.name !== currentUser.user.user_metadata?.full_name) {
+        // Legacy name field approach (for backward compatibility)
         const { error: nameError } = await this.supabase.auth.updateUser({
           data: { full_name: data.name }
         });
