@@ -844,15 +844,17 @@ export function EnhancedSignupWithVisitor({
                                                         'auth.agreeToTerms'
                                                     )}{' '}
                                                 </Label>
+                                                <Link
+                                                    href="/terms-and-conditions"
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="text-sm -ml-1 font-semibold text-[#063846] underline underline-offset-2 transition-colors hover:text-[#05141D]"
+                                                >
+                                                    {t(
+                                                        'auth.termsAndConditions'
+                                                    )}
+                                                </Link>
                                             </div>
-                                            <Link
-                                                href="/terms-and-conditions"
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="text-sm font-semibold text-[#063846] underline underline-offset-2 transition-colors hover:text-[#05141D]"
-                                            >
-                                                {t('auth.termsAndConditions')}
-                                            </Link>
                                         </div>
                                     </div>
 
