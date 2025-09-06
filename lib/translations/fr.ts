@@ -1376,7 +1376,7 @@ export const frTranslations = {
     "emptyMessage": "Sauvegardez vos articles préférés pour plus tard"
   },
   "profile": {
-    "title": "Profil utilisateur",
+    "title": "Profile utilisateur",
     "subtitle": "Gérez les paramètres et préférences de votre compte",
     "profile": "Profil",
     "orders": "Commandes",
