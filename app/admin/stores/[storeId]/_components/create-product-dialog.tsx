@@ -34,7 +34,6 @@ import {
     Clock,
 } from "lucide-react";
 import { toast } from "sonner";
-
 import { useCategories } from "../_hooks/use-categories";
 import { useColors } from "../_hooks/colors/use-colors";
 import { useCreateColor } from "../_hooks/colors/use-create-color";
@@ -198,7 +197,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
             setShortDescription(product.yprodinfobulle || "");
             setFullDescription(product.yproddetailstech || "");
             setCategoryId(product.xcategprodidfk || null);
-            setIsJewelryProduct(product.yprodestbijoux || false);
+            setIsJewelryProduct(Boolean(product.yprodestbijoux));
             // Set the current infospotaction from ydetailsevent
             setSelectedInfospotactionId(infospotactionId || null);
 
@@ -214,8 +213,8 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                     yvarprodid: variant.yvarprodid,
                     name: variant.yvarprodintitule || "",
                     code: variant.yvarprodcode || "",
-                    colorId: variant.xcouleuridfk.xcouleurid || null,
-                    sizeId: variant.xtailleidfk.xtailleid || null,
+                    colorId: variant.xcouleuridfk?.xcouleurid || null,
+                    sizeId: variant.xtailleidfk?.xtailleid || null,
                     yvarprodtypebijoux: variant.yvarprodtypebijoux || null,
                     yvarprodmatrieaux: variant.yvarprodmatrieaux || null,
                     images: variant.images || [],
@@ -510,8 +509,8 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
         }
 
         if (isStoreAdmin) {
-            // Store admin can only edit pending products, but can add variants to approved products
-            return productStatus === 'not_approved';
+            // Store admin can edit pending products and approved products (to modify details or add variants)
+            return productStatus === 'not_approved' || productStatus === 'approved';
         }
 
         return false;
@@ -644,14 +643,14 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                         return;
                     }
                 } else {
-                    // For regular products, validate color and size
-                    if (isColorMandatory && !variant.colorId) {
-                        toast.error(t("admin.createProduct.colorRequired") || "Color is required for this category");
+                    // For regular products, color and size are required
+                    if (!variant.colorId) {
+                        toast.error(t("admin.createProduct.colorRequired") || "Color is required for regular products");
                         return;
                     }
                     
-                    if (isSizeMandatory && !variant.sizeId) {
-                        toast.error(t("admin.createProduct.sizeRequired") || "Size is required for this category");
+                    if (!variant.sizeId) {
+                        toast.error(t("admin.createProduct.sizeRequired") || "Size is required for regular products");
                         return;
                     }
                 }
@@ -1334,7 +1333,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                                     <div>
                                                                         <Label className="text-gray-700 flex items-center gap-1">
                                                                             <Palette className="h-3 w-3" />
-                                                                            {t("admin.color") || "Color"} {isColorMandatory && <span className="text-red-600">*</span>}
+                                                                            {t("admin.color") || "Color"} {!isJewelryProduct && <span className="text-red-600">*</span>}
                                                                         </Label>
                                                                         <div className="flex gap-2 mt-1">
                                                                             <SuperSelect
@@ -1368,7 +1367,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                                     <div>
                                                                         <Label className="text-gray-700 flex items-center gap-1">
                                                                             <Ruler className="h-3 w-3" />
-                                                                            {t("admin.createProduct.size")} {isSizeMandatory && <span className="text-red-600">*</span>}
+                                                                            {t("admin.createProduct.size")} {!isJewelryProduct && <span className="text-red-600">*</span>}
                                                                         </Label>
                                                                         <div className="flex gap-2 mt-1">
                                                                             <SuperSelect
