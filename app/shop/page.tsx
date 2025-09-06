@@ -705,7 +705,7 @@ function ShopContent() {
             </div>
 
             {/* Fixed Bottom Filter Button */}
-            <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 transform">
+            <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 transform shadow-xl">
                 <button
                     onClick={() => setShowFilterSheet(true)}
                     className="flex h-16 w-56 items-center justify-center gap-3 rounded-2xl border-[0.50px] border-zinc-300 bg-gradient-to-r from-cyan-950 to-sky-900 text-white shadow-[0px_4px_100px_1px_rgba(0,0,0,0.10)] transition-all hover:shadow-xl"

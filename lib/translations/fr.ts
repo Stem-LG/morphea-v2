@@ -1499,6 +1499,8 @@ export const frTranslations = {
       "description": "Nous vous répondrons dans les 24 heures.",
       "firstName": "Prénom",
       "lastName": "Nom",
+      "country": "Pays",
+      "countryPlaceholder": "Entrez votre pays",
       "subject": "Sujet",
       "message": "Message",
       "firstNamePlaceholder": "Votre prénom",

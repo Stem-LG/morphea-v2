@@ -1464,6 +1464,8 @@ export const enTranslations = {
       "description": "We'll get back to you within 24 hours.",
       "firstName": "First Name",
       "lastName": "Last Name",
+      "country": "Country",
+      "countryPlaceholder": "Enter your country",
       "subject": "Subject",
       "message": "Message",
       "firstNamePlaceholder": "Your first name",
