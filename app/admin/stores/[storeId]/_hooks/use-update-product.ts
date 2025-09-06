@@ -13,7 +13,9 @@ interface ProductVariant {
     code?: string;
     colorId: number;
     sizeId: number;
-    yvarprodcaract?: string | null; // Product characteristics
+    // Jewelry fields - used when product is jewelry
+    yvarprodtypebijoux?: string | null; // Type of jewelry
+    yvarprodmatrieaux?: string | null; // Materials used
     images: (File | { ymediaid: number; ymediaurl: string; ymediaintitule: string })[];
     videos: (File | { ymediaid: number; ymediaurl: string; ymediaintitule: string })[];
     models3d: (File | { yobjet3did: number; yobjet3durl: string })[];
@@ -36,6 +38,7 @@ interface UpdateProductParams {
     productName: string;
     shortDescription: string;
     fullDescription: string;
+    isJewelryProduct?: boolean; // Explicit jewelry flag from UI
     variants: ProductVariant[];
     infospotactionId?: number;
     eventId?: number;
@@ -52,6 +55,14 @@ export function useUpdateProduct() {
         mutationFn: async (productData: UpdateProductParams) => {
             try {
                 // Step 1: Update the main product
+                // Determine if this is a jewelry product
+                // Use explicit flag if provided, otherwise auto-detect from variants
+                const isJewelryProduct = productData.isJewelryProduct !== undefined 
+                    ? productData.isJewelryProduct
+                    : productData.variants.some(variant => 
+                        variant.yvarprodtypebijoux || variant.yvarprodmatrieaux
+                    );
+
                 const { data: product, error: productError } = await supabase
                     .schema("morpheus")
                     .from("yprod")
@@ -62,6 +73,7 @@ export function useUpdateProduct() {
                         yproddetailstech: productData.fullDescription,
                         xcategprodidfk: productData.categoryId || null,
                         ydesignidfk: productData.designerId,
+                        yprodestbijoux: isJewelryProduct,
                     })
                     .eq("yprodid", productData.productId)
                     .select("*")
@@ -147,17 +159,32 @@ export function useUpdateProduct() {
         // Generate variant code
         const variantCode = variant.code || `${Date.now()}-${color?.xcouleurcode || 'C'}-${size?.xtaillecode || 'S'}`;
 
+        // Determine if this is a jewelry variant
+        const isJewelryVariant = variant.yvarprodtypebijoux || variant.yvarprodmatrieaux;
+
         const insertData: any = {
             yvarprodcode: variantCode,
             yvarprodintitule: variant.name,
             yvarprodgenre: size?.xtaillecode || 'S',
-            xcouleuridfk: variant.colorId,
-            xtailleidfk: variant.sizeId,
-            yvarprodcaract: variant.yvarprodcaract, // Product characteristics
             yprodidfk: productId,
             yvarprodnbrjourlivraison: 7,
             yvarprodprixcatalogue: variant.catalogPrice || 0,
         };
+
+        // Handle color/size vs jewelry fields based on variant type
+        if (isJewelryVariant) {
+            // For jewelry variants, set color/size to null and use jewelry fields
+            insertData.xcouleuridfk = null;
+            insertData.xtailleidfk = null;
+            insertData.yvarprodtypebijoux = variant.yvarprodtypebijoux || null;
+            insertData.yvarprodmatrieaux = variant.yvarprodmatrieaux || null;
+        } else {
+            // For regular variants, use color/size and clear jewelry fields
+            insertData.xcouleuridfk = variant.colorId;
+            insertData.xtailleidfk = variant.sizeId;
+            insertData.yvarprodtypebijoux = null;
+            insertData.yvarprodmatrieaux = null;
+        }
 
         // Add pricing data if provided
         if (variant.promotionPrice !== undefined) {
@@ -191,10 +218,25 @@ export function useUpdateProduct() {
         const updateData: any = {
             yvarprodintitule: variant.name,
             yvarprodcode: variant.code,
-            xcouleuridfk: variant.colorId,
-            xtailleidfk: variant.sizeId,
-            yvarprodcaract: variant.yvarprodcaract, // Product characteristics
         };
+
+        // Handle color/size vs jewelry fields based on product type
+        // We need to determine if this is a jewelry product from the variant data
+        const isJewelryVariant = variant.yvarprodtypebijoux || variant.yvarprodmatrieaux;
+        
+        if (isJewelryVariant) {
+            // For jewelry products, set color/size to null and use jewelry fields
+            updateData.xcouleuridfk = null;
+            updateData.xtailleidfk = null;
+            updateData.yvarprodtypebijoux = variant.yvarprodtypebijoux || null;
+            updateData.yvarprodmatrieaux = variant.yvarprodmatrieaux || null;
+        } else {
+            // For regular products, use color/size and clear jewelry fields
+            updateData.xcouleuridfk = variant.colorId;
+            updateData.xtailleidfk = variant.sizeId;
+            updateData.yvarprodtypebijoux = null;
+            updateData.yvarprodmatrieaux = null;
+        }
 
         // Add pricing data if provided
         if (variant.catalogPrice !== undefined) {

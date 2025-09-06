@@ -774,7 +774,16 @@ export const frTranslations = {
       "colorRequired": "La couleur est obligatoire pour cette catégorie",
       "sizeRequired": "La taille est obligatoire pour cette catégorie",
       "characteristics": "Caractéristiques",
-      "characteristicsPlaceholder": "Entrez les caractéristiques du produit..."
+      "characteristicsPlaceholder": "Entrez les caractéristiques du produit...",
+      "isJewelry": "Article de Bijouterie",
+      "jewelryProductHelp": "Activer si ce produit est un bijou",
+      "checkIfJewelry": "Cochez si c'est un article de bijouterie",
+      "jewelryType": "Type de Bijou",
+      "jewelryTypePlaceholder": "ex. Bague, Collier, Bracelet...",
+      "materials": "Matériaux",
+      "materialsPlaceholder": "ex. Or, Argent, Platine...",
+      "jewelryTypeRequired": "Le type de bijou est obligatoire pour les articles de bijouterie",
+      "materialsRequired": "Les matériaux sont obligatoires pour les articles de bijouterie"
     },
     "productView": {
       "productDetails": "Détails du Produit",
@@ -1312,6 +1321,8 @@ export const frTranslations = {
     "variant": "Variante",
     "color": "Couleur",
     "size": "Taille",
+    "jewelryType": "Type de Bijou",
+    "materials": "Matériaux",
     "characteristics": "Caractéristiques",
     "view": "Vue",
     "deliveryIn": "Livraison en",

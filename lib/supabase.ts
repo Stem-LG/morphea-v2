@@ -742,42 +742,36 @@ export type Database = {
           sysadresseip: string | null
           sysdate: string | null
           sysuser: string | null
-          xcategcolobl: boolean
           xcategparentid: number | null
           xcategprodcode: string
           xcategprodid: number
           xcategprodinfobulle: string
           xcategprodintitule: string
           xcategprodmediaid: number | null
-          xcategtailleobl: boolean
         }
         Insert: {
           sysaction?: string | null
           sysadresseip?: string | null
           sysdate?: string | null
           sysuser?: string | null
-          xcategcolobl?: boolean
           xcategparentid?: number | null
           xcategprodcode: string
           xcategprodid?: number
           xcategprodinfobulle: string
           xcategprodintitule: string
           xcategprodmediaid?: number | null
-          xcategtailleobl?: boolean
         }
         Update: {
           sysaction?: string | null
           sysadresseip?: string | null
           sysdate?: string | null
           sysuser?: string | null
-          xcategcolobl?: boolean
           xcategparentid?: number | null
           xcategprodcode?: string
           xcategprodid?: number
           xcategprodinfobulle?: string
           xcategprodintitule?: string
           xcategprodmediaid?: number | null
-          xcategtailleobl?: boolean
         }
         Relationships: [
           {
@@ -1741,6 +1735,7 @@ export type Database = {
           yinfospotactionsidfk: number | null
           yprodcode: string
           yproddetailstech: string
+          yprodestbijoux: boolean
           yprodid: number
           yprodinfobulle: string
           yprodintitule: string
@@ -1757,6 +1752,7 @@ export type Database = {
           yinfospotactionsidfk?: number | null
           yprodcode: string
           yproddetailstech: string
+          yprodestbijoux?: boolean
           yprodid?: number
           yprodinfobulle: string
           yprodintitule: string
@@ -1773,6 +1769,7 @@ export type Database = {
           yinfospotactionsidfk?: number | null
           yprodcode?: string
           yproddetailstech?: string
+          yprodestbijoux?: boolean
           yprodid?: number
           yprodinfobulle?: string
           yprodintitule?: string
@@ -1920,17 +1917,18 @@ export type Database = {
           xtailleidfk: number | null
           yestvisible: boolean | null
           yprodidfk: number | null
-          yvarprodcaract: string | null
           yvarprodcode: string
           yvarprodgenre: string
           yvarprodid: number
           yvarprodintitule: string
+          yvarprodmatrieaux: string | null
           yvarprodnbrjourlivraison: number
           yvarprodprixcatalogue: number
           yvarprodprixpromotion: number | null
           yvarprodpromotiondatedeb: string | null
           yvarprodpromotiondatefin: string | null
           yvarprodstatut: Database["morpheus"]["Enums"]["product_status"]
+          yvarprodtypebijoux: string | null
         }
         Insert: {
           sysaction?: string | null
@@ -1942,17 +1940,18 @@ export type Database = {
           xtailleidfk?: number | null
           yestvisible?: boolean | null
           yprodidfk?: number | null
-          yvarprodcaract?: string | null
           yvarprodcode: string
           yvarprodgenre: string
           yvarprodid?: number
           yvarprodintitule: string
+          yvarprodmatrieaux?: string | null
           yvarprodnbrjourlivraison: number
           yvarprodprixcatalogue: number
           yvarprodprixpromotion?: number | null
           yvarprodpromotiondatedeb?: string | null
           yvarprodpromotiondatefin?: string | null
           yvarprodstatut?: Database["morpheus"]["Enums"]["product_status"]
+          yvarprodtypebijoux?: string | null
         }
         Update: {
           sysaction?: string | null
@@ -1964,17 +1963,18 @@ export type Database = {
           xtailleidfk?: number | null
           yestvisible?: boolean | null
           yprodidfk?: number | null
-          yvarprodcaract?: string | null
           yvarprodcode?: string
           yvarprodgenre?: string
           yvarprodid?: number
           yvarprodintitule?: string
+          yvarprodmatrieaux?: string | null
           yvarprodnbrjourlivraison?: number
           yvarprodprixcatalogue?: number
           yvarprodprixpromotion?: number | null
           yvarprodpromotiondatedeb?: string | null
           yvarprodpromotiondatefin?: string | null
           yvarprodstatut?: Database["morpheus"]["Enums"]["product_status"]
+          yvarprodtypebijoux?: string | null
         }
         Relationships: [
           {

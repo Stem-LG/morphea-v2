@@ -15,6 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Progress } from "@/components/ui/progress";
+import { Switch } from "@/components/ui/switch";
 import {
     Plus,
     Trash2,
@@ -53,7 +54,9 @@ interface ProductVariant {
     code?: string;
     colorId: number | null;
     sizeId: number | null;
-    yvarprodcaract?: string | null; // New characteristics field
+    // Jewelry fields - used when product is jewelry
+    yvarprodtypebijoux?: string | null; // Type of jewelry
+    yvarprodmatrieaux?: string | null; // Materials used
     images: (File | { ymediaid: number; ymediaurl: string; ymediaintitule: string })[];
     videos: (File | { ymediaid: number; ymediaurl: string; ymediaintitule: string })[];
     models3d: (File | { yobjet3did: number; yobjet3durl: string; ycouleurarriereplan?: string })[];
@@ -97,13 +100,15 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
     const [fullDescription, setFullDescription] = useState("");
     const [categoryId, setCategoryId] = useState<number | null>(null);
     const [selectedInfospotactionId, setSelectedInfospotactionId] = useState<number | null>(null);
+    const [isJewelryProduct, setIsJewelryProduct] = useState(false);
     const [variants, setVariants] = useState<ProductVariant[]>([
         {
             id: "1",
             name: "",
             colorId: null,
             sizeId: null,
-            yvarprodcaract: null,
+            yvarprodtypebijoux: null,
+            yvarprodmatrieaux: null,
             images: [],
             videos: [],
             models3d: [],
@@ -178,10 +183,9 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
     const createProductMutation = useCreateProduct();
     const updateProductMutation = useUpdateProduct();
 
-    // Determine if color and size are mandatory based on selected category
-    const selectedCategory = categories?.find(cat => cat.xcategprodid === categoryId);
-    const isColorMandatory = selectedCategory?.xcategcolobl || false;
-    const isSizeMandatory = selectedCategory?.xcategtailleobl || false;
+    // These mandatory flags are no longer determined by category since columns were removed
+    const isColorMandatory = false;
+    const isSizeMandatory = false;
 
     // Effect to populate form when editing
     useEffect(() => {
@@ -194,6 +198,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
             setShortDescription(product.yprodinfobulle || "");
             setFullDescription(product.yproddetailstech || "");
             setCategoryId(product.xcategprodidfk || null);
+            setIsJewelryProduct(product.yprodestbijoux || false);
             // Set the current infospotaction from ydetailsevent
             setSelectedInfospotactionId(infospotactionId || null);
 
@@ -211,7 +216,8 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                     code: variant.yvarprodcode || "",
                     colorId: variant.xcouleuridfk.xcouleurid || null,
                     sizeId: variant.xtailleidfk.xtailleid || null,
-                    yvarprodcaract: variant.yvarprodcaract || null,
+                    yvarprodtypebijoux: variant.yvarprodtypebijoux || null,
+                    yvarprodmatrieaux: variant.yvarprodmatrieaux || null,
                     images: variant.images || [],
                     videos: variant.videos || [],
                     models3d: variant.models3d || [],
@@ -235,7 +241,8 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                             name: "",
                             colorId: null,
                             sizeId: null,
-                            yvarprodcaract: null,
+                            yvarprodtypebijoux: null,
+                            yvarprodmatrieaux: null,
                             images: [],
                             videos: [],
                             models3d: [],
@@ -252,13 +259,15 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
             setFullDescription("");
             setCategoryId(null);
             setSelectedInfospotactionId(null);
+            setIsJewelryProduct(false);
             setVariants([
                 {
                     id: "1",
                     name: "",
                     colorId: null,
                     sizeId: null,
-                    yvarprodcaract: null,
+                    yvarprodtypebijoux: null,
+                    yvarprodmatrieaux: null,
                     images: [],
                     videos: [],
                     models3d: [],
@@ -306,7 +315,8 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
             name: "",
             colorId: null,
             sizeId: null,
-            yvarprodcaract: null,
+            yvarprodtypebijoux: null,
+            yvarprodmatrieaux: null,
             images: [],
             videos: [],
             models3d: [],
@@ -362,11 +372,14 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                 fullDescription.trim() !== "" ||
                 categoryId !== null ||
                 selectedInfospotactionId !== null ||
+                isJewelryProduct ||
                 variants.some(variant => 
                     variant.name.trim() !== "" ||
                     variant.code?.trim() !== "" ||
                     variant.colorId !== null ||
                     variant.sizeId !== null ||
+                    variant.yvarprodtypebijoux?.trim() !== "" ||
+                    variant.yvarprodmatrieaux?.trim() !== "" ||
                     variant.images.length > 0 ||
                     variant.videos.length > 0 ||
                     variant.models3d.length > 0 ||
@@ -402,9 +415,6 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
     const handleVariantChange = (variantId: string, field: keyof ProductVariant, value: any) => {
         if (field === 'backgroundColor') {
             console.log(`Background color changed for variant ${variantId}: ${value}`);
-        }
-        if (field === 'yvarprodcaract') {
-            console.log(`Characteristics changed for variant ${variantId}: "${value}" (type: ${typeof value})`);
         }
         setVariants(variants.map((v) => (v.id === variantId ? { ...v, [field]: value } : v)));
     };
@@ -622,16 +632,28 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                     return;
                 }
                 
-                // Check color requirement based on category setting
-                if (isColorMandatory && !variant.colorId) {
-                    toast.error(t("admin.createProduct.colorRequired") || "Color is required for this category");
-                    return;
-                }
-                
-                // Check size requirement based on category setting
-                if (isSizeMandatory && !variant.sizeId) {
-                    toast.error(t("admin.createProduct.sizeRequired") || "Size is required for this category");
-                    return;
+                if (isJewelryProduct) {
+                    // For jewelry products, validate jewelry fields
+                    if (!variant.yvarprodtypebijoux?.trim()) {
+                        toast.error(t("admin.createProduct.jewelryTypeRequired") || "Jewelry type is required for jewelry items");
+                        return;
+                    }
+                    
+                    if (!variant.yvarprodmatrieaux?.trim()) {
+                        toast.error(t("admin.createProduct.materialsRequired") || "Materials are required for jewelry items");
+                        return;
+                    }
+                } else {
+                    // For regular products, validate color and size
+                    if (isColorMandatory && !variant.colorId) {
+                        toast.error(t("admin.createProduct.colorRequired") || "Color is required for this category");
+                        return;
+                    }
+                    
+                    if (isSizeMandatory && !variant.sizeId) {
+                        toast.error(t("admin.createProduct.sizeRequired") || "Size is required for this category");
+                        return;
+                    }
                 }
             }
             
@@ -660,7 +682,9 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                         code: v.code,
                         colorId: v.colorId!,
                         sizeId: v.sizeId!,
-                        yvarprodcaract: v.yvarprodcaract,
+                        // Include jewelry fields
+                        yvarprodtypebijoux: v.yvarprodtypebijoux,
+                        yvarprodmatrieaux: v.yvarprodmatrieaux,
                         images: v.images.filter((img): img is File => img instanceof File),
                         videos: v.videos.filter((vid): vid is File => vid instanceof File),
                         models3d: v.models3d.filter((model): model is File => model instanceof File),
@@ -683,6 +707,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                     productName,
                     shortDescription,
                     fullDescription,
+                    isJewelryProduct,
                     infospotactionId: selectedInfospotactionId || undefined,
                     eventId: selectedEventId || undefined,
                     variants: formattedVariants,
@@ -692,13 +717,14 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                 // Create new product
                 const createVariants = variants.map((v) => {
                     const normalizedBgColor = normalizeBackgroundColor(v.backgroundColor);
-                    console.log(`Creating variant "${v.name}" with characteristics: "${v.yvarprodcaract}" (type: ${typeof v.yvarprodcaract})`);
                     return {
                         name: v.name,
                         code: v.code,
                         colorId: v.colorId!,
                         sizeId: v.sizeId!,
-                        yvarprodcaract: v.yvarprodcaract,
+                        // Include jewelry fields
+                        yvarprodtypebijoux: v.yvarprodtypebijoux,
+                        yvarprodmatrieaux: v.yvarprodmatrieaux,
                         images: v.images.filter((img): img is File => img instanceof File),
                         videos: v.videos.filter((vid): vid is File => vid instanceof File),
                         models3d: v.models3d.filter((model): model is File => model instanceof File),
@@ -707,9 +733,8 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                     };
                 });
                 
-                console.log("Creating variants with characteristics and background colors:", createVariants.map(v => ({
+                console.log("Creating variants with background colors:", createVariants.map(v => ({
                     name: v.name,
-                    yvarprodcaract: v.yvarprodcaract,
                     backgroundColor: v.backgroundColor
                 })));
                 
@@ -722,6 +747,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                     productName,
                     shortDescription,
                     fullDescription,
+                    isJewelryProduct,
                     infospotactionId: selectedInfospotactionId || undefined,
                     variants: createVariants,
                 });
@@ -794,7 +820,9 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
             code: variant.code,
             colorId: variant.colorId!,
             sizeId: variant.sizeId!,
-            yvarprodcaract: variant.yvarprodcaract,
+            // Include jewelry fields
+            yvarprodtypebijoux: variant.yvarprodtypebijoux,
+            yvarprodmatrieaux: variant.yvarprodmatrieaux,
             images: variant.images,
             videos: variant.videos,
             models3d: formattedModels3d,
@@ -804,7 +832,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
             // Include pricing data
             catalogPrice: variant.catalogPrice,
             promotionPrice: variant.promotionPrice,
-            promotionStartDate: variant.promotionStartDate,
+            promotionStartDate: variant.promotionEndDate,
             promotionEndDate: variant.promotionEndDate,
             currencyId: variant.currencyId,
         };
@@ -941,7 +969,23 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                             />
                                         </div>
 
-                                        {/* Infospotaction Selection (Admin Only) */}
+                                        {/* Jewelry Product Toggle */}
+                                            <div>
+                                                <div className="flex items-center justify-between">
+                                                    <div>
+                                                        <Label className="text-gray-700">{t("admin.createProduct.isJewelry") || "Is Jewelry Product"}</Label>
+                                                        <div className="text-gray-500 text-xs mt-1">
+                                                            {t("admin.createProduct.jewelryProductHelp") || "Toggle if this product is jewelry"}
+                                                        </div>
+                                                    </div>
+                                                    <Switch
+                                                        checked={isJewelryProduct}
+                                                        onCheckedChange={setIsJewelryProduct}
+                                                        disabled={!canEditProductInfo()}
+                                                        className="data-[state=checked]:bg-blue-600"
+                                                    />
+                                                </div>
+                                            </div>                                        {/* Infospotaction Selection (Admin Only) */}
                                         {isAdmin && (
                                             <div>
                                                 <Label className="text-gray-700">{t("admin.createProduct.productPlacement")}</Label>
@@ -1238,92 +1282,119 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                         </div>
 
                                                         <div className="grid grid-cols-2 gap-4">
-                                                            {/* Color Selection */}
-                                                            <div>
-                                                                <Label className="text-gray-700 flex items-center gap-1">
-                                                                    <Palette className="h-3 w-3" />
-                                                                    {t("admin.color") || "Color"} {isColorMandatory && <span className="text-red-600">*</span>}
-                                                                </Label>
-                                                                <div className="flex gap-2 mt-1">
-                                                                    <SuperSelect
-                                                                        value={variant.colorId}
-                                                                        onValueChange={(value) =>
-                                                                            handleVariantChange(
-                                                                                variant.id,
-                                                                                "colorId",
-                                                                                value
-                                                                            )
-                                                                        }
-                                                                        options={colorOptions}
-                                                                        placeholder={t("admin.createProduct.selectColor") || "Select Color"}
-                                                                        disabled={!canEdit}
-                                                                        className="flex-1"
-                                                                    />
-                                                                    {canEdit && (
-                                                                        <Button
-                                                                            onClick={() => setShowColorForm(!showColorForm)}
-                                                                            size="sm"
-                                                                            variant="outline"
-                                                                            className="border-gray-300 text-gray-700 hover:bg-gray-50"
-                                                                        >
-                                                                            <Plus className="h-3 w-3" />
-                                                                        </Button>
-                                                                    )}
-                                                                </div>
-                                                            </div>
+                                                            {isJewelryProduct ? (
+                                                                // Jewelry Product Fields
+                                                                <>
+                                                                    {/* Jewelry Type */}
+                                                                    <div>
+                                                                        <Label className="text-gray-700 flex items-center gap-1">
+                                                                            <Package className="h-3 w-3" />
+                                                                            {t("admin.createProduct.jewelryType")} <span className="text-red-600">*</span>
+                                                                        </Label>
+                                                                        <Input
+                                                                            value={variant.yvarprodtypebijoux || ""}
+                                                                            onChange={(e) =>
+                                                                                handleVariantChange(
+                                                                                    variant.id,
+                                                                                    "yvarprodtypebijoux",
+                                                                                    e.target.value
+                                                                                )
+                                                                            }
+                                                                            placeholder={t("admin.createProduct.jewelryTypePlaceholder")}
+                                                                            className="mt-1 bg-white border-gray-300 text-gray-900"
+                                                                            disabled={!canEdit}
+                                                                        />
+                                                                    </div>
 
-                                                            {/* Size Selection */}
-                                                            <div>
-                                                                <Label className="text-gray-700 flex items-center gap-1">
-                                                                    <Ruler className="h-3 w-3" />
-                                                                    {t("admin.createProduct.size")} {isSizeMandatory && <span className="text-red-600">*</span>}
-                                                                </Label>
-                                                                <div className="flex gap-2 mt-1">
-                                                                    <SuperSelect
-                                                                        value={variant.sizeId}
-                                                                        onValueChange={(value) =>
-                                                                            handleVariantChange(variant.id, "sizeId", value)
-                                                                        }
-                                                                        options={sizeOptions}
-                                                                        placeholder={t("admin.createProduct.selectSize")}
-                                                                        disabled={sizesLoading || !canEdit}
-                                                                        className="flex-1"
-                                                                    />
-                                                                    {canEdit && (
-                                                                        <Button
-                                                                            onClick={() => setShowSizeForm(!showSizeForm)}
-                                                                            size="sm"
-                                                                            variant="outline"
-                                                                            className="border-gray-300 text-gray-700 hover:bg-gray-50"
-                                                                        >
-                                                                            <Plus className="h-3 w-3" />
-                                                                        </Button>
-                                                                    )}
-                                                                </div>
-                                                            </div>
-                                                        </div>
+                                                                    {/* Materials */}
+                                                                    <div>
+                                                                        <Label className="text-gray-700 flex items-center gap-1">
+                                                                            <Box className="h-3 w-3" />
+                                                                            {t("admin.createProduct.materials")} <span className="text-red-600">*</span>
+                                                                        </Label>
+                                                                        <Input
+                                                                            value={variant.yvarprodmatrieaux || ""}
+                                                                            onChange={(e) =>
+                                                                                handleVariantChange(
+                                                                                    variant.id,
+                                                                                    "yvarprodmatrieaux",
+                                                                                    e.target.value
+                                                                                )
+                                                                            }
+                                                                            placeholder={t("admin.createProduct.materialsPlaceholder")}
+                                                                            className="mt-1 bg-white border-gray-300 text-gray-900"
+                                                                            disabled={!canEdit}
+                                                                        />
+                                                                    </div>
+                                                                </>
+                                                            ) : (
+                                                                // Regular Product Fields
+                                                                <>
+                                                                    {/* Color Selection */}
+                                                                    <div>
+                                                                        <Label className="text-gray-700 flex items-center gap-1">
+                                                                            <Palette className="h-3 w-3" />
+                                                                            {t("admin.color") || "Color"} {isColorMandatory && <span className="text-red-600">*</span>}
+                                                                        </Label>
+                                                                        <div className="flex gap-2 mt-1">
+                                                                            <SuperSelect
+                                                                                value={variant.colorId}
+                                                                                onValueChange={(value) =>
+                                                                                    handleVariantChange(
+                                                                                        variant.id,
+                                                                                        "colorId",
+                                                                                        value
+                                                                                    )
+                                                                                }
+                                                                                options={colorOptions}
+                                                                                placeholder={t("admin.createProduct.selectColor") || "Select Color"}
+                                                                                disabled={!canEdit}
+                                                                                className="flex-1"
+                                                                            />
+                                                                            {canEdit && (
+                                                                                <Button
+                                                                                    onClick={() => setShowColorForm(!showColorForm)}
+                                                                                    size="sm"
+                                                                                    variant="outline"
+                                                                                    className="border-gray-300 text-gray-700 hover:bg-gray-50"
+                                                                                >
+                                                                                    <Plus className="h-3 w-3" />
+                                                                                </Button>
+                                                                            )}
+                                                                        </div>
+                                                                    </div>
 
-                                                        {/* Product Characteristics */}
-                                                        <div>
-                                                            <Label className="text-gray-700 flex items-center gap-1">
-                                                                <FileText className="h-3 w-3" />
-                                                                {t("admin.createProduct.characteristics") || "Characteristics"}
-                                                                <span className="text-gray-500 text-sm">({t("common.optional")})</span>
-                                                            </Label>
-                                                            <Input
-                                                                value={variant.yvarprodcaract || ""}
-                                                                onChange={(e) => {
-                                                                    console.log("Characteristics input changed:", e.target.value);
-                                                                    handleVariantChange(
-                                                                        variant.id,
-                                                                        "yvarprodcaract",
-                                                                        e.target.value.trim() || null
-                                                                    )
-                                                                }}
-                                                                placeholder={t("admin.createProduct.characteristicsPlaceholder") || "Enter product characteristics..."}
-                                                                className="mt-1 bg-white border-gray-300 text-gray-900"
-                                                                disabled={!canEdit}
-                                                            />
+                                                                    {/* Size Selection */}
+                                                                    <div>
+                                                                        <Label className="text-gray-700 flex items-center gap-1">
+                                                                            <Ruler className="h-3 w-3" />
+                                                                            {t("admin.createProduct.size")} {isSizeMandatory && <span className="text-red-600">*</span>}
+                                                                        </Label>
+                                                                        <div className="flex gap-2 mt-1">
+                                                                            <SuperSelect
+                                                                                value={variant.sizeId}
+                                                                                onValueChange={(value) =>
+                                                                                    handleVariantChange(variant.id, "sizeId", value)
+                                                                                }
+                                                                                options={sizeOptions}
+                                                                                placeholder={t("admin.createProduct.selectSize")}
+                                                                                disabled={sizesLoading || !canEdit}
+                                                                                className="flex-1"
+                                                                            />
+                                                                            {canEdit && (
+                                                                                <Button
+                                                                                    onClick={() => setShowSizeForm(!showSizeForm)}
+                                                                                    size="sm"
+                                                                                    variant="outline"
+                                                                                    className="border-gray-300 text-gray-700 hover:bg-gray-50"
+                                                                                >
+                                                                                    <Plus className="h-3 w-3" />
+                                                                                </Button>
+                                                                            )}
+                                                                        </div>
+                                                                    </div>
+                                                                </>
+                                                            )}
                                                         </div>
 
                                                         {/* Pricing Section (Admin Only) */}

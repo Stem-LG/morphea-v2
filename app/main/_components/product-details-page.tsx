@@ -13,7 +13,6 @@ import { useRemoveFromWishlist } from '@/app/_hooks/wishlist/useRemoveFromWishli
 import { useIsInWishlist } from '@/app/_hooks/wishlist/useIsInWishlist'
 import * as THREE from 'three'
 import { StarIcon } from 'lucide-react'
-import { CartIcon } from '@/app/_icons/cart_icon'
 
 // Loading component for 3D model
 function LoadingSpinner() {
@@ -183,16 +182,19 @@ type ProductVariant = {
     yvarprodstatut: string // Approval status field
     yestvisible?: boolean // Visibility status field (optional as it might not always be included)
     xdeviseidfk: number | null // Currency foreign key
-    yvarprodcaract?: string | null // Custom characteristics field
+    // Regular product fields (can be null for jewelry products)
     xcouleur: {
         xcouleurid: number
         xcouleurintitule: string
         xcouleurhexa: string
-    }
+    } | null
     xtaille: {
         xtailleid: number
         xtailleintitule: string
-    }
+    } | null
+    // Jewelry product fields
+    yvarprodtypebijoux?: string | null
+    yvarprodmatrieaux?: string | null
     yvarprodmedia: Array<{
         ymedia: {
             ymediaid: number
@@ -214,6 +216,7 @@ interface ProductDetailsPageProps {
         yprodintitule: string
         yproddetailstech: string
         yprodinfobulle: string
+        yprodestbijoux?: boolean | null // Jewelry status at product level
         yvarprod: ProductVariant[]
     }
     onClose: () => void
@@ -247,10 +250,34 @@ export function ProductDetailsPage({
         })
     }, [productData.yvarprod])
 
+    // Determine if this is a jewelry product
+    const isJewelryProduct = productData.yprodestbijoux === true
+
     const [selectedMediaIndex, setSelectedMediaIndex] = useState(0)
-    const [selectedColorId, setSelectedColorId] = useState<number>(0)
-    const [selectedSizeId, setSelectedSizeId] = useState<number>(0)
-    const [selectedCharacteristic, setSelectedCharacteristic] = useState<string | null>(null)
+    const [selectedColorId, setSelectedColorId] = useState<number>(() => {
+        if (isJewelryProduct) return 0 // Don't use color for jewelry
+        return approvedVariants && approvedVariants.length > 0 && approvedVariants[0].xcouleur
+            ? approvedVariants[0].xcouleur.xcouleurid
+            : 0
+    })
+    const [selectedSizeId, setSelectedSizeId] = useState<number>(() => {
+        if (isJewelryProduct) return 0 // Don't use size for jewelry
+        return approvedVariants && approvedVariants.length > 0 && approvedVariants[0].xtaille
+            ? approvedVariants[0].xtaille.xtailleid
+            : 0
+    })
+    const [selectedJewelryType, setSelectedJewelryType] = useState<string>(() => {
+        if (!isJewelryProduct) return '' // Don't use jewelry type for regular products
+        return approvedVariants && approvedVariants.length > 0
+            ? approvedVariants[0].yvarprodtypebijoux || ''
+            : ''
+    })
+    const [selectedMaterial, setSelectedMaterial] = useState<string>(() => {
+        if (!isJewelryProduct) return '' // Don't use material for regular products
+        return approvedVariants && approvedVariants.length > 0
+            ? approvedVariants[0].yvarprodmatrieaux || ''
+            : ''
+    })
     const [viewMode, setViewMode] = useState<'media' | '3d'>('media')
     const [quantity, setQuantity] = useState(1)
 
@@ -259,9 +286,9 @@ export function ProductDetailsPage({
     const addToWishlistMutation = useAddToWishlist()
     const removeFromWishlistMutation = useRemoveFromWishlist()
 
-    // Get all unique colors from approved variants with compatibility info
+    // Get all unique colors and sizes from approved variants only
     const availableColors = useMemo(() => {
-        if (!approvedVariants || approvedVariants.length === 0) return []
+        if (!approvedVariants || approvedVariants.length === 0 || isJewelryProduct) return []
 
         const colorMap = new Map()
         approvedVariants.forEach((variant) => {
@@ -270,185 +297,81 @@ export function ProductDetailsPage({
                 colorMap.set(color.xcouleurid, color)
             }
         })
-        
-        // Add compatibility info to each color
-        return Array.from(colorMap.values()).map(color => {
-            const isCompatible = approvedVariants.some((v) => {
-                const colorMatch = v.xcouleur?.xcouleurid === color.xcouleurid
-                const sizeMatch = selectedSizeId === 0 || v.xtaille?.xtailleid === selectedSizeId
-                const characteristicMatch = !selectedCharacteristic || v.yvarprodcaract === selectedCharacteristic
-                return colorMatch && sizeMatch && characteristicMatch
-            })
-            return { ...color, isCompatible }
-        })
-    }, [approvedVariants, selectedSizeId, selectedCharacteristic])
+        return Array.from(colorMap.values())
+    }, [approvedVariants, isJewelryProduct])
 
     const availableSizes = useMemo(() => {
-        if (!approvedVariants || approvedVariants.length === 0) return []
+        if (!approvedVariants || approvedVariants.length === 0 || isJewelryProduct) return []
 
         const sizeMap = new Map()
-        approvedVariants.forEach((variant) => {
+        // Filter sizes based on selected color from approved variants only
+        const variantsForColor = approvedVariants.filter(
+            (v) => v.xcouleur && v.xcouleur.xcouleurid === selectedColorId
+        )
+        variantsForColor.forEach((variant) => {
             const size = variant.xtaille
             if (size && !sizeMap.has(size.xtailleid)) {
                 sizeMap.set(size.xtailleid, size)
             }
         })
-        
-        // Add compatibility info to each size
-        return Array.from(sizeMap.values()).map(size => {
-            const isCompatible = approvedVariants.some((v) => {
-                const colorMatch = selectedColorId === 0 || v.xcouleur?.xcouleurid === selectedColorId
-                const sizeMatch = v.xtaille?.xtailleid === size.xtailleid
-                const characteristicMatch = !selectedCharacteristic || v.yvarprodcaract === selectedCharacteristic
-                return colorMatch && sizeMatch && characteristicMatch
-            })
-            return { ...size, isCompatible }
-        })
-    }, [approvedVariants, selectedColorId, selectedCharacteristic])
+        return Array.from(sizeMap.values())
+    }, [approvedVariants, selectedColorId, isJewelryProduct])
 
-    // Get available characteristics from approved variants only
-    const availableCharacteristics = useMemo(() => {
-        if (!approvedVariants || approvedVariants.length === 0) {
-            console.log('No approved variants found for characteristics')
-            return []
-        }
-        
-        console.log('Approved variants for characteristics:', approvedVariants)
-        const characteristicsSet = new Set<string>()
-        
-        approvedVariants.forEach((v) => {
-            if (v.yvarprodcaract && v.yvarprodcaract.trim() !== '') {
-                characteristicsSet.add(v.yvarprodcaract)
+    // Get all unique jewelry types and materials from approved variants only
+    const availableJewelryTypes = useMemo(() => {
+        if (!approvedVariants || approvedVariants.length === 0 || !isJewelryProduct) return []
+
+        const typeSet = new Set<string>()
+        approvedVariants.forEach((variant) => {
+            if (variant.yvarprodtypebijoux && variant.yvarprodtypebijoux.trim()) {
+                typeSet.add(variant.yvarprodtypebijoux.trim())
             }
         })
-        
-        // Add compatibility info to each characteristic
-        const characteristics = Array.from(characteristicsSet).map(characteristic => {
-            const isCompatible = approvedVariants.some((v) => {
-                const colorMatch = selectedColorId === 0 || v.xcouleur?.xcouleurid === selectedColorId
-                const sizeMatch = selectedSizeId === 0 || v.xtaille?.xtailleid === selectedSizeId
-                const characteristicMatch = v.yvarprodcaract === characteristic
-                return colorMatch && sizeMatch && characteristicMatch
-            })
-            return { value: characteristic, isCompatible }
+        const types = Array.from(typeSet).sort()
+        return types
+    }, [approvedVariants, isJewelryProduct])
+
+    const availableMaterials = useMemo(() => {
+        if (!approvedVariants || approvedVariants.length === 0 || !isJewelryProduct) return []
+
+        const materialSet = new Set<string>()
+        // If no type is selected, show all materials
+        const variantsToCheck = selectedJewelryType 
+            ? approvedVariants.filter((v) => v.yvarprodtypebijoux === selectedJewelryType)
+            : approvedVariants
+
+        variantsToCheck.forEach((variant) => {
+            if (variant.yvarprodmatrieaux && variant.yvarprodmatrieaux.trim()) {
+                materialSet.add(variant.yvarprodmatrieaux.trim())
+            }
         })
-        
-        console.log('Final available characteristics:', characteristics)
-        return characteristics
-    }, [approvedVariants, selectedColorId, selectedSizeId])
-
-    // Auto-select default valid combination when current selection is invalid
-    useEffect(() => {
-        if (!approvedVariants || approvedVariants.length === 0) return
-
-        // Check if current combination exists
-        const currentCombinationExists = approvedVariants.some((v) => {
-            const colorMatch = selectedColorId === 0 || v.xcouleur?.xcouleurid === selectedColorId
-            const sizeMatch = selectedSizeId === 0 || v.xtaille?.xtailleid === selectedSizeId
-            const characteristicMatch = !selectedCharacteristic || v.yvarprodcaract === selectedCharacteristic
-            return colorMatch && sizeMatch && characteristicMatch
-        })
-
-        // If current combination doesn't exist, find the best default combination
-        if (!currentCombinationExists && approvedVariants.length > 0) {
-            console.log('Current combination invalid, finding best default...')
-            
-            // Strategy 1: Try to find a variant that has all attributes (most complete)
-            let defaultVariant = approvedVariants.find(v => 
-                v.xcouleur && v.xtaille && v.yvarprodcaract
-            )
-            
-            // Strategy 2: If no complete variant, find one with color and size
-            if (!defaultVariant) {
-                defaultVariant = approvedVariants.find(v => 
-                    v.xcouleur && v.xtaille
-                )
-            }
-            
-            // Strategy 3: Find one with just color
-            if (!defaultVariant) {
-                defaultVariant = approvedVariants.find(v => v.xcouleur)
-            }
-            
-            // Strategy 4: Use first variant as last resort
-            if (!defaultVariant) {
-                defaultVariant = approvedVariants[0]
-            }
-            
-            console.log('Setting default combination from variant:', defaultVariant)
-            
-            // Set default values based on the selected variant
-            const defaultColorId = defaultVariant.xcouleur?.xcouleurid || 0
-            const defaultSizeId = defaultVariant.xtaille?.xtailleid || 0
-            const defaultCharacteristic = defaultVariant.yvarprodcaract || null
-            
-            // Only update if values are different to prevent infinite loops
-            if (selectedColorId !== defaultColorId) {
-                setSelectedColorId(defaultColorId)
-            }
-            if (selectedSizeId !== defaultSizeId) {
-                setSelectedSizeId(defaultSizeId)
-            }
-            if (selectedCharacteristic !== defaultCharacteristic) {
-                setSelectedCharacteristic(defaultCharacteristic)
-            }
-        }
-    }, [approvedVariants, selectedColorId, selectedSizeId, selectedCharacteristic])
+        const materials = Array.from(materialSet).sort()
+        return materials
+    }, [approvedVariants, selectedJewelryType, isJewelryProduct])
 
     // Get current selected variant from approved variants only
     const selectedVariant = useMemo(() => {
         if (!approvedVariants || approvedVariants.length === 0) return null
 
-        // Find variant that matches selected color, size, and characteristic
-        let matchingVariant = approvedVariants.find(
-            (v) => {
-                const colorMatch = selectedColorId === 0 || v.xcouleur?.xcouleurid === selectedColorId
-                const sizeMatch = selectedSizeId === 0 || v.xtaille?.xtailleid === selectedSizeId
-                const characteristicMatch = !selectedCharacteristic || v.yvarprodcaract === selectedCharacteristic
-                
-                return colorMatch && sizeMatch && characteristicMatch
-            }
-        )
-        
-        // If no exact match, try to find partial matches
-        if (!matchingVariant) {
-            // Try color + size match
-            matchingVariant = approvedVariants.find(
-                (v) => 
-                    (selectedColorId === 0 || v.xcouleur?.xcouleurid === selectedColorId) &&
-                    (selectedSizeId === 0 || v.xtaille?.xtailleid === selectedSizeId)
+        if (isJewelryProduct) {
+            return (
+                approvedVariants.find(
+                    (v) =>
+                        v.yvarprodtypebijoux === selectedJewelryType &&
+                        v.yvarprodmatrieaux === selectedMaterial
+                ) || approvedVariants[0]
+            )
+        } else {
+            return (
+                approvedVariants.find(
+                    (v) =>
+                        v.xcouleur && v.xtaille &&
+                        v.xcouleur.xcouleurid === selectedColorId &&
+                        v.xtaille.xtailleid === selectedSizeId
+                ) || approvedVariants[0]
             )
         }
-        
-        if (!matchingVariant) {
-            // Try color match only
-            matchingVariant = approvedVariants.find(
-                (v) => selectedColorId === 0 || v.xcouleur?.xcouleurid === selectedColorId
-            )
-        }
-        
-        if (!matchingVariant) {
-            // Try size match only
-            matchingVariant = approvedVariants.find(
-                (v) => selectedSizeId === 0 || v.xtaille?.xtailleid === selectedSizeId
-            )
-        }
-        
-        if (!matchingVariant) {
-            // Try characteristic match only
-            matchingVariant = approvedVariants.find(
-                (v) => !selectedCharacteristic || v.yvarprodcaract === selectedCharacteristic
-            )
-        }
-        
-        // Fallback to first variant
-        return matchingVariant || approvedVariants[0]
-    }, [approvedVariants, selectedColorId, selectedSizeId, selectedCharacteristic])
-
-    // Reset media index when variant changes
-    useEffect(() => {
-        setSelectedMediaIndex(0)
-    }, [selectedVariant])
+    }, [approvedVariants, selectedColorId, selectedSizeId, selectedJewelryType, selectedMaterial, isJewelryProduct])
 
     // Check if current variant is in wishlist
     const { data: isInWishlist } = useIsInWishlist(
@@ -457,8 +380,9 @@ export function ProductDetailsPage({
 
     // Get all media from approved variants only for the carousel
     const allMedia = useMemo(() => {
-        if (!selectedVariant) return []
+        if (!approvedVariants || approvedVariants.length === 0) return []
 
+        const mediaSet = new Set()
         const mediaArray: Array<{
             ymediaid: number
             ymediaintitule: string
@@ -466,15 +390,19 @@ export function ProductDetailsPage({
             ymediaboolvideo: boolean
         }> = []
 
-        if (selectedVariant.yvarprodmedia && Array.isArray(selectedVariant.yvarprodmedia)) {
-            selectedVariant.yvarprodmedia.forEach((mediaWrapper) => {
-                const media = mediaWrapper.ymedia
-                mediaArray.push(media)
-            })
-        }
-        
+        approvedVariants.forEach((variant) => {
+            if (variant.yvarprodmedia && Array.isArray(variant.yvarprodmedia)) {
+                variant.yvarprodmedia.forEach((mediaWrapper) => {
+                    const media = mediaWrapper.ymedia
+                    if (!mediaSet.has(media.ymediaid)) {
+                        mediaSet.add(media.ymediaid)
+                        mediaArray.push(media)
+                    }
+                })
+            }
+        })
         return mediaArray
-    }, [selectedVariant])
+    }, [approvedVariants])
 
     // Get 3D model for selected variant
     const selected3DModel = useMemo(() => {
@@ -532,49 +460,29 @@ export function ProductDetailsPage({
     const handleColorChange = (colorId: number) => {
         if (!approvedVariants || approvedVariants.length === 0) return
 
-        // Allow deselection by clicking the same color
-        if (selectedColorId === colorId) {
-            setSelectedColorId(0) // Reset to 0 to indicate no color selected
-            return
-        }
-
         setSelectedColorId(colorId)
 
-        // Check if current size is available for new color and characteristic combination
-        const compatibleVariants = approvedVariants.filter((v) => {
-            const colorMatch = v.xcouleur?.xcouleurid === colorId
-            const characteristicMatch = !selectedCharacteristic || v.yvarprodcaract === selectedCharacteristic
-            return colorMatch && characteristicMatch
-        })
-        
-        const currentSizeAvailable = compatibleVariants.some(
-            (v) => v.xtaille?.xtailleid === selectedSizeId
+        // Check if current size is available for new color from approved variants only
+        const variantsForColor = approvedVariants.filter(
+            (v) => v.xcouleur && v.xcouleur.xcouleurid === colorId
+        )
+        const currentSizeAvailable = variantsForColor.some(
+            (v) => v.xtaille && v.xtaille.xtailleid === selectedSizeId
         )
 
-        if (!currentSizeAvailable) {
-            // Reset size if current size is not available for this color+characteristic combination
-            setSelectedSizeId(0)
-        }
-        
-        // Check if current characteristic is still available for new color+size combination
-        if (selectedCharacteristic) {
-            const characteristicStillAvailable = approvedVariants.some((v) => {
-                const colorMatch = v.xcouleur?.xcouleurid === colorId
-                const sizeMatch = selectedSizeId === 0 || v.xtaille?.xtailleid === selectedSizeId
-                const characteristicMatch = v.yvarprodcaract === selectedCharacteristic
-                return colorMatch && sizeMatch && characteristicMatch
-            })
-            
-            if (!characteristicStillAvailable) {
-                setSelectedCharacteristic(null)
+        if (!currentSizeAvailable && variantsForColor.length > 0) {
+            // Switch to first available size for this color
+            const firstVariantWithSize = variantsForColor.find(v => v.xtaille)
+            if (firstVariantWithSize && firstVariantWithSize.xtaille) {
+                setSelectedSizeId(firstVariantWithSize.xtaille.xtailleid)
             }
         }
 
         // Update media view if variant has specific media
-        const newVariant = compatibleVariants.find(
-            (v) => selectedSizeId === 0 || v.xtaille?.xtailleid === selectedSizeId
-        ) || compatibleVariants[0]
-        
+        const newVariant =
+            variantsForColor.find(
+                (v) => v.xtaille && v.xtaille.xtailleid === selectedSizeId
+            ) || variantsForColor[0]
         if (newVariant?.yvarprodmedia && newVariant.yvarprodmedia.length > 0) {
             if (viewMode === 'media') {
                 setSelectedMediaIndex(0)
@@ -584,50 +492,46 @@ export function ProductDetailsPage({
 
     // Handle size selection
     const handleSizeChange = (sizeId: number) => {
-        // Allow deselection by clicking the same size
-        if (selectedSizeId === sizeId) {
-            setSelectedSizeId(0) // Reset to 0 to indicate no size selected
-        } else {
-            setSelectedSizeId(sizeId)
-            
-            // Check if current characteristic is still available for new size+color combination
-            if (selectedCharacteristic) {
-                const characteristicStillAvailable = approvedVariants.some((v) => {
-                    const colorMatch = selectedColorId === 0 || v.xcouleur?.xcouleurid === selectedColorId
-                    const sizeMatch = v.xtaille?.xtailleid === sizeId
-                    const characteristicMatch = v.yvarprodcaract === selectedCharacteristic
-                    return colorMatch && sizeMatch && characteristicMatch
-                })
-                
-                if (!characteristicStillAvailable) {
-                    setSelectedCharacteristic(null)
-                }
+        setSelectedSizeId(sizeId)
+    }
+
+    // Handle jewelry type selection
+    const handleJewelryTypeChange = (type: string) => {
+        if (!approvedVariants || approvedVariants.length === 0) return
+
+        setSelectedJewelryType(type)
+
+        // Check if current material is available for new type from approved variants only
+        const variantsForType = approvedVariants.filter(
+            (v) => v.yvarprodtypebijoux === type
+        )
+        const currentMaterialAvailable = variantsForType.some(
+            (v) => v.yvarprodmatrieaux === selectedMaterial
+        )
+
+        if (!currentMaterialAvailable && variantsForType.length > 0) {
+            // Switch to first available material for this type
+            const firstMaterial = variantsForType[0].yvarprodmatrieaux
+            if (firstMaterial) {
+                setSelectedMaterial(firstMaterial)
+            }
+        }
+
+        // Update media view if variant has specific media
+        const newVariant =
+            variantsForType.find(
+                (v) => v.yvarprodmatrieaux === selectedMaterial
+            ) || variantsForType[0]
+        if (newVariant?.yvarprodmedia && newVariant.yvarprodmedia.length > 0) {
+            if (viewMode === 'media') {
+                setSelectedMediaIndex(0)
             }
         }
     }
 
-    // Handle characteristic selection
-    const handleCharacteristicChange = (characteristic: string) => {
-        // Allow deselection by clicking the same characteristic
-        if (selectedCharacteristic === characteristic) {
-            setSelectedCharacteristic(null)
-        } else {
-            setSelectedCharacteristic(characteristic)
-            
-            // Check if current size is still available for new characteristic+color combination
-            if (selectedSizeId !== 0) {
-                const sizeStillAvailable = approvedVariants.some((v) => {
-                    const colorMatch = selectedColorId === 0 || v.xcouleur?.xcouleurid === selectedColorId
-                    const sizeMatch = v.xtaille?.xtailleid === selectedSizeId
-                    const characteristicMatch = v.yvarprodcaract === characteristic
-                    return colorMatch && sizeMatch && characteristicMatch
-                })
-                
-                if (!sizeStillAvailable) {
-                    setSelectedSizeId(0)
-                }
-            }
-        }
+    // Handle material selection
+    const handleMaterialChange = (material: string) => {
+        setSelectedMaterial(material)
     }
 
     const handleAddToCart = () => {
@@ -1047,49 +951,32 @@ export function ProductDetailsPage({
                                 {productData.yproddetailstech}
                             </div>
 
-                            {/* Color Selection */}
-                            {availableColors.length > 0 && (
+                            {/* Color Selection - Only for Regular Products */}
+                            {!isJewelryProduct && availableColors.length > 0 && (
                                 <div className="mb-6">
-                                    <h3 className="font-recia mb-3 text-lg font-semibold text-[#053340] flex items-center">
+                                    <h3 className="font-recia mb-3 text-lg font-semibold text-[#053340]">
                                         {t('productDetails.color') || 'Color'}
-                                        {selectedColorId === 0 && (
-                                            <span className="ml-2 text-sm font-normal text-gray-500 italic">
-                                                (Aucune couleur sélectionnée)
-                                            </span>
-                                        )}
                                     </h3>
                                     <div className="flex flex-wrap gap-3">
-                                        {availableColors.map((color) => {
-                                            const isCurrentVariantColor = selectedVariant?.xcouleur?.xcouleurid === color.xcouleurid
-                                            const isSelectedColor = selectedColorId === color.xcouleurid
-                                            
-                                            return (
-                                                <button
-                                                    key={color.xcouleurid}
-                                                    onClick={() => {
-                                                        if (color.isCompatible) {
-                                                            handleColorChange(color.xcouleurid)
-                                                        }
-                                                    }}
-                                                    disabled={!color.isCompatible}
-                                                    className={`group relative h-12 w-12 rounded-full border-2 transition-all duration-300 ${
-                                                        isSelectedColor
-                                                            ? 'scale-110 border-[#053340] shadow-lg ring-2 ring-[#053340] ring-offset-2'
-                                                            : isCurrentVariantColor
-                                                            ? 'border-[#053340] ring-2 ring-blue-400 ring-offset-1 shadow-md'
-                                                            : color.isCompatible
-                                                            ? 'border-gray-300 hover:scale-105 hover:border-gray-400 hover:shadow-md'
-                                                            : 'border-gray-200 opacity-40 cursor-not-allowed'
-                                                    }`}
-                                                    style={{
-                                                        backgroundColor: color.isCompatible 
-                                                            ? color.xcouleurhexa 
-                                                            : `${color.xcouleurhexa}80`,
-                                                    }}
-                                                    title={color.isCompatible 
-                                                        ? `${color.xcouleurintitule}${isCurrentVariantColor ? ' (Variante actuelle)' : ''}` 
-                                                        : `${color.xcouleurintitule} (Non disponible)`
-                                                    }
+                                        {availableColors.map((color) => (
+                                            <button
+                                                key={color.xcouleurid}
+                                                onClick={() =>
+                                                    handleColorChange(
+                                                        color.xcouleurid
+                                                    )
+                                                }
+                                                className={`group relative h-12 w-12 rounded-full border-2 transition-all duration-300 ${
+                                                    selectedColorId ===
+                                                    color.xcouleurid
+                                                        ? 'scale-110 border-[#053340] shadow-lg'
+                                                        : 'border-gray-300 hover:scale-105 hover:border-gray-400'
+                                                }`}
+                                                style={{
+                                                    backgroundColor:
+                                                        color.xcouleurhexa,
+                                                }}
+                                                title={color.xcouleurintitule}
                                             >
                                                 {selectedColorId ===
                                                     color.xcouleurid && (
@@ -1108,108 +995,101 @@ export function ProductDetailsPage({
                                                     </div>
                                                 )}
                                             </button>
-                                            )
-                                        })}
+                                        ))}
                                     </div>
                                 </div>
                             )}
 
-                            {/* Size Selection */}
-                            {availableSizes.length > 0 && (
+                            {/* Size Selection - Only for Regular Products */}
+                            {!isJewelryProduct && availableSizes.length > 0 && (
                                 <div className="mb-6">
-                                    <h3 className="font-recia mb-3 text-lg font-semibold text-[#053340] flex items-center">
+                                    <h3 className="font-recia mb-3 text-lg font-semibold text-[#053340]">
                                         {t('productDetails.size') || 'Size'}
-                                        {selectedSizeId === 0 && (
-                                            <span className="ml-2 text-sm font-normal text-gray-500 italic">
-                                                (Aucune taille sélectionnée)
-                                            </span>
-                                        )}
                                     </h3>
                                     <div className="flex flex-wrap gap-2">
-                                        {availableSizes.map((size) => {
-                                            const isCurrentVariantSize = selectedVariant?.xtaille?.xtailleid === size.xtailleid
-                                            const isSelectedSize = selectedSizeId === size.xtailleid
-                                            
-                                            return (
-                                                <button
-                                                    key={size.xtailleid}
-                                                    onClick={() => {
-                                                        if (size.isCompatible) {
-                                                            handleSizeChange(size.xtailleid)
-                                                        }
-                                                    }}
-                                                    disabled={!size.isCompatible}
-                                                    className={`font-supreme rounded-lg border-2 px-4 py-2 transition-all duration-300 ${
-                                                        isSelectedSize
-                                                            ? 'border-[#053340] bg-[#053340] text-white shadow-lg ring-2 ring-[#053340] ring-offset-2'
-                                                            : isCurrentVariantSize
-                                                            ? 'border-[#053340] text-[#053340] shadow-md ring-2 ring-blue-400 ring-offset-1'
-                                                            : size.isCompatible
-                                                            ? 'border-gray-300 text-gray-600 hover:border-[#053340] hover:text-[#053340] hover:shadow-md'
-                                                            : 'border-gray-200 text-gray-400 bg-gray-50 cursor-not-allowed opacity-50'
-                                                    }`}
-                                                    title={size.isCompatible 
-                                                        ? `${size.xtailleintitule}${isCurrentVariantSize ? ' (Variante actuelle)' : ''}` 
-                                                        : `${size.xtailleintitule} (Non disponible)`
-                                                    }
+                                        {availableSizes.map((size) => (
+                                            <button
+                                                key={size.xtailleid}
+                                                onClick={() =>
+                                                    handleSizeChange(
+                                                        size.xtailleid
+                                                    )
+                                                }
+                                                className={`font-supreme rounded-lg border px-4 py-2 transition-all duration-300 ${
+                                                    selectedSizeId ===
+                                                    size.xtailleid
+                                                        ? 'border-[#053340] bg-[#053340] text-white'
+                                                        : 'border-gray-300 text-gray-600 hover:border-gray-400 hover:text-[#053340]'
+                                                }`}
                                             >
                                                 {size.xtailleintitule}
-                                                </button>
-                                            )
-                                        })}
+                                            </button>
+                                        ))}
                                     </div>
                                 </div>
                             )}
 
-                            {/* Characteristics Selection */}
-                            {(() => {
-                                console.log('Rendering characteristics section, availableCharacteristics:', availableCharacteristics)
-                                console.log('availableCharacteristics.length:', availableCharacteristics.length)
-                                return null
-                            })()}
-                            {availableCharacteristics.length > 0 && (
+                            {/* Jewelry Type Selection */}
+                            {isJewelryProduct && (
                                 <div className="mb-6">
-                                    <h3 className="font-recia mb-3 text-lg font-semibold text-[#053340] flex items-center">
-                                        {t('productDetails.characteristics') || 'Caractéristiques'}
-                                        {!selectedCharacteristic && (
-                                            <span className="ml-2 text-sm font-normal text-gray-500 italic">
-                                                (Aucune caractéristique sélectionnée)
-                                            </span>
-                                        )}
+                                    <h3 className="font-recia mb-3 text-lg font-semibold text-[#053340]">
+                                        {t('productDetails.jewelryType') || 'Jewelry Type'}
                                     </h3>
-                                    <div className="flex flex-wrap gap-2">
-                                        {availableCharacteristics.map((characteristic) => {
-                                            const isCurrentVariantCharacteristic = selectedVariant?.yvarprodcaract === characteristic.value
-                                            const isSelectedCharacteristic = selectedCharacteristic === characteristic.value
-                                            
-                                            return (
+                                    {availableJewelryTypes.length > 0 ? (
+                                        <div className="flex flex-wrap gap-2">
+                                            {availableJewelryTypes.map((type) => (
                                                 <button
-                                                    key={characteristic.value}
-                                                    onClick={() => {
-                                                        if (characteristic.isCompatible) {
-                                                            handleCharacteristicChange(characteristic.value)
-                                                        }
-                                                    }}
-                                                    disabled={!characteristic.isCompatible}
-                                                    className={`font-supreme rounded-lg border-2 px-4 py-2 transition-all duration-300 ${
-                                                        isSelectedCharacteristic
-                                                            ? 'border-[#053340] bg-[#053340] text-white shadow-lg ring-2 ring-[#053340] ring-offset-2'
-                                                            : isCurrentVariantCharacteristic
-                                                            ? 'border-[#053340] text-[#053340] shadow-md ring-2 ring-blue-400 ring-offset-1'
-                                                            : characteristic.isCompatible
-                                                            ? 'border-gray-300 text-gray-600 hover:border-[#053340] hover:text-[#053340] hover:shadow-md'
-                                                            : 'border-gray-200 text-gray-400 bg-gray-50 cursor-not-allowed opacity-50'
-                                                    }`}
-                                                    title={characteristic.isCompatible 
-                                                        ? `${characteristic.value}${isCurrentVariantCharacteristic ? ' (Variante actuelle)' : ''}` 
-                                                        : `${characteristic.value} (Non disponible)`
+                                                    key={type}
+                                                    onClick={() =>
+                                                        handleJewelryTypeChange(type)
                                                     }
+                                                    className={`font-supreme rounded-lg border px-4 py-2 transition-all duration-300 ${
+                                                        selectedJewelryType === type
+                                                            ? 'border-[#053340] bg-[#053340] text-white'
+                                                            : 'border-gray-300 text-gray-600 hover:border-gray-400 hover:text-[#053340]'
+                                                    }`}
                                                 >
-                                                    {characteristic.value}
+                                                    {type}
                                                 </button>
-                                            )
-                                        })}
-                                    </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <div className="text-sm text-gray-500 italic">
+                                            No jewelry types available in variants
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Material Selection */}
+                            {isJewelryProduct && (
+                                <div className="mb-6">
+                                    <h3 className="font-recia mb-3 text-lg font-semibold text-[#053340]">
+                                        {t('productDetails.materials') || 'Materials'}
+                                    </h3>
+                                    {availableMaterials.length > 0 ? (
+                                        <div className="flex flex-wrap gap-2">
+                                            {availableMaterials.map((material) => (
+                                                <button
+                                                    key={material}
+                                                    onClick={() =>
+                                                        handleMaterialChange(material)
+                                                    }
+                                                    className={`font-supreme rounded-lg border px-4 py-2 transition-all duration-300 ${
+                                                        selectedMaterial === material
+                                                            ? 'border-[#053340] bg-[#053340] text-white'
+                                                            : 'border-gray-300 text-gray-600 hover:border-gray-400 hover:text-[#053340]'
+                                                    }`}
+                                                >
+                                                    {material}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <div className="text-sm text-gray-500 italic">
+                                            No materials available in variants
+                                        </div>
+                                    )}
                                 </div>
                             )}
 
@@ -1260,11 +1140,23 @@ export function ProductDetailsPage({
                                                 : ''
                                         }`}
                                     >
-                                        <span className="flex items-center justify-center gap-2 fill-white">
+                                        <span className="flex items-center justify-center">
                                             {addToCartMutation.isPending ? (
                                                 <div className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
                                             ) : (
-                                               <CartIcon/>
+                                                <svg
+                                                    className="mr-2 h-5 w-5"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    viewBox="0 0 24 24"
+                                                >
+                                                    <path
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        strokeWidth={2}
+                                                        d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                                                    />
+                                                </svg>
                                             )}
                                             {addToCartMutation.isPending
                                                 ? 'Adding...'
