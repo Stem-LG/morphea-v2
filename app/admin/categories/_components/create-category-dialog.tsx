@@ -6,8 +6,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Tag, Save, X, Upload, Image as ImageIcon, Palette, Ruler } from 'lucide-react'
+
+import { Tag, Save, X, Upload, Image as ImageIcon } from 'lucide-react'
 import { toast } from 'sonner'
 import {
     Credenza,
@@ -30,8 +30,6 @@ interface CategoryFormData {
     xcategprodcode: string
     xcategprodinfobulle: string
     xcategparentid: number | null
-    xcategcolobl: boolean
-    xcategtailleobl: boolean
     imageFile?: File
 }
 
@@ -59,8 +57,6 @@ export function CreateCategoryDialog({
         xcategprodcode: '',
         xcategprodinfobulle: '',
         xcategparentid: defaultParentId,
-        xcategcolobl: false,
-        xcategtailleobl: false,
     })
     const [imagePreview, setImagePreview] = useState<string | null>(null)
 
@@ -72,8 +68,6 @@ export function CreateCategoryDialog({
             xcategprodcode: '',
             xcategprodinfobulle: '',
             xcategparentid: defaultParentId,
-            xcategcolobl: false,
-            xcategtailleobl: false,
         })
         setImagePreview(null)
     }
@@ -142,8 +136,6 @@ export function CreateCategoryDialog({
                 xcategprodcode: '',
                 xcategprodinfobulle: '',
                 xcategparentid: defaultParentId,
-                xcategcolobl: false,
-                xcategtailleobl: false,
             })
         }
         setIsOpen(open)
@@ -226,44 +218,6 @@ export function CreateCategoryDialog({
                                 required
                                 disabled={createCategoryMutation.isPending}
                             />
-                        </div>
-
-                        {/* Boolean Fields */}
-                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                            <div className="flex items-center space-x-2">
-                                <Checkbox
-                                    id="xcategcolobl"
-                                    checked={formData.xcategcolobl}
-                                    onCheckedChange={(checked) =>
-                                        setFormData((prev) => ({
-                                            ...prev,
-                                            xcategcolobl: !!checked,
-                                        }))
-                                    }
-                                    disabled={createCategoryMutation.isPending}
-                                />
-                                <Label htmlFor="xcategcolobl" className="text-gray-700 flex items-center gap-2">
-                                    <Palette className="h-4 w-4" />
-                                    {t('admin.categories.colorMandatory')}
-                                </Label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                                <Checkbox
-                                    id="xcategtailleobl"
-                                    checked={formData.xcategtailleobl}
-                                    onCheckedChange={(checked) =>
-                                        setFormData((prev) => ({
-                                            ...prev,
-                                            xcategtailleobl: !!checked,
-                                        }))
-                                    }
-                                    disabled={createCategoryMutation.isPending}
-                                />
-                                <Label htmlFor="xcategtailleobl" className="text-gray-700 flex items-center gap-2">
-                                    <Ruler className="h-4 w-4" />
-                                    {t('admin.categories.sizeMandatory')}
-                                </Label>
-                            </div>
                         </div>
 
                         {/* Category Image Upload */}

@@ -747,7 +747,16 @@ export const enTranslations = {
       "colorRequired": "Color is required for this category",
       "sizeRequired": "Size is required for this category",
       "characteristics": "Characteristics",
-      "characteristicsPlaceholder": "Enter product characteristics..."
+      "characteristicsPlaceholder": "Enter product characteristics...",
+      "isJewelry": "Is Jewelry Item",
+      "jewelryProductHelp": "Toggle if this product is jewelry",
+      "checkIfJewelry": "Check if this is a jewelry item",
+      "jewelryType": "Jewelry Type",
+      "jewelryTypePlaceholder": "e.g. Ring, Necklace, Bracelet...",
+      "materials": "Materials",
+      "materialsPlaceholder": "e.g. Gold, Silver, Platinum...",
+      "jewelryTypeRequired": "Jewelry type is required for jewelry items",
+      "materialsRequired": "Materials are required for jewelry items"
     },
     "productView": {
       "productDetails": "Product Details",
@@ -1277,6 +1286,8 @@ export const enTranslations = {
     "variant": "Variant",
     "color": "Color",
     "size": "Size",
+    "jewelryType": "Jewelry Type",
+    "materials": "Materials",
     "characteristics": "Characteristics",
     "view": "View",
     "deliveryIn": "Delivery in",

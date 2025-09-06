@@ -135,7 +135,6 @@ interface ProductCardProps {
             yvarprodprixcatalogue: number
             yvarprodprixpromotion: number | null
             xdeviseidfk: number | null
-            yvarprodcaract?: string | null
             xcouleur?: {
                 xcouleurhexa: string
                 xcouleurintitule: string
@@ -165,7 +164,6 @@ export function ProductCard({
     const { t } = useLanguage()
     const [imageError, setImageError] = useState(false)
     const [hoveredColor, setHoveredColor] = useState<string | null>(null)
-    const [hoveredCharacteristic, setHoveredCharacteristic] = useState<string | null>(null)
     const [isImageHovered, setIsImageHovered] = useState(false)
     const [showSparks, setShowSparks] = useState(false)
 
@@ -184,13 +182,6 @@ export function ProductCard({
         if (hoveredColor) {
             return product.yvarprod.find(
                 (v) => v.xcouleur?.xcouleurhexa === hoveredColor
-            ) || firstVariant;
-        }
-        
-        // If hovering over characteristic, prioritize characteristic-based selection
-        if (hoveredCharacteristic) {
-            return product.yvarprod.find(
-                (v) => v.yvarprodcaract === hoveredCharacteristic
             ) || firstVariant;
         }
         
@@ -259,43 +250,16 @@ export function ProductCard({
                         hex: colorHex,
                         name: variant.xcouleur.xcouleurintitule,
                         hasSize: !!variant.xtaille?.xtailleid,
-                        hasCharacteristics: !!(variant.yvarprodcaract?.trim()),
                         variantCount: 1
                     })
                 } else {
                     existingColor.variantCount++
                     if (variant.xtaille?.xtailleid) existingColor.hasSize = true
-                    if (variant.yvarprodcaract?.trim()) existingColor.hasCharacteristics = true
                 }
             }
             return acc
         },
-        [] as Array<{ hex: string; name: string; hasSize: boolean; hasCharacteristics: boolean; variantCount: number }>
-    )
-
-    // Get unique characteristics with availability info
-    const uniqueCharacteristics = product.yvarprod?.reduce(
-        (acc, variant) => {
-            if (variant.yvarprodcaract && variant.yvarprodcaract.trim()) {
-                const characteristic = variant.yvarprodcaract.trim()
-                const existing = acc.find(c => c.value === characteristic)
-                
-                if (!existing) {
-                    acc.push({
-                        value: characteristic,
-                        hasColor: !!(variant.xcouleur?.xcouleurhexa),
-                        hasSize: !!(variant.xtaille?.xtailleid),
-                        variantCount: 1
-                    })
-                } else {
-                    existing.variantCount++
-                    if (variant.xcouleur?.xcouleurhexa) existing.hasColor = true
-                    if (variant.xtaille?.xtailleid) existing.hasSize = true
-                }
-            }
-            return acc
-        },
-        [] as Array<{ value: string; hasColor: boolean; hasSize: boolean; variantCount: number }>
+        [] as Array<{ hex: string; name: string; hasSize: boolean; variantCount: number }>
     )
     
     // Get unique sizes with availability info
@@ -310,18 +274,16 @@ export function ProductCard({
                         id: sizeId,
                         name: variant.xtaille.xtailleintitule,
                         hasColor: !!(variant.xcouleur?.xcouleurhexa),
-                        hasCharacteristics: !!(variant.yvarprodcaract?.trim()),
                         variantCount: 1
                     })
                 } else {
                     existing.variantCount++
                     if (variant.xcouleur?.xcouleurhexa) existing.hasColor = true
-                    if (variant.yvarprodcaract?.trim()) existing.hasCharacteristics = true
                 }
             }
             return acc
         },
-        [] as Array<{ id: number; name: string; hasColor: boolean; hasCharacteristics: boolean; variantCount: number }>
+        [] as Array<{ id: number; name: string; hasColor: boolean; variantCount: number }>
     )
 
     // Handle wishlist actions
@@ -402,7 +364,7 @@ export function ProductCard({
                                                     onMouseLeave={() => setHoveredColor(null)}
                                                 >
                                                     {/* Small indicators for additional options */}
-                                                    {(color.hasSize || color.hasCharacteristics) && (
+                                                    {color.hasSize && (
                                                         <div className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-morpheus-gold-light border border-white"></div>
                                                     )}
                                                 </div>
@@ -412,36 +374,6 @@ export function ProductCard({
                                                 +{uniqueColors.length - 5}
                                             </span>
                                         )}
-                                    </div>
-                                )}
-
-                                {/* Characteristics */}
-                                {uniqueCharacteristics && uniqueCharacteristics.length > 0 && (
-                                    <div className="mt-3">
-                                        <p className="text-xs text-gray-500 mb-1">Characteristics:</p>
-                                        <div className="flex flex-wrap gap-1">
-                                            {uniqueCharacteristics
-                                                .slice(0, 3)
-                                                .map((characteristic, idx) => (
-                                                    <span
-                                                        key={idx}
-                                                        className="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded-md cursor-pointer transition-all duration-200 hover:bg-morpheus-gold-light/20 hover:text-morpheus-gold-dark"
-                                                        title={characteristic.value}
-                                                        onMouseEnter={() => setHoveredCharacteristic(characteristic.value)}
-                                                        onMouseLeave={() => setHoveredCharacteristic(null)}
-                                                    >
-                                                        {characteristic.value.length > 15 ? `${characteristic.value.substring(0, 15)}...` : characteristic.value}
-                                                        {characteristic.variantCount > 1 && (
-                                                            <span className="ml-1 text-xs text-gray-500">({characteristic.variantCount})</span>
-                                                        )}
-                                                    </span>
-                                                ))}
-                                            {uniqueCharacteristics.length > 3 && (
-                                                <span className="text-morpheus-gold-light/70 ml-1 self-center text-xs">
-                                                    +{uniqueCharacteristics.length - 3}
-                                                </span>
-                                            )}
-                                        </div>
                                     </div>
                                 )}
 
@@ -658,7 +590,7 @@ export function ProductCard({
                                     onMouseLeave={() => setHoveredColor(null)}
                                 >
                                     {/* Small indicators for additional options */}
-                                    {(color.hasSize || color.hasCharacteristics) && (
+                                    {color.hasSize && (
                                         <div className="absolute -top-0.5 -right-0.5 h-1.5 w-1.5 rounded-full bg-morpheus-gold-light border border-white"></div>
                                     )}
                                 </div>
@@ -671,34 +603,6 @@ export function ProductCard({
                     </div>
                 )}
 
-                {/* Characteristics */}
-                {uniqueCharacteristics && uniqueCharacteristics.length > 0 && (
-                    <div className="mt-2">
-                        <div className="flex flex-wrap justify-center gap-1">
-                            {uniqueCharacteristics
-                                .slice(0, 2)
-                                .map((characteristic, idx) => (
-                                    <span
-                                        key={idx}
-                                        className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-md cursor-pointer transition-all duration-200 hover:bg-morpheus-gold-light/20 hover:text-morpheus-gold-dark"
-                                        title={characteristic.value}
-                                        onMouseEnter={() => setHoveredCharacteristic(characteristic.value)}
-                                        onMouseLeave={() => setHoveredCharacteristic(null)}
-                                    >
-                                        {characteristic.value.length > 10 ? `${characteristic.value.substring(0, 10)}...` : characteristic.value}
-                                        {characteristic.variantCount > 1 && (
-                                            <span className="ml-1 text-xs opacity-70">({characteristic.variantCount})</span>
-                                        )}
-                                    </span>
-                                ))}
-                            {uniqueCharacteristics.length > 2 && (
-                                <span className="text-xs text-gray-500 self-center">
-                                    +{uniqueCharacteristics.length - 2}
-                                </span>
-                            )}
-                        </div>
-                    </div>
-                )}
             </div>
         </div>
     )

@@ -14,7 +14,9 @@ interface ProductVariant {
     code?: string;
     colorId: number;
     sizeId: number;
-    yvarprodcaract?: string | null; // Product characteristics
+    // Jewelry fields - used when product is jewelry
+    yvarprodtypebijoux?: string | null; // Type of jewelry
+    yvarprodmatrieaux?: string | null; // Materials used
     images: File[];
     videos: File[];
     models3d: File[];
@@ -31,6 +33,7 @@ interface CreateProductParams {
     shortDescription: string;
     fullDescription: string;
     infospotactionId?: number;
+    isJewelryProduct?: boolean; // Explicit jewelry flag from UI
     variants: ProductVariant[];
 }
 
@@ -68,6 +71,14 @@ export function useCreateProduct() {
                 // Generate product code if not provided
                 const productCode = productData.productCode || Date.now().toString();
 
+                // Determine if this is a jewelry product
+                // Use explicit flag if provided, otherwise auto-detect from variants
+                const isJewelryProduct = productData.isJewelryProduct !== undefined 
+                    ? productData.isJewelryProduct
+                    : productData.variants.some(variant => 
+                        variant.yvarprodtypebijoux || variant.yvarprodmatrieaux
+                    );
+
                 // Step 1: Create the main product
                 const { data: product, error: productError } = await supabase
                     .schema("morpheus")
@@ -80,6 +91,7 @@ export function useCreateProduct() {
                         xcategprodidfk: productData.categoryId || null,
                         ydesignidfk: productData.designerId,
                         yinfospotactionsidfk: productData.infospotactionId || null,
+                        yprodestbijoux: isJewelryProduct,
                     })
                     .select("*")
                     .single();
@@ -137,25 +149,37 @@ export function useCreateProduct() {
                     // Generate variant code
                     const variantCode = variant.code || `${productCode}-${color?.xcouleurcode || 'C'}-${size?.xtaillecode || 'S'}`;
 
-                    // Create variant
-                    const { data: createdVariant, error: variantError } = await supabase
-                        .schema("morpheus")
-                        .from("yvarprod")
-                        .insert({
-                            yvarprodcode: variantCode,
-                            yvarprodintitule: variant.name,
-                            yvarprodgenre: size?.xtaillecode || 'S', // Set genre to size code as requested
-                            xcouleuridfk: variant.colorId,
-                            xtailleidfk: variant.sizeId,
-                            yvarprodcaract: variant.yvarprodcaract, // Product characteristics
-                            yprodidfk: product.yprodid,
-                            yvarprodnbrjourlivraison: 7, // Default delivery days
-                            yvarprodprixcatalogue: 0, // Default price
-                        })
-                        .select("*")
-                        .single();
+                // Create variant
+                const insertData: any = {
+                    yvarprodcode: variantCode,
+                    yvarprodintitule: variant.name,
+                    yvarprodgenre: size?.xtaillecode || 'S', // Set genre to size code as requested
+                    yprodidfk: product.yprodid,
+                    yvarprodnbrjourlivraison: 7, // Default delivery days
+                    yvarprodprixcatalogue: 0, // Default price
+                };
 
-                    if (variantError) {
+                // Handle color/size vs jewelry fields based on product type
+                if (isJewelryProduct) {
+                    // For jewelry products, set color/size to null and use jewelry fields
+                    insertData.xcouleuridfk = null;
+                    insertData.xtailleidfk = null;
+                    insertData.yvarprodtypebijoux = variant.yvarprodtypebijoux || null;
+                    insertData.yvarprodmatrieaux = variant.yvarprodmatrieaux || null;
+                } else {
+                    // For regular products, use color/size and clear jewelry fields
+                    insertData.xcouleuridfk = variant.colorId;
+                    insertData.xtailleidfk = variant.sizeId;
+                    insertData.yvarprodtypebijoux = null;
+                    insertData.yvarprodmatrieaux = null;
+                }
+
+                const { data: createdVariant, error: variantError } = await supabase
+                    .schema("morpheus")
+                    .from("yvarprod")
+                    .insert(insertData)
+                    .select("*")
+                    .single();                    if (variantError) {
                         throw new Error(`Failed to create variant: ${variantError.message}`);
                     }
 

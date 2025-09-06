@@ -266,8 +266,8 @@ export function useShopProducts({
                 ...product,
                 yvarprod: product.yvarprod?.filter((v: any) => {
                     const isApproved = v.yvarprodstatut === "approved";
-                    const matchesColor = !colorId || v.xcouleur.xcouleurid === colorId;
-                    const matchesSize = !sizeId || v.xtaille.xtailleid === sizeId;
+                    const matchesColor = !colorId || v.xcouleur?.xcouleurid === colorId;
+                    const matchesSize = !sizeId || v.xtaille?.xtailleid === sizeId;
 
                     // Price filtering with currency conversion
                     let matchesMinPrice = true;
@@ -424,6 +424,7 @@ export function useShopProductsInfinite({
                     yproddetailstech,
                     yprodinfobulle,
                     yprodstatut,
+                    yprodestbijoux,
                     yestvisible,
                     xcategprodidfk,
                     xcategprod:xcategprodidfk (
@@ -446,7 +447,8 @@ export function useShopProductsInfinite({
                         yvarprodpromotiondatefin,
                         yvarprodnbrjourlivraison,
                         yvarprodstatut,
-                        yvarprodcaract,
+                        yvarprodtypebijoux,
+                        yvarprodmatrieaux,
                         xdeviseidfk,
                         xcouleur:xcouleuridfk (
                             xcouleurid,
@@ -562,8 +564,8 @@ export function useShopProductsInfinite({
                 ...product,
                 yvarprod: product.yvarprod?.filter(variant => {
                     const isApproved = variant.yvarprodstatut === "approved";
-                    const matchesColor = !colorId || variant.xcouleur.xcouleurid === colorId;
-                    const matchesSize = !sizeId || variant.xtaille.xtailleid === sizeId;
+                    const matchesColor = !colorId || variant.xcouleur?.xcouleurid === colorId;
+                    const matchesSize = !sizeId || variant.xtaille?.xtailleid === sizeId;
 
                     // Price filtering with currency conversion
                     let matchesMinPrice = true;
