@@ -965,7 +965,7 @@ export default function VirtualTour({
             )}
 
             {/* Scene information overlay */}
-            <div className="absolute top-4 left-4 z-10 rounded-lg bg-black/70 px-4 py-2 text-white">
+            <div className="absolute top-4 left-4 z-10 rounded-lg bg-black/20 px-4 py-2 text-white font-light">
                 <h3 className="font-supreme">
                     {
                         tourData.scenes.find(

@@ -189,6 +189,25 @@ function VariantCard({ variant, onApprove, onReject, isLoading, eventStartDate, 
             return data;
         },
     });
+
+    // Update selectedCurrencyId to default to pivot currency when currencies load
+    useEffect(() => {
+        if (currencies && currencies.length > 0) {
+            // Find the pivot currency (xispivot = true)
+            const pivotCurrency = currencies.find(currency => currency.xispivot === true);
+            
+            // Only update to pivot currency if:
+            // 1. We found a pivot currency
+            // 2. Current selection matches the initial variant currency or default (1)
+            // 3. Current selection is not already the pivot currency
+            if (pivotCurrency && 
+                selectedCurrencyId !== pivotCurrency.xdeviseid &&
+                (selectedCurrencyId === (variant.xdeviseidfk || 1) || selectedCurrencyId === 1)) {
+                setSelectedCurrencyId(pivotCurrency.xdeviseid);
+            }
+        }
+    }, [currencies, variant.xdeviseidfk]);
+
     // Extract media data directly from the variant object (already loaded in main query)
     const models3d = variant.yobjet3d?.map((obj) => obj.yobjet3durl) || [];
     const allMedia = variant.yvarprodmedia?.map((media) => media.ymedia).filter(Boolean) || [];
