@@ -119,6 +119,7 @@ export const frTranslations = {
     "securePayment": "Paiement Sécurisé"
   },
   "admin": {
+    "hidden": "Masqué",
     "dashboard": "Tableau de bord",
     "products": "Produits",
     "management": "Gestion",

@@ -403,6 +403,9 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
         if (field === 'backgroundColor') {
             console.log(`Background color changed for variant ${variantId}: ${value}`);
         }
+        if (field === 'yvarprodcaract') {
+            console.log(`Characteristics changed for variant ${variantId}: "${value}" (type: ${typeof value})`);
+        }
         setVariants(variants.map((v) => (v.id === variantId ? { ...v, [field]: value } : v)));
     };
 
@@ -689,6 +692,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                 // Create new product
                 const createVariants = variants.map((v) => {
                     const normalizedBgColor = normalizeBackgroundColor(v.backgroundColor);
+                    console.log(`Creating variant "${v.name}" with characteristics: "${v.yvarprodcaract}" (type: ${typeof v.yvarprodcaract})`);
                     return {
                         name: v.name,
                         code: v.code,
@@ -703,8 +707,9 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                     };
                 });
                 
-                console.log("Creating variants with background colors:", createVariants.map(v => ({
+                console.log("Creating variants with characteristics and background colors:", createVariants.map(v => ({
                     name: v.name,
+                    yvarprodcaract: v.yvarprodcaract,
                     backgroundColor: v.backgroundColor
                 })));
                 
@@ -789,6 +794,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
             code: variant.code,
             colorId: variant.colorId!,
             sizeId: variant.sizeId!,
+            yvarprodcaract: variant.yvarprodcaract,
             images: variant.images,
             videos: variant.videos,
             models3d: formattedModels3d,
@@ -1306,13 +1312,14 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                             </Label>
                                                             <Input
                                                                 value={variant.yvarprodcaract || ""}
-                                                                onChange={(e) =>
+                                                                onChange={(e) => {
+                                                                    console.log("Characteristics input changed:", e.target.value);
                                                                     handleVariantChange(
                                                                         variant.id,
                                                                         "yvarprodcaract",
-                                                                        e.target.value || null
+                                                                        e.target.value.trim() || null
                                                                     )
-                                                                }
+                                                                }}
                                                                 placeholder={t("admin.createProduct.characteristicsPlaceholder") || "Enter product characteristics..."}
                                                                 className="mt-1 bg-white border-gray-300 text-gray-900"
                                                                 disabled={!canEdit}

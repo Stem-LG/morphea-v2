@@ -118,6 +118,7 @@ export const enTranslations = {
     "securePayment": "Secure Payment"
   },
   "admin": {
+    "hidden": "Hidden",
     "dashboard": "Dashboard",
     "products": "Products",
     "management": "Management",

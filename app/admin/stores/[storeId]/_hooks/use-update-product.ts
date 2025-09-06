@@ -13,6 +13,7 @@ interface ProductVariant {
     code?: string;
     colorId: number;
     sizeId: number;
+    yvarprodcaract?: string | null; // Product characteristics
     images: (File | { ymediaid: number; ymediaurl: string; ymediaintitule: string })[];
     videos: (File | { ymediaid: number; ymediaurl: string; ymediaintitule: string })[];
     models3d: (File | { yobjet3did: number; yobjet3durl: string })[];
@@ -152,6 +153,7 @@ export function useUpdateProduct() {
             yvarprodgenre: size?.xtaillecode || 'S',
             xcouleuridfk: variant.colorId,
             xtailleidfk: variant.sizeId,
+            yvarprodcaract: variant.yvarprodcaract, // Product characteristics
             yprodidfk: productId,
             yvarprodnbrjourlivraison: 7,
             yvarprodprixcatalogue: variant.catalogPrice || 0,
@@ -191,6 +193,7 @@ export function useUpdateProduct() {
             yvarprodcode: variant.code,
             xcouleuridfk: variant.colorId,
             xtailleidfk: variant.sizeId,
+            yvarprodcaract: variant.yvarprodcaract, // Product characteristics
         };
 
         // Add pricing data if provided
