@@ -63,10 +63,10 @@ export function ProfileInfoDisplay({ user }: ProfileInfoDisplayProps) {
                 </div>
 
                 {/* First Name */}
-                {user.user_metadata?.full_name && (() => {
-                    const fullName = user.user_metadata.full_name.trim();
-                    const nameParts = fullName.split(' ');
-                    const firstName = nameParts[0] || '';
+                {(() => {
+                    // Check for new firstName field first, then fall back to parsing full_name
+                    const firstName = user.user_metadata?.firstName || 
+                        (user.user_metadata?.full_name ? user.user_metadata.full_name.trim().split(' ')[0] : null);
                     
                     return firstName ? (
                         <div className="space-y-2">
@@ -98,10 +98,10 @@ export function ProfileInfoDisplay({ user }: ProfileInfoDisplayProps) {
                 })()}
 
                 {/* Last Name */}
-                {user.user_metadata?.full_name && (() => {
-                    const fullName = user.user_metadata.full_name.trim();
-                    const nameParts = fullName.split(' ');
-                    const lastName = nameParts.slice(1).join(' ') || '';
+                {(() => {
+                    // Check for new lastName field first, then fall back to parsing full_name
+                    const lastName = user.user_metadata?.lastName || 
+                        (user.user_metadata?.full_name ? user.user_metadata.full_name.trim().split(' ').slice(1).join(' ') : null);
                     
                     return lastName ? (
                         <div className="space-y-2">

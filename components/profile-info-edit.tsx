@@ -15,7 +15,6 @@ interface ProfileInfoEditProps {
 }
 
 interface ProfileUpdateData {
-    name?: string // For backend compatibility
     firstName?: string
     lastName?: string
     email?: string
@@ -37,16 +36,22 @@ export function ProfileInfoEdit({
 
     // Form state
     const [formData, setFormData] = useState<ProfileUpdateData>(() => {
-        const fullName = user.user_metadata?.full_name || ''
-        const nameParts = fullName.trim().split(' ')
-        const firstName = nameParts[0] || ''
-        const lastName = nameParts.slice(1).join(' ') || ''
+        // Try to get from separate fields first, fall back to parsing full_name
+        let firstName = user.user_metadata?.firstName || '';
+        let lastName = user.user_metadata?.lastName || '';
+        
+        // If no separate fields exist but full_name does, parse it
+        if (!firstName && !lastName && user.user_metadata?.full_name) {
+            const nameParts = user.user_metadata.full_name.trim().split(' ');
+            firstName = nameParts[0] || '';
+            lastName = nameParts.slice(1).join(' ') || '';
+        }
         
         return {
             firstName,
             lastName,
             email: user.email || '',
-        }
+        };
     })
 
     // Validation state
@@ -55,10 +60,16 @@ export function ProfileInfoEdit({
 
     // Reset form when user changes
     useEffect(() => {
-        const fullName = user.user_metadata?.full_name || ''
-        const nameParts = fullName.trim().split(' ')
-        const firstName = nameParts[0] || ''
-        const lastName = nameParts.slice(1).join(' ') || ''
+        // Try to get from separate fields first, fall back to parsing full_name
+        let firstName = user.user_metadata?.firstName || '';
+        let lastName = user.user_metadata?.lastName || '';
+        
+        // If no separate fields exist but full_name does, parse it
+        if (!firstName && !lastName && user.user_metadata?.full_name) {
+            const nameParts = user.user_metadata.full_name.trim().split(' ');
+            firstName = nameParts[0] || '';
+            lastName = nameParts.slice(1).join(' ') || '';
+        }
         
         setFormData({
             firstName,
@@ -124,11 +135,10 @@ export function ProfileInfoEdit({
         setIsSubmitting(true)
 
         try {
-            // Combine firstName and lastName into name for backend
-            const combinedName = `${formData.firstName?.trim() || ''} ${formData.lastName?.trim() || ''}`.trim()
-            
+            // Save firstName and lastName as separate fields in metadata
             await onSave({
-                name: combinedName,
+                firstName: formData.firstName?.trim() || '',
+                lastName: formData.lastName?.trim() || '',
                 email: formData.email
             })
         } catch (error) {
@@ -140,11 +150,16 @@ export function ProfileInfoEdit({
 
     // Handle cancel
     const handleCancel = () => {
-        // Reset form to original values
-        const fullName = user.user_metadata?.full_name || ''
-        const nameParts = fullName.trim().split(' ')
-        const firstName = nameParts[0] || ''
-        const lastName = nameParts.slice(1).join(' ') || ''
+        // Try to get from separate fields first, fall back to parsing full_name
+        let firstName = user.user_metadata?.firstName || '';
+        let lastName = user.user_metadata?.lastName || '';
+        
+        // If no separate fields exist but full_name does, parse it
+        if (!firstName && !lastName && user.user_metadata?.full_name) {
+            const nameParts = user.user_metadata.full_name.trim().split(' ');
+            firstName = nameParts[0] || '';
+            lastName = nameParts.slice(1).join(' ') || '';
+        }
         
         setFormData({
             firstName,
