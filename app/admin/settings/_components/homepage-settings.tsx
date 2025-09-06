@@ -100,6 +100,26 @@ export function HomepageSettings() {
                 return homeSettings?.collections.image1Url || ''
             case 'homepage_collections_image2_url':
                 return homeSettings?.collections.image2Url || ''
+            case 'homepage_collections_card1_title_en':
+                return homeSettings?.collections.card1?.title.en || ''
+            case 'homepage_collections_card1_title_fr':
+                return homeSettings?.collections.card1?.title.fr || ''
+            case 'homepage_collections_card1_subtitle_en':
+                return homeSettings?.collections.card1?.subtitle.en || ''
+            case 'homepage_collections_card1_subtitle_fr':
+                return homeSettings?.collections.card1?.subtitle.fr || ''
+            case 'homepage_collections_card1_link':
+                return homeSettings?.collections.card1?.link || ''
+            case 'homepage_collections_card2_title_en':
+                return homeSettings?.collections.card2?.title.en || ''
+            case 'homepage_collections_card2_title_fr':
+                return homeSettings?.collections.card2?.title.fr || ''
+            case 'homepage_collections_card2_subtitle_en':
+                return homeSettings?.collections.card2?.subtitle.en || ''
+            case 'homepage_collections_card2_subtitle_fr':
+                return homeSettings?.collections.card2?.subtitle.fr || ''
+            case 'homepage_collections_card2_link':
+                return homeSettings?.collections.card2?.link || ''
             case 'homepage_categories_title_en':
                 return homeSettings?.categories.title.en || ''
             case 'homepage_categories_title_fr':
@@ -299,7 +319,7 @@ export function HomepageSettings() {
     if (isLoading) {
         return (
             <div className="flex items-center justify-center p-8">
-                <Loader2 className="text-blue-600 h-8 w-8 animate-spin" />
+                <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
             </div>
         )
     }
@@ -310,7 +330,12 @@ export function HomepageSettings() {
                 <h2 className="text-2xl font-bold text-gray-900">
                     {t('admin.settings.homepageSettings')}
                 </h2>
-                <Badge variant="secondary" className="bg-gray-100 text-gray-800">{t('admin.settings.dynamic')}</Badge>
+                <Badge
+                    variant="secondary"
+                    className="bg-gray-100 text-gray-800"
+                >
+                    {t('admin.settings.dynamic')}
+                </Badge>
             </div>
 
             <Tabs defaultValue="hero" className="w-full">
@@ -1422,6 +1447,451 @@ export function HomepageSettings() {
                                     <FileDisplay settingKey="homepage_collections_image2_url" />
                                 </div>
                             </div>
+
+                            {/* Collection Card 1 Settings */}
+                            <div className="space-y-4">
+                                <h3 className="text-lg font-semibold text-gray-900">
+                                    Collection Card 1
+                                </h3>
+
+                                {/* Card 1 Titles */}
+                                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                    <div className="space-y-2">
+                                        <Label className="text-gray-900">
+                                            Card 1 Title (English)
+                                        </Label>
+                                        <Input
+                                            value={getCurrentValue(
+                                                'homepage_collections_card1_title_en'
+                                            )}
+                                            onChange={(e) =>
+                                                handleSettingChange(
+                                                    'homepage_collections_card1_title_en',
+                                                    e.target.value
+                                                )
+                                            }
+                                            className="border-gray-300 bg-white text-gray-900"
+                                            placeholder="Autumn Collection"
+                                        />
+                                        <Button
+                                            size="sm"
+                                            onClick={() =>
+                                                handleSaveSetting(
+                                                    'homepage_collections_card1_title_en'
+                                                )
+                                            }
+                                            disabled={
+                                                updateSetting.isPending ||
+                                                editingSettings[
+                                                    'homepage_collections_card1_title_en'
+                                                ] === undefined
+                                            }
+                                            className="bg-morpheus-gold-dark hover:bg-morpheus-gold-light"
+                                        >
+                                            {updateSetting.isPending ? (
+                                                <Loader2 className="h-4 w-4 animate-spin" />
+                                            ) : (
+                                                <Save className="h-4 w-4" />
+                                            )}
+                                            {t('admin.settings.save')}
+                                        </Button>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <Label className="text-gray-900">
+                                            Card 1 Title (French)
+                                        </Label>
+                                        <Input
+                                            value={getCurrentValue(
+                                                'homepage_collections_card1_title_fr'
+                                            )}
+                                            onChange={(e) =>
+                                                handleSettingChange(
+                                                    'homepage_collections_card1_title_fr',
+                                                    e.target.value
+                                                )
+                                            }
+                                            className="border-gray-300 bg-white text-gray-900"
+                                            placeholder="Collection Automne"
+                                        />
+                                        <Button
+                                            size="sm"
+                                            onClick={() =>
+                                                handleSaveSetting(
+                                                    'homepage_collections_card1_title_fr'
+                                                )
+                                            }
+                                            disabled={
+                                                updateSetting.isPending ||
+                                                editingSettings[
+                                                    'homepage_collections_card1_title_fr'
+                                                ] === undefined
+                                            }
+                                            className="bg-morpheus-gold-dark hover:bg-morpheus-gold-light"
+                                        >
+                                            {updateSetting.isPending ? (
+                                                <Loader2 className="h-4 w-4 animate-spin" />
+                                            ) : (
+                                                <Save className="h-4 w-4" />
+                                            )}
+                                            {t('admin.settings.save')}
+                                        </Button>
+                                    </div>
+                                </div>
+
+                                {/* Card 1 Subtitles */}
+                                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                    <div className="space-y-2">
+                                        <Label className="text-gray-900">
+                                            Card 1 Subtitle (English)
+                                        </Label>
+                                        <Input
+                                            value={getCurrentValue(
+                                                'homepage_collections_card1_subtitle_en'
+                                            )}
+                                            onChange={(e) =>
+                                                handleSettingChange(
+                                                    'homepage_collections_card1_subtitle_en',
+                                                    e.target.value
+                                                )
+                                            }
+                                            className="border-gray-300 bg-white text-gray-900"
+                                            placeholder="Discover the latest trends"
+                                        />
+                                        <Button
+                                            size="sm"
+                                            onClick={() =>
+                                                handleSaveSetting(
+                                                    'homepage_collections_card1_subtitle_en'
+                                                )
+                                            }
+                                            disabled={
+                                                updateSetting.isPending ||
+                                                editingSettings[
+                                                    'homepage_collections_card1_subtitle_en'
+                                                ] === undefined
+                                            }
+                                            className="bg-morpheus-gold-dark hover:bg-morpheus-gold-light"
+                                        >
+                                            {updateSetting.isPending ? (
+                                                <Loader2 className="h-4 w-4 animate-spin" />
+                                            ) : (
+                                                <Save className="h-4 w-4" />
+                                            )}
+                                            {t('admin.settings.save')}
+                                        </Button>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <Label className="text-gray-900">
+                                            Card 1 Subtitle (French)
+                                        </Label>
+                                        <Input
+                                            value={getCurrentValue(
+                                                'homepage_collections_card1_subtitle_fr'
+                                            )}
+                                            onChange={(e) =>
+                                                handleSettingChange(
+                                                    'homepage_collections_card1_subtitle_fr',
+                                                    e.target.value
+                                                )
+                                            }
+                                            className="border-gray-300 bg-white text-gray-900"
+                                            placeholder="Découvrez les dernières tendances"
+                                        />
+                                        <Button
+                                            size="sm"
+                                            onClick={() =>
+                                                handleSaveSetting(
+                                                    'homepage_collections_card1_subtitle_fr'
+                                                )
+                                            }
+                                            disabled={
+                                                updateSetting.isPending ||
+                                                editingSettings[
+                                                    'homepage_collections_card1_subtitle_fr'
+                                                ] === undefined
+                                            }
+                                            className="bg-morpheus-gold-dark hover:bg-morpheus-gold-light"
+                                        >
+                                            {updateSetting.isPending ? (
+                                                <Loader2 className="h-4 w-4 animate-spin" />
+                                            ) : (
+                                                <Save className="h-4 w-4" />
+                                            )}
+                                            {t('admin.settings.save')}
+                                        </Button>
+                                    </div>
+                                </div>
+
+                                {/* Card 1 Link */}
+                                <div className="space-y-2">
+                                    <Label className="text-gray-900">
+                                        Card 1 Link
+                                    </Label>
+                                    <Input
+                                        value={getCurrentValue(
+                                            'homepage_collections_card1_link'
+                                        )}
+                                        onChange={(e) =>
+                                            handleSettingChange(
+                                                'homepage_collections_card1_link',
+                                                e.target.value
+                                            )
+                                        }
+                                        className="border-gray-300 bg-white text-gray-900"
+                                        placeholder="/collections/autumn or https://example.com"
+                                    />
+                                    <Button
+                                        size="sm"
+                                        onClick={() =>
+                                            handleSaveSetting(
+                                                'homepage_collections_card1_link'
+                                            )
+                                        }
+                                        disabled={
+                                            updateSetting.isPending ||
+                                            editingSettings[
+                                                'homepage_collections_card1_link'
+                                            ] === undefined
+                                        }
+                                        className="bg-morpheus-gold-dark hover:bg-morpheus-gold-light"
+                                    >
+                                        {updateSetting.isPending ? (
+                                            <Loader2 className="h-4 w-4 animate-spin" />
+                                        ) : (
+                                            <Save className="h-4 w-4" />
+                                        )}
+                                        {t('admin.settings.save')}
+                                    </Button>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Collection Card 2 Settings */}
+                    <Card className="border-gray-200 bg-white shadow-xl">
+                        <CardHeader>
+                            <CardTitle className="text-gray-900">
+                                Collection Card 2
+                            </CardTitle>
+                            <CardDescription className="text-gray-600">
+                                Configure the second collection card content and
+                                link
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-6">
+                            {/* Card 2 Titles */}
+                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                <div className="space-y-2">
+                                    <Label className="text-gray-900">
+                                        Card 2 Title (English)
+                                    </Label>
+                                    <Input
+                                        value={getCurrentValue(
+                                            'homepage_collections_card2_title_en'
+                                        )}
+                                        onChange={(e) =>
+                                            handleSettingChange(
+                                                'homepage_collections_card2_title_en',
+                                                e.target.value
+                                            )
+                                        }
+                                        className="border-gray-300 bg-white text-gray-900"
+                                        placeholder="Spring Collection"
+                                    />
+                                    <Button
+                                        size="sm"
+                                        onClick={() =>
+                                            handleSaveSetting(
+                                                'homepage_collections_card2_title_en'
+                                            )
+                                        }
+                                        disabled={
+                                            updateSetting.isPending ||
+                                            editingSettings[
+                                                'homepage_collections_card2_title_en'
+                                            ] === undefined
+                                        }
+                                        className="bg-morpheus-gold-dark hover:bg-morpheus-gold-light"
+                                    >
+                                        {updateSetting.isPending ? (
+                                            <Loader2 className="h-4 w-4 animate-spin" />
+                                        ) : (
+                                            <Save className="h-4 w-4" />
+                                        )}
+                                        {t('admin.settings.save')}
+                                    </Button>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label className="text-gray-900">
+                                        Card 2 Title (French)
+                                    </Label>
+                                    <Input
+                                        value={getCurrentValue(
+                                            'homepage_collections_card2_title_fr'
+                                        )}
+                                        onChange={(e) =>
+                                            handleSettingChange(
+                                                'homepage_collections_card2_title_fr',
+                                                e.target.value
+                                            )
+                                        }
+                                        className="border-gray-300 bg-white text-gray-900"
+                                        placeholder="Collection Printemps"
+                                    />
+                                    <Button
+                                        size="sm"
+                                        onClick={() =>
+                                            handleSaveSetting(
+                                                'homepage_collections_card2_title_fr'
+                                            )
+                                        }
+                                        disabled={
+                                            updateSetting.isPending ||
+                                            editingSettings[
+                                                'homepage_collections_card2_title_fr'
+                                            ] === undefined
+                                        }
+                                        className="bg-morpheus-gold-dark hover:bg-morpheus-gold-light"
+                                    >
+                                        {updateSetting.isPending ? (
+                                            <Loader2 className="h-4 w-4 animate-spin" />
+                                        ) : (
+                                            <Save className="h-4 w-4" />
+                                        )}
+                                        {t('admin.settings.save')}
+                                    </Button>
+                                </div>
+                            </div>
+
+                            {/* Card 2 Subtitles */}
+                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                <div className="space-y-2">
+                                    <Label className="text-gray-900">
+                                        Card 2 Subtitle (English)
+                                    </Label>
+                                    <Input
+                                        value={getCurrentValue(
+                                            'homepage_collections_card2_subtitle_en'
+                                        )}
+                                        onChange={(e) =>
+                                            handleSettingChange(
+                                                'homepage_collections_card2_subtitle_en',
+                                                e.target.value
+                                            )
+                                        }
+                                        className="border-gray-300 bg-white text-gray-900"
+                                        placeholder="Fresh styles for the season"
+                                    />
+                                    <Button
+                                        size="sm"
+                                        onClick={() =>
+                                            handleSaveSetting(
+                                                'homepage_collections_card2_subtitle_en'
+                                            )
+                                        }
+                                        disabled={
+                                            updateSetting.isPending ||
+                                            editingSettings[
+                                                'homepage_collections_card2_subtitle_en'
+                                            ] === undefined
+                                        }
+                                        className="bg-morpheus-gold-dark hover:bg-morpheus-gold-light"
+                                    >
+                                        {updateSetting.isPending ? (
+                                            <Loader2 className="h-4 w-4 animate-spin" />
+                                        ) : (
+                                            <Save className="h-4 w-4" />
+                                        )}
+                                        {t('admin.settings.save')}
+                                    </Button>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label className="text-gray-900">
+                                        Card 2 Subtitle (French)
+                                    </Label>
+                                    <Input
+                                        value={getCurrentValue(
+                                            'homepage_collections_card2_subtitle_fr'
+                                        )}
+                                        onChange={(e) =>
+                                            handleSettingChange(
+                                                'homepage_collections_card2_subtitle_fr',
+                                                e.target.value
+                                            )
+                                        }
+                                        className="border-gray-300 bg-white text-gray-900"
+                                        placeholder="Styles frais pour la saison"
+                                    />
+                                    <Button
+                                        size="sm"
+                                        onClick={() =>
+                                            handleSaveSetting(
+                                                'homepage_collections_card2_subtitle_fr'
+                                            )
+                                        }
+                                        disabled={
+                                            updateSetting.isPending ||
+                                            editingSettings[
+                                                'homepage_collections_card2_subtitle_fr'
+                                            ] === undefined
+                                        }
+                                        className="bg-morpheus-gold-dark hover:bg-morpheus-gold-light"
+                                    >
+                                        {updateSetting.isPending ? (
+                                            <Loader2 className="h-4 w-4 animate-spin" />
+                                        ) : (
+                                            <Save className="h-4 w-4" />
+                                        )}
+                                        {t('admin.settings.save')}
+                                    </Button>
+                                </div>
+                            </div>
+
+                            {/* Card 2 Link */}
+                            <div className="space-y-2">
+                                <Label className="text-gray-900">
+                                    Card 2 Link
+                                </Label>
+                                <Input
+                                    value={getCurrentValue(
+                                        'homepage_collections_card2_link'
+                                    )}
+                                    onChange={(e) =>
+                                        handleSettingChange(
+                                            'homepage_collections_card2_link',
+                                            e.target.value
+                                        )
+                                    }
+                                    className="border-gray-300 bg-white text-gray-900"
+                                    placeholder="/collections/spring or https://example.com"
+                                />
+                                <Button
+                                    size="sm"
+                                    onClick={() =>
+                                        handleSaveSetting(
+                                            'homepage_collections_card2_link'
+                                        )
+                                    }
+                                    disabled={
+                                        updateSetting.isPending ||
+                                        editingSettings[
+                                            'homepage_collections_card2_link'
+                                        ] === undefined
+                                    }
+                                    className="bg-morpheus-gold-dark hover:bg-morpheus-gold-light"
+                                >
+                                    {updateSetting.isPending ? (
+                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                    ) : (
+                                        <Save className="h-4 w-4" />
+                                    )}
+                                    {t('admin.settings.save')}
+                                </Button>
+                            </div>
                         </CardContent>
                     </Card>
                 </TabsContent>
@@ -1575,7 +2045,7 @@ export function HomepageSettings() {
                                                 'homepage_categories_category1_id'
                                             ] === undefined
                                         }
-                                        className="bg-blue-600 hover:bg-blue-700 text-white"
+                                        className="bg-blue-600 text-white hover:bg-blue-700"
                                     >
                                         {updateSetting.isPending ? (
                                             <Loader2 className="h-4 w-4 animate-spin" />

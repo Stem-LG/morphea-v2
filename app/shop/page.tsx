@@ -333,7 +333,7 @@ function ShopContent() {
         boutiqueId: parseAsInteger,
         categoryId: parseAsInteger,
         search: parseAsString.withDefault(''),
-        sortBy: parseAsString.withDefault('newest'),
+        sortBy: parseAsString.withDefault('default'),
         columns: parseAsInteger.withDefault(3),
         colorId: parseAsInteger,
         sizeId: parseAsInteger,
@@ -690,7 +690,7 @@ function ShopContent() {
                                                 boutiqueId: null,
                                                 categoryId: null,
                                                 search: '',
-                                                sortBy: 'newest',
+                                                sortBy: 'default',
                                             })
                                         }}
                                         className="from-morpheus-gold-dark to-morpheus-gold-light hover:from-morpheus-gold-light hover:to-morpheus-gold-dark rounded-lg bg-gradient-to-r px-6 py-3 font-medium text-white transition-all duration-300"
@@ -767,6 +767,38 @@ function ShopContent() {
                                 <Separator />
                                 {expandedSections.sort && (
                                     <div className="mt-2 space-y-0 px-2">
+                                        <button
+                                            onClick={() =>
+                                                handleFilterChange('sortBy')(
+                                                    'default'
+                                                )
+                                            }
+                                            className={cn(
+                                                'hover:bg-morpheus-blue-lighter flex h-12 w-full items-center justify-start rounded-none p-4 text-lg hover:text-white',
+                                                sortBy === 'default'
+                                                    ? 'text-morpheus-blue-dark bg-gray-50'
+                                                    : 'text-neutral-400'
+                                            )}
+                                        >
+                                            <span>Par défaut</span>
+                                        </button>
+                                        <Separator />
+                                        <button
+                                            onClick={() =>
+                                                handleFilterChange('sortBy')(
+                                                    'recommended'
+                                                )
+                                            }
+                                            className={cn(
+                                                'hover:bg-morpheus-blue-lighter flex h-12 w-full items-center justify-start rounded-none p-4 text-lg hover:text-white',
+                                                sortBy === 'recommended'
+                                                    ? 'text-morpheus-blue-dark bg-gray-50'
+                                                    : 'text-neutral-400'
+                                            )}
+                                        >
+                                            <span>Recommandé</span>
+                                        </button>
+                                        <Separator />
                                         <button
                                             onClick={() =>
                                                 handleFilterChange('sortBy')(
@@ -1280,7 +1312,7 @@ function ShopContent() {
                                         boutiqueId: null,
                                         categoryId: null,
                                         search: '',
-                                        sortBy: 'newest',
+                                        sortBy: 'default',
                                         colorId: null,
                                         sizeId: null,
                                         minPrice: null,

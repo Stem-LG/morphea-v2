@@ -24,7 +24,7 @@ export const enTranslations = {
   },
   "common": {
     "welcome": "Welcome",
-    "logout": "Logout",
+    "logout": "Se déconnecter",
     "language": "Language",
     "english": "English",
     "french": "French",
@@ -44,7 +44,11 @@ export const enTranslations = {
     "retry": "Retry",
     "none": "None",
     "actions": "Actions",
-    "poweredBy": "Powered by"
+    "poweredBy": "Powered by",
+    "profile": "Profile",
+    "orders": "Orders",
+    "register": "Register",
+    "login": "Login"
   },
   "auth": {
     "name": "Name",
@@ -108,7 +112,15 @@ export const enTranslations = {
     "developmentPlaceholder": "This is a placeholder page for development purposes.",
     "backToSignUp": "← Back to Sign Up",
     "backToMorpheusMall": "← Back to Morphea",
-    "morpheusMall": "Morphea"
+    "morpheusMall": "Morphea",
+    "signInSubtitle": "Sign in to your account to continue",
+    "signUpSubtitle": "Create your account to start your journey with us",
+    "firstName": "First Name",
+    "firstNamePlaceholder": "Enter your first name",
+    "firstNameRequired": "First name is required",
+    "lastName": "Last Name",
+    "lastNamePlaceholder": "Enter your last name",
+    "lastNameRequired": "Last name is required"
   },
   "landing": {
     "title": "Welcome to Morphea",

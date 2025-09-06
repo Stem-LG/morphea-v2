@@ -196,7 +196,7 @@ export default function NavBar() {
                         <DropdownMenuContent
                             side="bottom"
                             align="end"
-                            className="w-48"
+                            className="w-48 z-[90]"
                         >
                             <DropdownMenuLabel>
                                 {currentUser && !currentUser.is_anonymous
@@ -215,7 +215,7 @@ export default function NavBar() {
                                             href="/profile"
                                             className="w-full"
                                         >
-                                            {t('nav.profile')}
+                                            {t('common.profile')}
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem asChild>
@@ -223,7 +223,7 @@ export default function NavBar() {
                                             href="/my-orders"
                                             className="w-full"
                                         >
-                                            {t('orders.myOrders')}
+                                            {t('common.orders')}
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem>
@@ -242,7 +242,7 @@ export default function NavBar() {
                                             href="/auth/sign-up"
                                             className="w-full"
                                         >
-                                            {t('auth.signUp')}
+                                            {t('common.register')}
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem asChild>
@@ -250,8 +250,7 @@ export default function NavBar() {
                                             href="/auth/login"
                                             className="w-full"
                                         >
-                                            {' '}
-                                                                                        {t('auth.signIn')} {' '}
+                                            {t('common.login')}
                                         </Link>
                                     </DropdownMenuItem>
                                 </>
@@ -474,8 +473,8 @@ function NavBarSheet({
                         setIsMenuOpen(false)
                     },
                 },
-                { name: t('auth.signIn'), href: '/auth/login' },
-                { name: t('auth.signUp'), href: '/auth/sign-up' },
+                { name: t('common.login'), href: '/auth/login' },
+                { name: t('common.register'), href: '/auth/sign-up' },
             ]
         } else {
             // For authenticated users: show all account-related items

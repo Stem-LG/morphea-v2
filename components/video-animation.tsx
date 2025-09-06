@@ -85,7 +85,6 @@ export default function VideoAnimation() {
                         <video
                             src="/vid.mp4"
                             autoPlay
-                            loop
                             muted
                             playsInline
                             className="absolute top-[40px] max-w-[200px] md:top-[80px] md:max-w-[300px]"

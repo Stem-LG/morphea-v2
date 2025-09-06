@@ -281,7 +281,6 @@ export default function OriginePage() {
                                                 className="absolute inset-0 h-full w-full object-contain"
                                                 autoPlay
                                                 muted
-                                                loop
                                                 playsInline
                                             >
                                                 <source

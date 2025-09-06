@@ -83,7 +83,7 @@ export function StoreCard({ store, onEdit, onDelete }: StoreCardProps) {
                     )}
                 </div>
             </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent className="space-y-3 flex-1">
                 <div className="flex items-center gap-2 text-gray-600">
                     <MapPin className="h-4 w-4 text-blue-600" />
                     <span className="text-sm">{store.yboutiqueadressemall || t("admin.noAddress")}</span>

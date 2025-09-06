@@ -88,7 +88,7 @@ export function useShopProducts({
     boutiqueId = null,
     categoryId = null,
     searchQuery = "",
-    sortBy = "newest",
+    sortBy = "default",
     colorId = null,
     sizeId = null,
     minPrice = null,
@@ -222,6 +222,11 @@ export function useShopProducts({
                 case 'alphabetical':
                     productsQuery = productsQuery.order("yprodintitule", { ascending: true });
                     break;
+                case 'recommended':
+                    // For recommended, we'll sort by purchase count (handled after fetching)
+                    productsQuery = productsQuery.order("yprodid", { ascending: false });
+                    break;
+                case 'default':
                 case 'newest':
                 default:
                     productsQuery = productsQuery.order("yprodid", { ascending: false });
@@ -290,8 +295,47 @@ export function useShopProducts({
                 }) || []
             })).filter(product => product.yvarprod.length > 0) || [];
 
+            // Handle special sorting cases
+            let finalProducts = productsWithApprovedVariants as ProductWithDetails[];
+
+            if (sortBy === 'recommended') {
+                // Get purchase counts for products from zdetailscommande table
+                const productIds = finalProducts.map(p => p.yvarprod.map(v => v.yvarprodid)).flat();
+
+                if (productIds.length > 0) {
+                    const { data: purchaseCounts } = await supabase
+                        .schema("morpheus")
+                        .from("zdetailscommande")
+                        .select("yvarprodidfk, zcommandequantite")
+                        .in("yvarprodidfk", productIds);
+
+                    // Calculate total purchase count per product
+                    const productPurchaseCounts = new Map<number, number>();
+
+                    finalProducts.forEach(product => {
+                        let totalPurchases = 0;
+                        product.yvarprod.forEach(variant => {
+                            const variantPurchases = purchaseCounts?.filter(pc => pc.yvarprodidfk === variant.yvarprodid)
+                                .reduce((sum, pc) => sum + (pc.zcommandequantite || 0), 0) || 0;
+                            totalPurchases += variantPurchases;
+                        });
+                        productPurchaseCounts.set(product.yprodid, totalPurchases);
+                    });
+
+                    // Sort by purchase count (descending)
+                    finalProducts.sort((a, b) => {
+                        const countA = productPurchaseCounts.get(a.yprodid) || 0;
+                        const countB = productPurchaseCounts.get(b.yprodid) || 0;
+                        return countB - countA;
+                    });
+                }
+            } else if (sortBy === 'default') {
+                // Randomize the products for default sorting
+                finalProducts = [...finalProducts].sort(() => Math.random() - 0.5);
+            }
+
             return {
-                products: productsWithApprovedVariants as ProductWithDetails[],
+                products: finalProducts,
                 totalCount: count || 0,
                 currentEvent
             };
@@ -309,7 +353,7 @@ export function useShopProductsInfinite({
     boutiqueId = null,
     categoryId = null,
     searchQuery = "",
-    sortBy = "newest",
+    sortBy = "default",
     colorId = null,
     sizeId = null,
     minPrice = null,
@@ -474,6 +518,11 @@ export function useShopProductsInfinite({
                 case 'alphabetical':
                     productsQuery = productsQuery.order("yprodintitule", { ascending: true });
                     break;
+                case 'recommended':
+                    // For recommended, we'll sort by purchase count (handled after fetching)
+                    productsQuery = productsQuery.order("yprodid", { ascending: false });
+                    break;
+                case 'default':
                 case 'newest':
                 default:
                     productsQuery = productsQuery.order("yprodid", { ascending: false });
@@ -542,11 +591,50 @@ export function useShopProductsInfinite({
                 }) || []
             })).filter(product => product.yvarprod.length > 0) || [];
 
+            // Handle special sorting cases
+            let finalProducts = productsWithApprovedVariants;
+
+            if (sortBy === 'recommended') {
+                // Get purchase counts for products from zdetailscommande table
+                const productIds = finalProducts.map(p => p.yvarprod.map(v => v.yvarprodid)).flat();
+
+                if (productIds.length > 0) {
+                    const { data: purchaseCounts } = await supabase
+                        .schema("morpheus")
+                        .from("zdetailscommande")
+                        .select("yvarprodidfk, zcommandequantite")
+                        .in("yvarprodidfk", productIds);
+
+                    // Calculate total purchase count per product
+                    const productPurchaseCounts = new Map<number, number>();
+
+                    finalProducts.forEach(product => {
+                        let totalPurchases = 0;
+                        product.yvarprod.forEach(variant => {
+                            const variantPurchases = purchaseCounts?.filter(pc => pc.yvarprodidfk === variant.yvarprodid)
+                                .reduce((sum, pc) => sum + (pc.zcommandequantite || 0), 0) || 0;
+                            totalPurchases += variantPurchases;
+                        });
+                        productPurchaseCounts.set(product.yprodid, totalPurchases);
+                    });
+
+                    // Sort by purchase count (descending)
+                    finalProducts.sort((a, b) => {
+                        const countA = productPurchaseCounts.get(a.yprodid) || 0;
+                        const countB = productPurchaseCounts.get(b.yprodid) || 0;
+                        return countB - countA;
+                    });
+                }
+            } else if (sortBy === 'default') {
+                // Randomize the products for default sorting
+                finalProducts = [...finalProducts].sort(() => Math.random() - 0.5);
+            }
+
             const totalCount = count || 0;
             const hasNextPage = (currentPage * perPage) < totalCount;
 
             return {
-                products: productsWithApprovedVariants,
+                products: finalProducts,
                 totalCount,
                 currentEvent,
                 hasNextPage,
