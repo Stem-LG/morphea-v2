@@ -200,8 +200,8 @@ export default function NavBar() {
                         >
                             <DropdownMenuLabel>
                                 {currentUser && !currentUser.is_anonymous
-                                    ? 'Mon compte'
-                                    : 'Compte invité'}
+                                    ? t('nav.account')
+                                    : t('nav.guestAccount')}
                             </DropdownMenuLabel>
                             <DropdownMenuSeparator />
                             <LanguageSwitcher />
@@ -215,7 +215,7 @@ export default function NavBar() {
                                             href="/profile"
                                             className="w-full"
                                         >
-                                            {t('profile')}
+                                            {t('nav.profile')}
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem asChild>
@@ -223,7 +223,7 @@ export default function NavBar() {
                                             href="/my-orders"
                                             className="w-full"
                                         >
-                                            {t('orders')}
+                                            {t('orders.myOrders')}
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem>
@@ -242,7 +242,7 @@ export default function NavBar() {
                                             href="/auth/sign-up"
                                             className="w-full"
                                         >
-                                            {t('register')}
+                                            {t('auth.signUp')}
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem asChild>
@@ -251,7 +251,7 @@ export default function NavBar() {
                                             className="w-full"
                                         >
                                             {' '}
-                                            {t('login')}{' '}
+                                                                                        {t('auth.signIn')} {' '}
                                         </Link>
                                     </DropdownMenuItem>
                                 </>
@@ -440,18 +440,18 @@ function NavBarSheet({
     const [showCategories, setShowCategories] = useState(false)
 
     const navbarItems: NavbarItem[] = [
-        { name: 'Visite Virtuelle', href: '/main' },
-        { name: 'Acceuil', href: '/' },
-        { name: 'Nouveauté', href: '/shop' },
+        { name: t('nav.virtualTours'), href: '/main' },
+        { name: t('nav.home'), href: '/' },
+        { name: t('nav.newProducts'), href: '/shop' },
         {
-            name: 'Categories',
+            name: t('nav.categories'),
             action: () => setShowCategories(!showCategories),
         },
         {
-            name: 'A Propos',
+            name: t('nav.about'),
             href: '/a-lorigine-de-morphea',
         },
-        { name: 'Contactez-Nous', href: 'mailto:contact@morpheus-sa.com' },
+        { name: t('nav.contactUs'), href: 'mailto:contact@morpheus-sa.com' },
     ]
 
     const navbarFooterItems = useMemo(() => {
@@ -461,46 +461,46 @@ function NavBarSheet({
             // For anonymous users: show cart, favourites, login and register
             return [
                 {
-                    name: 'Favoris',
+                    name: t('nav.favorites'),
                     onclick: () => {
                         setIsWishlistOpen(true)
                         setIsMenuOpen(false)
                     },
                 },
                 {
-                    name: 'Panier',
+                    name: t('nav.cart'),
                     onclick: () => {
                         setIsCartOpen(true)
                         setIsMenuOpen(false)
                     },
                 },
-                { name: t('login'), href: '/auth/login' },
-                { name: t('register'), href: '/auth/sign-up' },
+                { name: t('auth.signIn'), href: '/auth/login' },
+                { name: t('auth.signUp'), href: '/auth/sign-up' },
             ]
         } else {
             // For authenticated users: show all account-related items
             return [
-                { name: 'Mon Compte', href: '/profile' },
+                { name: t('nav.myAccount'), href: '/profile' },
                 {
-                    name: 'Favoris',
+                    name: t('nav.favorites'),
                     onclick: () => {
                         setIsWishlistOpen(true)
                         setIsMenuOpen(false)
                     },
                 },
                 {
-                    name: 'Panier',
+                    name: t('nav.cart'),
                     onclick: () => {
                         setIsCartOpen(true)
                         setIsMenuOpen(false)
                     },
                 },
-                { name: 'Mes Commandes', href: '/orders' },
+                { name: t('nav.myOrders'), href: '/orders' },
                 ...(hasAdminAccess
-                    ? [{ name: 'Administration', href: '/admin' }]
+                    ? [{ name: t('nav.administration'), href: '/admin' }]
                     : []),
                 {
-                    name: t('logout'),
+                    name: t('common.logout'),
                     onclick: () => {
                         logout()
                         setIsMenuOpen(false)

@@ -9,7 +9,18 @@ export const frTranslations = {
     "login": "Connexion",
     "signup": "Commencer",
     "loading": "Chargement...",
-    "notifications": "Notifications"
+    "notifications": "Notifications",
+    "account": "Mon compte",
+    "guestAccount": "Compte invité",
+    "home": "Acceuil",
+    "newProducts": "Nouveauté",
+    "categories": "Categories",
+    "about": "A Propos",
+    "contactUs": "Contactez-Nous",
+    "favorites": "Favoris",
+    "cart": "Panier",
+    "myAccount": "Mon Compte",
+    "myOrders": "Mes Commandes"
   },
   "common": {
     "welcome": "Bienvenue",
