@@ -148,6 +148,8 @@ export const enTranslations = {
     "addProduct": "Add Product",
     "editProduct": "Edit Product",
     "deleteProduct": "Delete Product",
+    "deleteProductConfirmation": "Are you sure you want to delete this product? This action cannot be undone.",
+    "deleteProductWarning": "This will permanently delete the product and all its variants, images, and associated data.",
     "adminPanel": "Menu",
     "productManagement": "Products",
     "productApprovals": "Product Approvals",

@@ -149,6 +149,8 @@ export const frTranslations = {
     "addProduct": "Ajouter un produit",
     "editProduct": "Modifier le produit",
     "deleteProduct": "Supprimer le produit",
+    "deleteProductConfirmation": "Êtes-vous sûr de vouloir supprimer ce produit ? Cette action ne peut pas être annulée.",
+    "deleteProductWarning": "Cela supprimera définitivement le produit et toutes ses variantes, images et données associées.",
     "adminPanel": "Menu",
     "productManagement": "Produits",
     "productApprovals": "Approbations de produits",
