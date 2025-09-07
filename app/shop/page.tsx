@@ -254,22 +254,22 @@ const FilterIcon = ({ className }: { className?: string }) => (
     >
         <path
             d="M14 8.1665L23.3333 8.1665"
-            stroke="#B27C64"
+            stroke="currentColor"
             strokeLinecap="round"
         />
         <path
             d="M4.66663 8.1665L9.33329 8.1665"
-            stroke="#B27C64"
+            stroke="currentColor"
             strokeLinecap="round"
         />
         <path
             d="M19.8333 19.8335L23.3333 19.8335"
-            stroke="#B27C64"
+            stroke="currentColor"
             strokeLinecap="round"
         />
         <path
             d="M4.66663 19.8335L14 19.8335"
-            stroke="#B27C64"
+            stroke="currentColor"
             strokeLinecap="round"
         />
         <circle
@@ -277,7 +277,7 @@ const FilterIcon = ({ className }: { className?: string }) => (
             cy="8.16683"
             r="2.33333"
             transform="rotate(90 11.6667 8.16683)"
-            stroke="#B27C64"
+            stroke="currentColor"
             strokeLinecap="round"
         />
         <circle
@@ -285,7 +285,7 @@ const FilterIcon = ({ className }: { className?: string }) => (
             cy="19.8333"
             r="2.33333"
             transform="rotate(90 17.5 19.8333)"
-            stroke="#B27C64"
+            stroke="currentColor"
             strokeLinecap="round"
         />
     </svg>
@@ -302,11 +302,11 @@ const SortIcon = ({ className }: { className?: string }) => (
     >
         <path
             d="M9.33335 2.3335L8.9798 1.97994L9.33335 1.62639L9.68691 1.97994L9.33335 2.3335ZM9.83335 19.8335C9.83335 20.1096 9.6095 20.3335 9.33335 20.3335C9.05721 20.3335 8.83335 20.1096 8.83335 19.8335L9.33335 19.8335L9.83335 19.8335ZM4.66669 7.00016L4.31313 6.64661L8.9798 1.97994L9.33335 2.3335L9.68691 2.68705L5.02024 7.35372L4.66669 7.00016ZM9.33335 2.3335L9.68691 1.97994L14.3536 6.64661L14 7.00016L13.6465 7.35372L8.9798 2.68705L9.33335 2.3335ZM9.33335 2.3335L9.83335 2.3335L9.83335 19.8335L9.33335 19.8335L8.83335 19.8335L8.83335 2.3335L9.33335 2.3335Z"
-            fill="#B27C64"
+            fill="currentColor"
         />
         <path
             d="M18.6667 25.6665L18.3131 26.0201L18.6667 26.3736L19.0202 26.0201L18.6667 25.6665ZM19.1667 8.1665C19.1667 7.89036 18.9428 7.6665 18.6667 7.6665C18.3905 7.6665 18.1667 7.89036 18.1667 8.1665L18.6667 8.1665L19.1667 8.1665ZM14 20.9998L13.6464 21.3534L18.3131 26.0201L18.6667 25.6665L19.0202 25.313L14.3536 20.6463L14 20.9998ZM18.6667 25.6665L19.0202 26.0201L23.6869 21.3534L23.3333 20.9998L22.9798 20.6463L18.3131 25.313L18.6667 25.6665ZM18.6667 25.6665L19.1667 25.6665L19.1667 8.1665L18.6667 8.1665L18.1667 8.1665L18.1667 25.6665L18.6667 25.6665Z"
-            fill="#B27C64"
+            fill="currentColor"
         />
     </svg>
 )
@@ -705,15 +705,16 @@ function ShopContent() {
             </div>
 
             {/* Fixed Bottom Filter Button */}
-            <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 transform">
+            <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 transform shadow-xl">
                 <button
                     onClick={() => setShowFilterSheet(true)}
-                    className="flex items-center gap-3 rounded-full border border-gray-200 bg-white px-8 py-4 text-gray-600 shadow-lg transition-all hover:bg-gray-50 hover:shadow-xl"
+                    className="flex h-16 w-56 items-center justify-center gap-3 rounded-2xl border-[0.50px] border-zinc-300 bg-gradient-to-r from-cyan-950 to-sky-900 text-white shadow-[0px_4px_100px_1px_rgba(0,0,0,0.10)] transition-all hover:shadow-xl"
                 >
                     <FilterIcon className="h-6 w-6" />
-                    <span className="font-medium text-gray-700">Filtrer</span>
+                    <span className="font-medium">Filtrer</span>
+                    <div className="h-6 w-px bg-white"></div>
                     <SortIcon className="h-6 w-6" />
-                    <span className="font-medium text-gray-700">Trier</span>
+                    <span className="font-medium">Trier</span>
                 </button>
             </div>
 

@@ -44,7 +44,7 @@ export const enTranslations = {
     "retry": "Retry",
     "none": "None",
     "actions": "Actions",
-    "poweredBy": "Powered by",
+    "poweredBy": "© 2025 – All rights reserved.  Powered by",
     "profile": "Profile",
     "orders": "Orders",
     "register": "Register",
@@ -1484,6 +1484,53 @@ export const enTranslations = {
     "addedToWishlist": "to wishlist",
     "addedToCart": "to cart",
     "added": "Added"
+  },
+  "contact": {
+    "title": "Contact Us",
+    "subtitle": "Connect with our team for any inquiries about our luxury collections.",
+    "form": {
+      "title": "Send us a Message",
+      "description": "We'll get back to you within 24 hours.",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "country": "Country",
+      "countryPlaceholder": "Enter your country",
+      "subject": "Subject",
+      "message": "Message",
+      "firstNamePlaceholder": "Your first name",
+      "lastNamePlaceholder": "Your last name",
+      "subjectPlaceholder": "What can we help with?",
+      "messagePlaceholder": "Your message...",
+      "send": "Send Message",
+      "sending": "Sending...",
+      "success": {
+        "title": "Message Sent!",
+        "message": "Thank you! We'll respond within 24 hours."
+      }
+    },
+    "info": {
+      "title": "Get in Touch",
+      "description": "Reach out through any of the channels below.",
+      "email": {
+        "title": "Email Us",
+        "description": "Quick response guaranteed"
+      },
+      "phone": {
+        "title": "Call Us",
+        "description": "Speak with our team"
+      },
+      "address": {
+        "title": "Visit Us",
+        "description": "Our headquarters"
+      },
+      "hours": {
+        "title": "Business Hours",
+        "weekdays": "Monday - Friday",
+        "saturday": "Saturday",
+        "sunday": "Sunday",
+        "closed": "Closed"
+      }
+    }
   },
   "visitorForm": {
     "title": "Welcome to Morphea",

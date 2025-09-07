@@ -44,7 +44,7 @@ export const frTranslations = {
     "retry": "Réessayer",
     "none": "Aucun",
     "actions": "Actions",
-    "poweredBy": "Powered by",
+    "poweredBy": "© 2025 – Tous droits réservés. Réalisé par",
     "profile": "Profil",
     "orders": "Commandes",
     "register": "S'inscrire",
@@ -1519,6 +1519,53 @@ export const frTranslations = {
     "addedToWishlist": "à la liste de souhaits",
     "addedToCart": "au panier",
     "added": "Ajouté"
+  },
+  "contact": {
+    "title": "Contactez-nous",
+    "subtitle": "Connectez-vous avec notre équipe pour toute question sur nos collections de luxe.",
+    "form": {
+      "title": "Envoyez-nous un Message",
+      "description": "Nous vous répondrons dans les 24 heures.",
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "country": "Pays",
+      "countryPlaceholder": "Entrez votre pays",
+      "subject": "Sujet",
+      "message": "Message",
+      "firstNamePlaceholder": "Votre prénom",
+      "lastNamePlaceholder": "Votre nom",
+      "subjectPlaceholder": "Comment vous aider ?",
+      "messagePlaceholder": "Votre message...",
+      "send": "Envoyer",
+      "sending": "Envoi...",
+      "success": {
+        "title": "Message Envoyé !",
+        "message": "Merci ! Nous répondrons dans les 24 heures."
+      }
+    },
+    "info": {
+      "title": "Contactez-nous",
+      "description": "Utilisez l'un des canaux ci-dessous.",
+      "email": {
+        "title": "Email",
+        "description": "Réponse rapide garantie"
+      },
+      "phone": {
+        "title": "Téléphone",
+        "description": "Parlez avec notre équipe"
+      },
+      "address": {
+        "title": "Adresse",
+        "description": "Notre siège social"
+      },
+      "hours": {
+        "title": "Horaires",
+        "weekdays": "Lundi - Vendredi",
+        "saturday": "Samedi",
+        "sunday": "Dimanche",
+        "closed": "Fermé"
+      }
+    }
   },
   "visitorForm": {
     "title": "Bienvenue chez Morphea",

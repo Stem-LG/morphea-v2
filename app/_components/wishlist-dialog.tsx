@@ -16,6 +16,7 @@ import {
 import { Button } from '@/components/ui/button'
 import Image from 'next/image'
 import { Heart, ShoppingCart, Star, Trash2 } from 'lucide-react'
+import { CartIcon } from '../_icons/cart_icon'
 
 interface WishlistDialogProps {
     isOpen: boolean
@@ -112,18 +113,36 @@ export function WishlistDialog({ isOpen, onClose }: WishlistDialogProps) {
 
     return (
         <Credenza open={isOpen} onOpenChange={onClose}>
+            <svg width="0" height="0" className="absolute">
+                <defs>
+                    <linearGradient
+                        id="star-stroke-gradient"
+                        x1="0%"
+                        y1="0%"
+                        x2="100%"
+                        y2="100%"
+                    >
+                        <stop offset="0%" stop-color="#B27C64" />
+                        <stop offset="50%" stop-color="#E8D07A" />
+                        <stop offset="100%" stop-color="#B27C64" />
+                    </linearGradient>
+                </defs>
+            </svg>
             <CredenzaContent className="max-h-[80vh] max-w-2xl border border-gray-200 bg-white shadow-2xl">
                 <CredenzaHeader className="border-b border-gray-100 pb-4">
                     <CredenzaTitle className="flex items-center gap-3 text-[#053340]">
                         <div className="rounded-lg bg-gray-50 p-2">
-                            <Star className="h-5 w-5 text-yellow-600" />
+                            <Star
+                                className="h-5 w-5"
+                                stroke="url(#star-stroke-gradient)"
+                            />
                         </div>
                         <div className="flex items-center gap-3">
                             <span className="font-recia text-2xl font-extrabold">
                                 {t('wishlist.title') || 'Wishlist'}
                             </span>
                             {wishlistItems.length > 0 && (
-                                <span className="font-supreme rounded-full bg-yellow-600 px-3 py-1 text-sm font-medium text-white">
+                                <span className="font-supreme rounded-full bg-gradient-to-br from-[#B27C64] via-[#E8D07A] to-[#B27C64] px-3 py-1 text-sm font-bold text-white">
                                     {wishlistItems.length}
                                 </span>
                             )}
@@ -139,7 +158,10 @@ export function WishlistDialog({ isOpen, onClose }: WishlistDialogProps) {
                     ) : wishlistItems.length === 0 ? (
                         <div className="py-12 text-center">
                             <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gray-50 p-4">
-                                <Star className="h-10 w-10 text-yellow-600" />
+                                <Star
+                                    className="h-10 w-10"
+                                    stroke="url(#star-stroke-gradient)"
+                                />
                             </div>
                             <h3 className="font-recia mb-3 text-xl font-extrabold text-[#053340]">
                                 {t('wishlist.empty') ||
@@ -252,7 +274,7 @@ export function WishlistDialog({ isOpen, onClose }: WishlistDialogProps) {
                                             }
                                             className="flex items-center gap-1 border-gray-300 bg-white text-[#053340] hover:border-[#053340] hover:bg-gray-100"
                                         >
-                                            <ShoppingCart className="h-3 w-3" />
+                                            <CartIcon className="h-3 w-3" />
                                             {t('wishlist.addToCart') ||
                                                 'Add to Cart'}
                                         </Button>

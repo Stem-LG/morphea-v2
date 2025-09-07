@@ -79,6 +79,10 @@ interface HomeSettings {
       link: string
     }>
   }
+  // Morphea Origin Vision Section
+  morpheaOriginVision: {
+    images: string[]
+  }
   // Footer Settings
   footer: {
     social: {
@@ -288,6 +292,13 @@ export function useHomeSettings() {
           },
           images: parseJSON(getSetting('homepage_creators_images'), []),
           creators: parseJSON(getSetting('homepage_creators_data'), [])
+        },
+        morpheaOriginVision: {
+          images: [
+            getSetting('morphea_origin_vision_image1_url'),
+            getSetting('morphea_origin_vision_image2_url'),
+            getSetting('morphea_origin_vision_image3_url')
+          ].filter(Boolean) // Remove null/undefined values
         },
         footer: {
           social: {

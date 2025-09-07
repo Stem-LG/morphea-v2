@@ -5,13 +5,16 @@ import { useProductSearch } from '@/app/_hooks/use-product-search'
 import { useLanguage } from '@/hooks/useLanguage'
 import { useCurrency } from '@/hooks/useCurrency'
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog'
+    Sheet,
+    SheetContent,
+    SheetHeader,
+    SheetTitle,
+} from '@/components/ui/sheet'
 import { Input } from '@/components/ui/input'
-import { SearchIcon, Package } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { Separator } from '@/components/ui/separator'
+import { SearchIcon, Package, X } from 'lucide-react'
 import Image from 'next/image'
 
 interface SearchDialogProps {
@@ -81,27 +84,46 @@ export function SearchDialog({
     }
 
     return (
-        <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="max-h-[80vh] max-w-2xl p-0">
-                <DialogHeader className="p-6 pb-0">
-                    <DialogTitle>Rechercher des produits</DialogTitle>
-                </DialogHeader>
-
-                {/* Search Input */}
-                <div className="px-6">
-                    <div className="relative">
-                        <SearchIcon className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
-                        <Input
-                            placeholder="Rechercher des produits..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="pl-10"
-                        />
+        <Sheet open={isOpen} onOpenChange={onClose}>
+            <SheetContent side="right" className="w-[400px] z-[90] sm:w-[540px] p-0 bg-white">
+                {/* Header */}
+                <div className="flex-shrink-0">
+                    <div className="flex items-center justify-center py-4 text-3xl">
+                        <h1 className="font-recia font-medium">
+                            Rechercher
+                        </h1>
                     </div>
+                    <Separator />
                 </div>
 
-                {/* Results */}
-                <div className="flex-1 overflow-y-auto px-6 pb-6">
+                {/* Close button - positioned relative to the entire sheet */}
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute top-5 right-7 z-10 h-8 w-8"
+                    onClick={onClose}
+                >
+                    <X className="h-4 w-4" />
+                </Button>
+
+                {/* Content */}
+                <ScrollArea className="flex-1 overflow-hidden">
+                    <div className="flex flex-col px-6">
+                        {/* Search Input */}
+                        <div className="py-6">
+                            <div className="relative">
+                                <SearchIcon className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
+                                <Input
+                                    placeholder="Rechercher des produits..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="pl-10 h-12"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Results */}
+                        <div className="pb-6">
                     {searchQuery.length < 2 ? (
                         <div className="flex flex-col items-center justify-center py-12 text-center">
                             <SearchIcon className="mb-4 h-12 w-12 text-gray-400" />
@@ -205,8 +227,10 @@ export function SearchDialog({
                             })}
                         </div>
                     )}
-                </div>
-            </DialogContent>
-        </Dialog>
+                        </div>
+                    </div>
+                </ScrollArea>
+            </SheetContent>
+        </Sheet>
     )
 }
