@@ -63,6 +63,12 @@ export function useUpdateProduct() {
                         variant.typebijouxId || variant.materiauxId
                     );
 
+                console.log("Updating product with infospotaction:", {
+                    productId: productData.productId,
+                    infospotactionId: productData.infospotactionId,
+                    isJewelryProduct
+                });
+
                 const { data: product, error: productError } = await supabase
                     .schema("morpheus")
                     .from("yprod")
@@ -74,6 +80,7 @@ export function useUpdateProduct() {
                         xcategprodidfk: productData.categoryId || null,
                         ydesignidfk: productData.designerId,
                         yprodestbijoux: isJewelryProduct,
+                        yinfospotactionsidfk: productData.infospotactionId || null,
                     })
                     .eq("yprodid", productData.productId)
                     .select("*")
@@ -81,21 +88,6 @@ export function useUpdateProduct() {
 
                 if (productError) {
                     throw new Error(`Failed to update product: ${productError.message}`);
-                }
-
-                // Step 1.5: Update infospotaction in product if provided
-                if (productData.infospotactionId !== undefined) {
-                    const { error: infospotActionError } = await supabase
-                        .schema("morpheus")
-                        .from("yprod")
-                        .update({
-                            yinfospotactionsidfk: productData.infospotactionId,
-                        })
-                        .eq("yprodid", productData.productId);
-
-                    if (infospotActionError) {
-                        console.warn(`Failed to update infospotaction: ${infospotActionError.message}`);
-                    }
                 }
 
                 // Step 2: Handle variants
