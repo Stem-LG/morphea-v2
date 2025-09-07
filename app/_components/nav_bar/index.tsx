@@ -113,7 +113,7 @@ export default function NavBar() {
     return (
         <>
             <nav
-                className={`fixed top-0 z-[80] flex h-18 w-full bg-[#bbbbbb77] px-4 transition-transform duration-300 ease-in-out md:h-18 md:px-6 lg:px-12 ${
+                className={`fixed top-0 z-[60] flex h-18 w-full bg-[#bbbbbb77] px-4 transition-transform duration-300 ease-in-out md:h-18 md:px-6 lg:px-12 ${
                     isVisible ? 'translate-y-0' : '-translate-y-full'
                 }`}
             >
@@ -514,7 +514,7 @@ function NavBarSheet({
             <SheetTitle />
             <SheetContent
                 side="left"
-                className="flex h-full w-[min(400px,90vw)] bg-white transition-all duration-300 sm:max-w-[90vw]"
+                className="flex h-full w-[min(400px,90vw)] bg-white transition-all duration-300 sm:max-w-[90vw] !z-[100] fixed"
             >
                 {/* Close button - positioned relative to the entire sheet */}
                 <SheetClose>
