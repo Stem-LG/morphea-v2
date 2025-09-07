@@ -27,6 +27,25 @@ export default function Home() {
         })
     }, [router, supabase.auth])
 
+    useEffect(() => {
+        // Ensure videos play when ready
+        const playIfReady = (video: HTMLVideoElement | null) => {
+            if (video && video.readyState >= 3) { // HAVE_FUTURE_DATA
+                video.play()
+            } else if (video) {
+                const handleCanPlay = () => {
+                    video.play()
+                    video.removeEventListener('canplay', handleCanPlay)
+                }
+                video.addEventListener('canplay', handleCanPlay)
+            }
+        }
+
+        playIfReady(video1Ref.current)
+        playIfReady(video2Ref.current)
+    }, [])
+
+
     const [hovered, setHovered] = useState<'left' | 'right'>('left')
     const [isPlaying, setIsPlaying] = useState(true)
     const [isMuted, setIsMuted] = useState(true)
