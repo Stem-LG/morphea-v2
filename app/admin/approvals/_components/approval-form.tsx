@@ -1034,7 +1034,7 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                 <div className="flex h-[calc(95vh-180px)]">
                     {/* Left Panel - Product Information */}
                     <div className="w-1/2 border-r border-gray-200">
-                        <ScrollArea className="h-full">
+                        <div className="h-full overflow-y-auto custom-scrollbar">
                             <div className="space-y-6 p-6">
                                 {/* Basic Product Info */}
                                 <Card className="border-gray-200 bg-gray-50">
@@ -1394,7 +1394,7 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                     </CardContent>
                                 </Card>
                             </div>
-                        </ScrollArea>
+                        </div>
                     </div>
 
                     {/* Right Panel - Variant Cards */}

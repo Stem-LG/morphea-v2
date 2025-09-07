@@ -1088,10 +1088,18 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                 <SuperSelect
                                                     value={selectedInfospotactionId}
                                                     onValueChange={(value) => setSelectedInfospotactionId(value as number)}
-                                                    options={infospotactions?.map(action => ({
-                                                        value: action.yinfospotactionsid,
-                                                        label: `${action.yinfospotactionstitle} - ${action.yinfospotactionsdescription}`
-                                                    })) || []}
+                                                    options={[
+                                                        // Add "None" option first
+                                                        {
+                                                            value: null,
+                                                            label: t("admin.approvals.none") || "Aucune"
+                                                        },
+                                                        // Then add all infospotactions
+                                                        ...(infospotactions?.map(action => ({
+                                                            value: action.yinfospotactionsid,
+                                                            label: `${action.yinfospotactionstitle} - ${action.yinfospotactionsdescription}`
+                                                        })) || [])
+                                                    ]}
                                                     placeholder={t("admin.createProduct.selectProductPlacementOptional")}
                                                     className="mt-1"
                                                 />
