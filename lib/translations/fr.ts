@@ -604,7 +604,7 @@ export const frTranslations = {
       "productApprovalRequirements": "Le produit ne peut pas être approuvé - informations requises manquantes",
       "productApprovalRequirementsMessage": "Pour approuver ce produit, veuillez compléter les éléments suivants",
       "categoryRequired": "Sélectionner une catégorie de produit",
-      "placementRequired": "Sélectionner un placement de produit"
+      "none": "Aucune"
     },
     "currencies": {
       "title": "Gestion des Devises",

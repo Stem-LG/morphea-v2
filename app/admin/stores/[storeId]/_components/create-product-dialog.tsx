@@ -960,7 +960,9 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                         </Button>
                     </div>
                 ) : (
-                    <ScrollArea className="max-h-[78vh] pr-4">
+                    <div 
+                        className="max-h-[78vh] overflow-y-auto pr-4 custom-scrollbar"
+                    >
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             {/* Left Column - Product Information & Creation Forms */}
                             <div className="space-y-6">
@@ -2060,7 +2062,7 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                 </Card>
                             </div>
                         </div>
-                    </ScrollArea>
+                    </div>
                 )}
 
                 {/* Progress Bar */}

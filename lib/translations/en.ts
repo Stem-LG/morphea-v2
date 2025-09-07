@@ -577,7 +577,7 @@ export const enTranslations = {
       "productApprovalRequirements": "Product cannot be approved - missing required information",
       "productApprovalRequirementsMessage": "To approve this product, please complete the following",
       "categoryRequired": "Select a product category",
-      "placementRequired": "Select a product placement"
+      "none": "None"
     },
     "currencies": {
       "title": "Currency Management",

@@ -849,15 +849,14 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
     // Can bulk approve only if all pending variants have valid prices
     const canBulkApprove = pendingVariants.length > 0 && pendingVariantsWithoutValidPrice.length === 0;
 
-    // Check if product can be approved (category and placement must be set)
+    // Check if product can be approved (only category is required)
     const canApproveProduct = () => {
         // Category must be selected (either existing or newly selected)
         const hasCategory = selectedCategoryId || product?.xcategprodidfk;
         
-        // For admin users, placement (infospotaction) must be selected
-        const hasPlacement = !isAdmin || selectedInfospotactionId;
+        // Placement (infospotaction) is now optional for all users
         
-        return hasCategory && hasPlacement;
+        return hasCategory;
     };
 
     const handleApproveProduct = async () => {
@@ -866,11 +865,7 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
         // Clear previous errors
         setProductApprovalError(null);
 
-        // Validate that infospotaction is selected (admin only)
-        if (isAdmin && !selectedInfospotactionId) {
-            setProductApprovalError(t("admin.approvals.productPlacementRequired"));
-            return;
-        }
+        // Placement (infospotaction) is now optional - no validation needed
 
         try {
             await approveProduct.mutateAsync({
@@ -1072,14 +1067,6 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                                                     )}
                                                                 </li>
                                                             )}
-                                                            {isAdmin &&
-                                                                !selectedInfospotactionId && (
-                                                                    <li>
-                                                                        {t(
-                                                                            'admin.approvals.placementRequired'
-                                                                        )}
-                                                                    </li>
-                                                                )}
                                                         </ul>
                                                     </div>
                                                 </div>
@@ -1195,18 +1182,17 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                                     )}
                                                     <Select
                                                         value={
-                                                            selectedInfospotactionId?.toString() ||
-                                                            ''
+                                                            selectedInfospotactionId === null
+                                                                ? "none"
+                                                                : selectedInfospotactionId?.toString() || ""
                                                         }
                                                         onValueChange={(
                                                             value
                                                         ) =>
                                                             setSelectedInfospotactionId(
-                                                                value
-                                                                    ? parseInt(
-                                                                          value
-                                                                      )
-                                                                    : null
+                                                                value === "none" || !value
+                                                                    ? null
+                                                                    : parseInt(value)
                                                             )
                                                         }
                                                     >
@@ -1218,6 +1204,13 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                                             />
                                                         </SelectTrigger>
                                                         <SelectContent className="border-gray-300 bg-white">
+                                                            {/* None option */}
+                                                            <SelectItem
+                                                                value="none"
+                                                                className="text-gray-900 hover:bg-gray-100"
+                                                            >
+                                                                {t('admin.approvals.none') || 'Aucune'}
+                                                            </SelectItem>
                                                             {infospotactions?.map(
                                                                 (action) => (
                                                                     <SelectItem
