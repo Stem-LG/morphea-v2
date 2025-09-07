@@ -379,13 +379,33 @@ export function ProductDetailsPage({
         }
     }, [approvedVariants, selectedColorId, selectedSizeId, selectedJewelryType, selectedMaterial, isJewelryProduct])
 
+    // Get media from the currently selected variant only
+    const selectedVariantMedia = useMemo(() => {
+        if (!selectedVariant || !selectedVariant.yvarprodmedia) return []
+
+        return selectedVariant.yvarprodmedia.map((mediaWrapper) => mediaWrapper.ymedia)
+    }, [selectedVariant])
+
+    // Reset media index when selected variant changes and has media
+    useEffect(() => {
+        if (selectedVariant && selectedVariantMedia.length > 0) {
+            setSelectedMediaIndex(0)
+        }
+    }, [selectedVariant?.yvarprodid, selectedVariantMedia.length])
+
     // Check if current variant is in wishlist
     const { data: isInWishlist } = useIsInWishlist(
         selectedVariant?.yvarprodid || 0
     )
 
-    // Get all media from approved variants only for the carousel
+    // Fallback to all media if selected variant has no media
     const allMedia = useMemo(() => {
+        // First try to use media from selected variant
+        if (selectedVariantMedia.length > 0) {
+            return selectedVariantMedia
+        }
+
+        // Fallback: get all media from approved variants
         if (!approvedVariants || approvedVariants.length === 0) return []
 
         const mediaSet = new Set()
@@ -408,7 +428,7 @@ export function ProductDetailsPage({
             }
         })
         return mediaArray
-    }, [approvedVariants])
+    }, [selectedVariantMedia, approvedVariants])
 
     // Get 3D model for selected variant
     const selected3DModel = useMemo(() => {
@@ -483,17 +503,6 @@ export function ProductDetailsPage({
                 setSelectedSizeId(firstVariantWithSize.xtaille.xtailleid)
             }
         }
-
-        // Update media view if variant has specific media
-        const newVariant =
-            variantsForColor.find(
-                (v) => v.xtaille && v.xtaille.xtailleid === selectedSizeId
-            ) || variantsForColor[0]
-        if (newVariant?.yvarprodmedia && newVariant.yvarprodmedia.length > 0) {
-            if (viewMode === 'media') {
-                setSelectedMediaIndex(0)
-            }
-        }
     }
 
     // Handle size selection
@@ -520,17 +529,6 @@ export function ProductDetailsPage({
             const firstMaterial = variantsForType[0].xmateriaux?.xmateriauxintitule
             if (firstMaterial) {
                 setSelectedMaterial(firstMaterial)
-            }
-        }
-
-        // Update media view if variant has specific media
-        const newVariant =
-            variantsForType.find(
-                (v) => v.xmateriaux?.xmateriauxintitule === selectedMaterial
-            ) || variantsForType[0]
-        if (newVariant?.yvarprodmedia && newVariant.yvarprodmedia.length > 0) {
-            if (viewMode === 'media') {
-                setSelectedMediaIndex(0)
             }
         }
     }
