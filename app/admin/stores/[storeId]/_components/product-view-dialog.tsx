@@ -62,6 +62,8 @@ export function ProductViewDialog({ isOpen, onClose, productId }: ProductViewDia
                         *,
                         xcouleur(*),
                         xtaille(*),
+                        xtypebijoux(*),
+                        xmateriaux(*),
                         xdevise(*),
                         yobjet3d(*),
                         yvarprodmedia(
@@ -182,9 +184,9 @@ export function ProductViewDialog({ isOpen, onClose, productId }: ProductViewDia
                     </div>
                 </DialogHeader>
 
-                <div className="flex h-[calc(95vh-120px)]">
+                <div className="flex h-[calc(95vh-120px)] gap-6">
                     {/* Left Panel - Product Information */}
-                    <div className="w-1/2 border-r border-gray-200">
+                    <div className="w-1/2 border-r border-gray-200 pr-3">
                         <ScrollArea className="h-full">
                             <div className="space-y-6">
                                 {/* Basic Product Info */}
@@ -208,6 +210,22 @@ export function ProductViewDialog({ isOpen, onClose, productId }: ProductViewDia
                                             <Label className="text-gray-700 text-sm">{t("admin.category")}</Label>
                                             <div className="text-gray-900">
                                                 {category?.xcategprodintitule || t("admin.unknown")}
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <Label className="text-gray-700 text-sm">{t("admin.productView.productType") || "Product Type"}</Label>
+                                            <div className="flex items-center gap-2 mt-1">
+                                                {product.yprodestbijoux ? (
+                                                    <Badge variant="secondary" className="bg-purple-100 text-purple-800 border-purple-200">
+                                                        <Package className="h-3 w-3 mr-1" />
+                                                        {t("admin.productView.jewelryProduct") || "Jewelry Product"}
+                                                    </Badge>
+                                                ) : (
+                                                    <Badge variant="secondary" className="bg-blue-100 text-blue-800 border-blue-200">
+                                                        <Package className="h-3 w-3 mr-1" />
+                                                        {t("admin.productView.regularProduct") || "Regular Product"}
+                                                    </Badge>
+                                                )}
                                             </div>
                                         </div>
                                         <div>
@@ -329,7 +347,7 @@ export function ProductViewDialog({ isOpen, onClose, productId }: ProductViewDia
                     </div>
 
                     {/* Right Panel - Variant Cards (Read-only) */}
-                    <div className="w-1/2">
+                    <div className="w-1/2 pl-3">
                         <div className="flex items-center justify-between mb-4">
                                 <h3 className="text-lg font-semibold text-gray-900">
                                     {t("admin.productView.productVariants")} ({product.yvarprod?.length || 0})
@@ -538,10 +556,38 @@ function VariantViewCard({ variant, t, canEditVisibility }: { variant: any; t: (
                 <div className="flex items-start justify-between">
                     <div className="flex-1">
                         <CardTitle className="text-gray-900 text-sm font-medium">{variant.yvarprodintitule}</CardTitle>
-                        <div className="flex items-center gap-2 mt-1 text-xs text-gray-600">
-                            <span>{variant.xcouleur?.xcouleurintitule}</span>
-                            <span>•</span>
-                            <span>{variant.xtaille?.xtailleintitule}</span>
+                        <div className="flex flex-wrap items-center gap-2 mt-1 text-xs">
+                            {/* Always show all available attributes */}
+                            {variant.xtypebijoux && (
+                                <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded border border-purple-200 font-medium">
+                                    {t("admin.productView.type") || "Type"}: {variant.xtypebijoux.xtypebijouxintitule}
+                                </span>
+                            )}
+                            
+                            {variant.xmateriaux && (
+                                <span className="bg-orange-100 text-orange-800 px-2 py-1 rounded border border-orange-200 font-medium">
+                                    {t("admin.productView.material") || "Material"}: {variant.xmateriaux.xmateriauxintitule}
+                                </span>
+                            )}
+                            
+                            {variant.xcouleur && (
+                                <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded border border-blue-200 font-medium">
+                                    {t("admin.productView.color") || "Color"}: {variant.xcouleur.xcouleurintitule}
+                                </span>
+                            )}
+                            
+                            {variant.xtaille && (
+                                <span className="bg-green-100 text-green-800 px-2 py-1 rounded border border-green-200 font-medium">
+                                    {t("admin.productView.size") || "Size"}: {variant.xtaille.xtailleintitule}
+                                </span>
+                            )}
+                            
+                            {/* Show message if no attributes are available */}
+                            {!variant.xtypebijoux && !variant.xmateriaux && !variant.xcouleur && !variant.xtaille && (
+                                <span className="text-gray-500 italic">
+                                    {t("admin.productView.noAttributes") || "No attributes defined"}
+                                </span>
+                            )}
                         </div>
                     </div>
                     {getStatusBadge()}

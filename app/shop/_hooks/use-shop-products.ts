@@ -11,6 +11,8 @@ interface UseShopProductsParams {
     sortBy?: string;
     colorId?: number | null;
     sizeId?: number | null;
+    typebijouxId?: string | null;
+    materiauxId?: string | null;
     minPrice?: number | null;
     maxPrice?: number | null;
 }
@@ -52,6 +54,14 @@ interface ProductWithDetails {
             xtailleid: number;
             xtailleintitule: string;
         };
+        xtypebijoux?: {
+            xtypebijouxid: string;
+            xtypebijouxintitule: string;
+        };
+        xmateriaux?: {
+            xmateriauxid: string;
+            xmateriauxintitule: string;
+        };
         yvarprodmedia?: Array<{
             ymedia: {
                 ymediaid: number;
@@ -91,13 +101,15 @@ export function useShopProducts({
     sortBy = "default",
     colorId = null,
     sizeId = null,
+    typebijouxId = null,
+    materiauxId = null,
     minPrice = null,
     maxPrice = null
 }: UseShopProductsParams = {}) {
     const supabase = createClient();
 
     return useQuery({
-        queryKey: ['shop-products', page, perPage, mallId, boutiqueId, categoryId, searchQuery, sortBy, colorId, sizeId, minPrice, maxPrice],
+        queryKey: ['shop-products', page, perPage, mallId, boutiqueId, categoryId, searchQuery, sortBy, colorId, sizeId, typebijouxId, materiauxId, minPrice, maxPrice],
         queryFn: async () => {
             // Step 1: Get the current active event
             const currentDate = new Date().toISOString().split('T')[0];
@@ -166,6 +178,8 @@ export function useShopProducts({
                         *,
                         xcouleur:xcouleuridfk (*),
                         xtaille:xtailleidfk (*),
+                        xtypebijoux:xtypebijouxidfk (*),
+                        xmateriaux:xmatrieauxidfk (*),
                         yvarprodmedia (
                             ymedia:ymediaidfk (*)
                         ),
@@ -268,6 +282,8 @@ export function useShopProducts({
                     const isApproved = v.yvarprodstatut === "approved";
                     const matchesColor = !colorId || v.xcouleur?.xcouleurid === colorId;
                     const matchesSize = !sizeId || v.xtaille?.xtailleid === sizeId;
+                    const matchesTypeBijoux = !typebijouxId || v.xtypebijoux?.xtypebijouxid === typebijouxId;
+                    const matchesMateriaux = !materiauxId || v.xmateriaux?.xmateriauxid === materiauxId;
 
                     // Price filtering with currency conversion
                     let matchesMinPrice = true;
@@ -291,7 +307,7 @@ export function useShopProducts({
                         }
                     }
 
-                    return isApproved && matchesColor && matchesSize && matchesMinPrice && matchesMaxPrice;
+                    return isApproved && matchesColor && matchesSize && matchesTypeBijoux && matchesMateriaux && matchesMinPrice && matchesMaxPrice;
                 }) || []
             })).filter(product => product.yvarprod.length > 0) || [];
 
@@ -356,13 +372,15 @@ export function useShopProductsInfinite({
     sortBy = "default",
     colorId = null,
     sizeId = null,
+    typebijouxId = null,
+    materiauxId = null,
     minPrice = null,
     maxPrice = null
 }: Omit<UseShopProductsParams, 'page'> = {}) {
     const supabase = createClient();
 
     return useInfiniteQuery({
-        queryKey: ['shop-products-infinite', perPage, mallId, boutiqueId, categoryId, searchQuery, sortBy, colorId, sizeId, minPrice, maxPrice],
+        queryKey: ['shop-products-infinite', perPage, mallId, boutiqueId, categoryId, searchQuery, sortBy, colorId, sizeId, typebijouxId, materiauxId, minPrice, maxPrice],
         queryFn: async ({ pageParam }: { pageParam: number }) => {
             const currentPage = pageParam || 1;
             // Step 1: Get the current active event
@@ -447,8 +465,6 @@ export function useShopProductsInfinite({
                         yvarprodpromotiondatefin,
                         yvarprodnbrjourlivraison,
                         yvarprodstatut,
-                        yvarprodtypebijoux,
-                        yvarprodmatrieaux,
                         xdeviseidfk,
                         xcouleur:xcouleuridfk (
                             xcouleurid,
@@ -458,6 +474,14 @@ export function useShopProductsInfinite({
                         xtaille:xtailleidfk (
                             xtailleid,
                             xtailleintitule
+                        ),
+                        xtypebijoux:xtypebijouxidfk (
+                            xtypebijouxid,
+                            xtypebijouxintitule
+                        ),
+                        xmateriaux:xmatrieauxidfk (
+                            xmateriauxid,
+                            xmateriauxintitule
                         ),
                         yvarprodmedia (
                             yvarprodmediaid,
@@ -566,6 +590,8 @@ export function useShopProductsInfinite({
                     const isApproved = variant.yvarprodstatut === "approved";
                     const matchesColor = !colorId || variant.xcouleur?.xcouleurid === colorId;
                     const matchesSize = !sizeId || variant.xtaille?.xtailleid === sizeId;
+                    const matchesTypeBijoux = !typebijouxId || variant.xtypebijoux?.xtypebijouxid === typebijouxId;
+                    const matchesMateriaux = !materiauxId || variant.xmateriaux?.xmateriauxid === materiauxId;
 
                     // Price filtering with currency conversion
                     let matchesMinPrice = true;
@@ -589,7 +615,7 @@ export function useShopProductsInfinite({
                         }
                     }
 
-                    return isApproved && matchesColor && matchesSize && matchesMinPrice && matchesMaxPrice;
+                    return isApproved && matchesColor && matchesSize && matchesTypeBijoux && matchesMateriaux && matchesMinPrice && matchesMaxPrice;
                 }) || []
             })).filter(product => product.yvarprod.length > 0) || [];
 

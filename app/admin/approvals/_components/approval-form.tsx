@@ -37,6 +37,8 @@ import type { Database } from "@/lib/supabase";
 type ProductVariant = Database["morpheus"]["Tables"]["yvarprod"]["Row"] & {
     xcouleur?: Database["morpheus"]["Tables"]["xcouleur"]["Row"];
     xtaille?: Database["morpheus"]["Tables"]["xtaille"]["Row"];
+    xtypebijoux?: Database["morpheus"]["Tables"]["xtypebijoux"]["Row"];
+    xmateriaux?: Database["morpheus"]["Tables"]["xmateriaux"]["Row"];
     xdevise?: Database["morpheus"]["Tables"]["xdevise"]["Row"];
     yobjet3d?: Database["morpheus"]["Tables"]["yobjet3d"]["Row"][];
     yvarprodmedia?: Array<{
@@ -388,10 +390,39 @@ function VariantCard({ variant, onApprove, onReject, isLoading, eventStartDate, 
                 <div className="flex items-start justify-between">
                     <div className="flex-1">
                         <CardTitle className="text-gray-900 text-sm font-medium">{variant.yvarprodintitule}</CardTitle>
-                        <div className="flex items-center gap-2 mt-1 text-xs text-gray-600">
-                            <span>{variant.xcouleur?.xcouleurintitule}</span>
-                            <span>•</span>
-                            <span>{variant.xtaille?.xtailleintitule}</span>
+                        <div className="flex flex-wrap items-center gap-2 mt-1 text-xs">
+                            {/* Type Bijoux Badge */}
+                            {variant.xtypebijoux && (
+                                <Badge variant="secondary" className="bg-purple-100 text-purple-800 border-purple-200 text-xs">
+                                    {t("admin.productView.type") || "Type"}: {variant.xtypebijoux.xtypebijouxintitule}
+                                </Badge>
+                            )}
+                            
+                            {/* Materiaux Badge */}
+                            {variant.xmateriaux && (
+                                <Badge variant="secondary" className="bg-orange-100 text-orange-800 border-orange-200 text-xs">
+                                    {t("admin.productView.material") || "Material"}: {variant.xmateriaux.xmateriauxintitule}
+                                </Badge>
+                            )}
+                            
+                            {/* Color Badge */}
+                            {variant.xcouleur && (
+                                <Badge variant="secondary" className="bg-blue-100 text-blue-800 border-blue-200 text-xs">
+                                    {t("admin.productView.color") || "Color"}: {variant.xcouleur.xcouleurintitule}
+                                </Badge>
+                            )}
+                            
+                            {/* Size Badge */}
+                            {variant.xtaille && (
+                                <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-200 text-xs">
+                                    {t("admin.productView.size") || "Size"}: {variant.xtaille.xtailleintitule}
+                                </Badge>
+                            )}
+                            
+                            {/* Show message if no attributes */}
+                            {!variant.xtypebijoux && !variant.xmateriaux && !variant.xcouleur && !variant.xtaille && (
+                                <span className="text-gray-500 italic">{t("admin.productView.noAttributes") || "No attributes set"}</span>
+                            )}
                         </div>
                     </div>
                     {getStatusBadge()}
@@ -732,6 +763,8 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                         *,
                         xcouleur(*),
                         xtaille(*),
+                        xtypebijoux(*),
+                        xmateriaux(*),
                         xdevise(*),
                         yobjet3d(*),
                         yvarprodmedia(
@@ -1429,7 +1462,13 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                     </div>
                                 )}
 
-                            <ScrollArea className="h-[calc(95vh-300px)] overflow-y-auto">
+                            <ScrollArea 
+                                className={`overflow-y-auto ${
+                                    (pendingVariants.length > 0 && pendingVariantsWithoutValidPrice.length > 0) || bulkApprovalError
+                                        ? 'max-h-[calc(95vh-330px)]' // Reduced height when alerts are shown
+                                        : 'max-h-[calc(95vh-250px)]' // Normal height when no alerts
+                                }`}
+                            >
                                 <div className="space-y-4 pr-4">
                                     {product.yvarprod?.map(
                                         (variant: ProductVariant) => (

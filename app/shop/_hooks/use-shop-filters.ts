@@ -468,3 +468,101 @@ export function useShopPriceRange() {
         gcTime: 10 * 60 * 1000, // 10 minutes
     });
 }
+
+// Hook to get unique jewelry types from current event products
+export function useShopTypeBijoux() {
+    const supabase = createClient();
+
+    return useQuery({
+        queryKey: ['shop-typebijoux'],
+        queryFn: async () => {
+            // Get current active event
+            const currentDate = new Date().toISOString().split('T')[0];
+
+            const { data: currentEvent, error: eventError } = await supabase
+                .schema("morpheus")
+                .from("yevent")
+                .select("*")
+                .lte("yeventdatedeb", currentDate)
+                .gte("yeventdatefin", currentDate)
+                .order("yeventdatedeb", { ascending: false })
+                .limit(1)
+                .single();
+
+            if (eventError || !currentEvent) {
+                console.error("No active event found:", eventError);
+                return [];
+            }
+
+            // Get jewelry types with product counts
+            const { data: typeData, error: typeError } = await supabase
+                .schema("morpheus")
+                .from("xtypebijoux")
+                .select(`
+                    xtypebijouxid,
+                    xtypebijouxintitule,
+                    xtypebijouxcode
+                `)
+                .order("xtypebijouxintitule");
+
+            if (typeError) {
+                console.error("Error fetching jewelry types:", typeError);
+                return [];
+            }
+
+            return typeData || [];
+        },
+        staleTime: 5 * 60 * 1000, // 5 minutes
+        gcTime: 10 * 60 * 1000, // 10 minutes
+        placeholderData: keepPreviousData,
+    });
+}
+
+// Hook to get unique materials from current event products
+export function useShopMateriaux() {
+    const supabase = createClient();
+
+    return useQuery({
+        queryKey: ['shop-materiaux'],
+        queryFn: async () => {
+            // Get current active event
+            const currentDate = new Date().toISOString().split('T')[0];
+
+            const { data: currentEvent, error: eventError } = await supabase
+                .schema("morpheus")
+                .from("yevent")
+                .select("*")
+                .lte("yeventdatedeb", currentDate)
+                .gte("yeventdatefin", currentDate)
+                .order("yeventdatedeb", { ascending: false })
+                .limit(1)
+                .single();
+
+            if (eventError || !currentEvent) {
+                console.error("No active event found:", eventError);
+                return [];
+            }
+
+            // Get materials with product counts
+            const { data: materialData, error: materialError } = await supabase
+                .schema("morpheus")
+                .from("xmateriaux")
+                .select(`
+                    xmateriauxid,
+                    xmateriauxintitule,
+                    xmateriauxcode
+                `)
+                .order("xmateriauxintitule");
+
+            if (materialError) {
+                console.error("Error fetching materials:", materialError);
+                return [];
+            }
+
+            return materialData || [];
+        },
+        staleTime: 5 * 60 * 1000, // 5 minutes
+        gcTime: 10 * 60 * 1000, // 10 minutes
+        placeholderData: keepPreviousData,
+    });
+}

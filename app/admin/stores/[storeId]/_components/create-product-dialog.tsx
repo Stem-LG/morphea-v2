@@ -39,6 +39,10 @@ import { useColors } from "../_hooks/colors/use-colors";
 import { useCreateColor } from "../_hooks/colors/use-create-color";
 import { useSizes } from "../_hooks/sizes/use-sizes";
 import { useCreateSize } from "../_hooks/sizes/use-create-size";
+import { useTypeBijoux } from "../_hooks/typebijoux/use-typebijoux";
+import { useCreateTypeBijoux } from "../_hooks/typebijoux/use-create-typebijoux";
+import { useMateriaux } from "../_hooks/materiaux/use-materiaux";
+import { useCreateMateriaux } from "../_hooks/materiaux/use-create-materiaux";
 import { useDesigner } from "../_hooks/use-designer";
 import { useCreateProduct } from "../_hooks/use-create-product";
 import { useUpdateProduct } from "../_hooks/use-update-product";
@@ -54,8 +58,8 @@ interface ProductVariant {
     colorId: number | null;
     sizeId: number | null;
     // Jewelry fields - used when product is jewelry
-    yvarprodtypebijoux?: string | null; // Type of jewelry
-    yvarprodmatrieaux?: string | null; // Materials used
+    typebijouxId: string | null; // Type of jewelry ID (replaces yvarprodtypebijoux)
+    materiauxId: string | null; // Materials ID (replaces yvarprodmatrieaux)
     images: (File | { ymediaid: number; ymediaurl: string; ymediaintitule: string })[];
     videos: (File | { ymediaid: number; ymediaurl: string; ymediaintitule: string })[];
     models3d: (File | { yobjet3did: number; yobjet3durl: string; ycouleurarriereplan?: string })[];
@@ -106,8 +110,8 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
             name: "",
             colorId: null,
             sizeId: null,
-            yvarprodtypebijoux: null,
-            yvarprodmatrieaux: null,
+            typebijouxId: null,
+            materiauxId: null,
             images: [],
             videos: [],
             models3d: [],
@@ -132,6 +136,20 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
         eur: "",
         us: "",
         x: "",
+    });
+
+    // Type bijoux creation state
+    const [showTypebijouxForm, setShowTypebijouxForm] = useState(false);
+    const [newTypebijoux, setNewTypebijoux] = useState({
+        code: "",
+        name: "",
+    });
+
+    // Materiaux creation state
+    const [showMateriauxForm, setShowMateriauxForm] = useState(false);
+    const [newMateriaux, setNewMateriaux] = useState({
+        code: "",
+        name: "",
     });
 
     // Progress bar state
@@ -160,6 +178,8 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
     const { data: categories, isLoading: categoriesLoading } = useCategories();
     const { data: colors } = useColors();
     const { data: sizes, isLoading: sizesLoading } = useSizes();
+    const { data: typebijoux, isLoading: typebijouxLoading } = useTypeBijoux();
+    const { data: materiaux, isLoading: materiauxLoading } = useMateriaux();
     const { data: currencies, isLoading: currenciesLoading } = useCurrencies();
     const { data: designer, isLoading: designerLoading } = useDesigner();
     const {
@@ -179,6 +199,8 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
     });
     const createColorMutation = useCreateColor();
     const createSizeMutation = useCreateSize();
+    const createTypebijouxMutation = useCreateTypeBijoux();
+    const createMateriauxMutation = useCreateMateriaux();
     const createProductMutation = useCreateProduct();
     const updateProductMutation = useUpdateProduct();
 
@@ -215,8 +237,8 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                     code: variant.yvarprodcode || "",
                     colorId: variant.xcouleuridfk?.xcouleurid || null,
                     sizeId: variant.xtailleidfk?.xtailleid || null,
-                    yvarprodtypebijoux: variant.yvarprodtypebijoux || null,
-                    yvarprodmatrieaux: variant.yvarprodmatrieaux || null,
+                    typebijouxId: variant.xtypebijouxidfk || null,
+                    materiauxId: variant.xmatrieauxidfk || null,
                     images: variant.images || [],
                     videos: variant.videos || [],
                     models3d: variant.models3d || [],
@@ -240,8 +262,8 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                             name: "",
                             colorId: null,
                             sizeId: null,
-                            yvarprodtypebijoux: null,
-                            yvarprodmatrieaux: null,
+                            typebijouxId: null,
+                            materiauxId: null,
                             images: [],
                             videos: [],
                             models3d: [],
@@ -265,8 +287,8 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                     name: "",
                     colorId: null,
                     sizeId: null,
-                    yvarprodtypebijoux: null,
-                    yvarprodmatrieaux: null,
+                    typebijouxId: null,
+                    materiauxId: null,
                     images: [],
                     videos: [],
                     models3d: [],
@@ -307,6 +329,18 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
             label: `${currency.xdeviseintitule} (${currency.xdevisecodealpha})`,
         })) || [];
 
+    const typebijouxOptions =
+        typebijoux?.map((type) => ({
+            value: type.xtypebijouxid,
+            label: type.xtypebijouxintitule,
+        })) || [];
+
+    const materiauxOptions =
+        materiaux?.map((material) => ({
+            value: material.xmateriauxid,
+            label: material.xmateriauxintitule,
+        })) || [];
+
     // Handlers
     const handleAddVariant = () => {
         const newVariant: ProductVariant = {
@@ -314,8 +348,8 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
             name: "",
             colorId: null,
             sizeId: null,
-            yvarprodtypebijoux: null,
-            yvarprodmatrieaux: null,
+            typebijouxId: null,
+            materiauxId: null,
             images: [],
             videos: [],
             models3d: [],
@@ -377,8 +411,8 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                     variant.code?.trim() !== "" ||
                     variant.colorId !== null ||
                     variant.sizeId !== null ||
-                    variant.yvarprodtypebijoux?.trim() !== "" ||
-                    variant.yvarprodmatrieaux?.trim() !== "" ||
+                    variant.typebijouxId !== null ||
+                    variant.materiauxId !== null ||
                     variant.images.length > 0 ||
                     variant.videos.length > 0 ||
                     variant.models3d.length > 0 ||
@@ -479,6 +513,40 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
         } catch (error) {
             console.error("Failed to create size:", error);
             toast.error(t("admin.createProduct.failedToCreateSize"));
+        }
+    };
+
+    const handleCreateTypebijoux = async () => {
+        if (!newTypebijoux.code || !newTypebijoux.name) {
+            toast.error(t("admin.createProduct.fillTypebijouxCodeAndName") || "Please fill in type bijoux code and name");
+            return;
+        }
+
+        try {
+            await createTypebijouxMutation.mutateAsync(newTypebijoux);
+            toast.success(t("admin.createProduct.typebijouxCreatedSuccessfully") || "Type bijoux created successfully");
+            setShowTypebijouxForm(false);
+            setNewTypebijoux({ code: "", name: "" });
+        } catch (error) {
+            console.error("Failed to create type bijoux:", error);
+            toast.error(t("admin.createProduct.failedToCreateTypebijoux") || "Failed to create type bijoux");
+        }
+    };
+
+    const handleCreateMateriaux = async () => {
+        if (!newMateriaux.code || !newMateriaux.name) {
+            toast.error(t("admin.createProduct.fillMateriauxCodeAndName") || "Please fill in materiaux code and name");
+            return;
+        }
+
+        try {
+            await createMateriauxMutation.mutateAsync(newMateriaux);
+            toast.success(t("admin.createProduct.materiauxCreatedSuccessfully") || "Materiaux created successfully");
+            setShowMateriauxForm(false);
+            setNewMateriaux({ code: "", name: "" });
+        } catch (error) {
+            console.error("Failed to create materiaux:", error);
+            toast.error(t("admin.createProduct.failedToCreateMateriaux") || "Failed to create materiaux");
         }
     };
 
@@ -622,8 +690,18 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
         }
 
         // Validate variants - only validate editable variants
+        console.log("Validating variants. Is jewelry product:", isJewelryProduct);
         for (const variant of variants) {
             const canEdit = canEditVariant(variant);
+            console.log("Variant validation:", {
+                name: variant.name,
+                canEdit,
+                isJewelryProduct,
+                typebijouxId: variant.typebijouxId,
+                materiauxId: variant.materiauxId,
+                colorId: variant.colorId,
+                sizeId: variant.sizeId
+            });
             if (canEdit) {
                 // Check basic required fields
                 if (!variant.name) {
@@ -633,12 +711,12 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                 
                 if (isJewelryProduct) {
                     // For jewelry products, validate jewelry fields
-                    if (!variant.yvarprodtypebijoux?.trim()) {
+                    if (!variant.typebijouxId) {
                         toast.error(t("admin.createProduct.jewelryTypeRequired") || "Jewelry type is required for jewelry items");
                         return;
                     }
                     
-                    if (!variant.yvarprodmatrieaux?.trim()) {
+                    if (!variant.materiauxId) {
                         toast.error(t("admin.createProduct.materialsRequired") || "Materials are required for jewelry items");
                         return;
                     }
@@ -679,11 +757,11 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                         yvarprodid: v.yvarprodid,
                         name: v.name,
                         code: v.code,
-                        colorId: v.colorId!,
-                        sizeId: v.sizeId!,
-                        // Include jewelry fields
-                        yvarprodtypebijoux: v.yvarprodtypebijoux,
-                        yvarprodmatrieaux: v.yvarprodmatrieaux,
+                        colorId: isJewelryProduct ? null : (v.colorId || null),
+                        sizeId: isJewelryProduct ? null : (v.sizeId || null),
+                        // Include jewelry fields using correct property names
+                        typebijouxId: isJewelryProduct ? (v.typebijouxId || null) : null,
+                        materiauxId: isJewelryProduct ? (v.materiauxId || null) : null,
                         images: v.images.filter((img): img is File => img instanceof File),
                         videos: v.videos.filter((vid): vid is File => vid instanceof File),
                         models3d: v.models3d.filter((model): model is File => model instanceof File),
@@ -719,11 +797,11 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                     return {
                         name: v.name,
                         code: v.code,
-                        colorId: v.colorId!,
-                        sizeId: v.sizeId!,
-                        // Include jewelry fields
-                        yvarprodtypebijoux: v.yvarprodtypebijoux,
-                        yvarprodmatrieaux: v.yvarprodmatrieaux,
+                        colorId: isJewelryProduct ? null : (v.colorId || null),
+                        sizeId: isJewelryProduct ? null : (v.sizeId || null),
+                        // Include jewelry fields using correct property names
+                        typebijouxId: isJewelryProduct ? (v.typebijouxId || null) : null,
+                        materiauxId: isJewelryProduct ? (v.materiauxId || null) : null,
                         images: v.images.filter((img): img is File => img instanceof File),
                         videos: v.videos.filter((vid): vid is File => vid instanceof File),
                         models3d: v.models3d.filter((model): model is File => model instanceof File),
@@ -732,10 +810,15 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                     };
                 });
                 
-                console.log("Creating variants with background colors:", createVariants.map(v => ({
+                console.log("Creating variants with all data:", createVariants.map(v => ({
                     name: v.name,
+                    colorId: v.colorId,
+                    sizeId: v.sizeId,
+                    typebijouxId: v.typebijouxId,
+                    materiauxId: v.materiauxId,
                     backgroundColor: v.backgroundColor
                 })));
+                console.log("Is jewelry product:", isJewelryProduct);
                 
                 await createProductMutation.mutateAsync({
                     storeId,
@@ -762,7 +845,16 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
             }, 600);
         } catch (error) {
             console.error("Failed to create product:", error);
-            toast.error(isEditMode ? t("admin.createProduct.failedToUpdateProduct") : t("admin.createProduct.failedToCreateProduct"));
+            
+            // Check for specific error types
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            
+            if (errorMessage.startsWith('DUPLICATE_PRODUCT_CODE:')) {
+                const duplicateCode = errorMessage.split(':')[1];
+                toast.error(t("admin.createProduct.duplicateProductCode") || `Product code '${duplicateCode}' already exists. Please use a different code.`);
+            } else {
+                toast.error(isEditMode ? t("admin.createProduct.failedToUpdateProduct") : t("admin.createProduct.failedToCreateProduct"));
+            }
 
             // Reset progress on error
             if (progressIntervalRef.current) {
@@ -819,9 +911,9 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
             code: variant.code,
             colorId: variant.colorId!,
             sizeId: variant.sizeId!,
-            // Include jewelry fields
-            yvarprodtypebijoux: variant.yvarprodtypebijoux,
-            yvarprodmatrieaux: variant.yvarprodmatrieaux,
+            // Include jewelry fields as foreign keys
+            xtypebijouxidfk: variant.typebijouxId,
+            xmatrieauxidfk: variant.materiauxId,
             images: variant.images,
             videos: variant.videos,
             models3d: formattedModels3d,
@@ -1175,6 +1267,114 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                         </CardContent>
                                     </Card>
                                 )}
+
+                                {/* Type Bijoux Creation Form */}
+                                {showTypebijouxForm && (
+                                    <Card className="bg-purple-50 border-purple-200">
+                                        <CardHeader>
+                                            <CardTitle className="text-lg text-gray-900 flex items-center gap-2">
+                                                <Package className="h-5 w-5 text-purple-600" />
+                                                {t("admin.createProduct.createNewTypeBijoux")}
+                                            </CardTitle>
+                                        </CardHeader>
+                                        <CardContent className="space-y-4">
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div>
+                                                    <Label className="text-gray-700">{t("admin.createProduct.typebijouxCode")}</Label>
+                                                    <Input
+                                                        value={newTypebijoux.code}
+                                                        onChange={(e) =>
+                                                            setNewTypebijoux({ ...newTypebijoux, code: e.target.value })
+                                                        }
+                                                        placeholder={t("admin.createProduct.typebijouxCodePlaceholder")}
+                                                        className="mt-1 bg-white border-gray-300 text-gray-900"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <Label className="text-gray-700">{t("admin.createProduct.typebijouxName")}</Label>
+                                                    <Input
+                                                        value={newTypebijoux.name}
+                                                        onChange={(e) =>
+                                                            setNewTypebijoux({ ...newTypebijoux, name: e.target.value })
+                                                        }
+                                                        placeholder={t("admin.createProduct.typebijouxNamePlaceholder")}
+                                                        className="mt-1 bg-white border-gray-300 text-gray-900"
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="flex gap-2">
+                                                <Button
+                                                    onClick={handleCreateTypebijoux}
+                                                    disabled={createTypebijouxMutation.isPending}
+                                                    className="bg-purple-600 hover:bg-purple-700 text-white"
+                                                >
+                                                    {createTypebijouxMutation.isPending ? t("admin.createProduct.creating") : t("admin.createProduct.createTypeBijoux")}
+                                                </Button>
+                                                <Button
+                                                    onClick={() => setShowTypebijouxForm(false)}
+                                                    variant="outline"
+                                                    className="border-gray-300 text-gray-700 hover:bg-gray-50"
+                                                >
+                                                    {t("common.cancel")}
+                                                </Button>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                )}
+
+                                {/* Materiaux Creation Form */}
+                                {showMateriauxForm && (
+                                    <Card className="bg-orange-50 border-orange-200">
+                                        <CardHeader>
+                                            <CardTitle className="text-lg text-gray-900 flex items-center gap-2">
+                                                <Box className="h-5 w-5 text-orange-600" />
+                                                {t("admin.createProduct.createNewMateriaux")}
+                                            </CardTitle>
+                                        </CardHeader>
+                                        <CardContent className="space-y-4">
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div>
+                                                    <Label className="text-gray-700">{t("admin.createProduct.materiauxCode")}</Label>
+                                                    <Input
+                                                        value={newMateriaux.code}
+                                                        onChange={(e) =>
+                                                            setNewMateriaux({ ...newMateriaux, code: e.target.value })
+                                                        }
+                                                        placeholder={t("admin.createProduct.materiauxCodePlaceholder")}
+                                                        className="mt-1 bg-white border-gray-300 text-gray-900"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <Label className="text-gray-700">{t("admin.createProduct.materiauxName")}</Label>
+                                                    <Input
+                                                        value={newMateriaux.name}
+                                                        onChange={(e) =>
+                                                            setNewMateriaux({ ...newMateriaux, name: e.target.value })
+                                                        }
+                                                        placeholder={t("admin.createProduct.materiauxNamePlaceholder")}
+                                                        className="mt-1 bg-white border-gray-300 text-gray-900"
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="flex gap-2">
+                                                <Button
+                                                    onClick={handleCreateMateriaux}
+                                                    disabled={createMateriauxMutation.isPending}
+                                                    className="bg-orange-600 hover:bg-orange-700 text-white"
+                                                >
+                                                    {createMateriauxMutation.isPending ? t("admin.createProduct.creating") : t("admin.createProduct.createMateriaux")}
+                                                </Button>
+                                                <Button
+                                                    onClick={() => setShowMateriauxForm(false)}
+                                                    variant="outline"
+                                                    className="border-gray-300 text-gray-700 hover:bg-gray-50"
+                                                >
+                                                    {t("common.cancel")}
+                                                </Button>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                )}
                             </div>
 
                             {/* Right Column - Product Variants */}
@@ -1290,19 +1490,32 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                                             <Package className="h-3 w-3" />
                                                                             {t("admin.createProduct.jewelryType")} <span className="text-red-600">*</span>
                                                                         </Label>
-                                                                        <Input
-                                                                            value={variant.yvarprodtypebijoux || ""}
-                                                                            onChange={(e) =>
-                                                                                handleVariantChange(
-                                                                                    variant.id,
-                                                                                    "yvarprodtypebijoux",
-                                                                                    e.target.value
-                                                                                )
-                                                                            }
-                                                                            placeholder={t("admin.createProduct.jewelryTypePlaceholder")}
-                                                                            className="mt-1 bg-white border-gray-300 text-gray-900"
-                                                                            disabled={!canEdit}
-                                                                        />
+                                                                        <div className="flex gap-2 mt-1">
+                                                                            <SuperSelect
+                                                                                value={variant.typebijouxId}
+                                                                                onValueChange={(value) =>
+                                                                                    handleVariantChange(
+                                                                                        variant.id,
+                                                                                        "typebijouxId",
+                                                                                        value as string
+                                                                                    )
+                                                                                }
+                                                                                options={typebijouxOptions}
+                                                                                placeholder={t("admin.createProduct.selectJewelryType")}
+                                                                                className="w-48 max-w-[200px]"
+                                                                                disabled={!canEdit || typebijouxLoading}
+                                                                            />
+                                                                            <Button
+                                                                                type="button"
+                                                                                size="sm"
+                                                                                variant="outline"
+                                                                                onClick={() => setShowTypebijouxForm(!showTypebijouxForm)}
+                                                                                disabled={!canEdit}
+                                                                                className="px-3"
+                                                                            >
+                                                                                <Plus className="h-4 w-4" />
+                                                                            </Button>
+                                                                        </div>
                                                                     </div>
 
                                                                     {/* Materials */}
@@ -1311,19 +1524,32 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                                             <Box className="h-3 w-3" />
                                                                             {t("admin.createProduct.materials")} <span className="text-red-600">*</span>
                                                                         </Label>
-                                                                        <Input
-                                                                            value={variant.yvarprodmatrieaux || ""}
-                                                                            onChange={(e) =>
-                                                                                handleVariantChange(
-                                                                                    variant.id,
-                                                                                    "yvarprodmatrieaux",
-                                                                                    e.target.value
-                                                                                )
-                                                                            }
-                                                                            placeholder={t("admin.createProduct.materialsPlaceholder")}
-                                                                            className="mt-1 bg-white border-gray-300 text-gray-900"
-                                                                            disabled={!canEdit}
-                                                                        />
+                                                                        <div className="flex gap-2 mt-1">
+                                                                            <SuperSelect
+                                                                                value={variant.materiauxId}
+                                                                                onValueChange={(value) =>
+                                                                                    handleVariantChange(
+                                                                                        variant.id,
+                                                                                        "materiauxId",
+                                                                                        value as string
+                                                                                    )
+                                                                                }
+                                                                                options={materiauxOptions}
+                                                                                placeholder={t("admin.createProduct.selectMaterials")}
+                                                                                className="w-48 max-w-[200px]"
+                                                                                disabled={!canEdit || materiauxLoading}
+                                                                            />
+                                                                            <Button
+                                                                                type="button"
+                                                                                size="sm"
+                                                                                variant="outline"
+                                                                                onClick={() => setShowMateriauxForm(!showMateriauxForm)}
+                                                                                disabled={!canEdit}
+                                                                                className="px-3"
+                                                                            >
+                                                                                <Plus className="h-4 w-4" />
+                                                                            </Button>
+                                                                        </div>
                                                                     </div>
                                                                 </>
                                                             ) : (
