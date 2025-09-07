@@ -225,13 +225,12 @@ export function useShopProducts({
                 productsQuery = productsQuery.eq("ydetailsevent.yboutiqueidfk", boutiqueId);
             }
 
-            // Apply sorting
+            // Apply sorting (note: price sorting will be handled after fetching due to nested relationship)
             switch (sortBy) {
                 case 'price_asc':
-                    productsQuery = productsQuery.order("yvarprod.yvarprodprixcatalogue", { ascending: true });
-                    break;
                 case 'price_desc':
-                    productsQuery = productsQuery.order("yvarprod.yvarprodprixcatalogue", { ascending: false });
+                    // Price sorting will be handled after fetching data since we can't order by nested fields directly
+                    productsQuery = productsQuery.order("yprodid", { ascending: false });
                     break;
                 case 'alphabetical':
                     productsQuery = productsQuery.order("yprodintitule", { ascending: true });
@@ -314,7 +313,27 @@ export function useShopProducts({
             // Handle special sorting cases
             let finalProducts = productsWithApprovedVariants as ProductWithDetails[];
 
-            if (sortBy === 'recommended') {
+            if (sortBy === 'price_asc' || sortBy === 'price_desc') {
+                // Sort by price (using the lowest price variant for each product)
+                finalProducts.sort((a, b) => {
+                    // Get the lowest price for each product
+                    const getLowestPrice = (product: ProductWithDetails) => {
+                        if (!product.yvarprod || product.yvarprod.length === 0) return Infinity;
+                        return Math.min(...product.yvarprod.map(variant =>
+                            variant.yvarprodprixpromotion || variant.yvarprodprixcatalogue || Infinity
+                        ));
+                    };
+
+                    const priceA = getLowestPrice(a);
+                    const priceB = getLowestPrice(b);
+
+                    if (sortBy === 'price_asc') {
+                        return priceA - priceB;
+                    } else {
+                        return priceB - priceA;
+                    }
+                });
+            } else if (sortBy === 'recommended') {
                 // Get purchase counts for products from zdetailscommande table
                 const productIds = finalProducts.map(p => p.yvarprod.map(v => v.yvarprodid)).flat();
 
@@ -533,13 +552,12 @@ export function useShopProductsInfinite({
                 productsQuery = productsQuery.eq("ydetailsevent.yboutiqueidfk", boutiqueId);
             }
 
-            // Apply sorting
+            // Apply sorting (note: price sorting will be handled after fetching due to nested relationship)
             switch (sortBy) {
                 case 'price_asc':
-                    productsQuery = productsQuery.order("yvarprod.yvarprodprixcatalogue", { ascending: true });
-                    break;
                 case 'price_desc':
-                    productsQuery = productsQuery.order("yvarprod.yvarprodprixcatalogue", { ascending: false });
+                    // Price sorting will be handled after fetching data since we can't order by nested fields directly
+                    productsQuery = productsQuery.order("yprodid", { ascending: false });
                     break;
                 case 'alphabetical':
                     productsQuery = productsQuery.order("yprodintitule", { ascending: true });
@@ -622,7 +640,27 @@ export function useShopProductsInfinite({
             // Handle special sorting cases
             let finalProducts = productsWithApprovedVariants;
 
-            if (sortBy === 'recommended') {
+            if (sortBy === 'price_asc' || sortBy === 'price_desc') {
+                // Sort by price (using the lowest price variant for each product)
+                finalProducts.sort((a, b) => {
+                    // Get the lowest price for each product
+                    const getLowestPrice = (product: any) => {
+                        if (!product.yvarprod || product.yvarprod.length === 0) return Infinity;
+                        return Math.min(...product.yvarprod.map((variant: any) =>
+                            variant.yvarprodprixpromotion || variant.yvarprodprixcatalogue || Infinity
+                        ));
+                    };
+
+                    const priceA = getLowestPrice(a);
+                    const priceB = getLowestPrice(b);
+
+                    if (sortBy === 'price_asc') {
+                        return priceA - priceB;
+                    } else {
+                        return priceB - priceA;
+                    }
+                });
+            } else if (sortBy === 'recommended') {
                 // Get purchase counts for products from zdetailscommande table
                 const productIds = finalProducts.map(p => p.yvarprod.map(v => v.yvarprodid)).flat();
 
