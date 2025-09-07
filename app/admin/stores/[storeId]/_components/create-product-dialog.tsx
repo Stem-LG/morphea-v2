@@ -2094,41 +2094,30 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                 )}
 
                 {/* Dialog Footer */}
-                <div className="flex justify-end gap-3 border-t border-gray-200 p-2">
-                    <Button
-                        onClick={handleCloseDialog}
-                        variant="outline"
-                        className="border-gray-300 text-gray-700 hover:bg-gray-50"
-                        disabled={isSubmitting || (isEditMode && productDetailsLoading) || (isEditMode && productDetailsError)}
-                    >
-                        {t("common.cancel")}
-                    </Button>
-                    <Button
-                        onClick={handleSubmit}
-                        disabled={
-                            isSubmitting ||
-                            createProductMutation.isPending ||
-                            updateProductMutation.isPending ||
-                            designerLoading ||
-                            (isEditMode && productDetailsLoading) ||
-                            (isEditMode && productDetailsError)
-                        }
-                        className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-semibold transition-all duration-300 hover:scale-105"
-                    >
-                        {isSubmitting ? (
-                            <div className="flex items-center gap-2">
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                                {isEditMode
-                                    ? t("admin.createProduct.updatingProduct")
-                                    : t("admin.createProduct.creatingProduct")}
-                            </div>
-                        ) : (
-                            isEditMode
+                {!isSubmitting && !(isEditMode && productDetailsLoading) && !(isEditMode && productDetailsError) && (
+                    <div className="flex justify-end gap-3 border-t border-gray-200 p-2">
+                        <Button
+                            onClick={handleCloseDialog}
+                            variant="outline"
+                            className="border-gray-300 text-gray-700 hover:bg-gray-50"
+                        >
+                            {t("common.cancel")}
+                        </Button>
+                        <Button
+                            onClick={handleSubmit}
+                            disabled={
+                                createProductMutation.isPending ||
+                                updateProductMutation.isPending ||
+                                designerLoading
+                            }
+                            className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-semibold transition-all duration-300 hover:scale-105"
+                        >
+                            {isEditMode
                                 ? t("admin.createProduct.updateProduct")
-                                : t("admin.createProduct.createProduct")
-                        )}
-                    </Button>
-                </div>
+                                : t("admin.createProduct.createProduct")}
+                        </Button>
+                    </div>
+                )}
             </DialogContent>
         </Dialog>
 
