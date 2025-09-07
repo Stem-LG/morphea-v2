@@ -192,9 +192,15 @@ type ProductVariant = {
         xtailleid: number
         xtailleintitule: string
     } | null
-    // Jewelry product fields
-    yvarprodtypebijoux?: string | null
-    yvarprodmatrieaux?: string | null
+    // Jewelry product fields (foreign key relationships)
+    xtypebijoux?: {
+        xtypebijouxid: string
+        xtypebijouxintitule: string
+    } | null
+    xmateriaux?: {
+        xmateriauxid: string
+        xmateriauxintitule: string
+    } | null
     yvarprodmedia: Array<{
         ymedia: {
             ymediaid: number
@@ -269,13 +275,13 @@ export function ProductDetailsPage({
     const [selectedJewelryType, setSelectedJewelryType] = useState<string>(() => {
         if (!isJewelryProduct) return '' // Don't use jewelry type for regular products
         return approvedVariants && approvedVariants.length > 0
-            ? approvedVariants[0].yvarprodtypebijoux || ''
+            ? approvedVariants[0].xtypebijoux?.xtypebijouxintitule || ''
             : ''
     })
     const [selectedMaterial, setSelectedMaterial] = useState<string>(() => {
         if (!isJewelryProduct) return '' // Don't use material for regular products
         return approvedVariants && approvedVariants.length > 0
-            ? approvedVariants[0].yvarprodmatrieaux || ''
+            ? approvedVariants[0].xmateriaux?.xmateriauxintitule || ''
             : ''
     })
     const [viewMode, setViewMode] = useState<'media' | '3d'>('media')
@@ -323,8 +329,8 @@ export function ProductDetailsPage({
 
         const typeSet = new Set<string>()
         approvedVariants.forEach((variant) => {
-            if (variant.yvarprodtypebijoux && variant.yvarprodtypebijoux.trim()) {
-                typeSet.add(variant.yvarprodtypebijoux.trim())
+            if (variant.xtypebijoux?.xtypebijouxintitule && variant.xtypebijoux.xtypebijouxintitule.trim()) {
+                typeSet.add(variant.xtypebijoux.xtypebijouxintitule.trim())
             }
         })
         const types = Array.from(typeSet).sort()
@@ -337,12 +343,12 @@ export function ProductDetailsPage({
         const materialSet = new Set<string>()
         // If no type is selected, show all materials
         const variantsToCheck = selectedJewelryType 
-            ? approvedVariants.filter((v) => v.yvarprodtypebijoux === selectedJewelryType)
+            ? approvedVariants.filter((v) => v.xtypebijoux?.xtypebijouxintitule === selectedJewelryType)
             : approvedVariants
 
         variantsToCheck.forEach((variant) => {
-            if (variant.yvarprodmatrieaux && variant.yvarprodmatrieaux.trim()) {
-                materialSet.add(variant.yvarprodmatrieaux.trim())
+            if (variant.xmateriaux?.xmateriauxintitule && variant.xmateriaux.xmateriauxintitule.trim()) {
+                materialSet.add(variant.xmateriaux.xmateriauxintitule.trim())
             }
         })
         const materials = Array.from(materialSet).sort()
@@ -357,8 +363,8 @@ export function ProductDetailsPage({
             return (
                 approvedVariants.find(
                     (v) =>
-                        v.yvarprodtypebijoux === selectedJewelryType &&
-                        v.yvarprodmatrieaux === selectedMaterial
+                        v.xtypebijoux?.xtypebijouxintitule === selectedJewelryType &&
+                        v.xmateriaux?.xmateriauxintitule === selectedMaterial
                 ) || approvedVariants[0]
             )
         } else {
@@ -373,13 +379,33 @@ export function ProductDetailsPage({
         }
     }, [approvedVariants, selectedColorId, selectedSizeId, selectedJewelryType, selectedMaterial, isJewelryProduct])
 
+    // Get media from the currently selected variant only
+    const selectedVariantMedia = useMemo(() => {
+        if (!selectedVariant || !selectedVariant.yvarprodmedia) return []
+
+        return selectedVariant.yvarprodmedia.map((mediaWrapper) => mediaWrapper.ymedia)
+    }, [selectedVariant])
+
+    // Reset media index when selected variant changes and has media
+    useEffect(() => {
+        if (selectedVariant && selectedVariantMedia.length > 0) {
+            setSelectedMediaIndex(0)
+        }
+    }, [selectedVariant?.yvarprodid, selectedVariantMedia.length])
+
     // Check if current variant is in wishlist
     const { data: isInWishlist } = useIsInWishlist(
         selectedVariant?.yvarprodid || 0
     )
 
-    // Get all media from approved variants only for the carousel
+    // Fallback to all media if selected variant has no media
     const allMedia = useMemo(() => {
+        // First try to use media from selected variant
+        if (selectedVariantMedia.length > 0) {
+            return selectedVariantMedia
+        }
+
+        // Fallback: get all media from approved variants
         if (!approvedVariants || approvedVariants.length === 0) return []
 
         const mediaSet = new Set()
@@ -402,7 +428,7 @@ export function ProductDetailsPage({
             }
         })
         return mediaArray
-    }, [approvedVariants])
+    }, [selectedVariantMedia, approvedVariants])
 
     // Get 3D model for selected variant
     const selected3DModel = useMemo(() => {
@@ -477,17 +503,6 @@ export function ProductDetailsPage({
                 setSelectedSizeId(firstVariantWithSize.xtaille.xtailleid)
             }
         }
-
-        // Update media view if variant has specific media
-        const newVariant =
-            variantsForColor.find(
-                (v) => v.xtaille && v.xtaille.xtailleid === selectedSizeId
-            ) || variantsForColor[0]
-        if (newVariant?.yvarprodmedia && newVariant.yvarprodmedia.length > 0) {
-            if (viewMode === 'media') {
-                setSelectedMediaIndex(0)
-            }
-        }
     }
 
     // Handle size selection
@@ -503,28 +518,17 @@ export function ProductDetailsPage({
 
         // Check if current material is available for new type from approved variants only
         const variantsForType = approvedVariants.filter(
-            (v) => v.yvarprodtypebijoux === type
+            (v) => v.xtypebijoux?.xtypebijouxintitule === type
         )
         const currentMaterialAvailable = variantsForType.some(
-            (v) => v.yvarprodmatrieaux === selectedMaterial
+            (v) => v.xmateriaux?.xmateriauxintitule === selectedMaterial
         )
 
         if (!currentMaterialAvailable && variantsForType.length > 0) {
             // Switch to first available material for this type
-            const firstMaterial = variantsForType[0].yvarprodmatrieaux
+            const firstMaterial = variantsForType[0].xmateriaux?.xmateriauxintitule
             if (firstMaterial) {
                 setSelectedMaterial(firstMaterial)
-            }
-        }
-
-        // Update media view if variant has specific media
-        const newVariant =
-            variantsForType.find(
-                (v) => v.yvarprodmatrieaux === selectedMaterial
-            ) || variantsForType[0]
-        if (newVariant?.yvarprodmedia && newVariant.yvarprodmedia.length > 0) {
-            if (viewMode === 'media') {
-                setSelectedMediaIndex(0)
             }
         }
     }

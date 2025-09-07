@@ -12,11 +12,11 @@ import { useQueryState } from "nuqs";
 interface ProductVariant {
     name: string;
     code?: string;
-    colorId: number;
-    sizeId: number;
-    // Jewelry fields - used when product is jewelry
-    yvarprodtypebijoux?: string | null; // Type of jewelry
-    yvarprodmatrieaux?: string | null; // Materials used
+    colorId: number | null; // Nullable for jewelry products
+    sizeId: number | null; // Nullable for jewelry products
+    // Jewelry fields - used when product is jewelry (foreign key IDs)
+    typebijouxId?: string | null; // Type of jewelry ID
+    materiauxId?: string | null; // Materials ID
     images: File[];
     videos: File[];
     models3d: File[];
@@ -76,7 +76,7 @@ export function useCreateProduct() {
                 const isJewelryProduct = productData.isJewelryProduct !== undefined 
                     ? productData.isJewelryProduct
                     : productData.variants.some(variant => 
-                        variant.yvarprodtypebijoux || variant.yvarprodmatrieaux
+                        variant.typebijouxId || variant.materiauxId
                     );
 
                 // Step 1: Create the main product
@@ -97,6 +97,10 @@ export function useCreateProduct() {
                     .single();
 
                 if (productError) {
+                    // Check for duplicate product code error
+                    if (productError.code === '23505' && productError.details?.includes('yprodcode')) {
+                        throw new Error(`DUPLICATE_PRODUCT_CODE:${productCode}`);
+                    }
                     throw new Error(`Failed to create product: ${productError.message}`);
                 }
 
@@ -131,20 +135,29 @@ export function useCreateProduct() {
                 // Step 2: Create variants
                 const createdVariants = [];
                 for (const variant of productData.variants) {
-                    // Get color and size codes for variant code generation
-                    const { data: color } = await supabase
-                        .schema("morpheus")
-                        .from("xcouleur")
-                        .select("xcouleurcode")
-                        .eq("xcouleurid", variant.colorId)
-                        .single();
+                    let color = null;
+                    let size = null;
+                    
+                    // Get color and size codes for variant code generation (only if they exist)
+                    if (variant.colorId) {
+                        const { data: colorData } = await supabase
+                            .schema("morpheus")
+                            .from("xcouleur")
+                            .select("xcouleurcode")
+                            .eq("xcouleurid", variant.colorId)
+                            .single();
+                        color = colorData;
+                    }
 
-                    const { data: size } = await supabase
-                        .schema("morpheus")
-                        .from("xtaille")
-                        .select("xtaillecode")
-                        .eq("xtailleid", variant.sizeId)
-                        .single();
+                    if (variant.sizeId) {
+                        const { data: sizeData } = await supabase
+                            .schema("morpheus")
+                            .from("xtaille")
+                            .select("xtaillecode")
+                            .eq("xtailleid", variant.sizeId)
+                            .single();
+                        size = sizeData;
+                    }
 
                     // Generate variant code
                     const variantCode = variant.code || `${productCode}-${color?.xcouleurcode || 'C'}-${size?.xtaillecode || 'S'}`;
@@ -161,17 +174,17 @@ export function useCreateProduct() {
 
                 // Handle color/size vs jewelry fields based on product type
                 if (isJewelryProduct) {
-                    // For jewelry products, set color/size to null and use jewelry fields
+                    // For jewelry products, set color/size to null and use jewelry foreign keys
                     insertData.xcouleuridfk = null;
                     insertData.xtailleidfk = null;
-                    insertData.yvarprodtypebijoux = variant.yvarprodtypebijoux || null;
-                    insertData.yvarprodmatrieaux = variant.yvarprodmatrieaux || null;
+                    insertData.xtypebijouxidfk = variant.typebijouxId || null;
+                    insertData.xmatrieauxidfk = variant.materiauxId || null;
                 } else {
-                    // For regular products, use color/size and clear jewelry fields
-                    insertData.xcouleuridfk = variant.colorId;
-                    insertData.xtailleidfk = variant.sizeId;
-                    insertData.yvarprodtypebijoux = null;
-                    insertData.yvarprodmatrieaux = null;
+                    // For regular products, use color/size and clear jewelry foreign keys
+                    insertData.xcouleuridfk = variant.colorId || null;
+                    insertData.xtailleidfk = variant.sizeId || null;
+                    insertData.xtypebijouxidfk = null;
+                    insertData.xmatrieauxidfk = null;
                 }
 
                 const { data: createdVariant, error: variantError } = await supabase

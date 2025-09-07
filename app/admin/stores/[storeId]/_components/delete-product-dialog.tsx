@@ -50,7 +50,7 @@ export function DeleteProductDialog({
 
                 <div className="space-y-4">
                     <p className="text-gray-900">
-                        Are you sure you want to delete this product? This action cannot be undone.
+                        {t("admin.deleteProductConfirmation")}
                     </p>
                     <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                         <p className="text-red-700 font-medium text-center">
@@ -58,7 +58,7 @@ export function DeleteProductDialog({
                         </p>
                     </div>
                     <p className="text-gray-600 text-sm">
-                        This will permanently delete the product and all its variants, images, and associated data.
+                        {t("admin.deleteProductWarning")}
                     </p>
                 </div>
 
@@ -78,7 +78,7 @@ export function DeleteProductDialog({
                         disabled={isLoading}
                         className="flex-1 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold"
                     >
-                        {isLoading ? "Deleting..." : t("common.delete")}
+                        {isLoading ? t("admin.events.deleting") : t("common.delete")}
                     </Button>
                 </DialogFooter>
             </DialogContent>

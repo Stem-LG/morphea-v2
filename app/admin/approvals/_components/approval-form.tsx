@@ -37,6 +37,8 @@ import type { Database } from "@/lib/supabase";
 type ProductVariant = Database["morpheus"]["Tables"]["yvarprod"]["Row"] & {
     xcouleur?: Database["morpheus"]["Tables"]["xcouleur"]["Row"];
     xtaille?: Database["morpheus"]["Tables"]["xtaille"]["Row"];
+    xtypebijoux?: Database["morpheus"]["Tables"]["xtypebijoux"]["Row"];
+    xmateriaux?: Database["morpheus"]["Tables"]["xmateriaux"]["Row"];
     xdevise?: Database["morpheus"]["Tables"]["xdevise"]["Row"];
     yobjet3d?: Database["morpheus"]["Tables"]["yobjet3d"]["Row"][];
     yvarprodmedia?: Array<{
@@ -388,10 +390,39 @@ function VariantCard({ variant, onApprove, onReject, isLoading, eventStartDate, 
                 <div className="flex items-start justify-between">
                     <div className="flex-1">
                         <CardTitle className="text-gray-900 text-sm font-medium">{variant.yvarprodintitule}</CardTitle>
-                        <div className="flex items-center gap-2 mt-1 text-xs text-gray-600">
-                            <span>{variant.xcouleur?.xcouleurintitule}</span>
-                            <span>•</span>
-                            <span>{variant.xtaille?.xtailleintitule}</span>
+                        <div className="flex flex-wrap items-center gap-2 mt-1 text-xs">
+                            {/* Type Bijoux Badge */}
+                            {variant.xtypebijoux && (
+                                <Badge variant="secondary" className="bg-purple-100 text-purple-800 border-purple-200 text-xs">
+                                    {t("admin.productView.type") || "Type"}: {variant.xtypebijoux.xtypebijouxintitule}
+                                </Badge>
+                            )}
+                            
+                            {/* Materiaux Badge */}
+                            {variant.xmateriaux && (
+                                <Badge variant="secondary" className="bg-orange-100 text-orange-800 border-orange-200 text-xs">
+                                    {t("admin.productView.material") || "Material"}: {variant.xmateriaux.xmateriauxintitule}
+                                </Badge>
+                            )}
+                            
+                            {/* Color Badge */}
+                            {variant.xcouleur && (
+                                <Badge variant="secondary" className="bg-blue-100 text-blue-800 border-blue-200 text-xs">
+                                    {t("admin.productView.color") || "Color"}: {variant.xcouleur.xcouleurintitule}
+                                </Badge>
+                            )}
+                            
+                            {/* Size Badge */}
+                            {variant.xtaille && (
+                                <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-200 text-xs">
+                                    {t("admin.productView.size") || "Size"}: {variant.xtaille.xtailleintitule}
+                                </Badge>
+                            )}
+                            
+                            {/* Show message if no attributes */}
+                            {!variant.xtypebijoux && !variant.xmateriaux && !variant.xcouleur && !variant.xtaille && (
+                                <span className="text-gray-500 italic">{t("admin.productView.noAttributes") || "No attributes set"}</span>
+                            )}
                         </div>
                     </div>
                     {getStatusBadge()}
@@ -732,6 +763,8 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                         *,
                         xcouleur(*),
                         xtaille(*),
+                        xtypebijoux(*),
+                        xmateriaux(*),
                         xdevise(*),
                         yobjet3d(*),
                         yvarprodmedia(
@@ -816,15 +849,14 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
     // Can bulk approve only if all pending variants have valid prices
     const canBulkApprove = pendingVariants.length > 0 && pendingVariantsWithoutValidPrice.length === 0;
 
-    // Check if product can be approved (category and placement must be set)
+    // Check if product can be approved (only category is required)
     const canApproveProduct = () => {
         // Category must be selected (either existing or newly selected)
         const hasCategory = selectedCategoryId || product?.xcategprodidfk;
         
-        // For admin users, placement (infospotaction) must be selected
-        const hasPlacement = !isAdmin || selectedInfospotactionId;
+        // Placement (infospotaction) is now optional for all users
         
-        return hasCategory && hasPlacement;
+        return hasCategory;
     };
 
     const handleApproveProduct = async () => {
@@ -833,11 +865,7 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
         // Clear previous errors
         setProductApprovalError(null);
 
-        // Validate that infospotaction is selected (admin only)
-        if (isAdmin && !selectedInfospotactionId) {
-            setProductApprovalError(t("admin.approvals.productPlacementRequired"));
-            return;
-        }
+        // Placement (infospotaction) is now optional - no validation needed
 
         try {
             await approveProduct.mutateAsync({
@@ -1006,7 +1034,7 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                 <div className="flex h-[calc(95vh-180px)]">
                     {/* Left Panel - Product Information */}
                     <div className="w-1/2 border-r border-gray-200">
-                        <ScrollArea className="h-full">
+                        <div className="h-full overflow-y-auto custom-scrollbar">
                             <div className="space-y-6 p-6">
                                 {/* Basic Product Info */}
                                 <Card className="border-gray-200 bg-gray-50">
@@ -1039,14 +1067,6 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                                                     )}
                                                                 </li>
                                                             )}
-                                                            {isAdmin &&
-                                                                !selectedInfospotactionId && (
-                                                                    <li>
-                                                                        {t(
-                                                                            'admin.approvals.placementRequired'
-                                                                        )}
-                                                                    </li>
-                                                                )}
                                                         </ul>
                                                     </div>
                                                 </div>
@@ -1162,18 +1182,17 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                                     )}
                                                     <Select
                                                         value={
-                                                            selectedInfospotactionId?.toString() ||
-                                                            ''
+                                                            selectedInfospotactionId === null
+                                                                ? "none"
+                                                                : selectedInfospotactionId?.toString() || ""
                                                         }
                                                         onValueChange={(
                                                             value
                                                         ) =>
                                                             setSelectedInfospotactionId(
-                                                                value
-                                                                    ? parseInt(
-                                                                          value
-                                                                      )
-                                                                    : null
+                                                                value === "none" || !value
+                                                                    ? null
+                                                                    : parseInt(value)
                                                             )
                                                         }
                                                     >
@@ -1185,6 +1204,13 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                                             />
                                                         </SelectTrigger>
                                                         <SelectContent className="border-gray-300 bg-white">
+                                                            {/* None option */}
+                                                            <SelectItem
+                                                                value="none"
+                                                                className="text-gray-900 hover:bg-gray-100"
+                                                            >
+                                                                {t('admin.approvals.none') || 'Aucune'}
+                                                            </SelectItem>
                                                             {infospotactions?.map(
                                                                 (action) => (
                                                                     <SelectItem
@@ -1368,7 +1394,7 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                     </CardContent>
                                 </Card>
                             </div>
-                        </ScrollArea>
+                        </div>
                     </div>
 
                     {/* Right Panel - Variant Cards */}
@@ -1429,7 +1455,13 @@ export function ApprovalForm({ isOpen, onClose, productId }: ApprovalFormProps) 
                                     </div>
                                 )}
 
-                            <ScrollArea className="h-[calc(95vh-300px)] overflow-y-auto">
+                            <ScrollArea 
+                                className={`overflow-y-auto ${
+                                    (pendingVariants.length > 0 && pendingVariantsWithoutValidPrice.length > 0) || bulkApprovalError
+                                        ? 'max-h-[calc(95vh-330px)]' // Reduced height when alerts are shown
+                                        : 'max-h-[calc(95vh-250px)]' // Normal height when no alerts
+                                }`}
+                            >
                                 <div className="space-y-4 pr-4">
                                     {product.yvarprod?.map(
                                         (variant: ProductVariant) => (

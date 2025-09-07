@@ -122,9 +122,9 @@ export function WishlistDialog({ isOpen, onClose }: WishlistDialogProps) {
                         x2="100%"
                         y2="100%"
                     >
-                        <stop offset="0%" stop-color="#B27C64" />
-                        <stop offset="50%" stop-color="#E8D07A" />
-                        <stop offset="100%" stop-color="#B27C64" />
+                        <stop offset="0%" stopColor="#B27C64" />
+                        <stop offset="50%" stopColor="#E8D07A" />
+                        <stop offset="100%" stopColor="#B27C64" />
                     </linearGradient>
                 </defs>
             </svg>

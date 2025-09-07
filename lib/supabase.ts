@@ -928,6 +928,36 @@ export type Database = {
         }
         Relationships: []
       }
+      xmateriaux: {
+        Row: {
+          sysaction: string | null
+          sysadresseip: string | null
+          sysdate: string | null
+          sysuser: string | null
+          xmateriauxcode: string | null
+          xmateriauxid: string
+          xmateriauxintitule: string | null
+        }
+        Insert: {
+          sysaction?: string | null
+          sysadresseip?: string | null
+          sysdate?: string | null
+          sysuser?: string | null
+          xmateriauxcode?: string | null
+          xmateriauxid: string
+          xmateriauxintitule?: string | null
+        }
+        Update: {
+          sysaction?: string | null
+          sysadresseip?: string | null
+          sysdate?: string | null
+          sysuser?: string | null
+          xmateriauxcode?: string | null
+          xmateriauxid?: string
+          xmateriauxintitule?: string | null
+        }
+        Relationships: []
+      }
       xnewsletter: {
         Row: {
           created_at: string
@@ -985,6 +1015,36 @@ export type Database = {
           xtailleintitule?: string
           xtailleus?: string | null
           xtaillex?: string | null
+        }
+        Relationships: []
+      }
+      xtypebijoux: {
+        Row: {
+          sysaction: string | null
+          sysadresseip: string | null
+          sysdate: string | null
+          sysuser: string | null
+          xtypebijouxcode: string | null
+          xtypebijouxid: string
+          xtypebijouxintitule: string | null
+        }
+        Insert: {
+          sysaction?: string | null
+          sysadresseip?: string | null
+          sysdate?: string | null
+          sysuser?: string | null
+          xtypebijouxcode?: string | null
+          xtypebijouxid: string
+          xtypebijouxintitule?: string | null
+        }
+        Update: {
+          sysaction?: string | null
+          sysadresseip?: string | null
+          sysdate?: string | null
+          sysuser?: string | null
+          xtypebijouxcode?: string | null
+          xtypebijouxid?: string
+          xtypebijouxintitule?: string | null
         }
         Relationships: []
       }
@@ -1914,21 +1974,21 @@ export type Database = {
           sysuser: string | null
           xcouleuridfk: number | null
           xdeviseidfk: number | null
+          xmatrieauxidfk: string | null
           xtailleidfk: number | null
+          xtypebijouxidfk: string | null
           yestvisible: boolean | null
           yprodidfk: number | null
           yvarprodcode: string
           yvarprodgenre: string
           yvarprodid: number
           yvarprodintitule: string
-          yvarprodmatrieaux: string | null
           yvarprodnbrjourlivraison: number
           yvarprodprixcatalogue: number
           yvarprodprixpromotion: number | null
           yvarprodpromotiondatedeb: string | null
           yvarprodpromotiondatefin: string | null
           yvarprodstatut: Database["morpheus"]["Enums"]["product_status"]
-          yvarprodtypebijoux: string | null
         }
         Insert: {
           sysaction?: string | null
@@ -1937,21 +1997,21 @@ export type Database = {
           sysuser?: string | null
           xcouleuridfk?: number | null
           xdeviseidfk?: number | null
+          xmatrieauxidfk?: string | null
           xtailleidfk?: number | null
+          xtypebijouxidfk?: string | null
           yestvisible?: boolean | null
           yprodidfk?: number | null
           yvarprodcode: string
           yvarprodgenre: string
           yvarprodid?: number
           yvarprodintitule: string
-          yvarprodmatrieaux?: string | null
           yvarprodnbrjourlivraison: number
           yvarprodprixcatalogue: number
           yvarprodprixpromotion?: number | null
           yvarprodpromotiondatedeb?: string | null
           yvarprodpromotiondatefin?: string | null
           yvarprodstatut?: Database["morpheus"]["Enums"]["product_status"]
-          yvarprodtypebijoux?: string | null
         }
         Update: {
           sysaction?: string | null
@@ -1960,21 +2020,21 @@ export type Database = {
           sysuser?: string | null
           xcouleuridfk?: number | null
           xdeviseidfk?: number | null
+          xmatrieauxidfk?: string | null
           xtailleidfk?: number | null
+          xtypebijouxidfk?: string | null
           yestvisible?: boolean | null
           yprodidfk?: number | null
           yvarprodcode?: string
           yvarprodgenre?: string
           yvarprodid?: number
           yvarprodintitule?: string
-          yvarprodmatrieaux?: string | null
           yvarprodnbrjourlivraison?: number
           yvarprodprixcatalogue?: number
           yvarprodprixpromotion?: number | null
           yvarprodpromotiondatedeb?: string | null
           yvarprodpromotiondatefin?: string | null
           yvarprodstatut?: Database["morpheus"]["Enums"]["product_status"]
-          yvarprodtypebijoux?: string | null
         }
         Relationships: [
           {
@@ -1992,11 +2052,25 @@ export type Database = {
             referencedColumns: ["xdeviseid"]
           },
           {
+            foreignKeyName: "yvarprod_xmatrieauxidfk_fkey"
+            columns: ["xmatrieauxidfk"]
+            isOneToOne: false
+            referencedRelation: "xmateriaux"
+            referencedColumns: ["xmateriauxid"]
+          },
+          {
             foreignKeyName: "yvarprod_xtailleidfk_fkey"
             columns: ["xtailleidfk"]
             isOneToOne: false
             referencedRelation: "xtaille"
             referencedColumns: ["xtailleid"]
+          },
+          {
+            foreignKeyName: "yvarprod_xtypebijouxidfk_fkey"
+            columns: ["xtypebijouxidfk"]
+            isOneToOne: false
+            referencedRelation: "xtypebijoux"
+            referencedColumns: ["xtypebijouxid"]
           },
           {
             foreignKeyName: "yvarprod_yprodidfk_fkey"
