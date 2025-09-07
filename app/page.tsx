@@ -425,7 +425,7 @@ export default function Home() {
                         creators={homeSettings?.creators.creators || []}
                         autoRotateSpeed={0.05}
                         height={300}
-                        cylinderWidth={2000}
+                        radius={homeSettings?.creators.carouselRadius || 3000}
                     />
                 </div>
             </section>

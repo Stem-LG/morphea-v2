@@ -78,6 +78,8 @@ interface HomeSettings {
       image: string
       link: string
     }>
+    // Carousel radius setting
+    carouselRadius: number | null
   }
   // Morphea Origin Vision Section
   morpheaOriginVision: {
@@ -291,7 +293,8 @@ export function useHomeSettings() {
             fr: getSetting('homepage_creators_subtitle_fr')
           },
           images: parseJSON(getSetting('homepage_creators_images'), []),
-          creators: parseJSON(getSetting('homepage_creators_data'), [])
+          creators: parseJSON(getSetting('homepage_creators_data'), []),
+          carouselRadius: parseNumber(getSetting('homepage_creators_carousel_radius')) || 3000
         },
         morpheaOriginVision: {
           images: [

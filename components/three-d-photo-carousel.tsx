@@ -8,7 +8,7 @@ interface ThreeDPhotoCarouselProps {
     images?: string[]
     autoRotateSpeed?: number
     height?: number
-    cylinderWidth?: number
+    radius?: number
     // New prop for creators with links
     creators?: Array<{
         image: string
@@ -20,7 +20,7 @@ function ThreeDPhotoCarousel({
     images = ['/lg1.jpg', '/lg2.png', '/lg3.jpg', '/lg4.jpg'], // Default images
     autoRotateSpeed = 0.5,
     height = 500,
-    cylinderWidth = 1400,
+    radius = 3000,
     creators = [], // New prop for creators with links
 }: ThreeDPhotoCarouselProps) {
     const { t } = useLanguage()
@@ -49,11 +49,11 @@ function ThreeDPhotoCarousel({
     // Responsive cylinder width based on screen size
     const responsiveCylinderWidth = isMobile
         ? Math.min(window.innerWidth * 2, 1200) // 98% of screen width, max 1200px on mobile
-        : cylinderWidth // Use provided width on desktop
+        : radius // Use provided radius on desktop
 
     const faceWidth = isMobile ? 100 : 150 // Much larger faces on mobile
     const actualCylinderWidth = faceWidth * faceCount * 1.2 // Add 20% spacing
-    const radius = actualCylinderWidth / (2 * Math.PI)
+    const carouselRadius = responsiveCylinderWidth / (2 * Math.PI)
     const rotation = useMotionValue(0)
 
     const transform = useTransform(rotation, (value) => `rotateY(${value}deg)`)
@@ -113,7 +113,7 @@ function ThreeDPhotoCarousel({
                     className="relative flex h-full origin-center justify-center"
                     style={{
                         transform,
-                        width: actualCylinderWidth,
+                        width: responsiveCylinderWidth,
                         height: faceWidth,
                         transformStyle: 'preserve-3d',
                         transformOrigin: 'center center',
@@ -133,7 +133,7 @@ function ThreeDPhotoCarousel({
                                 marginTop: `-${faceWidth / 2}px`,
                                 transform: `rotateY(${
                                     index * (360 / faceCount)
-                                }deg) translateZ(${radius}px)`,
+                                }deg) translateZ(${carouselRadius}px)`,
                                 transformOrigin: 'center center',
                             }}
                             onClick={() => handleImageClick(image, index)}

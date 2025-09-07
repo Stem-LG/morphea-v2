@@ -21,6 +21,7 @@ import {
 } from '@/components/ui/select'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
+import { Slider } from '@/components/ui/slider'
 import {
     Upload,
     Save,
@@ -164,6 +165,8 @@ export function HomepageSettings() {
                 return homeSettings?.creators.subtitle.fr || ''
             case 'homepage_creators_images':
                 return JSON.stringify(homeSettings?.creators.images || [])
+            case 'homepage_creators_carousel_radius':
+                return homeSettings?.creators.carouselRadius?.toString() || '3000'
             case 'homepage_creators_data':
                 return JSON.stringify(homeSettings?.creators.creators || [])
             case 'footer_social_facebook_url':
@@ -2852,6 +2855,66 @@ export function HomepageSettings() {
                                         )}
                                         {t('admin.settings.save')}
                                     </Button>
+                                </div>
+                            </div>
+
+                            {/* Carousel Radius Slider */}
+                            <div className="space-y-4 border-t border-gray-200 pt-6">
+                                <h4 className="text-lg font-semibold text-gray-900">
+                                    Carousel Settings
+                                </h4>
+                                <div className="space-y-4">
+                                    <div className="space-y-2">
+                                        <Label className="text-gray-900">
+                                            Carousel Radius (pixels)
+                                        </Label>
+                                        <div className="px-3">
+                                            <div className="w-1/3 max-w-sm">
+                                                <Slider
+                                                    value={[parseInt(getCurrentValue('homepage_creators_carousel_radius')) || 3000]}
+                                                    onValueChange={(value) =>
+                                                        handleSettingChange(
+                                                            'homepage_creators_carousel_radius',
+                                                            value[0].toString()
+                                                        )
+                                                    }
+                                                    max={5000}
+                                                    min={1000}
+                                                    step={100}
+                                                    className="w-full"
+                                                />
+                                                <div className="flex justify-between text-sm text-gray-500 mt-1">
+                                                    <span>1000px</span>
+                                                    <span className="font-medium">
+                                                        {getCurrentValue('homepage_creators_carousel_radius')}px
+                                                    </span>
+                                                    <span>5000px</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <Button
+                                            size="sm"
+                                            onClick={() =>
+                                                handleSaveSetting(
+                                                    'homepage_creators_carousel_radius'
+                                                )
+                                            }
+                                            disabled={
+                                                updateSetting.isPending ||
+                                                editingSettings[
+                                                    'homepage_creators_carousel_radius'
+                                                ] === undefined
+                                            }
+                                            className="bg-morpheus-gold-dark hover:bg-morpheus-gold-light"
+                                        >
+                                            {updateSetting.isPending ? (
+                                                <Loader2 className="h-4 w-4 animate-spin" />
+                                            ) : (
+                                                <Save className="h-4 w-4" />
+                                            )}
+                                            {t('admin.settings.save')}
+                                        </Button>
+                                    </div>
                                 </div>
                             </div>
 
