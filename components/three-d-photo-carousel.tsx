@@ -29,7 +29,8 @@ function ThreeDPhotoCarousel({
     const [isMobile, setIsMobile] = useState<boolean>(false)
 
     // Prioritize creators over legacy images
-    const displayItems = creators.length > 0 ? creators.map(c => c.image) : images
+    const displayItems =
+        creators.length > 0 ? creators.map((c) => c.image) : images
     const hasCreatorLinks = creators.length > 0
 
     // Detect mobile screen size
@@ -50,10 +51,7 @@ function ThreeDPhotoCarousel({
         ? Math.min(window.innerWidth * 2, 1200) // 98% of screen width, max 1200px on mobile
         : cylinderWidth // Use provided width on desktop
 
-    const faceWidth = Math.min(
-        responsiveCylinderWidth / faceCount,
-        isMobile ? 300 : 500
-    ) // Much larger faces on mobile
+    const faceWidth = isMobile ? 100 : 150 // Much larger faces on mobile
     const actualCylinderWidth = faceWidth * faceCount * 1.2 // Add 20% spacing
     const radius = actualCylinderWidth / (2 * Math.PI)
     const rotation = useMotionValue(0)
