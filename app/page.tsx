@@ -159,18 +159,7 @@ export default function Home() {
             homeSettings.creators.images.length > 0
                 ? homeSettings.creators.images
                 : [
-                      '/lg1.jpg',
-                      '/lg2.png',
-                      '/lg3.jpg',
-                      '/lg4.jpg',
-                      '/lg1.jpg',
-                      '/lg2.png',
-                      '/lg3.jpg',
-                      '/lg4.jpg',
-                      '/lg1.jpg',
-                      '/lg2.png',
-                      '/lg3.jpg',
-                      '/lg4.jpg',
+    
                   ],
     }
     return (
@@ -426,6 +415,7 @@ export default function Home() {
                         autoRotateSpeed={0.05}
                         height={300}
                         radius={homeSettings?.creators.carouselRadius || 3000}
+                        isLoading={isLoadingSettings}
                     />
                 </div>
             </section>

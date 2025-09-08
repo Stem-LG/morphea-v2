@@ -14,6 +14,8 @@ interface ThreeDPhotoCarouselProps {
         image: string
         link: string
     }>
+    // Loading state prop
+    isLoading?: boolean
 }
 
 function ThreeDPhotoCarousel({
@@ -22,6 +24,7 @@ function ThreeDPhotoCarousel({
     height = 500,
     radius = 3000,
     creators = [], // New prop for creators with links
+    isLoading = false, // Loading state
 }: ThreeDPhotoCarouselProps) {
     const { t } = useLanguage()
     const [selectedImage, setSelectedImage] = useState<string | null>(null)
@@ -81,6 +84,18 @@ function ThreeDPhotoCarousel({
 
     const handleCloseModal = () => {
         setSelectedImage(null)
+    }
+
+    // Show loading state if data is still loading
+    if (isLoading) {
+        return (
+            <div className="flex h-96 items-center justify-center text-gray-500">
+                <div className="flex items-center gap-2">
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600"></div>
+                    {t('common.loading')}
+                </div>
+            </div>
+        )
     }
 
     // Early return if no items
