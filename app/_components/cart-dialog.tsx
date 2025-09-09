@@ -143,10 +143,6 @@ export function CartDialog({ isOpen, onClose }: CartDialogProps) {
                             <h3 className="font-recia mb-3 text-xl font-extrabold text-[#053340]">
                                 {t('cart.empty') || 'Your cart is empty'}
                             </h3>
-                            <p className="font-supreme text-lg text-gray-600">
-                                {t('cart.emptyMessage') ||
-                                    'Add some items to get started'}
-                            </p>
                         </div>
                     ) : (
                         <div className="space-y-4">

@@ -32,21 +32,7 @@ type PasswordRequirement = {
 type VisitorFormData = {
     phone: string
     address: string
-    visitorTypes: {
-        acheteurluxe: boolean
-        acheteurpro: boolean
-        artisan: boolean
-        clientprive: boolean
-        collectionneur: boolean
-        createur: boolean
-        culturel: boolean
-        grandpublic: boolean
-        influenceur: boolean
-        investisseur: boolean
-        journaliste: boolean
-        pressespecialisee: boolean
-        vip: boolean
-    }
+    selectedVisitorType: string
 }
 
 interface EnhancedSignupWithVisitorProps
@@ -75,21 +61,7 @@ export function EnhancedSignupWithVisitor({
     const [visitorData, setVisitorData] = useState<VisitorFormData>({
         phone: '',
         address: '',
-        visitorTypes: {
-            acheteurluxe: false,
-            acheteurpro: false,
-            artisan: false,
-            clientprive: false,
-            collectionneur: false,
-            createur: false,
-            culturel: false,
-            grandpublic: false,
-            influenceur: false,
-            investisseur: false,
-            journaliste: false,
-            pressespecialisee: false,
-            vip: false,
-        },
+        selectedVisitorType: '',
     })
 
     const router = useRouter()
@@ -193,7 +165,7 @@ export function EnhancedSignupWithVisitor({
         !showVisitorForm ||
         (visitorData.phone.trim() &&
             visitorData.address.trim() &&
-            Object.values(visitorData.visitorTypes).some((type) => type)) // At least one visitor type selected
+            visitorData.selectedVisitorType.trim()) // Visitor type selected
 
     const isFormValid =
         firstName.trim() &&
@@ -259,16 +231,10 @@ export function EnhancedSignupWithVisitor({
         )
     }, [visitorTypeSearch])
 
-    const handleVisitorTypeChange = (
-        type: keyof VisitorFormData['visitorTypes'],
-        checked: boolean
-    ) => {
+    const handleVisitorTypeChange = (type: string) => {
         setVisitorData((prev) => ({
             ...prev,
-            visitorTypes: {
-                ...prev.visitorTypes,
-                [type]: checked,
-            },
+            selectedVisitorType: type,
         }))
     }
 
@@ -392,57 +358,19 @@ export function EnhancedSignupWithVisitor({
                                     visitorData.phone.trim() || null,
                                 yvisiteuradresse:
                                     visitorData.address.trim() || null,
-                                yvisiteurboolacheteurluxe: visitorData
-                                    .visitorTypes.acheteurluxe
-                                    ? '1'
-                                    : '0',
-                                yvisiteurboolacheteurpro: visitorData
-                                    .visitorTypes.acheteurpro
-                                    ? '1'
-                                    : '0',
-                                yvisiteurboolartisan: visitorData.visitorTypes
-                                    .artisan
-                                    ? '1'
-                                    : '0',
-                                yvisiteurboolclientprive: visitorData
-                                    .visitorTypes.clientprive
-                                    ? '1'
-                                    : '0',
-                                yvisiteurboolcollectionneur: visitorData
-                                    .visitorTypes.collectionneur
-                                    ? '1'
-                                    : '0',
-                                yvisiteurboolcreateur: visitorData.visitorTypes
-                                    .createur
-                                    ? '1'
-                                    : '0',
-                                yvisiteurboolculturel: visitorData.visitorTypes
-                                    .culturel
-                                    ? '1'
-                                    : '0',
-                                yvisiteurboolgrandpublic: visitorData
-                                    .visitorTypes.grandpublic
-                                    ? '1'
-                                    : '0',
-                                yvisiteurboolinfluenceur: visitorData
-                                    .visitorTypes.influenceur
-                                    ? '1'
-                                    : '0',
-                                yvisiteurboolinvestisseur: visitorData
-                                    .visitorTypes.investisseur
-                                    ? '1'
-                                    : '0',
-                                yvisiteurbooljournaliste: visitorData
-                                    .visitorTypes.journaliste
-                                    ? '1'
-                                    : '0',
-                                yvisiteurboolpressespecialisee: visitorData
-                                    .visitorTypes.pressespecialisee
-                                    ? '1'
-                                    : '0',
-                                yvisiteurboolvip: visitorData.visitorTypes.vip
-                                    ? '1'
-                                    : '0',
+                                yvisiteurboolacheteurluxe: visitorData.selectedVisitorType === 'acheteurluxe' ? '1' : '0',
+                                yvisiteurboolacheteurpro: visitorData.selectedVisitorType === 'acheteurpro' ? '1' : '0',
+                                yvisiteurboolartisan: visitorData.selectedVisitorType === 'artisan' ? '1' : '0',
+                                yvisiteurboolclientprive: visitorData.selectedVisitorType === 'clientprive' ? '1' : '0',
+                                yvisiteurboolcollectionneur: visitorData.selectedVisitorType === 'collectionneur' ? '1' : '0',
+                                yvisiteurboolcreateur: visitorData.selectedVisitorType === 'createur' ? '1' : '0',
+                                yvisiteurboolculturel: visitorData.selectedVisitorType === 'culturel' ? '1' : '0',
+                                yvisiteurboolgrandpublic: visitorData.selectedVisitorType === 'grandpublic' ? '1' : '0',
+                                yvisiteurboolinfluenceur: visitorData.selectedVisitorType === 'influenceur' ? '1' : '0',
+                                yvisiteurboolinvestisseur: visitorData.selectedVisitorType === 'investisseur' ? '1' : '0',
+                                yvisiteurbooljournaliste: visitorData.selectedVisitorType === 'journaliste' ? '1' : '0',
+                                yvisiteurboolpressespecialisee: visitorData.selectedVisitorType === 'pressespecialisee' ? '1' : '0',
+                                yvisiteurboolvip: visitorData.selectedVisitorType === 'vip' ? '1' : '0',
                             })
                     } catch (insertError) {
                         console.error(
@@ -1022,12 +950,10 @@ export function EnhancedSignupWithVisitor({
                                         <div className="space-y-3">
                                             <div>
                                                 <Label className="text-sm font-medium text-[#05141D]">
-                                                    Vos intérêts
+                                                    Votre profil
                                                 </Label>
                                                 <p className="mt-1 text-xs text-slate-500">
-                                                    {
-                                                        "Sélectionnez tout ce qui s'applique"
-                                                    }
+                                                    Sélectionnez votre profil principal
                                                 </p>
                                             </div>
 
@@ -1047,22 +973,14 @@ export function EnhancedSignupWithVisitor({
                                                 />
                                             </div>
 
-                                            {/* Selected types count */}
-                                            {Object.values(
-                                                visitorData.visitorTypes
-                                            ).some((type) => type) && (
+                                            {/* Selected type display */}
+                                            {visitorData.selectedVisitorType && (
                                                 <div className="flex items-center gap-2">
                                                     <Badge
                                                         variant="outline"
                                                         className="border-[#063846] text-[#063846]"
                                                     >
-                                                        {
-                                                            Object.values(
-                                                                visitorData.visitorTypes
-                                                            ).filter(Boolean)
-                                                                .length
-                                                        }{' '}
-                                                        sélectionné(s)
+                                                        {filteredVisitorTypes.find(type => type.key === visitorData.selectedVisitorType)?.label || visitorData.selectedVisitorType} sélectionné
                                                     </Badge>
                                                 </div>
                                             )}
@@ -1087,24 +1005,12 @@ export function EnhancedSignupWithVisitor({
                                                                     className="group flex cursor-pointer items-center space-x-3 rounded p-2 transition-colors hover:bg-slate-100"
                                                                 >
                                                                     <input
-                                                                        type="checkbox"
-                                                                        checked={
-                                                                            visitorData
-                                                                                .visitorTypes[
-                                                                                key as keyof VisitorFormData['visitorTypes']
-                                                                            ]
-                                                                        }
-                                                                        onChange={(
-                                                                            e
-                                                                        ) =>
-                                                                            handleVisitorTypeChange(
-                                                                                key as keyof VisitorFormData['visitorTypes'],
-                                                                                e
-                                                                                    .target
-                                                                                    .checked
-                                                                            )
-                                                                        }
-                                                                        className="h-4 w-4 rounded border-slate-300 bg-white text-[#063846] transition-colors focus:ring-1 focus:ring-[#063846]"
+                                                                        type="radio"
+                                                                        name="visitorType"
+                                                                        value={key}
+                                                                        checked={visitorData.selectedVisitorType === key}
+                                                                        onChange={(e) => handleVisitorTypeChange(e.target.value)}
+                                                                        className="h-4 w-4 border-slate-300 bg-white text-[#063846] transition-colors focus:ring-1 focus:ring-[#063846]"
                                                                     />
                                                                     <div className="flex-1">
                                                                         <span className="block text-sm font-medium text-slate-700">

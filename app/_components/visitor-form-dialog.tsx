@@ -20,21 +20,7 @@ type VisitorFormData = {
     email: string;
     phone: string;
     address: string;
-    visitorTypes: {
-        acheteurluxe: boolean;
-        acheteurpro: boolean;
-        artisan: boolean;
-        clientprive: boolean;
-        collectionneur: boolean;
-        createur: boolean;
-        culturel: boolean;
-        grandpublic: boolean;
-        influenceur: boolean;
-        investisseur: boolean;
-        journaliste: boolean;
-        pressespecialisee: boolean;
-        vip: boolean;
-    };
+    selectedVisitorType: string; // Changed from visitorTypes object to single string
 };
 
 const VISITOR_FORM_STORAGE_KEY = "morpheus_visitor_form_skipped";
@@ -44,13 +30,13 @@ const STEPS = [
         id: 1,
         title: "basicInformation",
         icon: User,
-        description: "Personal details",
+        description: "personalDetails",
     },
     {
         id: 2,
         title: "visitorTypes",
         icon: Users,
-        description: "Select all that apply",
+        description: "selectAllThatApply",
     },
 ];
 
@@ -64,21 +50,7 @@ export default function VisitorFormDialog() {
         email: "",
         phone: "",
         address: "",
-        visitorTypes: {
-            acheteurluxe: false,
-            acheteurpro: false,
-            artisan: false,
-            clientprive: false,
-            collectionneur: false,
-            createur: false,
-            culturel: false,
-            grandpublic: false,
-            influenceur: false,
-            investisseur: false,
-            journaliste: false,
-            pressespecialisee: false,
-            vip: false,
-        },
+        selectedVisitorType: "", // Default to empty string (no selection)
     });
 
     const { data: currentUser } = useAuth();
@@ -86,46 +58,103 @@ export default function VisitorFormDialog() {
     const supabase = createClient();
 
     useEffect(() => {
-        // Check if user has already skipped the form
-        const hasSkipped = localStorage.getItem(VISITOR_FORM_STORAGE_KEY);
-        
-        // Check if cookies have been accepted or refused - temporarily check all possible keys
-        const cookiesAccepted = localStorage.getItem('cookies-accepted');
-        const cookiesRefused = localStorage.getItem('cookies-refused');
-        const cookieConsent = localStorage.getItem('cookie-consent');
-        const cookieBanner = localStorage.getItem('cookie-banner');
-        const cookiesAccept = localStorage.getItem('cookies-accept');
-        const acceptCookies = localStorage.getItem('accept-cookies');
-        const cookiePreferences = localStorage.getItem('cookie-preferences');
-        
-        // Debug logging - show all localStorage keys
-        const allKeys = Object.keys(localStorage);
-        console.log('Visitor Form Debug:', {
-            hasSkipped,
-            currentUser: !!currentUser,
-            cookiesAccepted,
-            cookiesRefused,
-            cookieConsent,
-            cookieBanner,
-            cookiesAccept,
-            acceptCookies,
-            cookiePreferences,
-            allLocalStorageKeys: allKeys
-        });
-        
-        // For now, let's show the dialog regardless of cookie status to debug
-        if (!hasSkipped && currentUser) {
-            console.log('✅ Showing visitor form dialog (ignoring cookie status for now)');
-            // Add a small delay to ensure the page has loaded
-            const timer = setTimeout(() => {
-                setIsOpen(true);
-            }, 2000); // Increased delay
+        const checkVisitorFormConditions = () => {
+            // Check if user has already skipped the form
+            const hasSkipped = localStorage.getItem(VISITOR_FORM_STORAGE_KEY);
+            
+            // Check if cookies have been accepted or rejected using the cookie consent system
+            const cookiePreferences = localStorage.getItem('cookie-preferences');
+            
+            let cookiesDecisionMade = false;
+            
+            if (cookiePreferences) {
+                try {
+                    const preferences = JSON.parse(cookiePreferences);
+                    // Check if user has made any decision (accepted all, rejected all, or customized preferences)
+                    cookiesDecisionMade = preferences.analytics !== undefined || 
+                                       preferences.marketing !== undefined || 
+                                       preferences.functional !== undefined;
+                } catch (error) {
+                    console.error('Error parsing cookie preferences:', error);
+                }
+            }
+            
+            console.log('Visitor Form Debug:', {
+                hasSkipped: !!hasSkipped,
+                currentUser: !!currentUser,
+                cookiesDecisionMade,
+                cookiePreferences
+            });
+            
+            // Only show the visitor form if:
+            // 1. User hasn't skipped it before
+            // 2. User is logged in
+            // 3. Cookie decision has been made (accepted or rejected)
+            // 4. Dialog is not already open
+            if (!hasSkipped && currentUser && cookiesDecisionMade && !isOpen) {
+                console.log('✅ Showing visitor form dialog - all conditions met');
+                // Add a small delay to ensure the page has loaded
+                const timer = setTimeout(() => {
+                    setIsOpen(true);
+                }, 500);
 
-            return () => clearTimeout(timer);
-        } else {
-            console.log('❌ Not showing visitor form dialog:', { hasSkipped: !!hasSkipped, currentUser: !!currentUser });
-        }
-    }, [currentUser]);
+                return timer;
+            } else {
+                console.log('❌ Not showing visitor form dialog:', { 
+                    hasSkipped: !!hasSkipped, 
+                    currentUser: !!currentUser, 
+                    cookiesDecisionMade,
+                    isOpen 
+                });
+            }
+            return null;
+        };
+
+        // Check conditions on mount and when currentUser changes
+        const timer = checkVisitorFormConditions();
+
+        // Poll for cookie preferences changes since storage event doesn't work in same tab
+        const pollInterval = setInterval(() => {
+            const currentPreferences = localStorage.getItem('cookie-preferences');
+            if (currentPreferences) {
+                try {
+                    const preferences = JSON.parse(currentPreferences);
+                    const cookiesDecisionMade = preferences.analytics !== undefined || 
+                                              preferences.marketing !== undefined || 
+                                              preferences.functional !== undefined;
+                    
+                    const hasSkipped = localStorage.getItem(VISITOR_FORM_STORAGE_KEY);
+                    
+                    if (!hasSkipped && currentUser && cookiesDecisionMade && !isOpen) {
+                        console.log('✅ Cookie decision detected via polling, showing visitor form');
+                        setTimeout(() => {
+                            setIsOpen(true);
+                        }, 500);
+                        clearInterval(pollInterval); // Stop polling once we show the dialog
+                    }
+                } catch (error) {
+                    console.error('Error parsing cookie preferences in poll:', error);
+                }
+            }
+        }, 500); // Check every 500ms
+
+        // Listen for custom events dispatched by the cookie consent system
+        const handleCookieConsentChange = () => {
+            console.log('Cookie consent event received, checking visitor form conditions');
+            clearInterval(pollInterval); // Stop polling if we get an event
+            setTimeout(() => {
+                checkVisitorFormConditions();
+            }, 300);
+        };
+
+        window.addEventListener('cookieConsentChanged', handleCookieConsentChange);
+
+        return () => {
+            if (timer) clearTimeout(timer);
+            clearInterval(pollInterval);
+            window.removeEventListener('cookieConsentChanged', handleCookieConsentChange);
+        };
+    }, [currentUser, isOpen]);
 
     const handleSkip = () => {
         localStorage.setItem(VISITOR_FORM_STORAGE_KEY, "true");
@@ -161,19 +190,19 @@ export default function VisitorFormDialog() {
                 yvisiteuremail: formData.email.trim() || null,
                 yvisiteurtelephone: formData.phone.trim() || null,
                 yvisiteuradresse: formData.address.trim() || null,
-                yvisiteurboolacheteurluxe: formData.visitorTypes.acheteurluxe ? "1" : "0",
-                yvisiteurboolacheteurpro: formData.visitorTypes.acheteurpro ? "1" : "0",
-                yvisiteurboolartisan: formData.visitorTypes.artisan ? "1" : "0",
-                yvisiteurboolclientprive: formData.visitorTypes.clientprive ? "1" : "0",
-                yvisiteurboolcollectionneur: formData.visitorTypes.collectionneur ? "1" : "0",
-                yvisiteurboolcreateur: formData.visitorTypes.createur ? "1" : "0",
-                yvisiteurboolculturel: formData.visitorTypes.culturel ? "1" : "0",
-                yvisiteurboolgrandpublic: formData.visitorTypes.grandpublic ? "1" : "0",
-                yvisiteurboolinfluenceur: formData.visitorTypes.influenceur ? "1" : "0",
-                yvisiteurboolinvestisseur: formData.visitorTypes.investisseur ? "1" : "0",
-                yvisiteurbooljournaliste: formData.visitorTypes.journaliste ? "1" : "0",
-                yvisiteurboolpressespecialisee: formData.visitorTypes.pressespecialisee ? "1" : "0",
-                yvisiteurboolvip: formData.visitorTypes.vip ? "1" : "0",
+                yvisiteurboolacheteurluxe: formData.selectedVisitorType === "acheteurluxe" ? "1" : "0",
+                yvisiteurboolacheteurpro: formData.selectedVisitorType === "acheteurpro" ? "1" : "0",
+                yvisiteurboolartisan: formData.selectedVisitorType === "artisan" ? "1" : "0",
+                yvisiteurboolclientprive: formData.selectedVisitorType === "clientprive" ? "1" : "0",
+                yvisiteurboolcollectionneur: formData.selectedVisitorType === "collectionneur" ? "1" : "0",
+                yvisiteurboolcreateur: formData.selectedVisitorType === "createur" ? "1" : "0",
+                yvisiteurboolculturel: formData.selectedVisitorType === "culturel" ? "1" : "0",
+                yvisiteurboolgrandpublic: formData.selectedVisitorType === "grandpublic" ? "1" : "0",
+                yvisiteurboolinfluenceur: formData.selectedVisitorType === "influenceur" ? "1" : "0",
+                yvisiteurboolinvestisseur: formData.selectedVisitorType === "investisseur" ? "1" : "0",
+                yvisiteurbooljournaliste: formData.selectedVisitorType === "journaliste" ? "1" : "0",
+                yvisiteurboolpressespecialisee: formData.selectedVisitorType === "pressespecialisee" ? "1" : "0",
+                yvisiteurboolvip: formData.selectedVisitorType === "vip" ? "1" : "0",
             };
 
             const { error } = await supabase.schema("morpheus").from("yvisiteur").insert(visitorData);
@@ -205,13 +234,10 @@ export default function VisitorFormDialog() {
         }));
     };
 
-    const handleVisitorTypeChange = (type: keyof VisitorFormData["visitorTypes"], checked: boolean) => {
+    const handleVisitorTypeChange = (type: string) => {
         setFormData((prev) => ({
             ...prev,
-            visitorTypes: {
-                ...prev.visitorTypes,
-                [type]: checked,
-            },
+            selectedVisitorType: type,
         }));
     };
 
@@ -296,7 +322,7 @@ export default function VisitorFormDialog() {
                     >
                         {t(`visitorForm.${step.title}`)}
                     </h3>
-                    <p className="text-xs text-slate-500">{step.description}</p>
+                    <p className="text-xs text-slate-500">{t(`visitorForm.${step.description}`)}</p>
                 </div>
             </div>
         );
@@ -367,8 +393,8 @@ export default function VisitorFormDialog() {
                                             {currentStep === 2 && t("visitorForm.visitorTypes")}
                                         </h2>
                                         <p className="text-slate-600 text-sm sm:text-base">
-                                            {currentStep === 1 && "Personal details"}
-                                            {currentStep === 2 && "Select all that apply"}
+                                            {currentStep === 1 && t("visitorForm.personalDetails")}
+                                            {currentStep === 2 && t("visitorForm.selectAllThatApply")}
                                         </p>
                                     </div>
 
@@ -447,15 +473,6 @@ export default function VisitorFormDialog() {
                                     {/* Step 2: Visitor Types */}
                                     {currentStep === 2 && (
                                         <div className="space-y-4">
-                                            <div>
-                                                <Label className="text-[#05141D] text-sm font-medium">
-                                                    Vos intérêts
-                                                </Label>
-                                                <p className="text-slate-500 text-xs mt-1">
-                                                    Sélectionnez tout ce qui s'applique
-                                                </p>
-                                            </div>
-
                                             {/* Search for visitor types */}
                                             <div className="relative">
                                                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
@@ -468,11 +485,11 @@ export default function VisitorFormDialog() {
                                                 />
                                             </div>
 
-                                            {/* Selected types count */}
-                                            {Object.values(formData.visitorTypes).some(type => type) && (
+                                            {/* Selected type display */}
+                                            {formData.selectedVisitorType && (
                                                 <div className="flex items-center gap-2">
                                                     <Badge variant="outline" className="text-[#063846] border-[#063846]">
-                                                        {Object.values(formData.visitorTypes).filter(Boolean).length} sélectionné(s)
+                                                        {filteredVisitorTypes.find(type => type.key === formData.selectedVisitorType)?.label || formData.selectedVisitorType} sélectionné
                                                     </Badge>
                                                 </div>
                                             )}
@@ -490,19 +507,12 @@ export default function VisitorFormDialog() {
                                                                 className="flex items-center space-x-3 cursor-pointer p-2 rounded hover:bg-slate-100 transition-colors group"
                                                             >
                                                                 <input
-                                                                    type="checkbox"
-                                                                    checked={
-                                                                        formData.visitorTypes[
-                                                                            key as keyof VisitorFormData["visitorTypes"]
-                                                                        ]
-                                                                    }
-                                                                    onChange={(e) =>
-                                                                        handleVisitorTypeChange(
-                                                                            key as keyof VisitorFormData["visitorTypes"],
-                                                                            e.target.checked
-                                                                        )
-                                                                    }
-                                                                    className="w-4 h-4 text-[#063846] bg-white border-slate-300 rounded focus:ring-[#063846] focus:ring-1 transition-colors"
+                                                                    type="radio"
+                                                                    name="visitorType"
+                                                                    value={key}
+                                                                    checked={formData.selectedVisitorType === key}
+                                                                    onChange={(e) => handleVisitorTypeChange(e.target.value)}
+                                                                    className="w-4 h-4 text-[#063846] bg-white border-slate-300 focus:ring-[#063846] focus:ring-1 transition-colors"
                                                                 />
                                                                 <div className="flex-1">
                                                                     <span className="text-slate-700 text-sm font-medium block">
