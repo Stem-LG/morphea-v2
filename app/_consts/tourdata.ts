@@ -25,6 +25,7 @@ export interface Scene {
     id: string;
     name: string;
     panorama: string;
+    yboutiqueidfk?: number | null;
     initialView: {
         yaw: number;
         pitch: number;
@@ -126,6 +127,7 @@ export async function getTourData(): Promise<TourData> {
                 id: scene.yscenesid.toString(),
                 name: scene.yscenesname,
                 panorama: scene.yscenespanorama,
+                yboutiqueidfk: scene.yboutiqueidfk,
                 initialView: {
                     yaw: scene.yscenesaxexyaw,
                     pitch: scene.yscenesaxeypitch,

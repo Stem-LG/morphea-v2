@@ -138,7 +138,8 @@ export const enTranslations = {
     "firstNameRequired": "First name is required",
     "lastName": "Last Name",
     "lastNamePlaceholder": "Enter your last name",
-    "lastNameRequired": "Last name is required"
+    "lastNameRequired": "Last name is required",
+    "continueToMorphea": "Continue to Morphea"
   },
   "landing": {
     "title": "Welcome to Morphea",

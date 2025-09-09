@@ -10,6 +10,7 @@ import { Separator } from '@/components/ui/separator'
 import { Badge } from '@/components/ui/badge'
 import { useLanguage } from '@/hooks/useLanguage'
 import { useWebsiteUrl } from '@/hooks/use-website-url'
+import { useCookieConsent } from '@/hooks/useCookieConsent'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState, useEffect, useMemo } from 'react'
@@ -67,6 +68,7 @@ export function EnhancedSignupWithVisitor({
     const router = useRouter()
     const { t } = useLanguage()
     const { data: websiteUrl, isLoading: isLoadingWebsiteUrl } = useWebsiteUrl()
+    const { hasConsent } = useCookieConsent()
 
     // Local visitor data state
     const [existingVisitorData, setExistingVisitorData] = useState<any>(null)
@@ -163,6 +165,7 @@ export function EnhancedSignupWithVisitor({
     // Check if visitor form is properly filled when displayed
     const isVisitorFormValid =
         !showVisitorForm ||
+        !hasConsent ||
         (visitorData.phone.trim() &&
             visitorData.address.trim() &&
             visitorData.selectedVisitorType.trim()) // Visitor type selected
@@ -327,7 +330,7 @@ export function EnhancedSignupWithVisitor({
                             updateError
                         )
                     }
-                } else if (showVisitorForm) {
+                } else if (showVisitorForm && hasConsent) {
                     // Create new visitor record with form data
                     try {
                         const visitorCode = `V${Date.now().toString().slice(-8)}`
@@ -842,7 +845,7 @@ export function EnhancedSignupWithVisitor({
                         </div>
 
                         {/* Separator - Only visible on desktop */}
-                        {showVisitorForm && (
+                        {showVisitorForm && hasConsent && (
                             <div className="hidden lg:block">
                                 <Separator
                                     orientation="vertical"
@@ -852,7 +855,7 @@ export function EnhancedSignupWithVisitor({
                         )}
 
                         {/* Mobile Separator */}
-                        {showVisitorForm && (
+                        {showVisitorForm && hasConsent && (
                             <div className="px-8 lg:hidden">
                                 <div className="my-6 flex items-center gap-4">
                                     <Separator className="flex-1 bg-slate-300" />
@@ -868,7 +871,7 @@ export function EnhancedSignupWithVisitor({
                         )}
 
                         {/* Right Side - Visitor Form */}
-                        {showVisitorForm && (
+                        {showVisitorForm && hasConsent && (
                             <div className="flex-1 overflow-y-auto p-8">
                                 <div className="space-y-6">
                                     {/* Desktop Header */}

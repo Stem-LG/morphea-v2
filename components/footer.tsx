@@ -95,13 +95,13 @@ export default function Footer() {
         {
             code: 'fr' as const,
             name: t('common.french'),
-            flag: '🇫🇷',
+            flag: '/flags/fr.svg',
             shortName: 'FR',
         },
         {
             code: 'en' as const,
             name: t('common.english'),
-            flag: '🇺🇸',
+            flag: '/flags/us.svg',
             shortName: 'EN',
         },
     ]
@@ -649,7 +649,13 @@ export default function Footer() {
                         >
                             <span>{t('common.language')} :</span>
                             <span className="flex items-center gap-1">
-                                <span>{currentLanguage.flag}</span>
+                                <Image 
+                                    src={currentLanguage.flag} 
+                                    alt={currentLanguage.name}
+                                    width={18}
+                                    height={14}
+                                    className="rounded-xs"
+                                />
                                 <span>{currentLanguage.shortName}</span>
                                 <ChevronDown
                                     className={`size-4 transition-transform ${isLanguageDropdownOpen ? 'rotate-180' : ''}`}
@@ -672,7 +678,13 @@ export default function Footer() {
                                                 : ''
                                         }`}
                                     >
-                                        <span>{lang.flag}</span>
+                                        <Image 
+                                            src={lang.flag} 
+                                            alt={lang.name}
+                                            width={16}
+                                            height={12}
+                                            className="rounded-xs"
+                                        />
                                         <span className="">{lang.name}</span>
                                     </button>
                                 ))}

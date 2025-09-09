@@ -16,7 +16,8 @@ import { CheckCircle, User, Users, ArrowLeft, ArrowRight, Search } from "lucide-
 import { cn } from "@/lib/utils";
 
 type VisitorFormData = {
-    name: string;
+    firstName: string;
+    lastName: string;
     email: string;
     phone: string;
     address: string;
@@ -46,7 +47,8 @@ export default function VisitorFormDialog() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [visitorTypeSearch, setVisitorTypeSearch] = useState("");
     const [formData, setFormData] = useState<VisitorFormData>({
-        name: "",
+        firstName: "",
+        lastName: "",
         email: "",
         phone: "",
         address: "",
@@ -162,7 +164,7 @@ export default function VisitorFormDialog() {
     };
 
     const handleSubmit = async () => {
-        if (!currentUser || !formData.name.trim()) {
+        if (!currentUser || !formData.firstName.trim() || !formData.lastName.trim()) {
             return;
         }
 
@@ -186,7 +188,7 @@ export default function VisitorFormDialog() {
                 yvisiteurid: nextId,
                 yuseridfk: currentUser.id,
                 yvisiteurcode: visitorCode,
-                yvisiteurnom: formData.name.trim(),
+                yvisiteurnom: `${formData.firstName.trim()} ${formData.lastName.trim()}`.trim(),
                 yvisiteuremail: formData.email.trim() || null,
                 yvisiteurtelephone: formData.phone.trim() || null,
                 yvisiteuradresse: formData.address.trim() || null,
@@ -227,7 +229,7 @@ export default function VisitorFormDialog() {
         }
     };
 
-    const handleInputChange = (field: keyof Omit<VisitorFormData, "visitorTypes">, value: string) => {
+    const handleInputChange = (field: keyof Omit<VisitorFormData, "selectedVisitorType">, value: string) => {
         setFormData((prev) => ({
             ...prev,
             [field]: value,
@@ -242,7 +244,7 @@ export default function VisitorFormDialog() {
     };
 
     const isStep1Valid = () => {
-        return formData.name.trim().length > 0;
+        return formData.firstName.trim().length > 0 && formData.lastName.trim().length > 0;
     };
 
     const canProceedToNextStep = () => {
@@ -403,19 +405,38 @@ export default function VisitorFormDialog() {
                                         <div className="space-y-6">
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                                 <div className="space-y-2">
-                                                    <Label htmlFor="name" className="text-[#05141D] text-sm font-medium">
-                                                        {t("visitorForm.nameRequired")}
-                                                        {formData.name.trim() && <span className="text-green-500 ml-1">✓</span>}
+                                                    <Label htmlFor="firstName" className="text-[#05141D] text-sm font-medium">
+                                                        {t("profile.firstName")} *
+                                                        {formData.firstName.trim() && <span className="text-green-500 ml-1">✓</span>}
                                                     </Label>
                                                     <Input
-                                                        id="name"
+                                                        id="firstName"
                                                         type="text"
                                                         required
-                                                        value={formData.name}
-                                                        onChange={(e) => handleInputChange("name", e.target.value)}
-                                                        className={`bg-white border-slate-300 text-[#05141D] placeholder:text-slate-400 h-11 text-base focus:border-[#063846] focus:ring-[#063846] rounded-md transition-colors ${formData.name.trim() ? 'border-green-300 focus:border-green-500' : ''
-                                                            }`}
-                                                        placeholder={t("visitorForm.namePlaceholder")}
+                                                        value={formData.firstName}
+                                                        onChange={(e) => handleInputChange("firstName", e.target.value)}
+                                                        className={`bg-white border-slate-300 text-[#05141D] placeholder:text-slate-400 h-11 text-base focus:border-[#063846] focus:ring-[#063846] rounded-md transition-colors ${
+                                                            formData.firstName.trim() ? 'border-green-300 focus:border-green-500' : ''
+                                                        }`}
+                                                        placeholder={t("auth.firstNamePlaceholder")}
+                                                    />
+                                                </div>
+
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="lastName" className="text-[#05141D] text-sm font-medium">
+                                                        {t("profile.lastName")} *
+                                                        {formData.lastName.trim() && <span className="text-green-500 ml-1">✓</span>}
+                                                    </Label>
+                                                    <Input
+                                                        id="lastName"
+                                                        type="text"
+                                                        required
+                                                        value={formData.lastName}
+                                                        onChange={(e) => handleInputChange("lastName", e.target.value)}
+                                                        className={`bg-white border-slate-300 text-[#05141D] placeholder:text-slate-400 h-11 text-base focus:border-[#063846] focus:ring-[#063846] rounded-md transition-colors ${
+                                                            formData.lastName.trim() ? 'border-green-300 focus:border-green-500' : ''
+                                                        }`}
+                                                        placeholder={t("auth.lastNamePlaceholder")}
                                                     />
                                                 </div>
 
@@ -578,7 +599,7 @@ export default function VisitorFormDialog() {
                                             <Button
                                                 type="button"
                                                 onClick={handleSubmit}
-                                                disabled={isSubmitting || !formData.name.trim()}
+                                                disabled={isSubmitting || !formData.firstName.trim() || !formData.lastName.trim()}
                                                 className="flex-1 sm:flex-initial bg-gradient-to-r from-[#05141D] to-[#063846] hover:from-[#04111a] hover:to-[#052d37] text-white shadow-lg transition-all duration-300 hover:shadow-xl rounded-md text-xs sm:text-sm px-3 sm:px-4 py-3 sm:py-2"
                                             >
                                                 {isSubmitting ? t("visitorForm.submitting") : t("visitorForm.submit")}

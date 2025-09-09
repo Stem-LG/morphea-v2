@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import { Viewer } from '@photo-sphere-viewer/core'
 import { MarkersPlugin } from '@photo-sphere-viewer/markers-plugin'
 import ProductsListModal from './products-list-modal'
@@ -36,6 +37,7 @@ export default function VirtualTour({
     const containerRef = useRef<HTMLDivElement>(null)
     const viewerRef = useRef<Viewer | null>(null)
     const markersPluginRef = useRef<MarkersPlugin | null>(null)
+    const router = useRouter()
 
     // Initialize the scene view increment hook
     const incrementSceneView = useIncrementSceneView()
@@ -76,6 +78,7 @@ export default function VirtualTour({
 
     // Track viewed scenes to prevent duplicate increments
     const [viewedScenes, setViewedScenes] = useState<Set<string>>(new Set())
+    const [isSceneDropdownOpen, setIsSceneDropdownOpen] = useState(false)
 
     // Calculate the actual height accounting for navbar
     const getActualHeight = () => {
@@ -963,6 +966,108 @@ export default function VirtualTour({
                     </div>
                 </div>
             )}
+
+            {/* Exit Button */}
+            <button
+                onClick={() => router.push('/')}
+                className="absolute bottom-6 right-6 z-10 w-12 h-12 bg-black/20 hover:bg-black/40 text-white rounded-full flex items-center justify-center transition-all duration-300 hover:scale-105 shadow-lg group"
+                title="Quitter la visite virtuelle"
+            >
+                <svg 
+                    width="20" 
+                    height="20" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    strokeWidth="2" 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round"
+                    className="group-hover:scale-110 transition-transform duration-200"
+                >
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                    <polyline points="16,17 21,12 16,7"/>
+                    <line x1="21" y1="12" x2="9" y2="12"/>
+                </svg>
+            </button>
+
+            {/* Scene Navigation Dropdown */}
+            <div className="absolute top-4 right-4 z-10">
+                <div className="relative">
+                    <button
+                        onClick={() => setIsSceneDropdownOpen(!isSceneDropdownOpen)}
+                        className="rounded-lg bg-black/20 px-4 py-2 text-white font-light hover:bg-black/40 transition-all duration-300 flex items-center gap-2 group"
+                        title="Navigation des scènes"
+                    >
+                        <svg 
+                            width="18" 
+                            height="18" 
+                            viewBox="0 0 24 24" 
+                            fill="none" 
+                            stroke="currentColor" 
+                            strokeWidth="2" 
+                            strokeLinecap="round" 
+                            strokeLinejoin="round"
+                            className="group-hover:scale-110 transition-transform duration-200"
+                        >
+                            <path d="M3 6h18"/>
+                            <path d="M3 12h18"/>
+                            <path d="M3 18h18"/>
+                        </svg>
+                        <span className="font-supreme text-sm">Scènes</span>
+                        <svg 
+                            width="14" 
+                            height="14" 
+                            viewBox="0 0 24 24" 
+                            fill="none" 
+                            stroke="currentColor" 
+                            strokeWidth="2" 
+                            strokeLinecap="round" 
+                            strokeLinejoin="round"
+                            className={`transition-transform duration-200 ${isSceneDropdownOpen ? 'rotate-180' : ''}`}
+                        >
+                            <path d="M6 9l6 6 6-6"/>
+                        </svg>
+                    </button>
+
+                    {/* Dropdown Menu */}
+                    {isSceneDropdownOpen && (
+                        <div className="absolute top-full right-0 mt-2 w-64 rounded-lg bg-black/20 backdrop-blur-sm border border-white/10 shadow-xl overflow-hidden">
+                            <div className="max-h-80 overflow-y-auto">
+                                {tourData.scenes
+                                    .filter((scene) => scene.yboutiqueidfk) // Only show scenes with boutique ID
+                                    .map((scene, index) => (
+                                        <button
+                                            key={scene.id}
+                                            onClick={() => {
+                                                if (!isTransitioning) {
+                                                    setCurrentScene(scene.id)
+                                                    setIsSceneDropdownOpen(false)
+                                                }
+                                            }}
+                                            disabled={isTransitioning}
+                                            className={`w-full px-4 py-3 text-left text-sm transition-colors border-b border-white/10 last:border-b-0 ${
+                                                currentScene === scene.id
+                                                    ? "bg-white/20 text-white font-medium"
+                                                    : isTransitioning
+                                                    ? "text-gray-400 cursor-not-allowed"
+                                                    : "text-gray-200 hover:bg-white/10 hover:text-white"
+                                            }`}
+                                        >
+                                            <div className="font-supreme">
+                                                {scene.name}
+                                            </div>
+                                        </button>
+                                    ))}
+                                {tourData.scenes.filter((scene) => scene.yboutiqueidfk).length === 0 && (
+                                    <div className="px-4 py-3 text-sm text-gray-300 text-center">
+                                        Aucune scène boutique disponible
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </div>
 
             {/* Scene information overlay */}
             <div className="absolute top-4 left-4 z-10 rounded-lg bg-black/20 px-4 py-2 text-white font-light">
