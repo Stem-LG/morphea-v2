@@ -1622,7 +1622,7 @@ export const frTranslations = {
     "skipForNow": "Passer pour l'instant",
     "submit": "Soumettre",
     "submitting": "Soumission...",
-    "thankYou": "Merci d'avoir fourni vos informations !",
+    "thankYou": "Morphea vous remercie pour le partage de vos informations.",
     "errorSubmitting": "Une erreur s'est produite lors de la soumission de vos informations. Veuillez réessayer."
   },
   "order": {

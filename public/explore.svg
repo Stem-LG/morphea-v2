@@ -1,3 +1,8 @@
-<svg width="200" height="40" viewBox="0 0 200 40" xmlns="http://www.w3.org/2000/svg">
-  <polygon points="100,1 190,39 155,39 100,20 45,39 10,39" fill="#ffffff"/>
+<svg width="400" height="200" viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Floor base: white ellipse with black outline -->
+  <ellipse cx="200" cy="150" rx="150" ry="45" fill="white" stroke="black" stroke-width="3"/>
+
+  <!-- Flesh: black polygon, centered inside ellipse -->
+  <polygon points="200,115 300,150 260,150 200,135 140,150 100,150"
+           fill="black"/>
 </svg>

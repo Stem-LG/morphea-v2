@@ -160,8 +160,8 @@ export default function TourAdminViewer({
       const markerHtml = `
         <div
           style="
-            width: 40px;
-            height: 40px;
+            width: 90px;
+            height: 90px;
             background-image: url('/explore.svg');
             background-size: contain;
             background-repeat: no-repeat;

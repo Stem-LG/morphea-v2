@@ -722,7 +722,7 @@ export default function VirtualTour({
                     pitch: link.position.pitch,
                 },
                 image: '/explore.svg', // Using existing icon
-                size: { width: 40, height: 40 },
+                size: { width: 90, height: 90 },
                 anchor: 'center center',
                 tooltip: {
                     content: `${link.name}`,
