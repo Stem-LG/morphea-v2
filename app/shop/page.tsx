@@ -342,6 +342,7 @@ function ShopContent() {
     })
 
     const [showFilterSheet, setShowFilterSheet] = useState(false)
+    const [isNearFooter, setIsNearFooter] = useState(false)
 
     // Collapsible filter sections state
     const [expandedSections, setExpandedSections] = useState({
@@ -587,17 +588,27 @@ function ShopContent() {
 
     const hasActiveFilters = Boolean(boutiqueId || categoryId || search)
 
-    // Infinite scroll detection
+    // Infinite scroll detection and footer proximity detection
     useEffect(() => {
         const handleScroll = () => {
+            const scrollTop = document.documentElement.scrollTop
+            const windowHeight = window.innerHeight
+            const documentHeight = document.documentElement.offsetHeight
+
+            // Infinite scroll logic
             if (
-                window.innerHeight + document.documentElement.scrollTop >=
-                    document.documentElement.offsetHeight - 1000 &&
+                windowHeight + scrollTop >= documentHeight - 1000 &&
                 hasNextPage &&
                 !isFetchingNextPage
             ) {
                 fetchNextPage()
             }
+
+            // Footer proximity detection - adjust filter button position
+            // Consider we're near footer when we're within 300px of the bottom
+            const distanceFromBottom =
+                documentHeight - (scrollTop + windowHeight)
+            setIsNearFooter(distanceFromBottom <= 200)
         }
 
         window.addEventListener('scroll', handleScroll)
@@ -705,7 +716,12 @@ function ShopContent() {
             </div>
 
             {/* Fixed Bottom Filter Button */}
-            <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 transform shadow-xl">
+            <div
+                className={cn(
+                    'fixed left-1/2 z-50 -translate-x-1/2 transform shadow-xl transition-all duration-300',
+                    isNearFooter ? 'bottom-16' : 'bottom-6'
+                )}
+            >
                 <button
                     onClick={() => setShowFilterSheet(true)}
                     className="flex h-16 w-56 items-center justify-center gap-3 rounded-2xl border-[0.50px] border-zinc-300 bg-gradient-to-r from-cyan-950 to-sky-900 text-white shadow-[0px_4px_100px_1px_rgba(0,0,0,0.10)] transition-all hover:shadow-xl"
