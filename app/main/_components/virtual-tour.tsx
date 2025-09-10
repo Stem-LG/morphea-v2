@@ -353,6 +353,11 @@ export default function VirtualTour({
 
     // Fetch tour data from Supabase
     useEffect(() => {
+        // Don't fetch data if translations are still loading
+        if (!t) {
+            return;
+        }
+
         const fetchTourData = async () => {
             try {
                 setIsLoading(true)
@@ -410,7 +415,7 @@ export default function VirtualTour({
         }
 
         fetchTourData()
-    }, [getInitialScene, preloadSceneImages])
+    }, [getInitialScene, preloadSceneImages, t]) // Add t to the dependency array
 
     useEffect(() => {
         if (!containerRef.current || isLoading || !tourData.scenes.length)
@@ -478,7 +483,7 @@ export default function VirtualTour({
                             {
                                 detail: {
                                     sceneId: currentSceneData.id,
-                                    sceneName: currentSceneData.name,
+                                    sceneName: currentSceneData.name ,
                                     isInitialLoad: true,
                                 },
                             }
@@ -645,7 +650,7 @@ export default function VirtualTour({
                             {
                                 detail: {
                                     sceneId: currentSceneData.id,
-                                    sceneName: currentSceneData.name,
+                                    sceneName: currentSceneData.name ,
                                     viewCount: currentSceneData.id, // We'll get the actual count from the database
                                 },
                             }
@@ -1089,9 +1094,9 @@ export default function VirtualTour({
             <div className="absolute top-4 left-4 z-10 rounded-lg bg-black/20 px-4 py-2 font-light text-white">
                 <h3 className="font-supreme">
                     {
-                        tourData.scenes.find(
+                       t(tourData.scenes.find(
                             (scene) => scene.id === currentScene
-                        )?.name
+                        )?.name)
                     }
                 </h3>
                 {/* <p className="text-sm opacity-75">

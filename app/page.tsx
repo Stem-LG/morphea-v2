@@ -177,9 +177,8 @@ export default function Home() {
             homeSettings?.creators.images &&
             homeSettings.creators.images.length > 0
                 ? homeSettings.creators.images
-                : [
-    
-                  ],
+                : [],
+        creators: homeSettings?.creators.creators || [],
     }
     return (
         <div className="relative min-h-[100svh] w-full">
@@ -430,7 +429,7 @@ export default function Home() {
                     </div>
                     <ThreeDPhotoCarousel
                         images={creatorsData.images}
-                        creators={homeSettings?.creators.creators || []}
+                        creators={creatorsData.creators}
                         autoRotateSpeed={0.05}
                         height={300}
                         radius={homeSettings?.creators.carouselRadius || 3000}
