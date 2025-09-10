@@ -167,10 +167,7 @@ export function WishlistDialog({ isOpen, onClose }: WishlistDialogProps) {
                                 {t('wishlist.empty') ||
                                     'Your wishlist is empty'}
                             </h3>
-                            <p className="font-supreme text-lg text-gray-600">
-                                {t('wishlist.emptyMessage') ||
-                                    'Save items you love for later'}
-                            </p>
+                           
                         </div>
                     ) : (
                         <div className="space-y-4">
