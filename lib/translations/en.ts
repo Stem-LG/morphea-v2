@@ -1684,6 +1684,23 @@ export const enTranslations = {
     "minCharacters": "Type at least 2 characters to search",
     "noProductsFoundFor": "No products found for"
   },
+  "virtualTour": {
+    "loading": "Loading...",
+    "loadingVirtualTour": "Loading virtual tour...",
+    "fetchingData": "Fetching data...",
+    "processingScenes": "Processing scenes...",
+    "preloadingImages": "Preloading images...",
+    "initializingViewer": "Initializing viewer...",
+    "loadingViewer": "Loading viewer...",
+    "tourReady": "Tour ready",
+    "preparingTourData": "Preparing tour data...",
+    "initializingVirtualTour": "Initializing virtual tour...",
+    "exitVirtualTour": "Exit virtual tour",
+    "sceneNavigation": "Scene navigation",
+    "scenes": "Scenes",
+    "noSceneAvailable": "No scene available",
+    "noBoutiqueSceneAvailable": "No boutique scene available"
+  },
   "notifications": {
     "title": "Notifications",
     "unreadCount": "You have {count} unread notification(s)",

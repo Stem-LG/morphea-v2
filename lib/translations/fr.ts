@@ -1720,6 +1720,23 @@ export const frTranslations = {
     "minCharacters": "Tapez au moins 2 caractères pour rechercher",
     "noProductsFoundFor": "Aucun produit trouvé pour"
   },
+  "virtualTour": {
+    "loading": "Chargement...",
+    "loadingVirtualTour": "Chargement de la visite virtuelle...",
+    "fetchingData": "Récupération des données...",
+    "processingScenes": "Traitement des scènes...",
+    "preloadingImages": "Préchargement des images...",
+    "initializingViewer": "Initialisation du visualiseur...",
+    "loadingViewer": "Chargement du visualiseur...",
+    "tourReady": "Visite prête",
+    "preparingTourData": "Préparation des données de la visite...",
+    "initializingVirtualTour": "Initialisation de la visite virtuelle...",
+    "exitVirtualTour": "Quitter la visite virtuelle",
+    "sceneNavigation": "Navigation des scènes",
+    "scenes": "Scènes",
+    "noSceneAvailable": "Aucune scène de visite disponible",
+    "noBoutiqueSceneAvailable": "Aucune scène boutique disponible"
+  },
   "notifications": {
     "title": "Notifications",
     "unreadCount": "Vous avez {count} notification(s) non lue(s)",

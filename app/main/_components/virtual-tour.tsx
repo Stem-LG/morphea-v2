@@ -12,6 +12,7 @@ import {
     Scene,
 } from '@/app/_consts/tourdata'
 import { useIncrementSceneView } from '../_hooks/use-increment-scene-view'
+import { useLanguage } from '@/hooks/useLanguage'
 
 interface VirtualTourProps {
     className?: string
@@ -38,6 +39,7 @@ export default function VirtualTour({
     const viewerRef = useRef<Viewer | null>(null)
     const markersPluginRef = useRef<MarkersPlugin | null>(null)
     const router = useRouter()
+    const { t } = useLanguage()
 
     // Initialize the scene view increment hook
     const incrementSceneView = useIncrementSceneView()
@@ -71,10 +73,10 @@ export default function VirtualTour({
     const animationIntervalRef = useRef<NodeJS.Timeout | null>(null)
     const isUpdatingUrlRef = useRef(false)
     const isTransitioningRef = useRef(false)
-    
+
     // Loading progress states
     const [loadingProgress, setLoadingProgress] = useState(0)
-    const [loadingText, setLoadingText] = useState('Chargement...')
+    const [loadingText, setLoadingText] = useState(t('virtualTour.loading'))
 
     // Track viewed scenes to prevent duplicate increments
     const [viewedScenes, setViewedScenes] = useState<Set<string>>(new Set())
@@ -355,11 +357,11 @@ export default function VirtualTour({
             try {
                 setIsLoading(true)
                 setLoadingProgress(0)
-                setLoadingText('Récupération des données...')
-                
+                setLoadingText(t('virtualTour.fetchingData'))
+
                 // Simulate progress during data fetching
                 const progressInterval = setInterval(() => {
-                    setLoadingProgress(prev => {
+                    setLoadingProgress((prev) => {
                         if (prev >= 50) {
                             clearInterval(progressInterval)
                             return 50
@@ -367,13 +369,13 @@ export default function VirtualTour({
                         return prev + 10
                     })
                 }, 100)
-                
+
                 const data = await getTourData()
-                
+
                 clearInterval(progressInterval)
                 setLoadingProgress(70)
-                setLoadingText('Traitement des scènes...')
-                
+                setLoadingText(t('virtualTour.processingScenes'))
+
                 setTourData(data)
 
                 // Update starting scene if the data has scenes and the default scene doesn't exist
@@ -387,15 +389,15 @@ export default function VirtualTour({
                     }
 
                     setLoadingProgress(85)
-                    setLoadingText('Préchargement des images...')
-                    
+                    setLoadingText(t('virtualTour.preloadingImages'))
+
                     // Start preloading all scene images
                     preloadSceneImages(data.scenes)
                 }
-                
+
                 setLoadingProgress(90)
-                setLoadingText('Initialisation du visualiseur...')
-                
+                setLoadingText(t('virtualTour.initializingViewer'))
+
                 // Trigger viewer initialization
                 setTimeout(() => {
                     setIsLoading(false) // This will trigger the viewer initialization useEffect
@@ -416,7 +418,7 @@ export default function VirtualTour({
 
         // Continue from where data fetching left off (90%)
         setLoadingProgress(95)
-        setLoadingText('Chargement du visualiseur...')
+        setLoadingText(t('virtualTour.loadingViewer'))
 
         const initializeViewer = () => {
             const currentSceneData = tourData.scenes.find(
@@ -430,7 +432,7 @@ export default function VirtualTour({
                 panorama: currentSceneData.panorama,
                 minFov: 30,
                 maxFov: 120,
-                // loadingImg: '/logo.png', 
+                // loadingImg: '/logo.png',
                 loadingTxt: '', // Remove loading text
                 navbar:
                     showNavbar && !isProductDetailsOpen && !isProductsListOpen
@@ -460,15 +462,15 @@ export default function VirtualTour({
                         pitch: startingPitch,
                     })
                 }
-                
+
                 // Complete the loading process
                 setLoadingProgress(100)
-                setLoadingText('Visite prête')
-                
+                setLoadingText(t('virtualTour.tourReady'))
+
                 setTimeout(() => {
                     addMarkers()
                     setIsLoading(false) // Only turn off initial loading
-                    
+
                     // Dispatch custom event for initial scene load
                     if (typeof window !== 'undefined') {
                         const sceneChangeEvent = new CustomEvent(
@@ -879,30 +881,32 @@ export default function VirtualTour({
                 className={`relative ${className} flex items-center justify-center bg-gray-100`}
                 style={{ height: actualHeight, width }}
             >
-                <div className="text-center text-white max-w-md mx-auto px-6">
+                <div className="mx-auto max-w-md px-6 text-center text-white">
                     <img
                         src="/logo.png"
                         alt="Loading"
                         className="mx-auto mb-6 h-16 w-16 animate-pulse"
                     />
-                    <h3 className="text-xl font-supreme mb-4 text-gray-700">Chargement de la visite virtuelle...</h3>
-                    
+                    <h3 className="font-supreme mb-4 text-xl text-gray-700">
+                        {t('virtualTour.loadingVirtualTour')}
+                    </h3>
+
                     {/* Progress Bar */}
-                    <div className="w-full bg-gray-300 rounded-full h-3 mb-4 overflow-hidden">
-                        <div 
-                            className="h-full bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light transition-all duration-300 ease-out rounded-full"
+                    <div className="mb-4 h-3 w-full overflow-hidden rounded-full bg-gray-300">
+                        <div
+                            className="from-morpheus-gold-dark to-morpheus-gold-light h-full rounded-full bg-gradient-to-r transition-all duration-300 ease-out"
                             style={{ width: `${loadingProgress}%` }}
                         />
                     </div>
-                    
+
                     {/* Progress Percentage */}
                     <p className="text-sm text-gray-600">
                         {Math.round(loadingProgress)}%
                     </p>
-                    
+
                     {/* Loading hint */}
-                    <p className="text-xs text-gray-500 mt-2">
-                        Préparation des données de la visite...
+                    <p className="mt-2 text-xs text-gray-500">
+                        {t('virtualTour.preparingTourData')}
                     </p>
                 </div>
             </div>
@@ -917,7 +921,7 @@ export default function VirtualTour({
             >
                 <div className="text-center">
                     <p className="text-gray-600">
-                        Aucune scène de visite disponible
+                        {t('virtualTour.noSceneAvailable')}
                     </p>
                 </div>
             </div>
@@ -937,31 +941,33 @@ export default function VirtualTour({
 
             {/* Loading Progress Bar Overlay - Only show during initial load */}
             {isLoading && (
-                <div className="absolute inset-0 z-50 bg-black/80 flex items-center justify-center">
-                    <div className="text-center text-white max-w-md mx-auto px-6">
+                <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/80">
+                    <div className="mx-auto max-w-md px-6 text-center text-white">
                         <img
                             src="/logo.png"
                             alt="Loading"
                             className="mx-auto mb-6 h-16 w-16 animate-pulse"
                         />
-                        <h3 className="text-xl font-supreme mb-4">{loadingText}</h3>
-                        
+                        <h3 className="font-supreme mb-4 text-xl">
+                            {loadingText}
+                        </h3>
+
                         {/* Progress Bar */}
-                        <div className="w-full bg-gray-700 rounded-full h-3 mb-4 overflow-hidden">
-                            <div 
-                                className="h-full bg-gradient-to-r from-morpheus-gold-dark to-morpheus-gold-light transition-all duration-300 ease-out rounded-full"
+                        <div className="mb-4 h-3 w-full overflow-hidden rounded-full bg-gray-700">
+                            <div
+                                className="from-morpheus-gold-dark to-morpheus-gold-light h-full rounded-full bg-gradient-to-r transition-all duration-300 ease-out"
                                 style={{ width: `${loadingProgress}%` }}
                             />
                         </div>
-                        
+
                         {/* Progress Percentage */}
                         <p className="text-sm text-gray-300">
                             {Math.round(loadingProgress)}%
                         </p>
-                        
+
                         {/* Loading hint */}
-                        <p className="text-xs text-gray-400 mt-2">
-                            Initialisation de la visite virtuelle...
+                        <p className="mt-2 text-xs text-gray-400">
+                            {t('virtualTour.initializingVirtualTour')}
                         </p>
                     </div>
                 </div>
@@ -970,23 +976,23 @@ export default function VirtualTour({
             {/* Exit Button */}
             <button
                 onClick={() => router.push('/')}
-                className="absolute bottom-6 right-6 z-10 w-12 h-12 bg-black/20 hover:bg-black/40 text-white rounded-full flex items-center justify-center transition-all duration-300 hover:scale-105 shadow-lg group"
-                title="Quitter la visite virtuelle"
+                className="group absolute right-6 bottom-6 z-10 flex h-12 w-12 items-center justify-center rounded-full bg-black/20 text-white shadow-lg transition-all duration-300 hover:scale-105 hover:bg-black/40"
+                title={t('virtualTour.exitVirtualTour')}
             >
-                <svg 
-                    width="20" 
-                    height="20" 
-                    viewBox="0 0 24 24" 
-                    fill="none" 
-                    stroke="currentColor" 
-                    strokeWidth="2" 
-                    strokeLinecap="round" 
+                <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
                     strokeLinejoin="round"
-                    className="group-hover:scale-110 transition-transform duration-200"
+                    className="transition-transform duration-200 group-hover:scale-110"
                 >
-                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-                    <polyline points="16,17 21,12 16,7"/>
-                    <line x1="21" y1="12" x2="9" y2="12"/>
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                    <polyline points="16,17 21,12 16,7" />
+                    <line x1="21" y1="12" x2="9" y2="12" />
                 </svg>
             </button>
 
@@ -994,63 +1000,69 @@ export default function VirtualTour({
             <div className="absolute top-4 right-4 z-10">
                 <div className="relative">
                     <button
-                        onClick={() => setIsSceneDropdownOpen(!isSceneDropdownOpen)}
-                        className="rounded-lg bg-black/20 px-4 py-2 text-white font-light hover:bg-black/40 transition-all duration-300 flex items-center gap-2 group"
-                        title="Navigation des scènes"
+                        onClick={() =>
+                            setIsSceneDropdownOpen(!isSceneDropdownOpen)
+                        }
+                        className="group flex items-center gap-2 rounded-lg bg-black/20 px-4 py-2 font-light text-white transition-all duration-300 hover:bg-black/40"
+                        title={t('virtualTour.sceneNavigation')}
                     >
-                        <svg 
-                            width="18" 
-                            height="18" 
-                            viewBox="0 0 24 24" 
-                            fill="none" 
-                            stroke="currentColor" 
-                            strokeWidth="2" 
-                            strokeLinecap="round" 
+                        <svg
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
                             strokeLinejoin="round"
-                            className="group-hover:scale-110 transition-transform duration-200"
+                            className="transition-transform duration-200 group-hover:scale-110"
                         >
-                            <path d="M3 6h18"/>
-                            <path d="M3 12h18"/>
-                            <path d="M3 18h18"/>
+                            <path d="M3 6h18" />
+                            <path d="M3 12h18" />
+                            <path d="M3 18h18" />
                         </svg>
-                        <span className="font-supreme text-sm">Scènes</span>
-                        <svg 
-                            width="14" 
-                            height="14" 
-                            viewBox="0 0 24 24" 
-                            fill="none" 
-                            stroke="currentColor" 
-                            strokeWidth="2" 
-                            strokeLinecap="round" 
+                        <span className="font-supreme text-sm">
+                            {t('virtualTour.scenes')}
+                        </span>
+                        <svg
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
                             strokeLinejoin="round"
                             className={`transition-transform duration-200 ${isSceneDropdownOpen ? 'rotate-180' : ''}`}
                         >
-                            <path d="M6 9l6 6 6-6"/>
+                            <path d="M6 9l6 6 6-6" />
                         </svg>
                     </button>
 
                     {/* Dropdown Menu */}
                     {isSceneDropdownOpen && (
-                        <div className="absolute top-full right-0 mt-2 w-64 rounded-lg bg-black/20 backdrop-blur-sm border border-white/10 shadow-xl overflow-hidden">
+                        <div className="absolute top-full right-0 mt-2 w-64 overflow-hidden rounded-lg border border-white/10 bg-black/20 shadow-xl backdrop-blur-sm">
                             <div className="max-h-80 overflow-y-auto">
                                 {tourData.scenes
                                     .filter((scene) => scene.yboutiqueidfk) // Only show scenes with boutique ID
-                                    .map((scene, index) => (
+                                    .map((scene) => (
                                         <button
                                             key={scene.id}
                                             onClick={() => {
                                                 if (!isTransitioning) {
                                                     setCurrentScene(scene.id)
-                                                    setIsSceneDropdownOpen(false)
+                                                    setIsSceneDropdownOpen(
+                                                        false
+                                                    )
                                                 }
                                             }}
                                             disabled={isTransitioning}
-                                            className={`w-full px-4 py-3 text-left text-sm transition-colors border-b border-white/10 last:border-b-0 ${
+                                            className={`w-full border-b border-white/10 px-4 py-3 text-left text-sm transition-colors last:border-b-0 ${
                                                 currentScene === scene.id
-                                                    ? "bg-white/20 text-white font-medium"
+                                                    ? 'bg-white/20 font-medium text-white'
                                                     : isTransitioning
-                                                    ? "text-gray-400 cursor-not-allowed"
-                                                    : "text-gray-200 hover:bg-white/10 hover:text-white"
+                                                      ? 'cursor-not-allowed text-gray-400'
+                                                      : 'text-gray-200 hover:bg-white/10 hover:text-white'
                                             }`}
                                         >
                                             <div className="font-supreme">
@@ -1058,9 +1070,13 @@ export default function VirtualTour({
                                             </div>
                                         </button>
                                     ))}
-                                {tourData.scenes.filter((scene) => scene.yboutiqueidfk).length === 0 && (
-                                    <div className="px-4 py-3 text-sm text-gray-300 text-center">
-                                        Aucune scène boutique disponible
+                                {tourData.scenes.filter(
+                                    (scene) => scene.yboutiqueidfk
+                                ).length === 0 && (
+                                    <div className="px-4 py-3 text-center text-sm text-gray-300">
+                                        {t(
+                                            'virtualTour.noBoutiqueSceneAvailable'
+                                        )}
                                     </div>
                                 )}
                             </div>
@@ -1070,7 +1086,7 @@ export default function VirtualTour({
             </div>
 
             {/* Scene information overlay */}
-            <div className="absolute top-4 left-4 z-10 rounded-lg bg-black/20 px-4 py-2 text-white font-light">
+            <div className="absolute top-4 left-4 z-10 rounded-lg bg-black/20 px-4 py-2 font-light text-white">
                 <h3 className="font-supreme">
                     {
                         tourData.scenes.find(
