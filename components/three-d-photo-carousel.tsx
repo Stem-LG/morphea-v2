@@ -31,9 +31,13 @@ function ThreeDPhotoCarousel({
     const [isHovered, setIsHovered] = useState<boolean>(false)
     const [isMobile, setIsMobile] = useState<boolean>(false)
 
-    // Prioritize creators over legacy images
+    // Prioritize creators over legacy images, fallback to default images if both are empty
     const displayItems =
-        creators.length > 0 ? creators.map((c) => c.image) : images
+        creators.length > 0
+            ? creators.map((c) => c.image)
+            : images && images.length > 0
+                ? images
+                : ['/lg1.jpg', '/lg2.png', '/lg3.jpg', '/lg4.jpg'] // Fallback to default images
     const hasCreatorLinks = creators.length > 0
 
     // Detect mobile screen size

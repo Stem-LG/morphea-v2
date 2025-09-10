@@ -40,7 +40,7 @@ export interface TourData {
 }
 
 // Function to fetch tour data from Supabase
-export async function getTourData(): Promise<TourData> {
+export async function getTourData(t?: (key: string) => string): Promise<TourData> {
     const supabase = createClient()
     
     try {
@@ -125,7 +125,7 @@ export async function getTourData(): Promise<TourData> {
             
             return {
                 id: scene.yscenesid.toString(),
-                name: scene.yscenesname,
+                name: t ? t(scene.yscenesname):scene.yscenesname,
                 panorama: scene.yscenespanorama,
                 yboutiqueidfk: scene.yboutiqueidfk,
                 initialView: {

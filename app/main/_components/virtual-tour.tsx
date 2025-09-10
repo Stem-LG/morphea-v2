@@ -12,6 +12,8 @@ import {
     Scene,
 } from '@/app/_consts/tourdata'
 import { useIncrementSceneView } from '../_hooks/use-increment-scene-view'
+import { useLanguage } from '@/hooks/useLanguage';
+
 
 interface VirtualTourProps {
     className?: string
@@ -71,7 +73,8 @@ export default function VirtualTour({
     const animationIntervalRef = useRef<NodeJS.Timeout | null>(null)
     const isUpdatingUrlRef = useRef(false)
     const isTransitioningRef = useRef(false)
-    
+    const { t } = useLanguage();
+
     // Loading progress states
     const [loadingProgress, setLoadingProgress] = useState(0)
     const [loadingText, setLoadingText] = useState('Chargement...')
@@ -351,6 +354,11 @@ export default function VirtualTour({
 
     // Fetch tour data from Supabase
     useEffect(() => {
+        // Don't fetch data if translations are still loading
+        if (!t) {
+            return;
+        }
+
         const fetchTourData = async () => {
             try {
                 setIsLoading(true)
@@ -368,8 +376,8 @@ export default function VirtualTour({
                     })
                 }, 100)
                 
-                const data = await getTourData()
-                
+                const data = await getTourData(t)
+
                 clearInterval(progressInterval)
                 setLoadingProgress(70)
                 setLoadingText('Traitement des scènes...')
@@ -408,7 +416,7 @@ export default function VirtualTour({
         }
 
         fetchTourData()
-    }, [getInitialScene, preloadSceneImages])
+    }, [getInitialScene, preloadSceneImages, t]) // Add t to the dependency array
 
     useEffect(() => {
         if (!containerRef.current || isLoading || !tourData.scenes.length)
@@ -476,7 +484,7 @@ export default function VirtualTour({
                             {
                                 detail: {
                                     sceneId: currentSceneData.id,
-                                    sceneName: currentSceneData.name,
+                                    sceneName: currentSceneData.name ,
                                     isInitialLoad: true,
                                 },
                             }
@@ -643,7 +651,7 @@ export default function VirtualTour({
                             {
                                 detail: {
                                     sceneId: currentSceneData.id,
-                                    sceneName: currentSceneData.name,
+                                    sceneName: currentSceneData.name ,
                                     viewCount: currentSceneData.id, // We'll get the actual count from the database
                                 },
                             }
