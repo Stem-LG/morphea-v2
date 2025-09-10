@@ -85,12 +85,15 @@ export function SearchDialog({
 
     return (
         <Sheet open={isOpen} onOpenChange={onClose}>
-            <SheetContent side="right" className="w-[400px] z-[90] sm:w-[540px] p-0 bg-white">
+            <SheetContent
+                side="right"
+                className="z-[90] w-[400px] bg-white p-0 sm:w-[540px]"
+            >
                 {/* Header */}
                 <div className="flex-shrink-0">
                     <div className="flex items-center justify-center py-4 text-3xl">
                         <h1 className="font-recia font-medium">
-                            Rechercher
+                            {t('shop.search')}
                         </h1>
                     </div>
                     <Separator />
@@ -114,119 +117,126 @@ export function SearchDialog({
                             <div className="relative">
                                 <SearchIcon className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
                                 <Input
-                                    placeholder="Rechercher des produits..."
+                                    placeholder={t('shop.searchPlaceholder')}
                                     value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="pl-10 h-12"
+                                    onChange={(e) =>
+                                        setSearchQuery(e.target.value)
+                                    }
+                                    className="h-12 pl-10"
                                 />
                             </div>
                         </div>
 
                         {/* Results */}
                         <div className="pb-6">
-                    {searchQuery.length < 2 ? (
-                        <div className="flex flex-col items-center justify-center py-12 text-center">
-                            <SearchIcon className="mb-4 h-12 w-12 text-gray-400" />
-                            <p className="text-sm text-gray-500">
-                                Tapez au moins 2 caractères pour rechercher
-                            </p>
-                        </div>
-                    ) : isLoading ? (
-                        <div className="flex items-center justify-center py-12">
-                            <div className="border-morpheus-blue-dark h-8 w-8 animate-spin rounded-full border-b-2"></div>
-                        </div>
-                    ) : searchResults.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center py-8 text-center">
-                            <Package className="mb-4 h-12 w-12 text-gray-400" />
-                            <p className="text-sm text-gray-500">
-                                Aucun produit trouvé pour "{searchQuery}"
-                            </p>
-                        </div>
-                    ) : (
-                        <div className="space-y-2">
-                            <h3 className="mb-3 text-sm font-medium text-gray-900">
-                                Produits
-                            </h3>
-                            {searchResults.map((product) => {
-                                const image = getProductImage(product)
-                                const pricing = getProductPrice(product)
+                            {searchQuery.length < 2 ? (
+                                <div className="flex flex-col items-center justify-center py-12 text-center">
+                                    <SearchIcon className="mb-4 h-12 w-12 text-gray-400" />
+                                    <p className="text-sm text-gray-500">
+                                        {t('shop.minCharacters')}
+                                    </p>
+                                </div>
+                            ) : isLoading ? (
+                                <div className="flex items-center justify-center py-12">
+                                    <div className="border-morpheus-blue-dark h-8 w-8 animate-spin rounded-full border-b-2"></div>
+                                </div>
+                            ) : searchResults.length === 0 ? (
+                                <div className="flex flex-col items-center justify-center py-8 text-center">
+                                    <Package className="mb-4 h-12 w-12 text-gray-400" />
+                                    <p className="text-sm text-gray-500">
+                                        {t('shop.noProductsFoundFor')} "
+                                        {searchQuery}"
+                                    </p>
+                                </div>
+                            ) : (
+                                <div className="space-y-2">
+                                    <h3 className="mb-3 text-sm font-medium text-gray-900">
+                                        {t('shop.products')}
+                                    </h3>
+                                    {searchResults.map((product) => {
+                                        const image = getProductImage(product)
+                                        const pricing = getProductPrice(product)
 
-                                return (
-                                    <div
-                                        key={product.yprodid}
-                                        onClick={() =>
-                                            handleProductSelect(product)
-                                        }
-                                        className="flex cursor-pointer items-center gap-4 rounded-lg p-4 transition-colors hover:bg-gray-50"
-                                    >
-                                        {/* Product Image */}
-                                        <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100">
-                                            {image ? (
-                                                <Image
-                                                    src={image}
-                                                    alt={product.yprodintitule}
-                                                    width={64}
-                                                    height={64}
-                                                    className="h-full w-full object-cover"
-                                                />
-                                            ) : (
-                                                <div className="flex h-full w-full items-center justify-center">
-                                                    <Package className="h-6 w-6 text-gray-400" />
+                                        return (
+                                            <div
+                                                key={product.yprodid}
+                                                onClick={() =>
+                                                    handleProductSelect(product)
+                                                }
+                                                className="flex cursor-pointer items-center gap-4 rounded-lg p-4 transition-colors hover:bg-gray-50"
+                                            >
+                                                {/* Product Image */}
+                                                <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100">
+                                                    {image ? (
+                                                        <Image
+                                                            src={image}
+                                                            alt={
+                                                                product.yprodintitule
+                                                            }
+                                                            width={64}
+                                                            height={64}
+                                                            className="h-full w-full object-cover"
+                                                        />
+                                                    ) : (
+                                                        <div className="flex h-full w-full items-center justify-center">
+                                                            <Package className="h-6 w-6 text-gray-400" />
+                                                        </div>
+                                                    )}
                                                 </div>
-                                            )}
-                                        </div>
 
-                                        {/* Product Info */}
-                                        <div className="min-w-0 flex-1">
-                                            <h3 className="truncate font-medium text-gray-900">
-                                                {product.yprodintitule}
-                                            </h3>
-                                            {product.ydesign && (
-                                                <p className="truncate text-sm text-gray-500">
-                                                    {
-                                                        product.ydesign
-                                                            .ydesignmarque
-                                                    }
-                                                </p>
-                                            )}
-                                            {pricing && (
-                                                <div className="mt-1 flex items-center gap-2">
-                                                    <span className="text-morpheus-blue-dark text-sm font-medium">
-                                                        {pricing.current}
-                                                    </span>
-                                                    {pricing.hasDiscount &&
-                                                        pricing.original && (
-                                                            <span className="text-xs text-gray-400 line-through">
+                                                {/* Product Info */}
+                                                <div className="min-w-0 flex-1">
+                                                    <h3 className="truncate font-medium text-gray-900">
+                                                        {product.yprodintitule}
+                                                    </h3>
+                                                    {product.ydesign && (
+                                                        <p className="truncate text-sm text-gray-500">
+                                                            {
+                                                                product.ydesign
+                                                                    .ydesignmarque
+                                                            }
+                                                        </p>
+                                                    )}
+                                                    {pricing && (
+                                                        <div className="mt-1 flex items-center gap-2">
+                                                            <span className="text-morpheus-blue-dark text-sm font-medium">
                                                                 {
-                                                                    pricing.original
+                                                                    pricing.current
                                                                 }
                                                             </span>
-                                                        )}
+                                                            {pricing.hasDiscount &&
+                                                                pricing.original && (
+                                                                    <span className="text-xs text-gray-400 line-through">
+                                                                        {
+                                                                            pricing.original
+                                                                        }
+                                                                    </span>
+                                                                )}
+                                                        </div>
+                                                    )}
                                                 </div>
-                                            )}
-                                        </div>
 
-                                        {/* Arrow indicator */}
-                                        <div className="flex-shrink-0">
-                                            <svg
-                                                className="h-4 w-4 text-gray-400"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                viewBox="0 0 24 24"
-                                            >
-                                                <path
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    strokeWidth={2}
-                                                    d="M9 5l7 7-7 7"
-                                                />
-                                            </svg>
-                                        </div>
-                                    </div>
-                                )
-                            })}
-                        </div>
-                    )}
+                                                {/* Arrow indicator */}
+                                                <div className="flex-shrink-0">
+                                                    <svg
+                                                        className="h-4 w-4 text-gray-400"
+                                                        fill="none"
+                                                        stroke="currentColor"
+                                                        viewBox="0 0 24 24"
+                                                    >
+                                                        <path
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round"
+                                                            strokeWidth={2}
+                                                            d="M9 5l7 7-7 7"
+                                                        />
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                        )
+                                    })}
+                                </div>
+                            )}
                         </div>
                     </div>
                 </ScrollArea>

@@ -46,7 +46,7 @@ export const enTranslations = {
     "actions": "Actions",
     "required": "Required",
     "poweredBy": "© 2025 – All rights reserved.  Powered by",
-    "profile": "Profile", 
+    "profile": "Profile",
     "orders": "Orders",
     "register": "Register",
     "login": "Login"
@@ -55,7 +55,7 @@ export const enTranslations = {
     "title": "Cookie Settings",
     "description": "We use cookies to enhance your experience on our website. You can choose to accept all cookies or customize your preferences.",
     "acceptAll": "Accept All",
-    "rejectAll": "Reject All", 
+    "rejectAll": "Reject All",
     "managePreferences": "Manage Preferences",
     "save": "Save Preferences",
     "necessary": "Necessary Cookies",
@@ -736,7 +736,7 @@ export const enTranslations = {
       "createNewTypeBijoux": "Create New Jewelry Type",
       "typebijouxCode": "Type Code",
       "typebijouxCodePlaceholder": "e.g., RING, NECK, BRAC",
-      "typebijouxName": "Type Name", 
+      "typebijouxName": "Type Name",
       "typebijouxNamePlaceholder": "e.g., Ring, Necklace, Bracelet",
       "createTypeBijoux": "Create Type",
       "fillTypebijouxCodeAndName": "Please fill in jewelry type code and name",
@@ -746,7 +746,7 @@ export const enTranslations = {
       "materiauxCode": "Material Code",
       "materiauxCodePlaceholder": "e.g., GOLD, SILV, PLAT",
       "materiauxName": "Material Name",
-      "materiauxNamePlaceholder": "e.g., Gold, Silver, Platinum", 
+      "materiauxNamePlaceholder": "e.g., Gold, Silver, Platinum",
       "createMateriaux": "Create Material",
       "fillMateriauxCodeAndName": "Please fill in material code and name",
       "materiauxCreatedSuccessfully": "Material created successfully!",
@@ -1680,7 +1680,9 @@ export const enTranslations = {
     "priceDesc": "Price: High to Low",
     "nameAsc": "Name: A to Z",
     "nameDesc": "Name: Z to A",
-    "newest": "Newest First"
+    "newest": "Newest First",
+    "minCharacters": "Type at least 2 characters to search",
+    "noProductsFoundFor": "No products found for"
   },
   "notifications": {
     "title": "Notifications",

@@ -1716,7 +1716,9 @@ export const frTranslations = {
     "nameAsc": "Nom : A à Z",
     "nameDesc": "Nom : Z à A",
     "newest": "Plus récent",
-    "results": "Resultats"
+    "results": "Resultats",
+    "minCharacters": "Tapez au moins 2 caractères pour rechercher",
+    "noProductsFoundFor": "Aucun produit trouvé pour"
   },
   "notifications": {
     "title": "Notifications",
@@ -1740,7 +1742,7 @@ export const frTranslations = {
   "homepage": {
     "hero": {
       "mode": "MODE",
-    //  "preCollection": "PRÉ-COLLECTION 2026/27",
+      //  "preCollection": "PRÉ-COLLECTION 2026/27",
       "summerCollection": "COLLECTION ÉTÉ 2026",
       "discover": "Découvrir"
     },
