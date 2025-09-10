@@ -24,6 +24,7 @@ import { useCurrencies } from '@/app/_hooks/use-currencies'
 import { useLanguage } from '@/hooks/useLanguage'
 import { toast } from 'sonner'
 import { HomepageSettings } from './homepage-settings'
+import Link from 'next/link'
 
 interface PredefinedSetting {
     key: string
@@ -193,16 +194,21 @@ export function SettingsManagement() {
     return (
         <div className="space-y-6">
             {/* Header */}
-            <div className="flex items-center gap-3">
-                <SettingsIcon className="h-8 w-8 text-blue-600" />
-                <div>
-                    <h1 className="text-3xl font-bold text-gray-900">
-                        {t('admin.settings.title')}
-                    </h1>
-                    <p className="text-gray-600">
-                        {t('admin.settings.subtitle')}
-                    </p>
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                <div className="flex items-center gap-3">
+                    <SettingsIcon className="h-8 w-8 text-blue-600" />
+                    <div>
+                        <h1 className="text-3xl font-bold text-gray-900">
+                            {t('admin.settings.title')}
+                        </h1>
+                        <p className="text-gray-600">
+                            {t('admin.settings.subtitle')}
+                        </p>
+                    </div>
                 </div>
+                <Link href="/admin/translations">
+                    <Button>{t('settings.translations')}</Button>
+                </Link>
             </div>
 
             {/* Predefined Settings */}
