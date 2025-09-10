@@ -1740,7 +1740,7 @@ export const frTranslations = {
   "homepage": {
     "hero": {
       "mode": "MODE",
-      "preCollection": "PRÉ-COLLECTION 2026/27",
+    //  "preCollection": "PRÉ-COLLECTION 2026/27",
       "summerCollection": "COLLECTION ÉTÉ 2026",
       "discover": "Découvrir"
     },
