@@ -1021,7 +1021,7 @@ export default function VirtualTour({
                             <path d="M3 12h18"/>
                             <path d="M3 18h18"/>
                         </svg>
-                        <span className="font-supreme text-sm">Scènes</span>
+                        <span className="font-supreme text-sm">t(admin.tour.scenes)</span>
                         <svg 
                             width="14" 
                             height="14" 
@@ -1062,7 +1062,7 @@ export default function VirtualTour({
                                             }`}
                                         >
                                             <div className="font-supreme">
-                                                {scene.name}
+                                                {t(scene.name)}
                                             </div>
                                         </button>
                                     ))}
