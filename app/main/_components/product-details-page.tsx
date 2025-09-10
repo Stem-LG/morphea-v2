@@ -13,6 +13,7 @@ import { useRemoveFromWishlist } from '@/app/_hooks/wishlist/useRemoveFromWishli
 import { useIsInWishlist } from '@/app/_hooks/wishlist/useIsInWishlist'
 import * as THREE from 'three'
 import { StarIcon } from 'lucide-react'
+import { CartIcon } from '@/app/_icons/cart_icon'
 
 // Loading component for 3D model
 function LoadingSpinner() {
@@ -262,22 +263,28 @@ export function ProductDetailsPage({
     const [selectedMediaIndex, setSelectedMediaIndex] = useState(0)
     const [selectedColorId, setSelectedColorId] = useState<number>(() => {
         if (isJewelryProduct) return 0 // Don't use color for jewelry
-        return approvedVariants && approvedVariants.length > 0 && approvedVariants[0].xcouleur
+        return approvedVariants &&
+            approvedVariants.length > 0 &&
+            approvedVariants[0].xcouleur
             ? approvedVariants[0].xcouleur.xcouleurid
             : 0
     })
     const [selectedSizeId, setSelectedSizeId] = useState<number>(() => {
         if (isJewelryProduct) return 0 // Don't use size for jewelry
-        return approvedVariants && approvedVariants.length > 0 && approvedVariants[0].xtaille
+        return approvedVariants &&
+            approvedVariants.length > 0 &&
+            approvedVariants[0].xtaille
             ? approvedVariants[0].xtaille.xtailleid
             : 0
     })
-    const [selectedJewelryType, setSelectedJewelryType] = useState<string>(() => {
-        if (!isJewelryProduct) return '' // Don't use jewelry type for regular products
-        return approvedVariants && approvedVariants.length > 0
-            ? approvedVariants[0].xtypebijoux?.xtypebijouxintitule || ''
-            : ''
-    })
+    const [selectedJewelryType, setSelectedJewelryType] = useState<string>(
+        () => {
+            if (!isJewelryProduct) return '' // Don't use jewelry type for regular products
+            return approvedVariants && approvedVariants.length > 0
+                ? approvedVariants[0].xtypebijoux?.xtypebijouxintitule || ''
+                : ''
+        }
+    )
     const [selectedMaterial, setSelectedMaterial] = useState<string>(() => {
         if (!isJewelryProduct) return '' // Don't use material for regular products
         return approvedVariants && approvedVariants.length > 0
@@ -294,7 +301,12 @@ export function ProductDetailsPage({
 
     // Get all unique colors and sizes from approved variants only
     const availableColors = useMemo(() => {
-        if (!approvedVariants || approvedVariants.length === 0 || isJewelryProduct) return []
+        if (
+            !approvedVariants ||
+            approvedVariants.length === 0 ||
+            isJewelryProduct
+        )
+            return []
 
         const colorMap = new Map()
         approvedVariants.forEach((variant) => {
@@ -307,7 +319,12 @@ export function ProductDetailsPage({
     }, [approvedVariants, isJewelryProduct])
 
     const availableSizes = useMemo(() => {
-        if (!approvedVariants || approvedVariants.length === 0 || isJewelryProduct) return []
+        if (
+            !approvedVariants ||
+            approvedVariants.length === 0 ||
+            isJewelryProduct
+        )
+            return []
 
         const sizeMap = new Map()
         // Filter sizes based on selected color from approved variants only
@@ -325,11 +342,19 @@ export function ProductDetailsPage({
 
     // Get all unique jewelry types and materials from approved variants only
     const availableJewelryTypes = useMemo(() => {
-        if (!approvedVariants || approvedVariants.length === 0 || !isJewelryProduct) return []
+        if (
+            !approvedVariants ||
+            approvedVariants.length === 0 ||
+            !isJewelryProduct
+        )
+            return []
 
         const typeSet = new Set<string>()
         approvedVariants.forEach((variant) => {
-            if (variant.xtypebijoux?.xtypebijouxintitule && variant.xtypebijoux.xtypebijouxintitule.trim()) {
+            if (
+                variant.xtypebijoux?.xtypebijouxintitule &&
+                variant.xtypebijoux.xtypebijouxintitule.trim()
+            ) {
                 typeSet.add(variant.xtypebijoux.xtypebijouxintitule.trim())
             }
         })
@@ -338,16 +363,27 @@ export function ProductDetailsPage({
     }, [approvedVariants, isJewelryProduct])
 
     const availableMaterials = useMemo(() => {
-        if (!approvedVariants || approvedVariants.length === 0 || !isJewelryProduct) return []
+        if (
+            !approvedVariants ||
+            approvedVariants.length === 0 ||
+            !isJewelryProduct
+        )
+            return []
 
         const materialSet = new Set<string>()
         // If no type is selected, show all materials
-        const variantsToCheck = selectedJewelryType 
-            ? approvedVariants.filter((v) => v.xtypebijoux?.xtypebijouxintitule === selectedJewelryType)
+        const variantsToCheck = selectedJewelryType
+            ? approvedVariants.filter(
+                  (v) =>
+                      v.xtypebijoux?.xtypebijouxintitule === selectedJewelryType
+              )
             : approvedVariants
 
         variantsToCheck.forEach((variant) => {
-            if (variant.xmateriaux?.xmateriauxintitule && variant.xmateriaux.xmateriauxintitule.trim()) {
+            if (
+                variant.xmateriaux?.xmateriauxintitule &&
+                variant.xmateriaux.xmateriauxintitule.trim()
+            ) {
                 materialSet.add(variant.xmateriaux.xmateriauxintitule.trim())
             }
         })
@@ -363,7 +399,8 @@ export function ProductDetailsPage({
             return (
                 approvedVariants.find(
                     (v) =>
-                        v.xtypebijoux?.xtypebijouxintitule === selectedJewelryType &&
+                        v.xtypebijoux?.xtypebijouxintitule ===
+                            selectedJewelryType &&
                         v.xmateriaux?.xmateriauxintitule === selectedMaterial
                 ) || approvedVariants[0]
             )
@@ -371,19 +408,29 @@ export function ProductDetailsPage({
             return (
                 approvedVariants.find(
                     (v) =>
-                        v.xcouleur && v.xtaille &&
+                        v.xcouleur &&
+                        v.xtaille &&
                         v.xcouleur.xcouleurid === selectedColorId &&
                         v.xtaille.xtailleid === selectedSizeId
                 ) || approvedVariants[0]
             )
         }
-    }, [approvedVariants, selectedColorId, selectedSizeId, selectedJewelryType, selectedMaterial, isJewelryProduct])
+    }, [
+        approvedVariants,
+        selectedColorId,
+        selectedSizeId,
+        selectedJewelryType,
+        selectedMaterial,
+        isJewelryProduct,
+    ])
 
     // Get media from the currently selected variant only
     const selectedVariantMedia = useMemo(() => {
         if (!selectedVariant || !selectedVariant.yvarprodmedia) return []
 
-        return selectedVariant.yvarprodmedia.map((mediaWrapper) => mediaWrapper.ymedia)
+        return selectedVariant.yvarprodmedia.map(
+            (mediaWrapper) => mediaWrapper.ymedia
+        )
     }, [selectedVariant])
 
     // Reset media index when selected variant changes and has media
@@ -498,7 +545,7 @@ export function ProductDetailsPage({
 
         if (!currentSizeAvailable && variantsForColor.length > 0) {
             // Switch to first available size for this color
-            const firstVariantWithSize = variantsForColor.find(v => v.xtaille)
+            const firstVariantWithSize = variantsForColor.find((v) => v.xtaille)
             if (firstVariantWithSize && firstVariantWithSize.xtaille) {
                 setSelectedSizeId(firstVariantWithSize.xtaille.xtailleid)
             }
@@ -526,7 +573,8 @@ export function ProductDetailsPage({
 
         if (!currentMaterialAvailable && variantsForType.length > 0) {
             // Switch to first available material for this type
-            const firstMaterial = variantsForType[0].xmateriaux?.xmateriauxintitule
+            const firstMaterial =
+                variantsForType[0].xmateriaux?.xmateriauxintitule
             if (firstMaterial) {
                 setSelectedMaterial(firstMaterial)
             }
@@ -615,7 +663,12 @@ export function ProductDetailsPage({
 
     return (
         <div className={'fixed inset-0 z-[70] bg-black/50 backdrop-blur-sm'}>
-            <div className={"relative h-full w-full overflow-y-auto bg-white shadow-2xl " + (extraTop ? 'pt-18' : '')}>
+            <div
+                className={
+                    'relative h-full w-full overflow-y-auto bg-white shadow-2xl ' +
+                    (extraTop ? 'pt-18' : '')
+                }
+            >
                 {/* Close button - top right */}
                 <button
                     onClick={onClose}
@@ -956,53 +1009,57 @@ export function ProductDetailsPage({
                             </div>
 
                             {/* Color Selection - Only for Regular Products */}
-                            {!isJewelryProduct && availableColors.length > 0 && (
-                                <div className="mb-6">
-                                    <h3 className="font-recia mb-3 text-lg font-semibold text-[#053340]">
-                                        {t('productDetails.color') || 'Color'}
-                                    </h3>
-                                    <div className="flex flex-wrap gap-3">
-                                        {availableColors.map((color) => (
-                                            <button
-                                                key={color.xcouleurid}
-                                                onClick={() =>
-                                                    handleColorChange(
+                            {!isJewelryProduct &&
+                                availableColors.length > 0 && (
+                                    <div className="mb-6">
+                                        <h3 className="font-recia mb-3 text-lg font-semibold text-[#053340]">
+                                            {t('productDetails.color') ||
+                                                'Color'}
+                                        </h3>
+                                        <div className="flex flex-wrap gap-3">
+                                            {availableColors.map((color) => (
+                                                <button
+                                                    key={color.xcouleurid}
+                                                    onClick={() =>
+                                                        handleColorChange(
+                                                            color.xcouleurid
+                                                        )
+                                                    }
+                                                    className={`group relative h-12 w-12 rounded-full border-2 transition-all duration-300 ${
+                                                        selectedColorId ===
                                                         color.xcouleurid
-                                                    )
-                                                }
-                                                className={`group relative h-12 w-12 rounded-full border-2 transition-all duration-300 ${
-                                                    selectedColorId ===
-                                                    color.xcouleurid
-                                                        ? 'scale-110 border-[#053340] shadow-lg'
-                                                        : 'border-gray-300 hover:scale-105 hover:border-gray-400'
-                                                }`}
-                                                style={{
-                                                    backgroundColor:
-                                                        color.xcouleurhexa,
-                                                }}
-                                                title={color.xcouleurintitule}
-                                            >
-                                                {selectedColorId ===
-                                                    color.xcouleurid && (
-                                                    <div className="absolute inset-0 flex items-center justify-center">
-                                                        <svg
-                                                            className="h-5 w-5 text-white drop-shadow-lg"
-                                                            fill="currentColor"
-                                                            viewBox="0 0 20 20"
-                                                        >
-                                                            <path
-                                                                fillRule="evenodd"
-                                                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                                                clipRule="evenodd"
-                                                            />
-                                                        </svg>
-                                                    </div>
-                                                )}
-                                            </button>
-                                        ))}
+                                                            ? 'scale-110 border-[#053340] shadow-lg'
+                                                            : 'border-gray-300 hover:scale-105 hover:border-gray-400'
+                                                    }`}
+                                                    style={{
+                                                        backgroundColor:
+                                                            color.xcouleurhexa,
+                                                    }}
+                                                    title={
+                                                        color.xcouleurintitule
+                                                    }
+                                                >
+                                                    {selectedColorId ===
+                                                        color.xcouleurid && (
+                                                        <div className="absolute inset-0 flex items-center justify-center">
+                                                            <svg
+                                                                className="h-5 w-5 text-white drop-shadow-lg"
+                                                                fill="currentColor"
+                                                                viewBox="0 0 20 20"
+                                                            >
+                                                                <path
+                                                                    fillRule="evenodd"
+                                                                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                                                    clipRule="evenodd"
+                                                                />
+                                                            </svg>
+                                                        </div>
+                                                    )}
+                                                </button>
+                                            ))}
+                                        </div>
                                     </div>
-                                </div>
-                            )}
+                                )}
 
                             {/* Size Selection - Only for Regular Products */}
                             {!isJewelryProduct && availableSizes.length > 0 && (
@@ -1037,29 +1094,36 @@ export function ProductDetailsPage({
                             {isJewelryProduct && (
                                 <div className="mb-6">
                                     <h3 className="font-recia mb-3 text-lg font-semibold text-[#053340]">
-                                        {t('productDetails.jewelryType') || 'Jewelry Type'}
+                                        {t('productDetails.jewelryType') ||
+                                            'Jewelry Type'}
                                     </h3>
                                     {availableJewelryTypes.length > 0 ? (
                                         <div className="flex flex-wrap gap-2">
-                                            {availableJewelryTypes.map((type) => (
-                                                <button
-                                                    key={type}
-                                                    onClick={() =>
-                                                        handleJewelryTypeChange(type)
-                                                    }
-                                                    className={`font-supreme rounded-lg border px-4 py-2 transition-all duration-300 ${
-                                                        selectedJewelryType === type
-                                                            ? 'border-[#053340] bg-[#053340] text-white'
-                                                            : 'border-gray-300 text-gray-600 hover:border-gray-400 hover:text-[#053340]'
-                                                    }`}
-                                                >
-                                                    {type}
-                                                </button>
-                                            ))}
+                                            {availableJewelryTypes.map(
+                                                (type) => (
+                                                    <button
+                                                        key={type}
+                                                        onClick={() =>
+                                                            handleJewelryTypeChange(
+                                                                type
+                                                            )
+                                                        }
+                                                        className={`font-supreme rounded-lg border px-4 py-2 transition-all duration-300 ${
+                                                            selectedJewelryType ===
+                                                            type
+                                                                ? 'border-[#053340] bg-[#053340] text-white'
+                                                                : 'border-gray-300 text-gray-600 hover:border-gray-400 hover:text-[#053340]'
+                                                        }`}
+                                                    >
+                                                        {type}
+                                                    </button>
+                                                )
+                                            )}
                                         </div>
                                     ) : (
                                         <div className="text-sm text-gray-500 italic">
-                                            No jewelry types available in variants
+                                            No jewelry types available in
+                                            variants
                                         </div>
                                     )}
                                 </div>
@@ -1069,25 +1133,31 @@ export function ProductDetailsPage({
                             {isJewelryProduct && (
                                 <div className="mb-6">
                                     <h3 className="font-recia mb-3 text-lg font-semibold text-[#053340]">
-                                        {t('productDetails.materials') || 'Materials'}
+                                        {t('productDetails.materials') ||
+                                            'Materials'}
                                     </h3>
                                     {availableMaterials.length > 0 ? (
                                         <div className="flex flex-wrap gap-2">
-                                            {availableMaterials.map((material) => (
-                                                <button
-                                                    key={material}
-                                                    onClick={() =>
-                                                        handleMaterialChange(material)
-                                                    }
-                                                    className={`font-supreme rounded-lg border px-4 py-2 transition-all duration-300 ${
-                                                        selectedMaterial === material
-                                                            ? 'border-[#053340] bg-[#053340] text-white'
-                                                            : 'border-gray-300 text-gray-600 hover:border-gray-400 hover:text-[#053340]'
-                                                    }`}
-                                                >
-                                                    {material}
-                                                </button>
-                                            ))}
+                                            {availableMaterials.map(
+                                                (material) => (
+                                                    <button
+                                                        key={material}
+                                                        onClick={() =>
+                                                            handleMaterialChange(
+                                                                material
+                                                            )
+                                                        }
+                                                        className={`font-supreme rounded-lg border px-4 py-2 transition-all duration-300 ${
+                                                            selectedMaterial ===
+                                                            material
+                                                                ? 'border-[#053340] bg-[#053340] text-white'
+                                                                : 'border-gray-300 text-gray-600 hover:border-gray-400 hover:text-[#053340]'
+                                                        }`}
+                                                    >
+                                                        {material}
+                                                    </button>
+                                                )
+                                            )}
                                         </div>
                                     ) : (
                                         <div className="text-sm text-gray-500 italic">
@@ -1144,23 +1214,11 @@ export function ProductDetailsPage({
                                                 : ''
                                         }`}
                                     >
-                                        <span className="flex items-center justify-center">
+                                        <span className="flex items-center justify-center gap-2">
                                             {addToCartMutation.isPending ? (
                                                 <div className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
                                             ) : (
-                                                <svg
-                                                    className="mr-2 h-5 w-5"
-                                                    fill="none"
-                                                    stroke="currentColor"
-                                                    viewBox="0 0 24 24"
-                                                >
-                                                    <path
-                                                        strokeLinecap="round"
-                                                        strokeLinejoin="round"
-                                                        strokeWidth={2}
-                                                        d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-                                                    />
-                                                </svg>
+                                                <CartIcon className='fill-white' />
                                             )}
                                             {addToCartMutation.isPending
                                                 ? 'Adding...'
@@ -1201,9 +1259,9 @@ export function ProductDetailsPage({
                                 selectedVariant.yvarprodnbrjourlivraison >
                                     0 && (
                                     <div className="rounded-lg bg-white/5 p-4">
-                                        <div className="flex items-center text-sm text-gray-300">
+                                        <div className="flex items-center text-sm text-gray-600">
                                             <svg
-                                                className="text-morpheus-gold-light mr-2 h-4 w-4"
+                                                className="text-morpheus-gold-dark/80 mr-2 h-4 w-4"
                                                 fill="currentColor"
                                                 viewBox="0 0 20 20"
                                             >
