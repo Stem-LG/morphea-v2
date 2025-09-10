@@ -620,7 +620,7 @@ function ShopContent() {
                         <button
                             onClick={() => setQueryState({ columns: 3 })}
                             className="rounded-lg p-2 transition-opacity hover:opacity-70"
-                            title="3 colonnes"
+                            title={t('shop.threeColumns')}
                         >
                             <ThreeColumnIcon
                                 className="h-6 w-8"
@@ -630,7 +630,7 @@ function ShopContent() {
                         <button
                             onClick={() => setQueryState({ columns: 4 })}
                             className="rounded-lg p-2 transition-opacity hover:opacity-70"
-                            title="4 colonnes"
+                            title={t('shop.fourColumns')}
                         >
                             <FourColumnIcon
                                 className="h-6 w-10"
@@ -711,10 +711,10 @@ function ShopContent() {
                     className="flex h-16 w-56 items-center justify-center gap-3 rounded-2xl border-[0.50px] border-zinc-300 bg-gradient-to-r from-cyan-950 to-sky-900 text-white shadow-[0px_4px_100px_1px_rgba(0,0,0,0.10)] transition-all hover:shadow-xl"
                 >
                     <FilterIcon className="h-6 w-6" />
-                    <span className="font-medium">Filtrer</span>
+                    <span className="font-medium">{t('shop.filter')}</span>
                     <div className="h-6 w-px bg-white"></div>
                     <SortIcon className="h-6 w-6" />
-                    <span className="font-medium">Trier</span>
+                    <span className="font-medium">{t('shop.sort')}</span>
                 </button>
             </div>
 
@@ -726,7 +726,7 @@ function ShopContent() {
                     <div className="flex-shrink-0">
                         <div className="flex items-center justify-center py-4 text-3xl">
                             <h1 className="font-recia font-medium">
-                                Filtrer & Trier
+                                {t('shop.filterAndSort')}
                             </h1>
                         </div>
                         <Separator />
@@ -754,7 +754,7 @@ function ShopContent() {
                                     className="hover:bg-morpheus-blue-lighter flex h-12 w-full items-center justify-between rounded-none p-4 text-lg text-neutral-400 hover:text-white"
                                 >
                                     <span className="flex-1 text-left">
-                                        Trier Par
+                                        {t('shop.sortBy')}
                                     </span>
                                     <ChevronDown
                                         className={cn(
@@ -781,7 +781,7 @@ function ShopContent() {
                                                     : 'text-neutral-400'
                                             )}
                                         >
-                                            <span>Par défaut</span>
+                                            <span>{t('shop.default')}</span>
                                         </button>
                                         <Separator />
                                         <button
@@ -797,7 +797,7 @@ function ShopContent() {
                                                     : 'text-neutral-400'
                                             )}
                                         >
-                                            <span>Recommandé</span>
+                                            <span>{t('shop.recommended')}</span>
                                         </button>
                                         <Separator />
                                         <button
@@ -813,7 +813,7 @@ function ShopContent() {
                                                     : 'text-neutral-400'
                                             )}
                                         >
-                                            <span>Plus récent</span>
+                                            <span>{t('shop.newest')}</span>
                                         </button>
                                         <Separator />
                                         <button
@@ -829,7 +829,9 @@ function ShopContent() {
                                                     : 'text-neutral-400'
                                             )}
                                         >
-                                            <span>Prix croissant</span>
+                                            <span>
+                                                {t('shop.priceAscending')}
+                                            </span>
                                         </button>
                                         <Separator />
                                         <button
@@ -845,7 +847,9 @@ function ShopContent() {
                                                     : 'text-neutral-400'
                                             )}
                                         >
-                                            <span>Prix décroissant</span>
+                                            <span>
+                                                {t('shop.priceDescending')}
+                                            </span>
                                         </button>
                                         <Separator />
                                         <button
@@ -861,7 +865,9 @@ function ShopContent() {
                                                     : 'text-neutral-400'
                                             )}
                                         >
-                                            <span>Alphabétique</span>
+                                            <span>
+                                                {t('shop.alphabetical')}
+                                            </span>
                                         </button>
                                         <Separator />
                                     </div>
@@ -884,7 +890,7 @@ function ShopContent() {
                                             className="hover:bg-morpheus-blue-lighter flex h-12 w-full items-center justify-between rounded-none p-4 text-lg text-neutral-400 hover:text-white"
                                         >
                                             <span className="flex-1 text-left">
-                                                Catégories
+                                                {t('shop.categories')}
                                             </span>
                                             <ChevronDown
                                                 className={cn(
@@ -945,7 +951,7 @@ function ShopContent() {
                                             className="hover:bg-morpheus-blue-lighter flex h-12 w-full items-center justify-between rounded-none p-4 text-lg text-neutral-400 hover:text-white"
                                         >
                                             <span className="flex-1 text-left">
-                                                Créateurs
+                                                {t('shop.creators')}
                                             </span>
                                             <ChevronDown
                                                 className={cn(
@@ -1005,7 +1011,7 @@ function ShopContent() {
                                             className="hover:bg-morpheus-blue-lighter flex h-12 w-full items-center justify-between rounded-none p-4 text-lg text-neutral-400 hover:text-white"
                                         >
                                             <span className="flex-1 text-left">
-                                                Couleurs
+                                                {t('shop.colors')}
                                             </span>
                                             <ChevronDown
                                                 className={cn(
@@ -1064,7 +1070,7 @@ function ShopContent() {
                                             className="hover:bg-morpheus-blue-lighter flex h-12 w-full items-center justify-between rounded-none p-4 text-lg text-neutral-400 hover:text-white"
                                         >
                                             <span className="flex-1 text-left">
-                                                Tailles
+                                                {t('shop.sizes')}
                                             </span>
                                             <ChevronDown
                                                 className={cn(
@@ -1122,7 +1128,7 @@ function ShopContent() {
                                         className="hover:bg-morpheus-blue-lighter flex h-12 w-full items-center justify-between rounded-none p-4 text-lg text-neutral-400 hover:text-white"
                                     >
                                         <span className="flex-1 text-left">
-                                            Prix
+                                            {t('shop.price')}
                                         </span>
                                         <ChevronDown
                                             className={cn(
@@ -1197,7 +1203,7 @@ function ShopContent() {
                                             <div className="grid grid-cols-2 gap-3">
                                                 <div>
                                                     <label className="mb-1 block text-sm font-medium text-gray-700">
-                                                        Prix min (
+                                                        {t('shop.priceMin')} (
                                                         {currentCurrency?.xdevisecodealpha ||
                                                             'EUR'}
                                                         )
@@ -1239,15 +1245,15 @@ function ShopContent() {
                                                         displayPrices.min >
                                                             displayPrices.max && (
                                                             <p className="mt-1 text-xs text-red-500">
-                                                                Le prix min doit
-                                                                être inférieur
-                                                                au prix max
+                                                                {t(
+                                                                    'shop.priceMinError'
+                                                                )}
                                                             </p>
                                                         )}
                                                 </div>
                                                 <div>
                                                     <label className="mb-1 block text-sm font-medium text-gray-700">
-                                                        Prix max (
+                                                        {t('shop.priceMax')} (
                                                         {currentCurrency?.xdevisecodealpha ||
                                                             'EUR'}
                                                         )
@@ -1289,9 +1295,9 @@ function ShopContent() {
                                                         displayPrices.max <
                                                             displayPrices.min && (
                                                             <p className="mt-1 text-xs text-red-500">
-                                                                Le prix max doit
-                                                                être supérieur
-                                                                au prix min
+                                                                {t(
+                                                                    'shop.priceMaxError'
+                                                                )}
                                                             </p>
                                                         )}
                                                 </div>
@@ -1322,13 +1328,13 @@ function ShopContent() {
                                 }}
                                 className="outline-morpheus-blue-dark hover:from-morpheus-blue-light hover:to-morpheus-blue-dark text-morpheus-blue-dark flex-1 rounded-none bg-gradient-to-r p-4 text-lg outline transition-all duration-300 hover:text-white"
                             >
-                                Effacer tout
+                                {t('shop.clearAll')}
                             </button>
                             <button
                                 onClick={() => setShowFilterSheet(false)}
                                 className="from-morpheus-blue-light to-morpheus-blue-dark hover:border-morpheus-blue-dark hover:text-morpheus-blue-dark flex-1 rounded-none bg-gradient-to-r p-4 text-lg text-white transition-all duration-300 hover:border hover:from-white hover:to-white"
                             >
-                                Appliquer
+                                {t('shop.apply')}
                             </button>
                         </div>
                     </div>
