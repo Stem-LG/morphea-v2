@@ -3,6 +3,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { enTranslations } from '@/lib/translations/en';
 import { frTranslations } from '@/lib/translations/fr';
+import { useMergedTranslations } from './use-dynamic-translations';
 
 // Types
 export type Language = 'en' | 'fr';
@@ -17,6 +18,7 @@ interface LanguageContextType {
   setLanguage: (lang: Language) => void;
   t: (key: string) => string;
   isLoading: boolean;
+  error: Error | null;
 }
 
 // Create context
@@ -37,32 +39,19 @@ interface LanguageProviderProps {
 }
 
 export const LanguageProvider = ({ children }: LanguageProviderProps) => {
-  const [language, setLanguageState] = useState<Language>('fr'); // Default to French
-  const [translations, setTranslations] = useState<Translations>({});
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+   const [language, setLanguageState] = useState<Language>('fr'); // Default to French
 
-  // Loading messages in both languages
-  const loadingMessages = {
-    en: 'Loading...',
-    fr: 'Chargement...'
-  };
+   // Use merged translations (static + dynamic)
+   const { data: translations, isLoading: isLoadingTranslations, error } = useMergedTranslations(language);
 
-  // Load translations
-  const loadTranslations = (lang: Language) => {
-    setIsLoading(true);
-    try {
-      // Use imported translations directly
-      if (lang === 'en') {
-        setTranslations(enTranslations);
-      } else {
-        setTranslations(frTranslations);
-      }
-      setIsLoading(false);
-    } catch (error) {
-      console.error(`Failed to load translations for ${lang}:`, error);
-      setIsLoading(false);
-    }
-  };
+   // Loading messages in both languages
+   const loadingMessages = {
+     en: 'Loading...',
+     fr: 'Chargement...'
+   };
+
+   // Handle loading state - combine language switching with translation loading
+   const isLoading = isLoadingTranslations;
 
   // Set language and persist to localStorage
   const setLanguage = (lang: Language) => {
@@ -71,7 +60,7 @@ export const LanguageProvider = ({ children }: LanguageProviderProps) => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('locale', lang);
     }
-    loadTranslations(lang);
+    // Language change will automatically trigger new merged translations
   };
 
   // Translation function with nested key support
@@ -81,17 +70,25 @@ export const LanguageProvider = ({ children }: LanguageProviderProps) => {
       return loadingMessages[language];
     }
 
+    // Return key if translations failed to load
+    if (error || !translations) {
+      console.warn(`Translation error for key "${key}":`, error);
+      return key;
+    }
+
     const keys = key.split('.');
     let value: any = translations;
-    
+
     for (const k of keys) {
-      if (value && typeof value === 'object' && k in value) {
-        value = value[k];
-      } else {
-        return key; // Return key if translation not found
-      }
+        if (value && typeof value === 'object' && k in value) {
+            value = value[k];
+        } else {
+            // Return key if translation not found
+            console.warn(`Translation not found for key: ${key}`);
+            return key;
+        }
     }
-    
+
     return typeof value === 'string' ? value : key;
   };
 
@@ -102,15 +99,15 @@ export const LanguageProvider = ({ children }: LanguageProviderProps) => {
       const savedLanguage = localStorage.getItem('locale') as Language;
       const initialLanguage = savedLanguage || 'fr'; // Default to French
       setLanguageState(initialLanguage);
-      loadTranslations(initialLanguage);
+      // Language state change will automatically trigger merged translations loading
     } else {
       // Server-side default
-      loadTranslations('fr');
+      setLanguageState('fr');
     }
   }, []);
 
   return (
-    <LanguageContext.Provider value={{ language, translations, setLanguage, t, isLoading }}>
+    <LanguageContext.Provider value={{ language, translations, setLanguage, t, isLoading, error }}>
       {children}
     </LanguageContext.Provider>
   );

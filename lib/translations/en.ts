@@ -24,7 +24,7 @@ export const enTranslations = {
   },
   "common": {
     "welcome": "Welcome",
-    "logout": "Se déconnecter",
+    "logout": "Logout",
     "language": "Language",
     "english": "English",
     "french": "French",

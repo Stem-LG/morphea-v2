@@ -2353,6 +2353,45 @@ export type Database = {
           },
         ]
       }
+      dynamic_translations: {
+        Row: {
+          id: string
+          language_code: string
+          namespace: string
+          key_path: string
+          translation_value: string
+          is_active: boolean
+          created_at: string
+          updated_at: string
+          created_by: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          id?: string
+          language_code: string
+          namespace: string
+          key_path: string
+          translation_value: string
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+          created_by?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          id?: string
+          language_code?: string
+          namespace?: string
+          key_path?: string
+          translation_value?: string
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+          created_by?: string | null
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -2384,10 +2423,56 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      dynamic_translations: {
+        Row: {
+          id: string
+          language_code: string
+          namespace: string
+          key_path: string
+          translation_value: string
+          is_active: boolean
+          created_at: string
+          updated_at: string
+          created_by: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          id?: string
+          language_code: string
+          namespace: string
+          key_path: string
+          translation_value: string
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+          created_by?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          id?: string
+          language_code?: string
+          namespace?: string
+          key_path?: string
+          translation_value?: string
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+          created_by?: string | null
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
-      [_ in never]: never
+      active_translations: {
+        Row: {
+          language_code: string
+          namespace: string
+          key_path: string
+          translation_value: string
+          updated_at: string
+        }
+      }
     }
     Functions: {
       [_ in never]: never
