@@ -51,6 +51,7 @@ export async function updateSession(request: NextRequest) {
     !request.nextUrl.pathname.startsWith('/auth') &&
     !request.nextUrl.pathname.startsWith('/shop') &&
     !request.nextUrl.pathname.startsWith('/profile') && // Already handled above
+    !request.nextUrl.pathname.startsWith('/a-lorigine-de-morphea') &&
     request.nextUrl.pathname !== '/' &&
     request.nextUrl.pathname !== '/main'
   ) {
