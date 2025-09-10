@@ -1205,7 +1205,7 @@ export const enTranslations = {
       "updateScene": "Update Scene",
       "deleteScene": "Delete Scene",
       "scenesCount": "of",
-      "scenes": "scenes",
+      "scenes": "Scenes",
       "clickToSelectPosition2": "Click on panorama to select position for new markers",
       "clickMarkersToEdit": "Click on existing markers to edit them",
       "clickMarkersToInteract": "Click markers to interact with them",

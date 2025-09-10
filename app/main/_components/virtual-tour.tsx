@@ -1071,7 +1071,7 @@ export default function VirtualTour({
                                             }`}
                                         >
                                             <div className="font-supreme">
-                                                {scene.name}
+                                                {t(scene.name)}
                                             </div>
                                         </button>
                                     ))}

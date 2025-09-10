@@ -1219,6 +1219,7 @@ export const frTranslations = {
       "clickPreviewButtonToView": "Cliquez sur le bouton aperçu pour voir"
     },
     "tour": {
+      
       "adminControls": "Contrôles d'administration",
       "view": "Voir",
       "edit": "Modifier",
@@ -1240,7 +1241,7 @@ export const frTranslations = {
       "updateScene": "Mettre à Jour Scène",
       "deleteScene": "Supprimer Scène",
       "scenesCount": "sur",
-      "scenes": "scènes",
+      "scenes": "Scènes",
       "clickToSelectPosition2": "Cliquez sur le panorama pour sélectionner la position des nouveaux marqueurs",
       "clickMarkersToEdit": "Cliquez sur les marqueurs existants pour les modifier",
       "clickMarkersToInteract": "Cliquez sur les marqueurs pour interagir avec eux",
@@ -1781,7 +1782,7 @@ export const frTranslations = {
   "homepage": {
     "hero": {
       "mode": "MODE",
-      //  "preCollection": "PRÉ-COLLECTION 2026/27",
+      "preCollection": "PRÉ-COLLECTION 2026/27",
       "summerCollection": "COLLECTION ÉTÉ 2026",
       "discover": "Découvrir"
     },
