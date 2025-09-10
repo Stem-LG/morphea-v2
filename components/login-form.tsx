@@ -112,7 +112,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
                                     onClick={() => setShowPassword(!showPassword)}
                                     className="text-slate-400 hover:text-slate-600 transition-colors"
                                 >
-                                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                    {!showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                                 </button>
                             </div>
                         </div>
