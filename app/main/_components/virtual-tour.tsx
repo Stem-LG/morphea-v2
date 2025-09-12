@@ -735,7 +735,7 @@ export default function VirtualTour({
                 size: { width: 90, height: 90 },
                 anchor: 'center center',
                 tooltip: {
-                    content: `${link.name}`,
+                    content: t(link.name),
                     position: 'top center',
                 },
                 data: {
@@ -783,13 +783,13 @@ export default function VirtualTour({
         `,
                 anchor: 'center center',
                 tooltip: {
-                    content: info.title,
+                    content: info.title + "hello",
                     position: 'top center',
                 },
                 data: {
-                    type: 'info',
+                    type: 'info' ,
                     title: info.title,
-                    text: info.text,
+                    text: t(info.text),
                     action: info.action,
                 },
             })
