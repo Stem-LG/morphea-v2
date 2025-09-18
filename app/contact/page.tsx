@@ -138,7 +138,7 @@ export default function ContactPage() {
             <NavBar />
 
             {/* Hero Section */}
-            <section className="relative bg-gradient-to-br from-[#053340] via-[#0a4c5c] to-[#053340] px-8 py-32">
+            <section className="relative -top-18 bg-gradient-to-br from-[#053340] via-[#0a4c5c] to-[#053340] px-8 py-32">
                 <div className="absolute inset-0 bg-black/20"></div>
 
                 {/* Decorative elements */}
