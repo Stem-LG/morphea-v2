@@ -663,6 +663,21 @@ export function ProductDetailsPage({
 
     return (
         <div className={'fixed inset-0 z-[70] bg-black/50 backdrop-blur-sm'}>
+            <svg width="0" height="0" className="absolute">
+                <defs>
+                    <linearGradient
+                        id="delivery-gradient"
+                        x1="0%"
+                        y1="0%"
+                        x2="100%"
+                        y2="100%"
+                    >
+                        <stop offset="0%" stopColor="#B27C64" />
+                        <stop offset="50%" stopColor="#E8D07A" />
+                        <stop offset="100%" stopColor="#B27C64" />
+                    </linearGradient>
+                </defs>
+            </svg>
             <div
                 className={
                     'relative h-full w-full overflow-y-auto bg-white shadow-2xl ' +
@@ -1218,7 +1233,7 @@ export function ProductDetailsPage({
                                             {addToCartMutation.isPending ? (
                                                 <div className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
                                             ) : (
-                                                <CartIcon className='fill-white' />
+                                                <CartIcon className="fill-white" />
                                             )}
                                             {addToCartMutation.isPending
                                                 ? 'Adding...'
@@ -1261,8 +1276,8 @@ export function ProductDetailsPage({
                                     <div className="rounded-lg bg-white/5 p-4">
                                         <div className="flex items-center text-sm text-gray-600">
                                             <svg
-                                                className="text-morpheus-gold-dark/80 mr-2 h-4 w-4"
-                                                fill="currentColor"
+                                                className="mr-2 h-4 w-4"
+                                                fill="url(#delivery-gradient)"
                                                 viewBox="0 0 20 20"
                                             >
                                                 <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
