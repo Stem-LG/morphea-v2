@@ -1046,7 +1046,7 @@ export default function VirtualTour({
 
                     {/* Dropdown Menu */}
                     {isSceneDropdownOpen && (
-                        <div className="absolute top-full right-0 mt-2 w-64 overflow-hidden rounded-lg border border-white/10 bg-black/20 shadow-xl backdrop-blur-sm">
+                        <div className="absolute top-full right-0 mt-2 w-64 overflow-hidden rounded-lg border border-white/20 bg-black/40 shadow-xl backdrop-blur-sm">
                             <div className="max-h-80 overflow-y-auto">
                                 {tourData.scenes
                                     .filter((scene) => scene.yboutiqueidfk) // Only show scenes with boutique ID
@@ -1064,10 +1064,10 @@ export default function VirtualTour({
                                             disabled={isTransitioning}
                                             className={`w-full border-b border-white/10 px-4 py-3 text-left text-sm transition-colors last:border-b-0 ${
                                                 currentScene === scene.id
-                                                    ? 'bg-white/20 font-medium text-white'
+                                                    ? 'bg-white/10 font-semibold text-white shadow-inner'
                                                     : isTransitioning
                                                       ? 'cursor-not-allowed text-gray-400'
-                                                      : 'text-gray-200 hover:bg-white/10 hover:text-white'
+                                                      : 'text-white hover:bg-white/20 hover:text-white'
                                             }`}
                                         >
                                             <div className="font-supreme">
