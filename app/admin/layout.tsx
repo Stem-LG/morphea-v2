@@ -31,7 +31,7 @@ export default function AdminV2Layout({ children }: AdminV2LayoutProps) {
     }
 
     return (
-        <div className="flex min-h-[calc(100svh-6rem)] w-full bg-gradient-to-br from-white to-gray-50">
+        <div className="flex min-h-[calc(100svh-4rem)] w-full bg-gradient-to-br from-white to-gray-50">
             {/* Modern Sidebar - Account for existing navbar */}
             <ModernSidebar
                 isOpen={sidebarOpen}
@@ -45,7 +45,7 @@ export default function AdminV2Layout({ children }: AdminV2LayoutProps) {
             <div className={`w-full flex-1 transition-all duration-300`}>
                 {/* Page Content - No duplicate top navigation */}
                 <main className="w-full">
-                    <div className="min-h-[calc(100vh-6rem)] w-full border border-gray-200/50 bg-gradient-to-br from-gray-50/50 to-white/50 shadow-2xl">
+                    <div className="min-h-[calc(100vh-4rem)] w-full border border-gray-200/50 bg-gradient-to-br from-gray-50/50 to-white/50 shadow-2xl">
                         {children}
                     </div>
                 </main>

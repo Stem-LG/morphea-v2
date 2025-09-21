@@ -85,7 +85,7 @@ export default function VirtualTour({
     // Calculate the actual height accounting for navbar
     const getActualHeight = () => {
         if (accountForNavbar && height === '100vh') {
-            return 'calc(100vh - 4.5rem)' // 4rem is the navbar height (h-16)
+            return 'calc(100vh - 3.5rem)' // 4rem is the navbar height (h-16)
         }
         return height
     }
