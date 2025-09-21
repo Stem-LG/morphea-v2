@@ -9,7 +9,7 @@ import { NotificationsDialog } from '@/app/_components/notifications-dialog'
 import { useCart } from '@/app/_hooks/cart/useCart'
 import { useWishlist } from '@/app/_hooks/wishlist/useWishlist'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { useState, Fragment, useMemo } from 'react'
 import { useNotifications } from '@/app/_hooks/use-notifications'
 import { useScrollDirection } from '@/hooks/use-scroll-direction'
@@ -61,6 +61,7 @@ export default function NavBar() {
     const [selectedProduct, setSelectedProduct] = useState(null)
     const { t } = useLanguage()
     const router = useRouter()
+    const pathname = usePathname()
     const { isVisible } = useScrollDirection()
     // const loadMoreRef = useRef<HTMLDivElement>(null)
 
@@ -295,6 +296,7 @@ export default function NavBar() {
                 t={t}
                 setIsCartOpen={setIsCartOpen}
                 setIsWishlistOpen={setIsWishlistOpen}
+                pathname={pathname}
             />
 
             <div className="h-14 bg-white" />
@@ -426,6 +428,7 @@ function NavBarSheet({
     t,
     setIsCartOpen,
     setIsWishlistOpen,
+    pathname,
 }: {
     isMenuOpen: boolean
     setIsMenuOpen: any
@@ -435,8 +438,17 @@ function NavBarSheet({
     t: (key: string) => string
     setIsCartOpen: (open: boolean) => void
     setIsWishlistOpen: (open: boolean) => void
+    pathname: string
 }) {
     const [showCategories, setShowCategories] = useState(false)
+
+    // Helper function to check if a path is active
+    const isActivePath = (href: string) => {
+        if (href === '/') {
+            return pathname === '/'
+        }
+        return pathname === href || pathname.startsWith(href + '/')
+    }
 
     const navbarItems: NavbarItem[] = [
         { name: t('nav.virtualTours'), href: '/main' },
@@ -494,7 +506,7 @@ function NavBarSheet({
                         setIsMenuOpen(false)
                     },
                 },
-                { name: t('nav.myOrders'), href: '/orders' },
+                { name: t('nav.myOrders'), href: '/my-orders' },
                 ...(hasAdminAccess
                     ? [{ name: t('nav.administration'), href: '/admin' }]
                     : []),
@@ -543,12 +555,15 @@ function NavBarSheet({
                                     const hasAction = !!item.action
                                     const isCategories =
                                         item.name === 'Categories'
+                                    const isActive = hasHref && isActivePath(item.href!)
 
                                     return (
                                         <Fragment key={item.name}>
                                             <Button
                                                 variant="ghost"
-                                                className="font-supreme hover:bg-morpheus-blue-lighter h-14 justify-between rounded-none text-lg text-neutral-400 hover:text-white"
+                                                className={`font-supreme hover:bg-morpheus-blue-lighter h-14 justify-between rounded-none text-lg text-neutral-400 hover:text-white ${
+                                                    isActive ? 'font-bold text-neutral-600' : ''
+                                                }`}
                                                 asChild={hasHref}
                                                 onClick={
                                                     hasAction
@@ -563,10 +578,12 @@ function NavBarSheet({
                                             >
                                                 {hasHref ? (
                                                     <Link href={item.href!}>
-                                                        {item.name[0].toUpperCase() +
-                                                            item.name
-                                                                .toLowerCase()
-                                                                .slice(1)}
+                                                        <span className={isActive ? 'font-bold' : ''}>
+                                                            {item.name[0].toUpperCase() +
+                                                                item.name
+                                                                    .toLowerCase()
+                                                                    .slice(1)}
+                                                        </span>
                                                     </Link>
                                                 ) : (
                                                     <>
@@ -602,12 +619,15 @@ function NavBarSheet({
                                 {/* Footer Items - Combined with same styling */}
                                 {navbarFooterItems.map((item) => {
                                     const hasHref = !!item.href
+                                    const isActive = hasHref && isActivePath(item.href!)
 
                                     return (
                                         <Fragment key={item.name}>
                                             <Button
                                                 variant="ghost"
-                                                className="font-supreme hover:bg-morpheus-blue-lighter h-14 justify-start rounded-none text-lg text-neutral-400 hover:text-white"
+                                                className={`font-supreme hover:bg-morpheus-blue-lighter h-14 justify-start rounded-none text-lg text-neutral-400 hover:text-white ${
+                                                    isActive ? 'font-bold text-neutral-600' : ''
+                                                }`}
                                                 onClick={
                                                     item.onclick ||
                                                     (hasHref
@@ -621,10 +641,12 @@ function NavBarSheet({
                                             >
                                                 {hasHref ? (
                                                     <Link href={item.href!}>
-                                                        {item.name[0].toUpperCase() +
-                                                            item.name
-                                                                .toLowerCase()
-                                                                .slice(1)}
+                                                        <span className={isActive ? 'font-bold' : ''}>
+                                                            {item.name[0].toUpperCase() +
+                                                                item.name
+                                                                    .toLowerCase()
+                                                                    .slice(1)}
+                                                        </span>
                                                     </Link>
                                                 ) : (
                                                     item.name[0].toUpperCase() +
