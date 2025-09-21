@@ -19,6 +19,14 @@ export default function Home() {
     const { data: homeSettings, isLoading: isLoadingSettings } =
         useHomeSettings()
 
+    // State declarations
+    const [activeVideo, setActiveVideo] = useState<'left' | 'right'>('left')
+    const [isPlaying, setIsPlaying] = useState(true)
+    const [isMuted, setIsMuted] = useState(true)
+    const video1Ref = useRef<HTMLVideoElement>(null)
+    const video2Ref = useRef<HTMLVideoElement>(null)
+    const heroContainerRef = useRef<HTMLDivElement>(null)
+
     useEffect(() => {
         supabase.auth.onAuthStateChange(async (event) => {
             if (event == 'PASSWORD_RECOVERY') {
@@ -28,11 +36,41 @@ export default function Home() {
     }, [router, supabase.auth])
 
     useEffect(() => {
-        // Ensure videos play when ready
-        const playIfReady = (video: HTMLVideoElement | null) => {
-            if (video && video.readyState >= 3) { // HAVE_FUTURE_DATA
+        // Handle video end events for auto-switching
+        const handleVideo1End = () => {
+            console.log('Video 1 ended, switching to video 2')
+            const video2 = video2Ref.current
+            if (video2) {
+                video2.currentTime = 0
+                if (isPlaying) {
+                    video2.play()
+                }
+            }
+            setActiveVideo('right')
+        }
+
+        const handleVideo2End = () => {
+            console.log('Video 2 ended, switching to video 1')
+            const video1 = video1Ref.current
+            if (video1) {
+                video1.currentTime = 0
+                if (isPlaying) {
+                    video1.play()
+                }
+            }
+            setActiveVideo('left')
+        }
+
+        // Ensure videos play when ready and add event listeners
+        const setupVideo = (video: HTMLVideoElement | null, onEnded: () => void) => {
+            if (!video) return
+
+            // Add ended event listener
+            video.addEventListener('ended', onEnded)
+
+            if (video.readyState >= 3) { // HAVE_FUTURE_DATA
                 video.play()
-            } else if (video) {
+            } else {
                 const handleCanPlay = () => {
                     video.play()
                     video.removeEventListener('canplay', handleCanPlay)
@@ -41,16 +79,40 @@ export default function Home() {
             }
         }
 
-        playIfReady(video1Ref.current)
-        playIfReady(video2Ref.current)
+        const video1 = video1Ref.current
+        const video2 = video2Ref.current
+
+        setupVideo(video1, handleVideo1End)
+        setupVideo(video2, handleVideo2End)
+
+        // Cleanup event listeners
+        return () => {
+            if (video1) {
+                video1.removeEventListener('ended', handleVideo1End)
+            }
+            if (video2) {
+                video2.removeEventListener('ended', handleVideo2End)
+            }
+        }
     }, [])
 
+    // Additional effect to handle video switching and ensure proper playback
+    useEffect(() => {
+        const video1 = video1Ref.current
+        const video2 = video2Ref.current
 
-    const [hovered, setHovered] = useState<'left' | 'right'>('left')
-    const [isPlaying, setIsPlaying] = useState(true)
-    const [isMuted, setIsMuted] = useState(true)
-    const video1Ref = useRef<HTMLVideoElement>(null)
-    const video2Ref = useRef<HTMLVideoElement>(null)
+        if (activeVideo === 'left' && video1) {
+            // When switching to video 1, ensure it's playing if the global play state is true
+            if (isPlaying && video1.paused) {
+                video1.play()
+            }
+        } else if (activeVideo === 'right' && video2) {
+            // When switching to video 2, ensure it's playing if the global play state is true
+            if (isPlaying && video2.paused) {
+                video2.play()
+            }
+        }
+    }, [activeVideo, isPlaying])
 
     // Video control functions
     const togglePlayPause = () => {
@@ -74,6 +136,58 @@ export default function Home() {
         if (video1) video1.muted = !isMuted
         if (video2) video2.muted = !isMuted
         setIsMuted(!isMuted)
+    }
+
+    // Video switching functions
+    const switchToVideo = (video: 'left' | 'right') => {
+        const video1 = video1Ref.current
+        const video2 = video2Ref.current
+
+        // Reset the target video to the beginning
+        if (video === 'left' && video1) {
+            video1.currentTime = 0
+            // If videos should be playing, start the video
+            if (isPlaying) {
+                video1.play()
+            }
+        } else if (video === 'right' && video2) {
+            video2.currentTime = 0
+            // If videos should be playing, start the video
+            if (isPlaying) {
+                video2.play()
+            }
+        }
+
+        setActiveVideo(video)
+    }
+
+    // Swipe gesture handling
+    const handleTouchStart = (e: React.TouchEvent) => {
+        const touch = e.touches[0]
+        heroContainerRef.current?.setAttribute('data-touch-start-x', touch.clientX.toString())
+    }
+
+    const handleTouchEnd = (e: React.TouchEvent) => {
+        const touchStartX = heroContainerRef.current?.getAttribute('data-touch-start-x')
+        if (!touchStartX) return
+
+        const touchEndX = e.changedTouches[0].clientX
+        const touchStartXNum = parseFloat(touchStartX)
+        const swipeThreshold = 50 // minimum distance for a swipe
+
+        const swipeDistance = touchEndX - touchStartXNum
+
+        if (Math.abs(swipeDistance) > swipeThreshold) {
+            if (swipeDistance > 0) {
+                // Swipe right - show left video
+                switchToVideo('left')
+            } else {
+                // Swipe left - show right video
+                switchToVideo('right')
+            }
+        }
+
+        heroContainerRef.current?.removeAttribute('data-touch-start-x')
     }
 
     // Video and overlay data - now dynamic from settings
@@ -188,9 +302,8 @@ export default function Home() {
                     ref={video1Ref}
                     key={videoData.side1.src}
                     src={videoData.side1.src}
-                    className={`absolute top-0 left-0 h-full w-full object-cover transition-opacity duration-700 ${hovered === 'right' ? 'opacity-0' : 'opacity-100'}`}
+                    className={`absolute top-0 left-0 h-full w-full object-cover transition-opacity duration-700 ${activeVideo === 'right' ? 'opacity-0' : 'opacity-100'}`}
                     autoPlay
-                    loop
                     muted={isMuted}
                     playsInline
                 />
@@ -198,18 +311,17 @@ export default function Home() {
                     ref={video2Ref}
                     key={videoData.side2.src}
                     src={videoData.side2.src}
-                    className={`absolute top-0 left-0 h-full w-full object-cover transition-opacity duration-700 ${hovered === 'right' ? 'opacity-100' : 'opacity-0'}`}
+                    className={`absolute top-0 left-0 h-full w-full object-cover transition-opacity duration-700 ${activeVideo === 'right' ? 'opacity-100' : 'opacity-0'}`}
                     autoPlay
-                    loop
                     muted={isMuted}
                     playsInline
                 />
             </div>
 
-            {/* Bottom center overlay text for each video - Mobile Responsive - Positioned above hover divs */}
-            <div className="pointer-events-none relative top-[calc(100vh-320px)] left-1/2 z-50 flex w-full -translate-x-1/2 transform justify-center px-4 sm:top-[calc(100vh-400px)] md:bottom-16 md:px-0">
+            {/* Bottom center overlay text for each video - Mobile Responsive */}
+            <div className="relative  left-1/2 z-50 flex w-full -translate-x-1/2 transform justify-center px-4 top-[calc(100vh-400px)] md:bottom-16 md:px-0">
                 <div
-                    className={`transition-opacity duration-700 ${hovered === 'right' ? 'opacity-0' : 'opacity-100'}`}
+                    className={`transition-opacity duration-700 ${activeVideo === 'right' ? 'opacity-0' : 'opacity-100'}`}
                 >
                     <div className="text-center">
                         <div className="font-supreme pointer-events-auto mb-2 text-lg font-medium text-white uppercase select-text text-shadow-md md:text-2xl">
@@ -226,12 +338,21 @@ export default function Home() {
                         </a>
                     </div>
                     <div className="m-auto mt-8 flex max-w-20 flex-row items-center justify-center gap-2 md:mt-14 md:max-w-24">
-                        <div className="h-[4px] w-[50%] rounded-2xl bg-[#D9D9D9] md:h-[5px]" />
-                        <div className="h-[4px] w-[50%] rounded-2xl bg-[#7A7676] md:h-[5px]" />
+                        {/* clickable indicators */}
+                        <button
+                            onClick={() => switchToVideo('left')}
+                            className="h-[4px] w-[50%] rounded-2xl bg-[#D9D9D9] transition-colors hover:bg-white md:h-[5px]"
+                            aria-label="Switch to video 1"
+                        />
+                        <button
+                            onClick={() => switchToVideo('right')}
+                            className="h-[4px] w-[50%] rounded-2xl bg-[#7A7676] transition-colors hover:bg-[#5A5656] md:h-[5px]"
+                            aria-label="Switch to video 2"
+                        />
                     </div>
                 </div>
                 <div
-                    className={`absolute left-1/2 w-full -translate-x-1/2 transition-opacity duration-700 ${hovered === 'right' ? 'opacity-100' : 'opacity-0'}`}
+                    className={`absolute left-1/2 w-full -translate-x-1/2 transition-opacity duration-700 ${activeVideo === 'right' ? 'opacity-100' : 'opacity-0'}`}
                 >
                     <div className="text-center">
                         <div className="font-supreme pointer-events-auto mb-2 text-lg font-medium text-white uppercase select-text text-shadow-md md:text-2xl">
@@ -248,24 +369,27 @@ export default function Home() {
                         </a>
                     </div>
                     <div className="m-auto mt-8 flex max-w-20 flex-row items-center justify-center gap-2 md:mt-14 md:max-w-24">
-                        <div className="h-[4px] w-[50%] rounded-2xl bg-[#7A7676] md:h-[5px]" />
-                        <div className="h-[4px] w-[50%] rounded-2xl bg-[#D9D9D9] md:h-[5px]" />
+                        {/* clickable indicators */}
+                        <button
+                            onClick={() => switchToVideo('left')}
+                            className="pointer-events-auto h-[4px] w-[50%] rounded-2xl bg-[#7A7676] transition-colors hover:bg-[#5A5656] md:h-[5px]"
+                            aria-label="Switch to video 1"
+                        />
+                        <button
+                            onClick={() => switchToVideo('right')}
+                            className="pointer-events-auto h-[4px] w-[50%] rounded-2xl bg-[#D9D9D9] transition-colors hover:bg-white md:h-[5px]"
+                            aria-label="Switch to video 2"
+                        />
                     </div>
                 </div>
             </div>
 
-            <div className="relative z-0 flex h-[calc(100svh-250px)] flex-row sm:h-[calc(100svh-280px)]">
-                {/* Trigger Divs - Desktop hover, Mobile touch */}
-                <div
-                    className="pointer-events-auto h-full w-[50vw]"
-                    onMouseEnter={() => setHovered('left')}
-                    onTouchStart={() => setHovered('left')}
-                />
-                <div
-                    className="pointer-events-auto h-full w-[50vw]"
-                    onMouseEnter={() => setHovered('right')}
-                    onTouchStart={() => setHovered('right')}
-                />
+            <div
+                ref={heroContainerRef}
+                className="relative z-0 h-[calc(100svh-250px)] sm:h-[calc(100svh-280px)]"
+                onTouchStart={handleTouchStart}
+                onTouchEnd={handleTouchEnd}
+            >
                 {/* Video Control Buttons - Mobile Responsive */}
                 <div className="absolute bottom-3 left-0 z-50 flex w-full justify-between px-2 md:bottom-6 md:px-4">
                     <button
