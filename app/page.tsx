@@ -183,7 +183,7 @@ export default function Home() {
     return (
         <div className="relative min-h-[100svh] w-full">
             {/* Fullscreen video background with fade animation */}
-            <div className="fixed top-0 left-0 h-full w-full">
+            <div className="fixed top-0 left-0 h-svh w-full">
                 <video
                     ref={video1Ref}
                     key={videoData.side1.src}
@@ -267,7 +267,7 @@ export default function Home() {
                     onTouchStart={() => setHovered('right')}
                 />
                 {/* Video Control Buttons - Mobile Responsive */}
-                <div className="absolute bottom-8 left-0 z-50 flex w-full justify-between px-2 md:bottom-10 md:px-4">
+                <div className="absolute bottom-3 left-0 z-50 flex w-full justify-between px-2 md:bottom-6 md:px-4">
                     <button
                         onClick={togglePlayPause}
                         className="flex h-12 w-12 touch-manipulation items-center justify-center rounded-full bg-black/20 backdrop-blur-sm transition-colors hover:bg-black/40 md:h-12 md:w-12"
