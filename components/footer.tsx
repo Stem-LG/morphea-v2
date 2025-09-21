@@ -15,10 +15,9 @@ export default function Footer() {
     const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [isSocialMediaOpen, setIsSocialMediaOpen] = useState(false)
-    const [isPlanDeMorpheaOpen, setIsPlanDeMorpheaOpen] = useState(false)
     const { language, setLanguage, t } = useLanguage()
     const dropdownRef = useRef<HTMLDivElement>(null)
-    const planSectionRef = useRef<HTMLDivElement>(null)
+    const socialSectionRef = useRef<HTMLDivElement>(null)
     const supabase = createClient()
     const { data: homeSettings } = useHomeSettings()
     const { data: categories = [] } = useCategories()
@@ -81,15 +80,15 @@ export default function Footer() {
         }
     }, [])
 
-    // Smooth scroll to plan section when it opens
+    // Smooth scroll to social media section when it opens
     useEffect(() => {
-        if (isPlanDeMorpheaOpen && planSectionRef.current) {
-            planSectionRef.current.scrollIntoView({
+        if (isSocialMediaOpen && socialSectionRef.current) {
+            socialSectionRef.current.scrollIntoView({
                 behavior: 'smooth',
                 block: 'start',
             })
         }
-    }, [isPlanDeMorpheaOpen])
+    }, [isSocialMediaOpen])
 
     const languages = [
         {
@@ -176,16 +175,7 @@ export default function Footer() {
                                         {t('footer.about.origin')}
                                     </a>
                                 </li>
-                                <li>
-                                    <button
-                                        onClick={() =>
-                                            setIsPlanDeMorpheaOpen(true)
-                                        }
-                                        className="block touch-manipulation py-1 text-base text-neutral-700 transition-colors hover:text-black md:text-lg"
-                                    >
-                                        {t('footer.about.plan')}
-                                    </button>
-                                </li>
+
                                 <li>
                                     <a
                                         href={
@@ -365,7 +355,9 @@ export default function Footer() {
 
                 {/* Follow us bar - Mobile Responsive - Conditionally rendered */}
                 {isSocialMediaOpen && (
-                    <div className="border-y border-gray-200 pt-3 pb-8 md:pt-4 md:pb-11">
+                    <div
+                        ref={socialSectionRef}
+                        className="border-y border-gray-200 pt-3 pb-8 md:pt-4 md:pb-11">
                         <div className="flex flex-col items-center justify-center gap-4 md:gap-6">
                             <div className="flex w-full items-center justify-between">
                                 <div className="size-8" />
@@ -510,131 +502,7 @@ export default function Footer() {
                     </div>
                 )}
 
-                {/* Plan de Morphea section - Mobile Responsive - Conditionally rendered */}
-                {isPlanDeMorpheaOpen && (
-                    <div
-                        ref={planSectionRef}
-                        className="border-y border-gray-200 pt-3 pb-8 md:pt-4 md:pb-11"
-                    >
-                        <div className="flex flex-col items-center justify-center gap-4 md:gap-6">
-                            <div className="flex w-full items-center justify-between">
-                                <div className="size-8" />
-                                <span className="font-recia text-lg font-semibold text-neutral-700 md:text-xl">
-                                    {t('footer.planDeMorphea.title')}
-                                </span>
-                                <button
-                                    onClick={() =>
-                                        setIsPlanDeMorpheaOpen(false)
-                                    }
-                                    className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-gray-600 transition-colors hover:bg-gray-200 hover:text-black"
-                                    aria-label="Close plan de morphea"
-                                >
-                                    <X size={16} />
-                                </button>
-                            </div>
-                            <div className="flex flex-col items-center gap-4 text-gray-700 md:gap-6">
-                                {(() => {
-                                    // Combine main pages and categories into one array
-                                    const mainPages = [
-                                        {
-                                            name: t(
-                                                'footer.planDeMorphea.login'
-                                            ),
-                                            href: '/auth/login',
-                                        },
-                                        {
-                                            name: t(
-                                                'footer.planDeMorphea.register'
-                                            ),
-                                            href: '/auth/sign-up',
-                                        },
-                                        {
-                                            name: t(
-                                                'footer.planDeMorphea.home'
-                                            ),
-                                            href: '/',
-                                        },
-                                        {
-                                            name: t('nav.virtualTours'),
-                                            href: '/main',
-                                        },
-                                        {
-                                            name: t(
-                                                'footer.planDeMorphea.shop'
-                                            ),
-                                            href: '/shop',
-                                        },
-                                        {
-                                            name: t(
-                                                'footer.planDeMorphea.events'
-                                            ),
-                                            href: '/#events',
-                                        },
-                                        {
-                                            name: t(
-                                                'footer.planDeMorphea.creators'
-                                            ),
-                                            href: '/#creators',
-                                        },
-                                        {
-                                            name: t(
-                                                'footer.planDeMorphea.categories'
-                                            ),
-                                            href: '/#categories',
-                                        },
-                                    ]
 
-                                    const allLinks = [...mainPages]
-
-                                    // Split links into columns of max 6 items each
-                                    const columns = []
-                                    for (
-                                        let i = 0;
-                                        i < allLinks.length;
-                                        i += 8
-                                    ) {
-                                        columns.push(allLinks.slice(i, i + 8))
-                                    }
-
-                                    return (
-                                        <div className="flex flex-wrap justify-center gap-8 md:gap-12 lg:gap-20 xl:gap-40">
-                                            {columns.map(
-                                                (column, columnIndex) => (
-                                                    <div
-                                                        key={columnIndex}
-                                                        className="flex flex-col gap-2"
-                                                    >
-                                                        {column.map(
-                                                            (
-                                                                link,
-                                                                linkIndex
-                                                            ) => (
-                                                                <a
-                                                                    key={`${columnIndex}-${linkIndex}`}
-                                                                    href={
-                                                                        link.href
-                                                                    }
-                                                                    className="touch-manipulation text-center text-base transition-colors hover:text-black md:text-left md:text-lg"
-                                                                    onClick={() =>
-                                                                        setIsPlanDeMorpheaOpen(
-                                                                            false
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    {link.name}
-                                                                </a>
-                                                            )
-                                                        )}
-                                                    </div>
-                                                )
-                                            )}
-                                        </div>
-                                    )
-                                })()}
-                            </div>
-                        </div>
-                    </div>
-                )}
 
                 {/* Bottom language row - Mobile Responsive */}
                 <div className="font-supreme flex justify-between py-3 text-base text-stone-500 md:py-4 md:text-lg">
