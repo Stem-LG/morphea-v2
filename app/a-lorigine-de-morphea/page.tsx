@@ -97,7 +97,7 @@ export default function OriginePage() {
             <NavBar />
 
             {/* Hero Section */}
-            <section className="-top-18 relative bg-gradient-to-br from-[#053340] via-[#0a4c5c] to-[#053340] px-8 py-32">
+            <section className="-top-14 relative bg-gradient-to-br from-[#053340] via-[#0a4c5c] to-[#053340] px-8 py-32">
                 <div className="absolute inset-0 bg-black/20"></div>
                 <div className="relative z-10 mx-auto max-w-4xl text-center">
                     <h1 className="font-recia mb-12 text-5xl font-extrabold tracking-tight text-white md:text-7xl">
@@ -119,12 +119,7 @@ export default function OriginePage() {
                 <div className="mx-auto max-w-7xl">
                     {/* Identity & DNA Section */}
                     <div className="relative overflow-hidden bg-gradient-to-br from-gray-50 via-white to-gray-50 px-8 py-32">
-                        {/* Background Pattern */}
-                        <div className="absolute inset-0 opacity-5">
-                            <div className="border-morpheus-gold-light absolute top-20 left-20 h-96 w-96 rounded-full border"></div>
-                            <div className="border-morpheus-blue-light absolute right-20 bottom-20 h-64 w-64 rounded-full border"></div>
-                            <div className="border-morpheus-gold-dark/20 absolute top-1/2 left-1/2 h-[800px] w-[800px] -translate-x-1/2 -translate-y-1/2 transform rounded-full border"></div>
-                        </div>
+                        
 
                         <div className="relative z-10 mx-auto max-w-7xl">
                             {/* Modern Layout with Asymmetric Design */}
@@ -255,7 +250,7 @@ export default function OriginePage() {
                                 </div>
 
                                 {/* Visual Side - Takes 5 columns */}
-                                <div className="relative top-5 lg:col-span-5">
+                                <div className="relative  md:top-10 lg:col-span-5">
                                     {/* Main Video with Modern Frame */}
                                     <div className="relative">
                                         {/* Main Video Container */}
@@ -274,9 +269,7 @@ export default function OriginePage() {
                                             </video>
                                         </div>
 
-                                        {/* Side Accent */}
-                                        <div className="from-morpheus-gold-dark to-morpheus-gold-light absolute top-1/2 -right-4 h-32 w-2 -translate-y-1/2 transform rounded-full bg-gradient-to-b shadow-lg"></div>
-                                    </div>
+                                         </div>
                                 </div>
                             </div>
                         </div>
