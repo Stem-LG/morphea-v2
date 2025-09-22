@@ -73,6 +73,7 @@ export default function VirtualTour({
     const animationIntervalRef = useRef<NodeJS.Timeout | null>(null)
     const isUpdatingUrlRef = useRef(false)
     const isTransitioningRef = useRef(false)
+    const rotationAnimRef = useRef<number | null>(null)
 
     // Loading progress states
     const [loadingProgress, setLoadingProgress] = useState(0)
@@ -348,6 +349,48 @@ export default function VirtualTour({
             }
         }
     }, [handleKeyDown, handleKeyUp])
+
+    const easeInOutQuad = (t: number) => (t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t)
+
+    const animateRotateBy = (delta: number, duration = 400) => {
+        if (!viewerRef.current || isTransitioningRef.current) return
+        // stop keyboard animation if any
+        setPressedKeys(new Set())
+        // cancel ongoing rotation animation
+        if (rotationAnimRef.current) {
+            cancelAnimationFrame(rotationAnimRef.current)
+            rotationAnimRef.current = null
+        }
+        const startYaw = currentPosition.yaw
+        const startPitch = currentPosition.pitch
+        const targetYaw = normalizeAngle(startYaw + delta)
+        const diff = normalizeAngle(targetYaw - startYaw)
+        const startTime = performance.now()
+
+        const step = (now: number) => {
+            const t = Math.min((now - startTime) / duration, 1)
+            const eased = easeInOutQuad(t)
+            const yaw = normalizeAngle(startYaw + diff * eased)
+            viewerRef.current!.rotate({ yaw, pitch: startPitch })
+            setCurrentPosition((prev) => ({ ...prev, yaw }))
+            if (t < 1) {
+                rotationAnimRef.current = requestAnimationFrame(step)
+            } else {
+                rotationAnimRef.current = null
+            }
+        }
+
+        rotationAnimRef.current = requestAnimationFrame(step)
+    }
+
+    useEffect(() => {
+        return () => {
+            if (rotationAnimRef.current) {
+                cancelAnimationFrame(rotationAnimRef.current)
+                rotationAnimRef.current = null
+            }
+        }
+    }, [])
 
     // Update URL when scene changes (handled in transition completion to avoid blocking navigation)
 
@@ -754,16 +797,16 @@ export default function VirtualTour({
                 },
                 html: `
           <div style="
-            width: 32px; 
-            height: 32px; 
-            background: var(--morpheus-gold-light); 
-            border: 3px solid white; 
-            border-radius: 50%; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            color: white; 
-            font-weight: bold; 
+            width: 32px;
+            height: 32px;
+            background: var(--morpheus-gold-light);
+            border: 3px solid white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
             font-size: 16px;
             cursor: pointer;
             animation: pulse 2s infinite;
@@ -936,6 +979,7 @@ export default function VirtualTour({
     return (
         <div
             className={`relative ${className}`}
+
             style={{ height: actualHeight, width }}
         >
             <div
@@ -981,7 +1025,7 @@ export default function VirtualTour({
             {/* Exit Button */}
             <button
                 onClick={() => router.push('/')}
-                className="group absolute right-6 bottom-6 z-10 flex h-12 w-12 items-center justify-center rounded-full bg-black/20 text-white shadow-lg transition-all duration-300 hover:scale-105 hover:bg-black/40"
+                className="group absolute right-6 bottom-14 z-10 flex h-12 w-12 items-center justify-center rounded-full bg-black/20 text-white shadow-lg transition-all duration-300 hover:scale-105 hover:bg-black/40"
                 title={t('virtualTour.exitVirtualTour')}
             >
                 <svg
@@ -999,6 +1043,57 @@ export default function VirtualTour({
                     <polyline points="16,17 21,12 16,7" />
                     <line x1="21" y1="12" x2="9" y2="12" />
                 </svg>
+            </button>
+
+            {/* Rotate Left 45° */}
+            <button
+                onClick={() => animateRotateBy(-Math.PI / 4)}
+                className="group absolute left-4 top-1/2 -translate-y-1/2 z-10 flex h-12 w-12 items-center justify-center rounded-full bg-black/20 text-white shadow-lg transition-all duration-300 hover:scale-105 hover:bg-black/40"
+                title={t('virtualTour.turnLeft45')}
+            >
+                <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="transition-transform duration-200 group-hover:scale-110"
+                >
+                    <polyline points="15 18 9 12 15 6" />
+                </svg>
+            </button>
+
+            {/* Rotate Right 45° */}
+            <button
+                onClick={() => animateRotateBy(Math.PI / 4)}
+                className="group absolute right-4 top-1/2 -translate-y-1/2 z-10 flex h-12 w-12 items-center justify-center rounded-full bg-black/20 text-white shadow-lg transition-all duration-300 hover:scale-105 hover:bg-black/40"
+                title={t('virtualTour.turnRight45')}
+            >
+                <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="transition-transform duration-200 group-hover:scale-110"
+                >
+                    <polyline points="9 6 15 12 9 18" />
+                </svg>
+            </button>
+
+            {/* Turn Around 180° */}
+            <button
+                onClick={() => animateRotateBy(Math.PI)}
+                className="group absolute left-6 bottom-14 z-10 flex h-12 w-12 items-center justify-center rounded-full bg-black/20 text-white shadow-lg transition-all duration-300 hover:scale-105 hover:bg-black/40"
+                title={t('virtualTour.turnAround180')}
+            >
+                <span className="font-supreme text-sm">180°</span>
             </button>
 
             {/* Scene Navigation Dropdown */}
