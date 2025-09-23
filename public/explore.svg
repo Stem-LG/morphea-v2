@@ -1,8 +1,17 @@
-<svg width="400" height="200" viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
+<svg width="600" height="300" viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .floor-ellipse {
+      fill: rgba(0, 0, 0, 0.2);
+      transition: fill 0.3s ease;
+    }
+    .floor-ellipse:hover {
+      fill: rgba(0, 0, 0, 0.4);
+    }
+  </style>
   <!-- Floor base: white ellipse with black outline -->
-  <ellipse cx="200" cy="150" rx="150" ry="45" fill="white" stroke="black" stroke-width="3"/>
+  <ellipse cx="200" cy="150" rx="150" ry="45" class="floor-ellipse"/>
 
   <!-- Flesh: black polygon, centered inside ellipse -->
   <polygon points="200,115 300,150 260,150 200,135 140,150 100,150"
-           fill="black"/>
+           fill="white"/>
 </svg>
