@@ -10,7 +10,7 @@ import { useCart } from '@/app/_hooks/cart/useCart'
 import { useWishlist } from '@/app/_hooks/wishlist/useWishlist'
 import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
-import { useState, Fragment, useMemo } from 'react'
+import { useState, useEffect, Fragment, useMemo } from 'react'
 import { useNotifications } from '@/app/_hooks/use-notifications'
 import { useScrollDirection } from '@/hooks/use-scroll-direction'
 import { ProductDetailsPage } from '../../main/_components/product-details-page'
@@ -44,7 +44,7 @@ import {
 import { LanguageSwitcher } from './language-switcher'
 import { NavBarIconButton } from './navbar_icon_button'
 import { Separator } from '@/components/ui/separator'
-import { ChevronRight, XIcon, ChevronDown } from 'lucide-react'
+import { ChevronRight, ChevronLeft, XIcon, ChevronDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useCategories } from '@/hooks/useCategories'
 import { organizeCategoriesIntoTree } from '@/app/admin/categories/_components/category-tree-utils'
@@ -421,6 +421,21 @@ function CategoryNavigation({
 function CategoryDropdownMenu({ onSelect }: { onSelect: () => void }) {
     const { data: categories, isLoading } = useCategories()
     const router = useRouter()
+    const [isMobile, setIsMobile] = useState(false)
+    const [mobilePath, setMobilePath] = useState<any[]>([])
+    useEffect(() => {
+        if (typeof window === 'undefined') return
+        const mq = window.matchMedia('(max-width: 768px)')
+        const handler = () => setIsMobile(mq.matches)
+        handler()
+        // Support older Safari
+        // @ts-ignore
+        mq.addEventListener ? mq.addEventListener('change', handler) : mq.addListener(handler)
+        return () => {
+            // @ts-ignore
+            mq.removeEventListener ? mq.removeEventListener('change', handler) : mq.removeListener(handler)
+        }
+    }, [])
     const categoryTree = useMemo(() => {
         if (!categories || categories.length === 0) return []
         return organizeCategoriesIntoTree(
@@ -461,15 +476,61 @@ function CategoryDropdownMenu({ onSelect }: { onSelect: () => void }) {
 
     return (
         <DropdownMenuContent
-            side="right"
+            side={isMobile ? 'bottom' : 'right'}
             align="start"
-            sideOffset={8}
-            className="z-[120] min-w-[16rem] max-h-[70vh] overflow-auto rounded-none p-0"
+            sideOffset={isMobile ? 0 : 8}
+            className={`z-[120] max-h-[70vh] overflow-auto rounded-none p-0 ${isMobile ? 'w-[min(90vw,400px)]' : 'min-w-[16rem]'}`}
+            avoidCollisions={false}
         >
             {isLoading ? (
                 <DropdownMenuItem disabled>Loading...</DropdownMenuItem>
             ) : categoryTree.length === 0 ? (
                 <DropdownMenuItem disabled>No categories</DropdownMenuItem>
+            ) : categoryTree.length === 0 ? (
+                <DropdownMenuItem disabled>No categories</DropdownMenuItem>
+            ) : isMobile ? (
+                <>
+                    {mobilePath.length > 0 && (
+                        <DropdownMenuItem
+                            className="h-12 md:h-14 group text-base md:text-lg px-4 py-0 rounded-none text-neutral-400 hover:bg-morpheus-blue-lighter hover:text-white focus:bg-morpheus-blue-lighter focus:text-white data-[highlighted]:bg-morpheus-blue-lighter data-[highlighted]:text-white w-full"
+                            onSelect={(e) => {
+                                e.preventDefault()
+                                setMobilePath((p) => p.slice(0, -1))
+                            }}
+                        >
+                            <span className="flex items-center">
+                                <ChevronLeft className="h-4 w-4 mr-2 group-hover:text-white" />
+                                Back
+                            </span>
+                        </DropdownMenuItem>
+                    )}
+                    {(mobilePath.length === 0 ? categoryTree : (mobilePath[mobilePath.length - 1]?.children || [])).map((node: any) => (
+                        (node.children && node.children.length > 0) ? (
+                            <DropdownMenuItem
+                                key={node.xcategprodid}
+                                className="h-12 md:h-14 text-base group md:text-lg px-4 py-0 rounded-none text-neutral-400 hover:bg-morpheus-blue-lighter hover:text-white focus:bg-morpheus-blue-lighter focus:text-white data-[highlighted]:bg-morpheus-blue-lighter data-[highlighted]:text-white w-full justify-between"
+                                onSelect={(e) => {
+                                    e.preventDefault()
+                                    setMobilePath((p) => [...p, node])
+                                }}
+                            >
+                                <span>{node.xcategprodintitule}</span>
+                                <ChevronRight className="h-4 w-4 opacity-70 group-hover:text-white" />
+                            </DropdownMenuItem>
+                        ) : (
+                            <DropdownMenuItem
+                                key={node.xcategprodid}
+                                className="h-12 md:h-14 text-base md:text-lg px-4 py-0 rounded-none text-neutral-400 hover:bg-morpheus-blue-lighter hover:text-white focus:bg-morpheus-blue-lighter focus:text-white data-[highlighted]:bg-morpheus-blue-lighter data-[highlighted]:text-white w-full"
+                                onSelect={() => {
+                                    router.push(`/shop?categoryId=${node.xcategprodid}`)
+                                    onSelect()
+                                }}
+                            >
+                                {node.xcategprodintitule}
+                            </DropdownMenuItem>
+                        )
+                    ))}
+                </>
             ) : (
                 categoryTree.map((node: any) => renderNode(node))
             )}
