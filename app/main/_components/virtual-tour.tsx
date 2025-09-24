@@ -1025,7 +1025,7 @@ export default function VirtualTour({
             {/* Exit Button */}
             <button
                 onClick={() => router.push('/')}
-                className="group absolute right-6 bottom-14 z-10 flex h-12 w-12 items-center justify-center rounded-full bg-black/20 text-white shadow-lg transition-all duration-300 hover:scale-105 hover:bg-black/40"
+                className="group absolute right-6 bottom-14 z-10 flex size-12 md:size-16 items-center justify-center rounded-full bg-black/20 text-white shadow-lg transition-all duration-300 hover:scale-105 hover:bg-black/40"
                 title={t('virtualTour.exitVirtualTour')}
             >
                 <svg
@@ -1048,52 +1048,54 @@ export default function VirtualTour({
             {/* Rotate Left 45° */}
             <button
                 onClick={() => animateRotateBy(-Math.PI / 4)}
-                className="group absolute left-4 top-1/2 -translate-y-1/2 z-10 flex h-12 w-12 items-center justify-center rounded-full bg-black/20 text-white shadow-lg transition-all duration-300 hover:scale-105 hover:bg-black/40"
+                className="group absolute scale-75 md:scale-100 left-4 top-1/2 -translate-y-1/2 z-10 flex h-24 w-24 items-center justify-center rounded-full bg-black/20 text-white shadow-lg transition-all duration-300 hover:scale-105 hover:bg-black/40"
                 title={t('virtualTour.turnLeft45')}
             >
                 <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="transition-transform duration-200 group-hover:scale-110"
+                    width="64"
+                    height="64"
+                    viewBox="0 0 400 200"
+                    className="transition-transform duration-200 scale-200 -translate-x-3 -rotate-90"
                 >
-                    <polyline points="15 18 9 12 15 6" />
+                    {/* Left-pointing arrow based on original polygon, scaled up and modified for direction */}
+                     <polygon points="200,110 300,155 260,155 200,140 140,155 100,155"
+           fill="white"
+           stroke="white"
+           strokeWidth="3"
+           strokeLinejoin="round"/>
                 </svg>
             </button>
 
             {/* Rotate Right 45° */}
             <button
                 onClick={() => animateRotateBy(Math.PI / 4)}
-                className="group absolute right-4 top-1/2 -translate-y-1/2 z-10 flex h-12 w-12 items-center justify-center rounded-full bg-black/20 text-white shadow-lg transition-all duration-300 hover:scale-105 hover:bg-black/40"
+                className="group absolute overflow-clip scale-75 md:scale-100 right-4 top-1/2 -translate-y-1/2 z-10 flex h-24 w-24 items-center justify-center rounded-full bg-black/20 text-white shadow-lg transition-all duration-300 hover:scale-105 hover:bg-black/40"
                 title={t('virtualTour.turnRight45')}
             >
                 <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="transition-transform duration-200 group-hover:scale-110"
+                    width="64"
+                    height="64"
+                    viewBox="0 0 400 200"
+                    className="transition-transform duration-200 scale-200 translate-x-3 rotate-90"
                 >
-                    <polyline points="9 6 15 12 9 18" />
+                    {/* Left-pointing arrow based on original polygon, scaled up and modified for direction */}
+                     <polygon points="200,110 300,155 260,155 200,140 140,155 100,155"
+                        fill="white"
+                        stroke="white"
+                        strokeWidth="3"
+                        strokeLinejoin="round"
+                    />
                 </svg>
             </button>
 
             {/* Turn Around 180° */}
             <button
                 onClick={() => animateRotateBy(Math.PI)}
-                className="group absolute left-6 bottom-14 z-10 flex h-12 w-12 items-center justify-center rounded-full bg-black/20 text-white shadow-lg transition-all duration-300 hover:scale-105 hover:bg-black/40"
+                className="group absolute left-6 bottom-14 z-10 flex size-12 md:size-16 items-center justify-center rounded-full bg-black/20 text-white shadow-lg transition-all duration-300 hover:scale-105 hover:bg-black/40"
                 title={t('virtualTour.turnAround180')}
+                
             >
-                <span className="font-supreme text-sm">180°</span>
+                <span className="font-supreme md:text-lg">180°</span>
             </button>
 
             {/* Scene Navigation Dropdown */}
