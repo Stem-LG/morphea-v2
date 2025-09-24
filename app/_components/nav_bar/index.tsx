@@ -37,6 +37,9 @@ import {
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
+    DropdownMenuSub,
+    DropdownMenuSubTrigger,
+    DropdownMenuSubContent,
 } from '@/components/ui/dropdown-menu'
 import { LanguageSwitcher } from './language-switcher'
 import { NavBarIconButton } from './navbar_icon_button'
@@ -409,9 +412,71 @@ function CategoryNavigation({
     return (
         <div className="space-y-0">
             {categoryTree.map((category) => renderCategory(category))}
+
         </div>
     )
 }
+
+// Dropdown content for categories with nested submenus
+function CategoryDropdownMenu({ onSelect }: { onSelect: () => void }) {
+    const { data: categories, isLoading } = useCategories()
+    const router = useRouter()
+    const categoryTree = useMemo(() => {
+        if (!categories || categories.length === 0) return []
+        return organizeCategoriesIntoTree(
+            categories.map((cat) => ({ ...cat, yprod: [{ count: 0 }] }))
+        )
+    }, [categories])
+
+    const renderNode = (node: any): React.ReactNode => {
+        const hasChildren = node.children && node.children.length > 0
+        if (hasChildren) {
+            return (
+                <DropdownMenuSub key={node.xcategprodid}>
+                    <DropdownMenuSubTrigger className="h-12 md:h-14 text-base md:text-lg px-4 py-0 rounded-none text-neutral-400 hover:bg-morpheus-blue-lighter hover:text-white focus:bg-morpheus-blue-lighter focus:text-white data-[highlighted]:bg-morpheus-blue-lighter data-[highlighted]:text-white data-[state=open]:bg-morpheus-blue-lighter data-[state=open]:text-white">
+                        {node.xcategprodintitule}
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuSubContent
+                        sideOffset={8}
+                        className="z-[120] max-h-[70vh] overflow-auto rounded-none p-0"
+                    >
+                        {node.children.map((child: any) => renderNode(child))}
+                    </DropdownMenuSubContent>
+                </DropdownMenuSub>
+            )
+        }
+        return (
+            <DropdownMenuItem
+                key={node.xcategprodid}
+                className="h-12 md:h-14 text-base md:text-lg px-4 py-0 rounded-none text-neutral-400 hover:bg-morpheus-blue-lighter hover:text-white focus:bg-morpheus-blue-lighter focus:text-white data-[highlighted]:bg-morpheus-blue-lighter data-[highlighted]:text-white w-full"
+                onSelect={() => {
+                    router.push(`/shop?categoryId=${node.xcategprodid}`)
+                    onSelect()
+                }}
+            >
+                {node.xcategprodintitule}
+            </DropdownMenuItem>
+        )
+    }
+
+    return (
+        <DropdownMenuContent
+            side="right"
+            align="start"
+            sideOffset={8}
+            className="z-[120] min-w-[16rem] max-h-[70vh] overflow-auto rounded-none p-0"
+        >
+            {isLoading ? (
+                <DropdownMenuItem disabled>Loading...</DropdownMenuItem>
+            ) : categoryTree.length === 0 ? (
+                <DropdownMenuItem disabled>No categories</DropdownMenuItem>
+            ) : (
+                categoryTree.map((node: any) => renderNode(node))
+            )}
+        </DropdownMenuContent>
+    )
+}
+
 
 type NavbarItem = {
     name: string
@@ -453,7 +518,7 @@ function NavBarSheet({
     const navbarItems: NavbarItem[] = [
         { name: t('nav.virtualTours'), href: '/main' },
         { name: t('nav.home'), href: '/' },
-        { name: t('nav.newProducts'), href: '/shop' },
+        { name: t('nav.newProducts'), href: '/creators' },
         {
             name: t('nav.categories'),
             action: () => setShowCategories(!showCategories),
@@ -553,9 +618,41 @@ function NavBarSheet({
                                 {navbarItems.map((item) => {
                                     const hasHref = !!item.href
                                     const hasAction = !!item.action
-                                    const isCategories =
-                                        item.name === 'Categories'
+                                    const isCategories = !hasHref && hasAction
                                     const isActive = hasHref && isActivePath(item.href!)
+
+                                    if (isCategories) {
+                                        return (
+                                            <Fragment key={item.name}>
+                                                <DropdownMenu open={showCategories} onOpenChange={setShowCategories} modal={false}>
+                                                    <DropdownMenuTrigger asChild>
+                                                        <Button
+                                                            variant="ghost"
+                                                            className={`font-supreme hover:bg-morpheus-blue-lighter h-14 justify-between rounded-none text-lg text-neutral-400 hover:text-white ${
+                                                                isActive ? 'font-bold text-neutral-600' : ''
+                                                            }`}
+                                                        >
+                                                            <span className="ml-1">
+                                                                {item.name[0] + item.name.toLowerCase().slice(1)}
+                                                            </span>
+                                                            {showCategories ? (
+                                                                <ChevronDown className="size-6" />
+                                                            ) : (
+                                                                <ChevronRight className="size-6" />
+                                                            )}
+                                                        </Button>
+                                                    </DropdownMenuTrigger>
+                                                    <CategoryDropdownMenu
+                                                        onSelect={() => {
+                                                            setIsMenuOpen(false)
+                                                            setShowCategories(false)
+                                                        }}
+                                                    />
+                                                </DropdownMenu>
+                                                <Separator />
+                                            </Fragment>
+                                        )
+                                    }
 
                                     return (
                                         <Fragment key={item.name}>
@@ -566,52 +663,26 @@ function NavBarSheet({
                                                 }`}
                                                 asChild={hasHref}
                                                 onClick={
-                                                    hasAction
-                                                        ? item.action
-                                                        : hasHref
-                                                          ? () =>
-                                                                setIsMenuOpen(
-                                                                    false
-                                                                )
-                                                          : undefined
+                                                    hasHref
+                                                        ? () => setIsMenuOpen(false)
+                                                        : undefined
                                                 }
                                             >
                                                 {hasHref ? (
                                                     <Link href={item.href!}>
                                                         <span className={isActive ? 'font-bold' : ''}>
-                                                            {item.name[0].toUpperCase() +
-                                                                item.name
-                                                                    .toLowerCase()
-                                                                    .slice(1)}
+                                                            {item.name[0].toUpperCase() + item.name.toLowerCase().slice(1)}
                                                         </span>
                                                     </Link>
                                                 ) : (
                                                     <>
                                                         <span className="ml-1">
-                                                            {item.name[0] +
-                                                                item.name
-                                                                    .toLowerCase()
-                                                                    .slice(1)}
+                                                            {item.name[0] + item.name.toLowerCase().slice(1)}
                                                         </span>
-                                                        {isCategories &&
-                                                            (showCategories ? (
-                                                                <ChevronDown className="size-6" />
-                                                            ) : (
-                                                                <ChevronRight className="size-6" />
-                                                            ))}
                                                     </>
                                                 )}
                                             </Button>
                                             <Separator />
-                                            {isCategories && showCategories && (
-                                                <div className="mb-4">
-                                                    <CategoryNavigation
-                                                        onCategoryClick={() =>
-                                                            setIsMenuOpen(false)
-                                                        }
-                                                    />
-                                                </div>
-                                            )}
                                         </Fragment>
                                     )
                                 })}

@@ -65,6 +65,7 @@ const ALLOWED_SETTING_KEYS = [
   'morphea_origin_vision_image1_url',
   'morphea_origin_vision_image2_url',
   'morphea_origin_vision_image3_url',
+  'morphea_origin_founder_image_url',
   'homepage_collections_subtitle_en',
   'homepage_collections_subtitle_fr',
   'homepage_collections_image1_url',
@@ -125,7 +126,9 @@ const ALLOWED_SETTING_KEYS = [
   'footer_link_my_account',
   'footer_link_orders_delivery',
   'footer_link_cookies_privacy',
-  'footer_link_terms'
+  'footer_link_terms',
+  // Creators mapping
+  'creators_images_by_boutique'
 ]
 
 export function useUpdateSetting() {

@@ -85,6 +85,10 @@ interface HomeSettings {
   morpheaOriginVision: {
     images: string[]
   }
+  // Morphea Origin Founder Section
+  morpheaOriginFounder: {
+    imageUrl: string | null
+  }
   // Footer Settings
   footer: {
     social: {
@@ -302,6 +306,9 @@ export function useHomeSettings() {
             getSetting('morphea_origin_vision_image2_url'),
             getSetting('morphea_origin_vision_image3_url')
           ].filter(Boolean) // Remove null/undefined values
+        },
+        morpheaOriginFounder: {
+          imageUrl: getSetting('morphea_origin_founder_image_url')
         },
         footer: {
           social: {

@@ -3473,6 +3473,42 @@ export function HomepageSettings() {
                                         </div>
                                         <FileDisplay settingKey="morphea_origin_vision_image3_url" />
                                     </div>
+
+                                    {/* Founder Image */}
+                                    <div className="md:col-span-3 space-y-2">
+                                        <Label className="font-medium text-gray-900">
+                                            Founder Image
+                                        </Label>
+                                        <div className="flex items-center gap-4">
+                                            <Input
+                                                type="file"
+                                                accept="image/*"
+                                                onChange={(e) => {
+                                                    const file = e.target.files?.[0]
+                                                    if (file) {
+                                                        handleFileUpload(
+                                                            'morphea_origin_founder_image_url',
+                                                            file,
+                                                            'image'
+                                                        )
+                                                    }
+                                                }}
+                                                className="border-gray-300 bg-white text-gray-900"
+                                                disabled={
+                                                    uploadingFiles[
+                                                        'morphea_origin_founder_image_url'
+                                                    ]
+                                                }
+                                            />
+                                            {uploadingFiles[
+                                                'morphea_origin_founder_image_url'
+                                            ] && (
+                                                <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
+                                            )}
+                                        </div>
+                                        <FileDisplay settingKey="morphea_origin_founder_image_url" />
+                                    </div>
+
                                 </div>
 
                                 {/* Preview Section */}

@@ -352,8 +352,17 @@ export default function OriginePage() {
                                             }}
                                         >
                                             <div className="relative aspect-[5/5] overflow-hidden rounded-3xl border border-gray-200 bg-gradient-to-br from-gray-50 to-white shadow-lg">
-                                                {/* Image placeholder */}
-                                                <div className="absolute inset-4 rounded-2xl border-2 border-dashed border-gray-300"></div>
+                                                {homeSettings?.morpheaOriginFounder?.imageUrl ? (
+                                                    <Image
+                                                        className="absolute inset-0 h-full w-full object-cover"
+                                                        src={homeSettings.morpheaOriginFounder.imageUrl}
+                                                        alt="Founder image"
+                                                        width={1000}
+                                                        height={1000}
+                                                    />
+                                                ) : (
+                                                    <div className="absolute inset-4 rounded-2xl border-2 border-dashed border-gray-300"></div>
+                                                )}
                                             </div>
                                         </div>
                                     </div>

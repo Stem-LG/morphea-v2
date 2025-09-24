@@ -24,6 +24,7 @@ import { useCurrencies } from '@/app/_hooks/use-currencies'
 import { useLanguage } from '@/hooks/useLanguage'
 import { toast } from 'sonner'
 import { HomepageSettings } from './homepage-settings'
+import { CreatorsSettings } from './creators-settings'
 import Link from 'next/link'
 
 interface PredefinedSetting {
@@ -418,6 +419,9 @@ export function SettingsManagement() {
 
             {/* Homepage Settings */}
             <HomepageSettings />
+
+            {/* Creators Images Settings */}
+            <CreatorsSettings />
         </div>
     )
 }
