@@ -43,6 +43,7 @@ export const enTranslations = {
     "close": "Close",
     "retry": "Retry",
     "none": "None",
+    "all": "All",
     "actions": "Actions",
     "required": "Required",
     "poweredBy": "© 2025 morpheus, Réalisé par mellime",

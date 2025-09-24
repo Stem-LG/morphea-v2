@@ -920,6 +920,22 @@ function ShopContent() {
                                         <Separator />
                                         {expandedSections.categories && (
                                             <div className="mt-2 space-y-0 px-2">
+                                                <div>
+                                                    <button
+                                                        onClick={() =>
+                                                            handleFilterChange('categoryId')(null)
+                                                        }
+                                                        className={cn(
+                                                            'hover:bg-morpheus-blue-lighter flex h-12 w-full items-center justify-start rounded-none p-4 text-lg hover:text-white',
+                                                            categoryId == null
+                                                                ? 'font-semibold text-morpheus-blue-dark bg-gray-50'
+                                                                : 'text-neutral-400'
+                                                        )}
+                                                    >
+                                                        <span>{t('common.all') || 'All'}</span>
+                                                    </button>
+                                                    <Separator />
+                                                </div>
                                                 {categories.map((category) => (
                                                     <div
                                                         key={
@@ -938,7 +954,7 @@ function ShopContent() {
                                                                 'hover:bg-morpheus-blue-lighter flex h-12 w-full items-center justify-start rounded-none p-4 text-lg hover:text-white',
                                                                 categoryId ===
                                                                     category.xcategprodid
-                                                                    ? 'text-morpheus-blue-dark bg-gray-50'
+                                                                    ? 'font-semibold text-morpheus-blue-dark bg-gray-50'
                                                                     : 'text-neutral-400'
                                                             )}
                                                         >
@@ -981,6 +997,23 @@ function ShopContent() {
                                         <Separator />
                                         {expandedSections.creators && (
                                             <div className="mt-2 space-y-0 px-2">
+                                                <div>
+                                                    <button
+                                                        onClick={() =>
+                                                            handleFilterChange('boutiqueId')(null)
+                                                        }
+                                                        className={cn(
+                                                            'hover:bg-morpheus-blue-lighter flex h-12 w-full items-center justify-start rounded-none p-4 text-lg hover:text-white',
+                                                            boutiqueId == null
+                                                                ? 'font-semibold text-morpheus-blue-dark bg-gray-50'
+                                                                : 'text-neutral-400'
+                                                        )}
+                                                    >
+                                                        <span>{t('common.all') || 'All'}</span>
+                                                    </button>
+                                                    <Separator />
+                                                </div>
+
                                                 {boutiques.map((boutique) => (
                                                     <div
                                                         key={
@@ -999,7 +1032,7 @@ function ShopContent() {
                                                                 'hover:bg-morpheus-blue-lighter flex h-12 w-full items-center justify-start rounded-none p-4 text-lg hover:text-white',
                                                                 boutiqueId ===
                                                                     boutique.yboutiqueid
-                                                                    ? 'text-morpheus-blue-dark bg-gray-50'
+                                                                    ? 'font-semibold text-morpheus-blue-dark bg-gray-50'
                                                                     : 'text-neutral-400'
                                                             )}
                                                         >
@@ -1041,6 +1074,23 @@ function ShopContent() {
                                         <Separator />
                                         {expandedSections.colors && (
                                             <div className="mt-2 space-y-0 px-2">
+                                                <div>
+                                                    <button
+                                                        onClick={() =>
+                                                            handleFilterChange('colorId')(null)
+                                                        }
+                                                        className={cn(
+                                                            'hover:bg-morpheus-blue-lighter flex h-12 w-full items-center justify-start rounded-none p-4 text-lg hover:text-white',
+                                                            colorId == null
+                                                                ? 'font-semibold text-morpheus-blue-dark bg-gray-50'
+                                                                : 'text-neutral-400'
+                                                        )}
+                                                    >
+                                                        <span>{t('common.all') || 'All'}</span>
+                                                    </button>
+                                                    <Separator />
+                                                </div>
+
                                                 {colors.map((color) => (
                                                     <div key={color.xcouleurid}>
                                                         <button
@@ -1055,7 +1105,7 @@ function ShopContent() {
                                                                 'hover:bg-morpheus-blue-lighter flex h-12 w-full items-center justify-start gap-3 rounded-none p-4 text-lg hover:text-white',
                                                                 colorId ===
                                                                     color.xcouleurid
-                                                                    ? 'text-morpheus-blue-dark bg-gray-50'
+                                                                    ? 'font-semibold text-morpheus-blue-dark bg-gray-50'
                                                                     : 'text-neutral-400'
                                                             )}
                                                         >
@@ -1100,6 +1150,23 @@ function ShopContent() {
                                         <Separator />
                                         {expandedSections.sizes && (
                                             <div className="mt-2 space-y-0 px-2">
+                                                <div>
+                                                    <button
+                                                        onClick={() =>
+                                                            handleFilterChange('sizeId')(null)
+                                                        }
+                                                        className={cn(
+                                                            'hover:bg-morpheus-blue-lighter flex h-12 w-full items-center justify-start rounded-none p-4 text-lg hover:text-white',
+                                                            sizeId == null
+                                                                ? 'font-semibold text-morpheus-blue-dark bg-gray-50'
+                                                                : 'text-neutral-400'
+                                                        )}
+                                                    >
+                                                        <span>{t('common.all') || 'All'}</span>
+                                                    </button>
+                                                    <Separator />
+                                                </div>
+
                                                 {sizes.map((size) => (
                                                     <div key={size.xtailleid}>
                                                         <button
@@ -1114,7 +1181,7 @@ function ShopContent() {
                                                                 'hover:bg-morpheus-blue-lighter flex h-12 w-full items-center justify-start rounded-none p-4 text-lg hover:text-white',
                                                                 sizeId ===
                                                                     size.xtailleid
-                                                                    ? 'text-morpheus-blue-dark bg-gray-50'
+                                                                    ? 'font-semibold text-morpheus-blue-dark bg-gray-50'
                                                                     : 'text-neutral-400'
                                                             )}
                                                         >
