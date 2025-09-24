@@ -429,7 +429,7 @@ export default function OrderPage() {
                             htmlFor="firstName"
                             className="font-supreme font-semibold text-[#053340]"
                         >
-                            {t('profile.firstName') || 'First Name'}
+                            {t('profile.firstName') || 'First Name'}<span className="text-red-500"> *</span>
                         </Label>
                         <Input
                             id="firstName"
@@ -449,7 +449,7 @@ export default function OrderPage() {
                             htmlFor="lastName"
                             className="font-supreme font-semibold text-[#053340]"
                         >
-                            {t('profile.lastName') || 'Last Name'}
+                            {t('profile.lastName') || 'Last Name'}<span className="text-red-500"> *</span>
                         </Label>
                         <Input
                             id="lastName"
@@ -470,7 +470,7 @@ export default function OrderPage() {
                         htmlFor="phone"
                         className="font-supreme font-semibold text-[#053340]"
                     >
-                        {t('visitorForm.phone')}
+                        {t('visitorForm.phone')}<span className="text-red-500"> *</span>
                     </Label>
                     <Input
                         id="phone"
@@ -487,7 +487,7 @@ export default function OrderPage() {
                         htmlFor="address"
                         className="font-supreme font-semibold text-[#053340]"
                     >
-                        {t('visitorForm.address')}
+                        {t('visitorForm.address')}<span className="text-red-500"> *</span>
                     </Label>
                     <Input
                         id="address"
@@ -505,7 +505,7 @@ export default function OrderPage() {
                             htmlFor="city"
                             className="font-supreme font-semibold text-[#053340]"
                         >
-                            {t('order.city')}
+                            {t('order.city')}<span className="text-red-500"> *</span>
                         </Label>
                         <Input
                             id="city"
@@ -522,7 +522,7 @@ export default function OrderPage() {
                             htmlFor="postalCode"
                             className="font-supreme font-semibold text-[#053340]"
                         >
-                            {t('order.postalCode')}
+                            {t('order.postalCode')}<span className="text-red-500"> *</span>
                         </Label>
                         <Input
                             id="postalCode"
@@ -542,7 +542,7 @@ export default function OrderPage() {
                             htmlFor="country"
                             className="font-supreme font-semibold text-[#053340]"
                         >
-                            {t('order.country')}
+                            {t('order.country')}<span className="text-red-500"> *</span>
                         </Label>
                         <Input
                             id="country"
@@ -593,7 +593,7 @@ export default function OrderPage() {
                             htmlFor="cardholderFirstName"
                             className="font-supreme font-semibold text-[#053340]"
                         >
-                            {t('profile.firstName') || 'First Name'}
+                            {t('profile.firstName') || 'First Name'}<span className="text-red-500"> *</span>
                         </Label>
                         <Input
                             id="cardholderFirstName"
@@ -616,7 +616,7 @@ export default function OrderPage() {
                             htmlFor="cardholderLastName"
                             className="font-supreme font-semibold text-[#053340]"
                         >
-                            {t('profile.lastName') || 'Last Name'}
+                            {t('profile.lastName') || 'Last Name'}<span className="text-red-500"> *</span>
                         </Label>
                         <Input
                             id="cardholderLastName"
@@ -640,7 +640,7 @@ export default function OrderPage() {
                         htmlFor="cardNumber"
                         className="font-supreme font-semibold text-[#053340]"
                     >
-                        {t('order.cardNumber')}
+                        {t('order.cardNumber')}<span className="text-red-500"> *</span>
                     </Label>
                     <Input
                         id="cardNumber"
@@ -659,7 +659,7 @@ export default function OrderPage() {
                             htmlFor="expiryDate"
                             className="font-supreme font-semibold text-[#053340]"
                         >
-                            {t('order.expiryDate')}
+                            {t('order.expiryDate')}<span className="text-red-500"> *</span>
                         </Label>
                         <Input
                             id="expiryDate"
@@ -680,7 +680,7 @@ export default function OrderPage() {
                             htmlFor="cvv"
                             className="font-supreme font-semibold text-[#053340]"
                         >
-                            {t('order.cvv')}
+                            {t('order.cvv')}<span className="text-red-500"> *</span>
                         </Label>
                         <Input
                             id="cvv"

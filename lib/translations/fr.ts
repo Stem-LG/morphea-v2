@@ -134,6 +134,7 @@ export const frTranslations = {
     "signOut": "Déconnexion",
     "signInSubtitle": "Connectez-vous à votre compte pour continuer",
     "signUpSubtitle": "Créez votre compte pour commencer votre voyage avec nous",
+    "allFieldsRequiredNote": "Tous les champs sont obligatoires.",
     "firstName": "Prénom",
     "firstNamePlaceholder": "Entrez votre prénom",
     "firstNameRequired": "Le prénom est requis",

@@ -215,6 +215,7 @@ export function SignUpForm({
             {/* Form Card */}
             <div className="rounded-lg border border-slate-200 bg-white/80 p-8 shadow-xl backdrop-blur-sm">
                 <form onSubmit={handleSignUp} className="space-y-6">
+                    <div className="text-xs text-slate-500">{t('auth.allFieldsRequiredNote')}</div>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label

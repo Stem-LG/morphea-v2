@@ -133,6 +133,7 @@ export const enTranslations = {
     "morpheusMall": "Morphea",
     "signInSubtitle": "Sign in to your account to continue",
     "signUpSubtitle": "Create your account to start your journey with us",
+    "allFieldsRequiredNote": "All fields are required.",
     "firstName": "First Name",
     "firstNamePlaceholder": "Enter your first name",
     "firstNameRequired": "First name is required",

@@ -456,6 +456,7 @@ export function EnhancedSignupWithVisitor({
                                 </div>
                             ) : (
                                 <div className="space-y-6">
+                                        <div className="text-xs text-red-500">*{t('auth.allFieldsRequiredNote')}</div>
                                     <div className="grid grid-cols-2 gap-4">
                                         <div className="space-y-2">
                                             <Label
