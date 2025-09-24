@@ -616,49 +616,51 @@ function NavBarSheet({
                                     )
                                 })}
 
-                                {/* Footer Items - Combined with same styling */}
-                                {navbarFooterItems.map((item) => {
-                                    const hasHref = !!item.href
-                                    const isActive = hasHref && isActivePath(item.href!)
+                                {/* Footer Items - Mobile only */}
+                                <div className="md:hidden">
+                                    {navbarFooterItems.map((item) => {
+                                        const hasHref = !!item.href
+                                        const isActive = hasHref && isActivePath(item.href!)
 
-                                    return (
-                                        <Fragment key={item.name}>
-                                            <Button
-                                                variant="ghost"
-                                                className={`font-supreme hover:bg-morpheus-blue-lighter h-14 justify-start rounded-none text-lg text-neutral-400 hover:text-white ${
-                                                    isActive ? 'font-bold text-neutral-600' : ''
-                                                }`}
-                                                onClick={
-                                                    item.onclick ||
-                                                    (hasHref
-                                                        ? () =>
-                                                              setIsMenuOpen(
-                                                                  false
-                                                              )
-                                                        : undefined)
-                                                }
-                                                asChild={hasHref}
-                                            >
-                                                {hasHref ? (
-                                                    <Link href={item.href!}>
-                                                        <span className={isActive ? 'font-bold' : ''}>
-                                                            {item.name[0].toUpperCase() +
-                                                                item.name
-                                                                    .toLowerCase()
-                                                                    .slice(1)}
-                                                        </span>
-                                                    </Link>
-                                                ) : (
-                                                    item.name[0].toUpperCase() +
-                                                    item.name
-                                                        .toLowerCase()
-                                                        .slice(1)
-                                                )}
-                                            </Button>
-                                            <Separator />
-                                        </Fragment>
-                                    )
-                                })}
+                                        return (
+                                            <Fragment key={item.name}>
+                                                <Button
+                                                    variant="ghost"
+                                                    className={`font-supreme hover:bg-morpheus-blue-lighter h-14 justify-start rounded-none text-lg text-neutral-400 hover:text-white ${
+                                                        isActive ? 'font-bold text-neutral-600' : ''
+                                                    }`}
+                                                    onClick={
+                                                        item.onclick ||
+                                                        (hasHref
+                                                            ? () =>
+                                                                  setIsMenuOpen(
+                                                                      false
+                                                                  )
+                                                            : undefined)
+                                                    }
+                                                    asChild={hasHref}
+                                                >
+                                                    {hasHref ? (
+                                                        <Link href={item.href!}>
+                                                            <span className={isActive ? 'font-bold' : ''}>
+                                                                {item.name[0].toUpperCase() +
+                                                                    item.name
+                                                                        .toLowerCase()
+                                                                        .slice(1)}
+                                                            </span>
+                                                        </Link>
+                                                    ) : (
+                                                        item.name[0].toUpperCase() +
+                                                        item.name
+                                                            .toLowerCase()
+                                                            .slice(1)
+                                                    )}
+                                                </Button>
+                                                <Separator />
+                                            </Fragment>
+                                        )
+                                    })}
+                                </div>
                             </div>
                         </ScrollArea>
                     </div>
