@@ -18,9 +18,11 @@ export default function OriginePage() {
     const [visibleCards, setVisibleCards] = useState<number[]>([])
     const [visibleMissionCards, setVisibleMissionCards] = useState<number[]>([])
     const [visibleValueCards, setVisibleValueCards] = useState<number[]>([])
+    const [visibleFounderItems, setVisibleFounderItems] = useState<number[]>([])
     const cardRefs = useRef<(HTMLDivElement | null)[]>([])
     const missionCardRefs = useRef<(HTMLDivElement | null)[]>([])
     const valueCardRefs = useRef<(HTMLDivElement | null)[]>([])
+    const founderRefs = useRef<(HTMLDivElement | null)[]>([])
 
     useEffect(() => {
         supabase.auth.onAuthStateChange(async (event) => {
@@ -68,6 +70,13 @@ export default function OriginePage() {
                                 }
                                 return prev
                             })
+                        } else if (cardType === 'founder') {
+                            setVisibleFounderItems((prev) => {
+                                if (!prev.includes(cardIndex)) {
+                                    return [...prev, cardIndex].sort((a, b) => a - b)
+                                }
+                                return prev
+                            })
                         }
                     }
                 })
@@ -86,6 +95,9 @@ export default function OriginePage() {
             if (ref) observer.observe(ref)
         })
         valueCardRefs.current.forEach((ref) => {
+            if (ref) observer.observe(ref)
+        })
+        founderRefs.current.forEach((ref) => {
             if (ref) observer.observe(ref)
         })
 
@@ -119,7 +131,7 @@ export default function OriginePage() {
                 <div className="mx-auto max-w-7xl">
                     {/* Identity & DNA Section */}
                     <div className="relative overflow-hidden bg-gradient-to-br from-gray-50 via-white to-gray-50 px-8 py-32">
-                        
+
 
                         <div className="relative z-10 mx-auto max-w-7xl">
                             {/* Modern Layout with Asymmetric Design */}
@@ -275,6 +287,80 @@ export default function OriginePage() {
                         </div>
                     </div>
 
+
+                        {/* Founder Section */}
+                        <div className="relative bg-white px-8 py-24">
+                            <div className="mx-auto max-w-7xl">
+                                <div className="grid items-center gap-16 lg:grid-cols-12">
+                                    {/* Text Side */}
+                                    <div className="lg:col-span-7">
+                                        <div
+                                            ref={(el) => {
+                                                founderRefs.current[0] = el
+                                            }}
+                                            data-card-index="0"
+                                            data-card-type="founder"
+                                            className={cn(
+                                                'transition-all duration-1000',
+                                                visibleFounderItems.includes(0)
+                                                    ? 'translate-x-0 opacity-100'
+                                                    : '-translate-x-12 opacity-0'
+                                            )}
+                                            style={{
+                                                transitionTimingFunction:
+                                                    'cubic-bezier(0.22, 1, 0.36, 1)',
+                                            }}
+                                        >
+                                            <div className="relative mb-8">
+                                                <div className="from-morpheus-gold-dark to-morpheus-gold-light absolute top-0 -left-4 h-24 w-1 bg-gradient-to-b"></div>
+                                                <h3 className="font-recia text-4xl font-bold text-gray-900 md:text-5xl">
+                                                    FONDATRICE DE MORPHEUS
+                                                </h3>
+                                            </div>
+
+                                            <div className="space-y-6">
+                                                <p className="font-supreme text-lg leading-relaxed text-gray-700">
+                                                    Chaque personne porte en elle un univers unique, façonné par ses valeurs, ses croyances, sa culture et sa vision du monde. C'est justement cette diversité qui stimule la créativité et donne vie à des projets hors du commun.
+                                                </p>
+                                                <p className="font-supreme text-lg leading-relaxed text-gray-700">
+                                                    L'histoire de Morpheus a commencé avec un constat simple : je ne trouvais pas, ailleurs, ce que je cherchais vraiment...
+                                                </p>
+                                                <p className="font-supreme mt-6 text-base tracking-wide text-morpheus-blue-dark">
+                                                    — Myriam Koubaa
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Visual Side */}
+                                    <div className="lg:col-span-5">
+                                        <div
+                                            ref={(el) => {
+                                                founderRefs.current[1] = el
+                                            }}
+                                            data-card-index="1"
+                                            data-card-type="founder"
+                                            className={cn(
+                                                'transition-all duration-1000',
+                                                visibleFounderItems.includes(1)
+                                                    ? 'translate-x-0 opacity-100'
+                                                    : 'translate-x-12 opacity-0'
+                                            )}
+                                            style={{
+                                                transitionTimingFunction:
+                                                    'cubic-bezier(0.22, 1, 0.36, 1)',
+                                            }}
+                                        >
+                                            <div className="relative aspect-[5/5] overflow-hidden rounded-3xl border border-gray-200 bg-gradient-to-br from-gray-50 to-white shadow-lg">
+                                                {/* Image placeholder */}
+                                                <div className="absolute inset-4 rounded-2xl border-2 border-dashed border-gray-300"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                     {/* Mission Section */}
                     <div className="px-8 py-24">
                         <div className="mx-auto max-w-6xl">
@@ -379,6 +465,8 @@ export default function OriginePage() {
                             )}
                         </div>
                     </div>
+
+
 
                     {/* Values Section */}
                     <div className="px-8 py-24">
