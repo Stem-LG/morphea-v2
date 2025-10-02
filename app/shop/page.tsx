@@ -42,13 +42,27 @@ const ThreeColumnIcon = ({
         xmlns="http://www.w3.org/2000/svg"
         className={className}
     >
+        <defs>
+            <linearGradient
+                id="three-column-gradient"
+                x1="0"
+                y1="0"
+                x2="37"
+                y2="31"
+                gradientUnits="userSpaceOnUse"
+            >
+                <stop offset="0%" stopColor="#B27C64" />
+                <stop offset="50%" stopColor="#E8D07A" />
+                <stop offset="100%" stopColor="#B27C64" />
+            </linearGradient>
+        </defs>
         <rect
             x="24.829"
             y="10.4019"
             width="12.1711"
             height="10.1982"
             rx="2"
-            fill={isActive ? '#E8D07A' : '#D9D9D9'}
+            fill={isActive ? 'url(#three-column-gradient)' : '#D9D9D9'}
         />
         <rect
             x="24.829"
@@ -56,7 +70,7 @@ const ThreeColumnIcon = ({
             width="12.1711"
             height="10.1982"
             rx="2"
-            fill={isActive ? '#E8D07A' : '#D9D9D9'}
+            fill={isActive ? 'url(#three-column-gradient)' : '#D9D9D9'}
         />
         <rect
             x="12.4144"
@@ -64,27 +78,27 @@ const ThreeColumnIcon = ({
             width="12.1711"
             height="10.1982"
             rx="2"
-            fill={isActive ? '#E8D07A' : '#D9D9D9'}
+            fill={isActive ? 'url(#three-column-gradient)' : '#D9D9D9'}
         />
         <rect
             width="12.1711"
             height="10.1982"
             rx="2"
-            fill={isActive ? '#E8D07A' : '#D9D9D9'}
+            fill={isActive ? 'url(#three-column-gradient)' : '#D9D9D9'}
         />
         <rect
             y="10.4014"
             width="12.1711"
             height="10.1982"
             rx="2"
-            fill={isActive ? '#E8D07A' : '#D9D9D9'}
+            fill={isActive ? 'url(#three-column-gradient)' : '#D9D9D9'}
         />
         <rect
             y="20.8027"
             width="12.1711"
             height="10.1982"
             rx="2"
-            fill={isActive ? '#E8D07A' : '#D9D9D9'}
+            fill={isActive ? 'url(#three-column-gradient)' : '#D9D9D9'}
         />
         <rect
             x="24.829"
@@ -92,7 +106,7 @@ const ThreeColumnIcon = ({
             width="12.1711"
             height="10.1982"
             rx="2"
-            fill={isActive ? '#E8D07A' : '#D9D9D9'}
+            fill={isActive ? 'url(#three-column-gradient)' : '#D9D9D9'}
         />
         <rect
             x="12.4144"
@@ -100,21 +114,21 @@ const ThreeColumnIcon = ({
             width="12.1711"
             height="10.1982"
             rx="2"
-            fill={isActive ? '#E8D07A' : '#D9D9D9'}
+            fill={isActive ? 'url(#three-column-gradient)' : '#D9D9D9'}
         />
         <rect
             x="12.4144"
             width="12.1711"
             height="10.1982"
             rx="2"
-            fill={isActive ? '#E8D07A' : '#D9D9D9'}
+            fill={isActive ? 'url(#three-column-gradient)' : '#D9D9D9'}
         />
         <rect
             x="24.829"
             width="12.1711"
             height="10.1982"
             rx="2"
-            fill={isActive ? '#E8D07A' : '#D9D9D9'}
+            fill={isActive ? 'url(#three-column-gradient)' : '#D9D9D9'}
         />
     </svg>
 )
@@ -134,33 +148,47 @@ const FourColumnIcon = ({
         xmlns="http://www.w3.org/2000/svg"
         className={className}
     >
+        <defs>
+            <linearGradient
+                id="four-column-gradient"
+                x1="0"
+                y1="0"
+                x2="50"
+                y2="31"
+                gradientUnits="userSpaceOnUse"
+            >
+                <stop offset="0%" stopColor="#B27C64" />
+                <stop offset="50%" stopColor="#E8D07A" />
+                <stop offset="100%" stopColor="#B27C64" />
+            </linearGradient>
+        </defs>
         <rect
             x="12.5172"
             y="10.4019"
             width="12.2718"
             height="10.1974"
             rx="2"
-            fill={isActive ? '#E8D07A' : '#D9D9D9'}
+            fill={isActive ? 'url(#four-column-gradient)' : '#D9D9D9'}
         />
         <rect
             width="12.2718"
             height="10.1974"
             rx="2"
-            fill={isActive ? '#E8D07A' : '#D9D9D9'}
+            fill={isActive ? 'url(#four-column-gradient)' : '#D9D9D9'}
         />
         <rect
             y="10.4014"
             width="12.2718"
             height="10.1974"
             rx="2"
-            fill={isActive ? '#E8D07A' : '#D9D9D9'}
+            fill={isActive ? 'url(#four-column-gradient)' : '#D9D9D9'}
         />
         <rect
             y="20.8027"
             width="12.2718"
             height="10.1974"
             rx="2"
-            fill={isActive ? '#E8D07A' : '#D9D9D9'}
+            fill={isActive ? 'url(#four-column-gradient)' : '#D9D9D9'}
         />
         <rect
             x="12.5172"
@@ -168,14 +196,14 @@ const FourColumnIcon = ({
             width="12.2718"
             height="10.1974"
             rx="2"
-            fill={isActive ? '#E8D07A' : '#D9D9D9'}
+            fill={isActive ? 'url(#four-column-gradient)' : '#D9D9D9'}
         />
         <rect
             x="12.5172"
             width="12.2718"
             height="10.1974"
             rx="2"
-            fill={isActive ? '#E8D07A' : '#D9D9D9'}
+            fill={isActive ? 'url(#four-column-gradient)' : '#D9D9D9'}
         />
         <rect
             x="25.0344"
@@ -183,7 +211,7 @@ const FourColumnIcon = ({
             width="12.2718"
             height="10.1974"
             rx="2"
-            fill={isActive ? '#E8D07A' : '#D9D9D9'}
+            fill={isActive ? 'url(#four-column-gradient)' : '#D9D9D9'}
         />
         <rect
             x="25.0344"
@@ -191,7 +219,7 @@ const FourColumnIcon = ({
             width="12.2718"
             height="10.1974"
             rx="2"
-            fill={isActive ? '#E8D07A' : '#D9D9D9'}
+            fill={isActive ? 'url(#four-column-gradient)' : '#D9D9D9'}
         />
         <rect
             x="25.0344"
@@ -199,14 +227,14 @@ const FourColumnIcon = ({
             width="12.2718"
             height="10.1974"
             rx="2"
-            fill={isActive ? '#E8D07A' : '#D9D9D9'}
+            fill={isActive ? 'url(#four-column-gradient)' : '#D9D9D9'}
         />
         <rect
             x="25.0344"
             width="12.2718"
             height="10.1974"
             rx="2"
-            fill={isActive ? '#E8D07A' : '#D9D9D9'}
+            fill={isActive ? 'url(#four-column-gradient)' : '#D9D9D9'}
         />
         <rect
             x="37.5518"
@@ -214,7 +242,7 @@ const FourColumnIcon = ({
             width="12.2718"
             height="10.1974"
             rx="2"
-            fill={isActive ? '#E8D07A' : '#D9D9D9'}
+            fill={isActive ? 'url(#four-column-gradient)' : '#D9D9D9'}
         />
         <rect
             x="37.5518"
@@ -222,7 +250,7 @@ const FourColumnIcon = ({
             width="12.2718"
             height="10.1974"
             rx="2"
-            fill={isActive ? '#E8D07A' : '#D9D9D9'}
+            fill={isActive ? 'url(#four-column-gradient)' : '#D9D9D9'}
         />
         <rect
             x="37.5518"
@@ -230,14 +258,14 @@ const FourColumnIcon = ({
             width="12.2718"
             height="10.1974"
             rx="2"
-            fill={isActive ? '#E8D07A' : '#D9D9D9'}
+            fill={isActive ? 'url(#four-column-gradient)' : '#D9D9D9'}
         />
         <rect
             x="37.5518"
             width="12.2718"
             height="10.1974"
             rx="2"
-            fill={isActive ? '#E8D07A' : '#D9D9D9'}
+            fill={isActive ? 'url(#four-column-gradient)' : '#D9D9D9'}
         />
     </svg>
 )

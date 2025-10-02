@@ -22,21 +22,33 @@ const WishlistIcon = ({
         xmlns="http://www.w3.org/2000/svg"
         className={className}
     >
+        <defs>
+            <linearGradient
+                id="wishlist-gradient"
+                x1="0"
+                y1="0"
+                x2="24"
+                y2="24"
+                gradientUnits="userSpaceOnUse"
+            >
+                <stop offset="0%" stopColor="#B27C64" />
+                <stop offset="50%" stopColor="#E8D07A" />
+                <stop offset="100%" stopColor="#B27C64" />
+            </linearGradient>
+            <clipPath id="clip0_96_453">
+                <rect width="24" height="24" fill="white" />
+            </clipPath>
+        </defs>
         <g clipPath="url(#clip0_96_453)">
             <path
                 d="M1.18037 10.564C0.829719 10.2394 1.02019 9.65262 1.49448 9.59633L8.21491 8.79842C8.40821 8.77548 8.57611 8.65397 8.65764 8.47704L11.4922 2.32564C11.6923 1.89151 12.3088 1.89143 12.5089 2.32555L15.3435 8.47691C15.425 8.65384 15.5918 8.77568 15.7851 8.79862L22.5059 9.59633C22.9802 9.65262 23.1701 10.2396 22.8195 10.5642L17.8514 15.1639C17.7085 15.2962 17.6449 15.4931 17.6828 15.6842L19.0013 22.3285C19.0944 22.7975 18.5959 23.1608 18.1791 22.9273L12.2739 19.6176C12.104 19.5225 11.8977 19.5229 11.7278 19.6181L5.82196 22.9264C5.4052 23.1599 4.90573 22.7974 4.99881 22.3285L6.31752 15.6846C6.35546 15.4935 6.29199 15.2962 6.14908 15.1639L1.18037 10.564Z"
-                stroke={filled ? '#E8D07A' : '#DDDDDD'}
-                fill={filled ? '#E8D07A' : 'none'}
+                stroke={filled ? 'url(#wishlist-gradient)' : '#DDDDDD'}
+                fill={filled ? 'url(#wishlist-gradient)' : 'none'}
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
             />
         </g>
-        <defs>
-            <clipPath id="clip0_96_453">
-                <rect width="24" height="24" fill="white" />
-            </clipPath>
-        </defs>
     </svg>
 )
 

@@ -1723,7 +1723,6 @@ export const frTranslations = {
     "nameAsc": "Nom : A à Z",
     "nameDesc": "Nom : Z à A",
     "newest": "Plus récent",
-    "results": "Resultats",
     "minCharacters": "Tapez au moins 2 caractères pour rechercher",
     "noProductsFoundFor": "Aucun produit trouvé pour",
     "filter": "Filtrer",
@@ -1747,7 +1746,8 @@ export const frTranslations = {
     "priceMinError": "Le prix min doit être inférieur au prix max",
     "priceMaxError": "Le prix max doit être supérieur au prix min",
     "clearAll": "Effacer tout",
-    "apply": "Appliquer"
+    "apply": "Appliquer",
+    "results": "Resultats"
   },
   "virtualTour": {
     "loading": "Chargement...",

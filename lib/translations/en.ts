@@ -1710,7 +1710,8 @@ export const enTranslations = {
     "priceMinError": "Min price must be less than max price",
     "priceMaxError": "Max price must be greater than min price",
     "clearAll": "Clear All",
-    "apply": "Apply"
+    "apply": "Apply",
+    "results": "results"
   },
   "virtualTour": {
     "loading": "Loading...",
