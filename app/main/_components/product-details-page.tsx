@@ -14,6 +14,7 @@ import { useIsInWishlist } from '@/app/_hooks/wishlist/useIsInWishlist'
 import * as THREE from 'three'
 import { StarIcon } from 'lucide-react'
 import { CartIcon } from '@/app/_icons/cart_icon'
+import { CurrencySelector } from '@/app/_components/currency-selector'
 
 // Loading component for 3D model
 function LoadingSpinner() {
@@ -999,7 +1000,12 @@ export function ProductDetailsPage({
                         </div>
 
                         {/* Right Side - Product Details */}
-                        <div className="rounded-lg border border-gray-200 bg-white p-8 shadow-sm">
+                        <div className="relative rounded-lg border border-gray-200 bg-white p-8 shadow-sm">
+                            {/* Currency Selector */}
+                            <div className="absolute top-8 right-8">
+                                <CurrencySelector />
+                            </div>
+
                             {/* Product Title */}
                             <h1 className="font-recia mb-2 text-3xl font-bold text-[#053340]">
                                 {productData.yprodintitule}

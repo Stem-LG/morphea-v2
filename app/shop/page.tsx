@@ -25,6 +25,7 @@ import {
 } from '@/components/ui/sheet'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
+import { CurrencySelector } from '@/app/_components/currency-selector'
 
 // Custom SVG Components
 const ThreeColumnIcon = ({
@@ -654,28 +655,31 @@ function ShopContent() {
                             +{totalCount} {t('shop.results') || 'resultats'}
                         </p>
                     </div>
-                    {/* Grid toggle buttons - Hidden on mobile and small screens */}
-                    <div className="hidden items-center gap-1 lg:flex">
-                        <button
-                            onClick={() => setQueryState({ columns: 3 })}
-                            className="rounded-lg p-2 transition-opacity hover:opacity-70"
-                            title={t('shop.threeColumns')}
-                        >
-                            <ThreeColumnIcon
-                                className="h-6 w-8"
-                                isActive={columns === 3}
-                            />
-                        </button>
-                        <button
-                            onClick={() => setQueryState({ columns: 4 })}
-                            className="rounded-lg p-2 transition-opacity hover:opacity-70"
-                            title={t('shop.fourColumns')}
-                        >
-                            <FourColumnIcon
-                                className="h-6 w-10"
-                                isActive={columns === 4}
-                            />
-                        </button>
+                    {/* Grid toggle buttons and Currency Selector - Hidden on mobile and small screens */}
+                    <div className="hidden items-center gap-3 lg:flex">
+                        <CurrencySelector />
+                        <div className="flex items-center gap-1">
+                            <button
+                                onClick={() => setQueryState({ columns: 3 })}
+                                className="rounded-lg p-2 transition-opacity hover:opacity-70"
+                                title={t('shop.threeColumns')}
+                            >
+                                <ThreeColumnIcon
+                                    className="h-6 w-8"
+                                    isActive={columns === 3}
+                                />
+                            </button>
+                            <button
+                                onClick={() => setQueryState({ columns: 4 })}
+                                className="rounded-lg p-2 transition-opacity hover:opacity-70"
+                                title={t('shop.fourColumns')}
+                            >
+                                <FourColumnIcon
+                                    className="h-6 w-10"
+                                    isActive={columns === 4}
+                                />
+                            </button>
+                        </div>
                     </div>
                 </div>
 
