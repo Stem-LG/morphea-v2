@@ -41,6 +41,56 @@ interface EnhancedSignupWithVisitorProps
     showVisitorForm?: boolean
 }
 
+
+// Custom Alert Circle Icon with Gold Gradient
+const AlertCircleGradient = ({ className }: { className?: string }) => (
+    <svg
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className={className}
+    >
+        <defs>
+            <linearGradient
+                id="alert-circle-gradient"
+                x1="0"
+                y1="0"
+                x2="24"
+                y2="24"
+                gradientUnits="userSpaceOnUse"
+            >
+                <stop offset="0%" stopColor="#B27C64" />
+                <stop offset="50%" stopColor="#E8D07A" />
+                <stop offset="100%" stopColor="#B27C64" />
+            </linearGradient>
+        </defs>
+        <circle
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="url(#alert-circle-gradient)"
+            strokeWidth="2"
+        />
+        <line
+            x1="12"
+            y1="8"
+            x2="12"
+            y2="12"
+            stroke="url(#alert-circle-gradient)"
+            strokeWidth="2"
+            strokeLinecap="round"
+        />
+        <circle
+            cx="12"
+            cy="16"
+            r="1"
+            fill="url(#alert-circle-gradient)"
+        />
+    </svg>
+)
+
 export function EnhancedSignupWithVisitor({
     className,
     showVisitorForm = false,
@@ -602,7 +652,7 @@ export function EnhancedSignupWithVisitor({
                                                         {isPasswordValid ? (
                                                             <CheckCircle className="h-5 w-5 text-green-500" />
                                                         ) : (
-                                                            <AlertCircle className="h-5 w-5 text-amber-500" />
+                                                            <AlertCircleGradient className="h-5 w-5 text-amber-500" />
                                                         )}
 
                                                         {/* Enhanced tooltip */}
@@ -804,9 +854,9 @@ export function EnhancedSignupWithVisitor({
                                         {isLoading ? (
                                             <div className="flex items-center gap-2">
                                                 <Loader2 className="h-4 w-4 animate-spin" />
-                                                <span>
+                                                {/* <span>
                                                     {t('auth.creatingAccount')}
-                                                </span>
+                                                </span> */}
                                             </div>
                                         ) : (
                                             <div className="flex items-center justify-center gap-2">

@@ -14,6 +14,55 @@ import { useRouter } from 'next/navigation'
 import { useState, useEffect, useMemo } from 'react'
 import { CheckCircle, XCircle, AlertCircle } from 'lucide-react'
 
+// Custom Alert Circle Icon with Gold Gradient
+const AlertCircleGradient = ({ className }: { className?: string }) => (
+    <svg
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className={className}
+    >
+        <defs>
+            <linearGradient
+                id="alert-circle-gradient"
+                x1="0"
+                y1="0"
+                x2="24"
+                y2="24"
+                gradientUnits="userSpaceOnUse"
+            >
+                <stop offset="0%" stopColor="#B27C64" />
+                <stop offset="50%" stopColor="#E8D07A" />
+                <stop offset="100%" stopColor="#B27C64" />
+            </linearGradient>
+        </defs>
+        <circle
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="url(#alert-circle-gradient)"
+            strokeWidth="2"
+        />
+        <line
+            x1="12"
+            y1="8"
+            x2="12"
+            y2="12"
+            stroke="url(#alert-circle-gradient)"
+            strokeWidth="2"
+            strokeLinecap="round"
+        />
+        <circle
+            cx="12"
+            cy="16"
+            r="1"
+            fill="url(#alert-circle-gradient)"
+        />
+    </svg>
+)
+
 type PasswordRequirement = {
     label: string
     met: boolean
@@ -306,7 +355,7 @@ export function SignUpForm({
                                         </div>
                                     ) : (
                                         <div className="group relative">
-                                            <AlertCircle className="h-5 w-5 text-amber-500" />
+                                            <AlertCircleGradient className="h-5 w-5" />
                                             <div className="pointer-events-none absolute right-0 bottom-full z-10 mb-2 max-w-xs rounded bg-slate-900 px-3 py-2 text-sm whitespace-nowrap text-white opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100">
                                                 <div className="mb-1 text-xs font-medium">
                                                     {t(
@@ -461,7 +510,7 @@ export function SignUpForm({
                                     alt="Loading"
                                     className="h-5 w-5"
                                 />
-                                {t('auth.creatingAccount')}
+                                {/* {t('auth.creatingAccount')} */}
                             </div>
                         ) : (
                             t('auth.createAccount')
