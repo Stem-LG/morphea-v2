@@ -293,7 +293,7 @@ export default function OriginePage() {
                             <div className="mx-auto max-w-7xl">
                                 <div className="grid items-center gap-16 lg:grid-cols-12">
                                     {/* Text Side */}
-                                    <div className="lg:col-span-7">
+                                    <div className="lg:col-span-6">
                                         <div
                                             ref={(el) => {
                                                 founderRefs.current[0] = el
@@ -314,26 +314,35 @@ export default function OriginePage() {
                                             <div className="relative mb-8">
                                                 <div className="from-morpheus-gold-dark to-morpheus-gold-light absolute top-0 -left-4 h-24 w-1 bg-gradient-to-b"></div>
                                                 <h3 className="font-recia text-4xl font-bold text-gray-900 md:text-5xl">
-                                                    FONDATRICE DE MORPHEUS
+                                                    {t('morpheaOrigin.founder.title').toUpperCase()}
                                                 </h3>
                                             </div>
 
                                             <div className="space-y-6">
                                                 <p className="font-supreme text-lg leading-relaxed text-gray-700">
-                                                    Chaque personne porte en elle un univers unique, façonné par ses valeurs, ses croyances, sa culture et sa vision du monde. C'est justement cette diversité qui stimule la créativité et donne vie à des projets hors du commun.
+                                                    {t('morpheaOrigin.founder.bio')}
                                                 </p>
                                                 <p className="font-supreme text-lg leading-relaxed text-gray-700">
-                                                    L'histoire de Morpheus a commencé avec un constat simple : je ne trouvais pas, ailleurs, ce que je cherchais vraiment...
+                                                    {t('morpheaOrigin.founder.bio2')}
+                                                </p>
+                                                <p className="font-supreme text-lg leading-relaxed text-gray-700">
+                                                    {t('morpheaOrigin.founder.journey')}
+                                                </p>
+                                                <p className="font-supreme text-lg leading-relaxed text-gray-700">
+                                                    {t('morpheaOrigin.founder.vision')}
+                                                </p>
+                                                <p className="font-supreme text-lg leading-relaxed text-gray-700">
+                                                    {t('morpheaOrigin.founder.conclusion')}
                                                 </p>
                                                 <p className="font-supreme mt-6 text-base tracking-wide text-morpheus-blue-dark">
-                                                    — Myriam Koubaa
+                                                    — {t('morpheaOrigin.founder.name')}, {t('morpheaOrigin.founder.role')}
                                                 </p>
                                             </div>
                                         </div>
                                     </div>
 
                                     {/* Visual Side */}
-                                    <div className="lg:col-span-5">
+                                    <div className="lg:col-span-6">
                                         <div
                                             ref={(el) => {
                                                 founderRefs.current[1] = el
@@ -351,14 +360,14 @@ export default function OriginePage() {
                                                     'cubic-bezier(0.22, 1, 0.36, 1)',
                                             }}
                                         >
-                                            <div className="relative aspect-[5/5] overflow-hidden rounded-3xl border border-gray-200 bg-gradient-to-br from-gray-50 to-white shadow-lg">
+                                            <div className="relative aspect-[5/5] top-7 overflow-hidden rounded-3xl border border-gray-200 bg-gradient-to-br from-gray-50 to-white shadow-lg">
                                                 {homeSettings?.morpheaOriginFounder?.imageUrl ? (
                                                     <Image
                                                         className="absolute inset-0 h-full w-full object-cover"
                                                         src={homeSettings.morpheaOriginFounder.imageUrl}
-                                                        alt="Founder image"
-                                                        width={1000}
-                                                        height={1000}
+                                                        alt={t('morpheaOrigin.founder.name')}
+                                                        width={1200}
+                                                        height={1200}
                                                     />
                                                 ) : (
                                                     <div className="absolute inset-4 rounded-2xl border-2 border-dashed border-gray-300"></div>
@@ -487,7 +496,7 @@ export default function OriginePage() {
                                 <div className="from-morpheus-gold-dark to-morpheus-gold-light mx-auto h-1 w-24 bg-gradient-to-r"></div>
                             </div>
 
-                            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+                            <div className="gap-8 flex justify-center flex-wrap">
                                 {(
                                     translations?.morpheaOrigin?.values
                                         ?.items || []
@@ -500,7 +509,7 @@ export default function OriginePage() {
                                         data-card-index={index}
                                         data-card-type="value"
                                         className={cn(
-                                            'group relative transition-all duration-700',
+                                            'group relative transition-all duration-700 w-[100%] md:w-[40%] lg:w-[30%]',
                                             visibleValueCards.includes(index)
                                                 ? 'translate-y-0 opacity-100'
                                                 : 'translate-y-8 opacity-0'

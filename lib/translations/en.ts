@@ -1944,21 +1944,21 @@ export const enTranslations = {
   "morpheaOrigin": {
     "hero": {
       "title": "The Origins of Morphea",
-      "subtitle": "The Morphea universe was born as a showcase to translate these experiences into an immersive space that reveals exceptional talents and know-how, between heritage and innovation."
+      "subtitle": "Imagined by Morpheus, Morphea is an immersive space dedicated to highlighting rare talents and exceptional craftsmanship, between tradition and innovation."
     },
     "identity": {
       "title": "Our Identity",
       "morpheus": {
         "name": "Morpheus",
-        "description": " is a revolutionary virtual reality platform that transforms the online shopping experience. Through cutting-edge immersive technologies, we create virtual environments where users can explore, interact and purchase as in the real world."
+        "description": ": A creator of singular experiences, where fashion, lifestyle, and refinement intersect. It reveals rare talents and exceptional craftsmanship, boldly blending heritage and innovation."
       },
       "morphea": {
         "name": "Morphea",
-        "description": " represents the natural evolution of online commerce towards a more human and authentic experience. Our virtual marketplace showcases traditional craftsmanship and contemporary creations in an innovative digital environment."
+        "description": ": At the crossroads of luxury and innovation, Morphea is a virtual reality platform designed to reinvent online shopping into an immersive, sensory, and deeply human experience. In a realistic, interactive, and innovative digital environment, users can explore, experience, and acquire exceptional pieces in a completely unprecedented way."
       },
       "heritage": {
-        "name": "Heritage",
-        "description": " Our mission is to preserve and celebrate artisanal traditions while embracing technological innovation. We create bridges between past and future, between traditional craftsmanship and the infinite possibilities of digital."
+        "name": "Heritage & Innovation",
+        "description": ": Our mission is to preserve artisanal heritage while embracing the possibilities offered by technology. Morphea acts as a bridge between past and future, between ancestral gestures and immersive experiences of the digital world. We build bridges between tradition and innovation to bring stories, materials, and exceptional talents to life within a new space of expression."
       },
       "cards": [
         {
@@ -1980,29 +1980,29 @@ export const enTranslations = {
       ]
     },
     "mission": {
-      "title": "Our Mission",
+      "title": "Our Missions",
       "items": [
         {
-          "title": "Revolutionize Shopping",
-          "description": "Transform the online shopping experience through virtual reality and immersive technologies."
+          "title": "Reinvent tomorrow's shopping",
+          "description": "Offer an immersive and sensory online shopping experience, thanks to virtual reality and cutting-edge immersive technologies."
         },
         {
-          "title": "Support Creators",
-          "description": "Provide a global platform for artisans, designers and creators to showcase their unique works."
+          "title": "Highlight Mediterranean creators",
+          "description": "Provide a global showcase for artisans, designers, and artists to highlight and promote their unique creations."
         },
         {
-          "title": "Preserve Craftsmanship",
-          "description": "Value and perpetuate artisanal traditions in a modern digital environment."
+          "title": "Preserve artisanal craftsmanship",
+          "description": "Celebrate traditions and ancestral techniques by integrating them into an innovative digital universe, to ensure their transmission and sustainability."
         },
         {
-          "title": "Connect Cultures",
-          "description": "Create bridges between cultures and traditions through a shared virtual space."
+          "title": "Foster dialogue between cultures",
+          "description": "Create a virtual space where aesthetics, stories, and heritage from around the world meet, to encourage exchange and mutual enrichment."
         }
       ]
     },
     "vision": {
       "title": "Our Vision",
-      "description": "To become the global reference for immersive virtual commerce, where tradition and innovation meet to create unique and memorable shopping experiences.",
+      "description": "Redefine online commerce by creating an immersive and equitable virtual world where innovation meets the soul of traditions, to offer shopping experiences that are unique, sensory, and memorable.",
       "imageAlt": "Vision",
       "defaultImageAlt": "Default vision"
     },
@@ -2010,75 +2010,89 @@ export const enTranslations = {
       "title": "Our Values",
       "items": [
         {
-          "title": "Respect",
-          "description": "We respect every creator, every tradition and every customer in our ecosystem."
+          "title": "Living transmission",
+          "description": "Each creation tells a story and symbolizes Mediterranean craftsmanship."
         },
         {
-          "title": "Quality",
-          "description": "We are committed to maintaining the highest quality standards in all our services."
+          "title": "Reinvented heritage",
+          "description": "We value a millennial cultural heritage through contemporary aesthetics."
         },
         {
-          "title": "Innovation",
-          "description": "We embrace new technologies to constantly improve the user experience."
+          "title": "Sensory luxury",
+          "description": "Elegance is experienced through sensory, rare, and emotional experiences."
         },
         {
-          "title": "Sustainability",
-          "description": "We promote sustainable and responsible practices in online commerce."
+          "title": "Collaborative creativity",
+          "description": "We build bridges between passionate creators, artisans, designers, and brands to build a dynamic and ethical community."
+        },
+        {
+          "title": "Responsible sustainability",
+          "description": "Our approach to luxury and design is guided by respect for the environment, combining new technologies and sustainable practices."
         }
       ]
     },
     "features": {
-      "title": "What you'll find",
+      "title": "What Morphea has in store for you",
       "items": [
         {
-          "title": "Immersive Experience",
-          "description": "Discover our 3D virtual boutiques with intuitive navigation and realistic interactions."
+          "title": "An unprecedented immersive experience",
+          "description": "Dive into our 3D virtual boutiques, with fluid navigation and ultra-realistic interactions for a reimagined shopping journey."
         },
         {
-          "title": "Exclusive Products",
-          "description": "Access a unique selection of artisanal creations and contemporary designs."
+          "title": "Unique and exclusive pieces",
+          "description": "Explore a curated selection of artisanal creations and contemporary designs, specially designed for us."
         },
         {
-          "title": "Secure Marketplace",
-          "description": "Make your purchases safely with our protected and reliable payment systems."
+          "title": "A reliable and secure marketplace",
+          "description": "Shop with confidence thanks to reliable payment systems and enhanced protection of your data."
         },
         {
-          "title": "Creative Community",
-          "description": "Join a dynamic community of creators, designers and art enthusiasts."
+          "title": "A community of talents",
+          "description": "Connect with a vibrant network of creators, designers, and art lovers, united around a shared passion."
         },
         {
-          "title": "Exclusive Events",
-          "description": "Fashion shows, workshops and digital meetings to discover trends and innovations in the sector."
+          "title": "Immersive events",
+          "description": "Participate in fashion shows, workshops, and virtual meetings to experience trends, discover new releases, and interact live."
         },
         {
           "title": "Our Partners",
-          "description": "Morphea collaborates with creators, designers, artists, artisan associations, specialized media and cultural institutions."
+          "description": "Morphea surrounds itself with creators, designers, artists, artisan associations, specialized media, and cultural institutions to build a rich and committed ecosystem."
         }
       ]
     },
     "benefits": {
-      "title": "Why join us",
+      "title": "Why join Morphea?",
       "items": [
         {
-          "description": "Expose your creations to an international audience."
+          "description": "Present your creations to an international audience passionate about art, design, and craftsmanship."
         },
         {
-          "description": "Participate in immersive events and workshops."
+          "description": "Participate in immersive events, workshops, and fashion shows that push the boundaries of digital."
         },
         {
-          "description": "Access a secure marketplace to sell your works."
+          "description": "Benefit from a secure marketplace to market your creations in a reliable environment."
         },
         {
-          "description": "Join a dynamic community of professionals and enthusiasts."
+          "description": "Exchange with professionals, creators, and enlightened enthusiasts within a vibrant and creative network."
         },
         {
-          "description": "Design and organize your events, marketing strategies and communication campaigns."
+          "description": "Design your own events, develop your marketing strategies, and launch your communication campaigns with the support of our ecosystem."
         }
       ]
     },
     "promise": {
       "title": "Our Promise",
-      "description": "Morphea is not just a virtual mall: it is a living place where tradition and modernity intertwine, where each creation tells a story and where each visitor becomes an actor in the experience."
+      "description": "More than a virtual marketplace, Morphea is a place of emotions and discoveries, where the heritage of craftsmanship meets immersive technologies. Here, each piece tells a story and each visit immerses you in the heart of creation."
+    },
+    "founder": {
+      "title": "Founder of Morpheus",
+      "name": "Myriam Koubaa",
+      "role": "CEO Morpheus",
+      "bio": "Myriam has always been drawn to beauty: a fabric that captures light, a scene that tells a story, a fragrance that awakens the imagination.",
+      "bio2": "Early on, she felt that luxury is not just about wealth: it's a language, a way to express the deep identity of a place, a creator, or a culture.",
+      "journey": "After years spent exploring fashion, events, and high-end marketing, Myriam feels the absence of these heritages that have fascinated her since childhood. She dreams of a space where elegance combines with boldness, where Mediterranean craftsmanship dialogues with innovation, where every moment becomes a sensory journey.",
+      "vision": "It is from this desire that Morpheus was born: a bridge between tradition and the future, a creative laboratory where designers, artisans, artists, and brands meet to reinvent luxury.",
+      "conclusion": "For Myriam, Morpheus is not just an entity or a project: it's an invitation to celebrate diversity, to reveal the beauty of cultures, and to create experiences that touch the soul as much as the senses."
     }
   }
 };
