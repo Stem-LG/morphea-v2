@@ -1231,10 +1231,10 @@ export default function VirtualTour({
             <button
                 onClick={() => { setGuideStep(0); setShowGuide(true); }}
                 className="group absolute right-6 bottom-32 z-10 flex size-12 md:size-14 items-center justify-center rounded-full bg-black/20 text-white shadow-lg transition-all duration-300 hover:scale-105 hover:bg-black/40"
-                title="Guide"
-                aria-label="Open 360 guide"
+                title={t('virtualTour.guide.title')}
+                aria-label={t('virtualTour.guide.openGuide')}
             >
-                <span className="font-supreme text-xl">!</span>
+                <span className="font-supreme text-xl">i</span>
             </button>
 
             {/* Coach-marks overlay */}
@@ -1257,7 +1257,7 @@ export default function VirtualTour({
                                         <path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                                     </svg>
                                 </div>
-                                <div className="text-center text-xs mt-2 opacity-80">{isTouch ? 'Swipe' : 'Drag'}</div>
+                                <div className="text-center text-xs mt-2 opacity-80">{isTouch ? t('virtualTour.guide.swipe') : t('virtualTour.guide.drag')}</div>
                                 <style>{`@keyframes swipe-x{0%{transform:translateX(-24px)}50%{transform:translateX(24px)}100%{transform:translateX(-24px)}} .animate-swipe-x{animation:swipe-x 1.6s ease-in-out infinite}`}</style>
                             </div>
                         </div>
@@ -1267,12 +1267,12 @@ export default function VirtualTour({
                     {guideStep === 1 && (
                         <>
                             {/* Arrow to left rotate (points right toward the button) */}
-                            <svg className="absolute left-28 top-1/2 -translate-y-1/2 rotate-180 text-white" width="100" height="40" viewBox="0 0 140 40">
-                                <path d="M0 20 H110 M110 20 L95 10 M110 20 L95 30" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+                            <svg className="absolute left-28 top-1/2 -translate-y-1/2 rotate-180 text-white" width="70" height="40" viewBox="0 0 90 40">
+                                <path d="M0 20 H70 M70 20 L58 12 M70 20 L58 28" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
                             </svg>
                             {/* Arrow to right rotate (points toward the right button) */}
-                            <svg className="absolute right-28 top-1/2 -translate-y-1/2 text-white" width="100" height="40" viewBox="0 0 140 40">
-                                <path d="M0 20 H110 M110 20 L95 10 M110 20 L95 30" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+                            <svg className="absolute right-28 top-1/2 -translate-y-1/2 text-white" width="70" height="40" viewBox="0 0 90 40">
+                                <path d="M0 20 H70 M70 20 L58 12 M70 20 L58 28" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
                             </svg>
                         </>
                     )}
@@ -1281,30 +1281,30 @@ export default function VirtualTour({
                     {/* Step 2: arrow pointing to the bottom-left (zoom slider) */}
                     {guideStep === 2 && (
                         <div className="absolute left-20 bottom-16 text-white">
-                            <svg className="text-white" width="160" height="50" viewBox="0 0 160 50" style={{ transform: 'rotate(-225deg)' }}>
-                                <path d="M0 25 H130 M130 25 L115 13 M130 25 L115 37" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+                            <svg className="text-white" width="100" height="50" viewBox="0 0 100 50" style={{ transform: 'rotate(-225deg)' }}>
+                                <path d="M0 25 H80 M80 25 L68 15 M80 25 L68 35" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
                             </svg>
                         </div>
                     )}
 
                     {/* Step 3: arrow to the 180° turn button */}
                     {guideStep === 3 && (
-                        <svg className="absolute -left-8 bottom-36 md:-left-6 md:bottom-40 text-white" width="160" height="50" viewBox="0 0 160 50" style={{ transform: 'rotate(90deg)' }}>
-                            <path d="M0 25 H130 M130 25 L115 13 M130 25 L115 37" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+                        <svg className="absolute -left-1 bottom-32 md:left-1 md:bottom-36 text-white" width="100" height="50" viewBox="0 0 100 50" style={{ transform: 'rotate(90deg)' }}>
+                            <path d="M0 25 H80 M80 25 L68 15 M80 25 L68 35" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                     )}
 
                     {/* Step 4: arrow to the Exit button */}
                     {guideStep === 4 && (
-                        <svg className="absolute -right-8 bottom-36 md:-right-6 md:bottom-40 text-white" width="160" height="50" viewBox="0 0 160 50" style={{ transform: 'rotate(90deg)' }}>
-                            <path d="M0 25 H130 M130 25 L115 13 M130 25 L115 37" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+                        <svg className="absolute -right-1 bottom-32 md:right-2 md:bottom-36 text-white" width="100" height="50" viewBox="0 0 100 50" style={{ transform: 'rotate(90deg)' }}>
+                            <path d="M0 25 H80 M80 25 L68 15 M80 25 L68 35" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                     )}
 
                     {/* Step 5: arrow to the Scenes menu (menu is auto-opened while on this step) */}
                     {guideStep === 5 && (
-                        <svg className="absolute right-0 top-20 text-white" width="160" height="50" viewBox="0 0 160 50" style={{ transform: 'rotate(-90deg)' }}>
-                            <path d="M0 25 H130 M130 25 L115 13 M130 25 L115 37" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+                        <svg className="absolute right-0 top-20 text-white" width="100" height="50" viewBox="0 0 100 50" style={{ transform: 'rotate(-90deg)' }}>
+                            <path d="M0 25 H80 M80 25 L68 15 M80 25 L68 35" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                     )}
 
@@ -1313,19 +1313,26 @@ export default function VirtualTour({
                         className="absolute bottom-28 left-1/2 -translate-x-1/2 max-w-sm rounded-xl bg-white/95 text-gray-900 shadow-xl p-4 backdrop-blur-sm"
                         role="dialog"
                         aria-modal="true"
-                        aria-label="360 usage guide"
+                        aria-label={t('virtualTour.guide.openGuide')}
                     >
                         <h4 className="font-supreme text-base mb-1">
-                            {['Look around','Move left/right','Zoom','Turn around 180°','Exit tour','Scenes menu'][guideStep]}
+                            {[
+                                t('virtualTour.guide.steps.lookAround.title'),
+                                t('virtualTour.guide.steps.moveLeftRight.title'),
+                                t('virtualTour.guide.steps.zoom.title'),
+                                t('virtualTour.guide.steps.turnAround.title'),
+                                t('virtualTour.guide.steps.exitTour.title'),
+                                t('virtualTour.guide.steps.scenesMenu.title')
+                            ][guideStep]}
                         </h4>
                         <p className="text-sm opacity-80 mb-3 whitespace-pre-wrap">
                             {[
-                                (isTouch ? 'Swipe to rotate the view.' : 'Click and drag to rotate the view.'),
-                                'Use the side arrows to rotate left and right by 45°.',
-                                (isTouch ? 'Pinch to zoom in and out.\nOr use the zoom buttons.' : 'Use your mouse wheel to zoom in and out.\nOr use the slider.'),
-                                'Use the 180° button to quickly look behind you.',
-                                'Use the Exit button to leave the tour.',
-                                'Tap markers to move between rooms or use the Scenes menu to jump.'
+                                (isTouch ? t('virtualTour.guide.steps.lookAround.descriptionTouch') : t('virtualTour.guide.steps.lookAround.descriptionMouse')),
+                                t('virtualTour.guide.steps.moveLeftRight.description'),
+                                (isTouch ? t('virtualTour.guide.steps.zoom.descriptionTouch') : t('virtualTour.guide.steps.zoom.descriptionMouse')),
+                                t('virtualTour.guide.steps.turnAround.description'),
+                                t('virtualTour.guide.steps.exitTour.description'),
+                                t('virtualTour.guide.steps.scenesMenu.description')
                             ][guideStep]}
                         </p>
                         <div className="flex items-center justify-between">
@@ -1333,7 +1340,7 @@ export default function VirtualTour({
                                 onClick={() => { try { localStorage.setItem('vt_guide_seen_v1', '1') } catch {} ; setShowGuide(false) }}
                                 className="text-sm text-gray-600 hover:text-gray-900"
                             >
-                                Skip
+                                {t('virtualTour.guide.skip')}
                             </button>
                             <div className="flex items-center gap-2">
                                 {/* simple progress dots */}
@@ -1350,7 +1357,7 @@ export default function VirtualTour({
                                     }}
                                     className="ml-2 px-3 py-1.5 rounded-md bg-gray-900 text-white text-sm hover:bg-black"
                                 >
-                                    {guideStep < 5 ? 'Next' : 'Done'}
+                                    {guideStep < 5 ? t('virtualTour.guide.next') : t('virtualTour.guide.done')}
                                 </button>
                             </div>
                         </div>

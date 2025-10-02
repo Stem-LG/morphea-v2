@@ -1764,7 +1764,47 @@ export const frTranslations = {
     "sceneNavigation": "Navigation des scènes",
     "scenes": "Scènes",
     "noSceneAvailable": "Aucune scène de visite disponible",
-    "noBoutiqueSceneAvailable": "Aucune scène boutique disponible"
+    "noBoutiqueSceneAvailable": "Aucune scène boutique disponible",
+    "turnLeft45": "Tourner à gauche 45°",
+    "turnRight45": "Tourner à droite 45°",
+    "turnAround180": "Se retourner 180°",
+    "guide": {
+      "title": "Guide",
+      "openGuide": "Ouvrir le guide 360",
+      "skip": "Passer",
+      "next": "Suivant",
+      "done": "Terminé",
+      "swipe": "Glisser",
+      "drag": "Glisser",
+      "steps": {
+        "lookAround": {
+          "title": "Regarder autour",
+          "descriptionTouch": "Glissez pour faire pivoter la vue.",
+          "descriptionMouse": "Cliquez et faites glisser pour faire pivoter la vue."
+        },
+        "moveLeftRight": {
+          "title": "Déplacer gauche/droite",
+          "description": "Utilisez les flèches latérales pour pivoter à gauche et à droite de 45°."
+        },
+        "zoom": {
+          "title": "Zoom",
+          "descriptionTouch": "Pincez pour zoomer et dézoomer.\nOu utilisez les boutons de zoom.",
+          "descriptionMouse": "Utilisez la molette de votre souris pour zoomer et dézoomer.\nOu utilisez le curseur."
+        },
+        "turnAround": {
+          "title": "Se retourner 180°",
+          "description": "Utilisez le bouton 180° pour regarder rapidement derrière vous."
+        },
+        "exitTour": {
+          "title": "Quitter la visite",
+          "description": "Utilisez le bouton Sortie pour quitter la visite."
+        },
+        "scenesMenu": {
+          "title": "Menu des scènes",
+          "description": "Appuyez sur les marqueurs pour vous déplacer entre les pièces ou utilisez le menu Scènes pour sauter."
+        }
+      }
+    }
   },
   "notifications": {
     "title": "Notifications",

@@ -1728,7 +1728,47 @@ export const enTranslations = {
     "sceneNavigation": "Scene navigation",
     "scenes": "Scenes",
     "noSceneAvailable": "No scene available",
-    "noBoutiqueSceneAvailable": "No boutique scene available"
+    "noBoutiqueSceneAvailable": "No boutique scene available",
+    "turnLeft45": "Turn left 45°",
+    "turnRight45": "Turn right 45°",
+    "turnAround180": "Turn around 180°",
+    "guide": {
+      "title": "Guide",
+      "openGuide": "Open 360 guide",
+      "skip": "Skip",
+      "next": "Next",
+      "done": "Done",
+      "swipe": "Swipe",
+      "drag": "Drag",
+      "steps": {
+        "lookAround": {
+          "title": "Look around",
+          "descriptionTouch": "Swipe to rotate the view.",
+          "descriptionMouse": "Click and drag to rotate the view."
+        },
+        "moveLeftRight": {
+          "title": "Move left/right",
+          "description": "Use the side arrows to rotate left and right by 45°."
+        },
+        "zoom": {
+          "title": "Zoom",
+          "descriptionTouch": "Pinch to zoom in and out.\nOr use the zoom buttons.",
+          "descriptionMouse": "Use your mouse wheel to zoom in and out.\nOr use the slider."
+        },
+        "turnAround": {
+          "title": "Turn around 180°",
+          "description": "Use the 180° button to quickly look behind you."
+        },
+        "exitTour": {
+          "title": "Exit tour",
+          "description": "Use the Exit button to leave the tour."
+        },
+        "scenesMenu": {
+          "title": "Scenes menu",
+          "description": "Tap markers to move between rooms or use the Scenes menu to jump."
+        }
+      }
+    }
   },
   "notifications": {
     "title": "Notifications",
