@@ -3,16 +3,17 @@
 import { useCurrency } from '@/hooks/useCurrency'
 import { useLanguage } from '@/hooks/useLanguage'
 import {
+    DropdownMenu,
+    DropdownMenuContent,
     DropdownMenuRadioGroup,
     DropdownMenuRadioItem,
-    DropdownMenuSub,
-    DropdownMenuSubContent,
-    DropdownMenuSubTrigger,
+    DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { NavBarIconButton } from './navbar_icon_button'
 
 export const CurrencySwitcher = () => {
     const { currencies, currentCurrency, setCurrency } = useCurrency()
-    const { t, language } = useLanguage()
+    const { language } = useLanguage()
 
     // Helper function to get currency name based on language
     const getCurrencyName = (currency: any) => {
@@ -23,18 +24,19 @@ export const CurrencySwitcher = () => {
     }
 
     return (
-        <DropdownMenuSub>
-            <DropdownMenuSubTrigger>
-                <span className="flex-1">{t('common.currency')}</span>
-                <span className="mr-2">
-                    {currentCurrency && (
-                        <span className="font-medium">
-                            {currentCurrency.xdevisecodealpha}
-                        </span>
-                    )}
-                </span>
-            </DropdownMenuSubTrigger>
-            <DropdownMenuSubContent>
+        <DropdownMenu modal={false}>
+            <DropdownMenuTrigger>
+                <NavBarIconButton>
+                    <span className="text-sm font-semibold">
+                        {currentCurrency?.xdevisecodealpha || 'EUR'}
+                    </span>
+                </NavBarIconButton>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+                side="bottom"
+                align="center"
+                className="w-48 z-[90]"
+            >
                 <DropdownMenuRadioGroup
                     value={currentCurrency?.xdeviseid.toString()}
                     onValueChange={(value) => {
@@ -62,7 +64,7 @@ export const CurrencySwitcher = () => {
                         </DropdownMenuRadioItem>
                     ))}
                 </DropdownMenuRadioGroup>
-            </DropdownMenuSubContent>
-        </DropdownMenuSub>
+            </DropdownMenuContent>
+        </DropdownMenu>
     )
 }
