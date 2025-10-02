@@ -14,7 +14,7 @@ export function PoweredBy() {
     }
 
     return (
-        <div className="flex">
+        <div className="flex justify-center">
             <div className="px-2 py-1">
                 {mellimeUrl && !isLoadingMellimeUrl ? (
                     <button

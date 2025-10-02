@@ -1865,7 +1865,7 @@ export const frTranslations = {
   },
   "footer": {
     "newsletter": {
-      "description": "Recevez en avant-première nos nouvelles collections et événements exclusifs",
+      "description": "Accédez en avant-première à nos collections inédites et à nos rendez-vous privilégiés.",
       "emailPlaceholder": "person@email.com",
       "subscribe": "S'abonner",
       "emailRequired": "Veuillez entrer votre adresse email",

@@ -1829,7 +1829,7 @@ export const enTranslations = {
   },
   "footer": {
     "newsletter": {
-      "description": "Receive Our New Collections And Exclusive Events In Preview",
+      "description": "Get early access to our exclusive collections and privileged appointments.",
       "emailPlaceholder": "person@email.com",
       "subscribe": "Subscribe",
       "emailRequired": "Please enter your email address",

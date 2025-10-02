@@ -124,7 +124,7 @@ export default function Footer() {
                                 className="h-12 w-36 object-cover md:h-16 md:w-44"
                             />
                         </div>
-                        <p className="mb-4 max-w-xs px-2 text-lg leading-6 text-neutral-700 md:max-w-sm md:px-0 md:text-xl">
+                        <p className="mb-4 max-w-xs px-2 text-lg leading-6 text-neutral-700 md:max-w-md md:px-0 md:text-xl">
                             {t('footer.newsletter.description')}
                         </p>
                         <form
@@ -505,8 +505,8 @@ export default function Footer() {
 
 
                 {/* Bottom language row - Mobile Responsive */}
-                <div className="font-supreme flex justify-between py-3 text-base text-stone-500 md:py-4 md:text-lg">
-                    <div className="relative inline-block flex-1" ref={dropdownRef}>
+                <div className="font-supreme sm:flex justify-between py-3 text-base text-stone-500 md:py-4 md:text-lg">
+                    <div className="relative inline-block flex-1 mb-4 sm:mb-0" ref={dropdownRef}>
                         <button
                             onClick={() =>
                                 setIsLanguageDropdownOpen(
