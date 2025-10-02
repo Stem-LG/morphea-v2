@@ -1089,7 +1089,7 @@ export default function VirtualTour({
             {/* Rotate Left 45° */}
             <button
                 onClick={() => animateRotateBy(-Math.PI / 4)}
-                className="group absolute scale-75 md:scale-100 left-4 top-1/2 -translate-y-1/2 z-10 flex h-24 w-24 items-center justify-center rounded-full bg-black/20 text-white shadow-lg transition-all duration-300 hover:scale-105 hover:bg-black/40"
+                className="group absolute scale-75 left-4 top-1/2 -translate-y-1/2 z-10 flex h-24 w-24 items-center justify-center rounded-full bg-black/20 text-white shadow-lg transition-all duration-300 hover:scale-105 hover:bg-black/40"
                 title={t('virtualTour.turnLeft45')}
             >
                 <svg
@@ -1110,7 +1110,7 @@ export default function VirtualTour({
             {/* Rotate Right 45° */}
             <button
                 onClick={() => animateRotateBy(Math.PI / 4)}
-                className="group absolute overflow-clip scale-75 md:scale-100 right-4 top-1/2 -translate-y-1/2 z-10 flex h-24 w-24 items-center justify-center rounded-full bg-black/20 text-white shadow-lg transition-all duration-300 hover:scale-105 hover:bg-black/40"
+                className="group absolute overflow-clip scale-75 right-4 top-1/2 -translate-y-1/2 z-10 flex h-24 w-24 items-center justify-center rounded-full bg-black/20 text-white shadow-lg transition-all duration-300 hover:scale-80 hover:bg-black/40"
                 title={t('virtualTour.turnRight45')}
             >
                 <svg
@@ -1234,7 +1234,7 @@ export default function VirtualTour({
                 title="Guide"
                 aria-label="Open 360 guide"
             >
-                <span className="font-supreme text-xl">?</span>
+                <span className="font-supreme text-xl">!</span>
             </button>
 
             {/* Coach-marks overlay */}
