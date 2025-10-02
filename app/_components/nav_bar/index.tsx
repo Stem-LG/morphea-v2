@@ -143,9 +143,7 @@ export default function NavBar() {
                         />
                     </Link>
                 </div>
-                <div className="flex flex-1 items-center justify-end gap-2 md:hidden">
-                    <CurrencySwitcher />
-                </div>
+                <div className="flex flex-1 md:hidden" />
                 <div className="hidden flex-1 items-center justify-end gap-2 md:flex">
                     {hasAdminAccess && (
                         <NavBarIconButton onClick={() => router.push('/admin')}>
@@ -166,7 +164,6 @@ export default function NavBar() {
                             )}
                         </div>
                     )}
-                    <CurrencySwitcher />
                     <div className="relative">
                         <NavBarIconButton
                             onClick={() => setIsWishlistOpen(true)}
@@ -212,6 +209,7 @@ export default function NavBar() {
                             </DropdownMenuLabel>
                             <DropdownMenuSeparator />
                             <LanguageSwitcher />
+                            <CurrencySwitcher />
                             <DropdownMenuSeparator />
 
                             {currentUser && !currentUser.is_anonymous ? (
