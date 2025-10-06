@@ -112,8 +112,7 @@ export function BoutiqueMultiSelect({
                                     </Button>
                                 )}
                             </div>
-                            <ScrollArea className="h-60">
-                                <div className="space-y-3 p-2">
+                            <div className="h-60 space-y-3 p-2 overflow-y-scroll">
                                     {isLoading ? (
                                         <div className="py-4 text-center text-gray-600">
                                             {t(
@@ -187,8 +186,7 @@ export function BoutiqueMultiSelect({
                                             )
                                         )
                                     )}
-                                </div>
-                            </ScrollArea>
+                            </div>
                         </CardContent>
                     </Card>
                 </PopoverContent>

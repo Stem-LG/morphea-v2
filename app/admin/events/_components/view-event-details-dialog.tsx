@@ -319,8 +319,7 @@ export function ViewEventDetailsDialog({
                                             </CardTitle>
                                         </CardHeader>
                                         <CardContent className="py-3">
-                                            <ScrollArea className="max-h-32">
-                                                <div className="space-y-3">
+                                                <div className="space-y-1 h-44 overflow-y-scroll">
                                                     {Array.from(
                                                         new Map(
                                                             eventDetails.rawDetails
@@ -376,8 +375,7 @@ export function ViewEventDetailsDialog({
                                                             </div>
                                                         </div>
                                                     ))}
-                                                </div>
-                                            </ScrollArea>
+                                            </div>
                                         </CardContent>
                                     </Card>
                                 )}
