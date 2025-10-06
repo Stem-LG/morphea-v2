@@ -46,7 +46,7 @@ export const enTranslations = {
     "all": "All",
     "actions": "Actions",
     "required": "Required",
-    "poweredBy": "© 2025 morpheus, Réalisé par millime",
+    "poweredBy": "© 2025 Morpheus, Realised by Millime",
     "profile": "Profile",
     "orders": "Orders",
     "register": "Register",
