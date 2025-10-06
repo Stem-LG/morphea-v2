@@ -710,33 +710,35 @@ export function ProductDetailsPage({
                     <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
                         {/* Left Side - Images/3D Viewer */}
                         <div className="space-y-4">
-                            {/* View Mode Toggle */}
-                            <div className="flex gap-2">
-                                <button
-                                    onClick={() => setViewMode('media')}
-                                    className={`font-supreme rounded-lg px-4 py-2 text-sm font-medium transition-all duration-300 ${
-                                        viewMode === 'media'
-                                            ? 'bg-[#053340] text-white'
-                                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-[#053340]'
-                                    }`}
-                                >
-                                    {t('productDetails.media') || 'Images'}
-                                </button>
-                                <button
-                                    onClick={() => setViewMode('3d')}
-                                    className={`font-supreme rounded-lg px-4 py-2 text-sm font-medium transition-all duration-300 ${
-                                        viewMode === '3d'
-                                            ? 'bg-[#053340] text-white'
-                                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-[#053340]'
-                                    }`}
-                                >
-                                    {t('productDetails.view3D') || '3D View'}
-                                </button>
-                            </div>
+                            {/* View Mode Toggle - Only show if 3D model exists */}
+                            {selected3DModel && (
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => setViewMode('media')}
+                                        className={`font-supreme rounded-lg px-4 py-2 text-sm font-medium transition-all duration-300 ${
+                                            viewMode === 'media'
+                                                ? 'bg-[#053340] text-white'
+                                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-[#053340]'
+                                        }`}
+                                    >
+                                        {t('productDetails.media') || 'Images'}
+                                    </button>
+                                    <button
+                                        onClick={() => setViewMode('3d')}
+                                        className={`font-supreme rounded-lg px-4 py-2 text-sm font-medium transition-all duration-300 ${
+                                            viewMode === '3d'
+                                                ? 'bg-[#053340] text-white'
+                                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-[#053340]'
+                                        }`}
+                                    >
+                                        {t('productDetails.view3D') || '3D View'}
+                                    </button>
+                                </div>
+                            )}
 
                             {/* Main Display Area */}
                             <div className="aspect-square overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
-                                {viewMode === 'media' ? (
+                                {viewMode === 'media' || !selected3DModel ? (
                                     <div className="flex h-full flex-col">
                                         {/* Main Media */}
                                         <div className="flex-1 overflow-hidden rounded-lg bg-white">
