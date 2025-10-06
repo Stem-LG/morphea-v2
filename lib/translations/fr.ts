@@ -13,7 +13,7 @@ export const frTranslations = {
     "account": "Mon compte",
     "guestAccount": "Compte invité",
     "home": "Acceuil",
-    "newProducts": "Nouveauté",
+    "newProducts": "Nouveautés",
     "categories": "Categories",
     "about": "A Propos",
     "contactUs": "Contactez-Nous",
