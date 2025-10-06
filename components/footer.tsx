@@ -44,10 +44,17 @@ export default function Footer() {
         setIsSubmitting(true)
 
         try {
-            // Insert into xnewsletter table in morpheus schema
-            await supabase.schema('morpheus').from('xnewsletter').insert({
+            // Generate a unique unsubscription token
+            const unsubscriptionToken = crypto.randomUUID()
+
+            // Upsert into xnewsletter table in morpheus schema
+            // This will insert if email doesn't exist, or update if it does
+            await supabase.schema('morpheus').from('xnewsletter').upsert({
                 email: email.trim().toLowerCase(),
                 subscribed: true,
+                unsubscription_token: unsubscriptionToken,
+            }, {
+                onConflict: 'email'
             })
 
             // Always show success message regardless of the response
@@ -109,7 +116,7 @@ export default function Footer() {
         languages.find((lang) => lang.code === language) || languages[0]
 
     return (
-        <footer className="font-supreme relative border-t border-gray-200 bg-white">
+        <footer id="footer" className="font-supreme relative border-t border-gray-200 bg-white">
             <div className="mx-auto px-4 md:px-6 lg:px-10">
                 {/* Top grid - Mobile Responsive */}
                 <div className="grid grid-cols-1 gap-8 py-8 md:grid-cols-12 md:gap-10 md:py-12">

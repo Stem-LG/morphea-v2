@@ -21,6 +21,7 @@ import {
     Store,
     ShoppingBag,
     Settings,
+    Mail,
 } from 'lucide-react'
 import { useLanguage } from '@/hooks/useLanguage'
 
@@ -148,6 +149,13 @@ export function ModernSidebar({
                 label: t('admin.virtualTourAdmin'),
                 icon: Eye,
                 href: '/admin/tour',
+                roles: ['admin'],
+            },
+            {
+                id: 'newsletter',
+                label: t('admin.newsletter.title') || 'Newsletter',
+                icon: Mail,
+                href: '/admin/newsletter',
                 roles: ['admin'],
             },
             {

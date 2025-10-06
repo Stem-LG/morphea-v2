@@ -1008,6 +1008,19 @@ export const frTranslations = {
       "assignDesignerButton": "Attribuer le Designer"
     },
     "virtualTourAdmin": "Univers virtuel",
+    "newsletter": {
+      "title": "Newsletter",
+      "description": "Gérer les abonnements à la newsletter et les exports",
+      "export": {
+        "title": "Exporter les Abonnés",
+        "description": "Télécharger un fichier CSV contenant les informations des abonnés à la newsletter",
+        "includeUnsubscribed": "Inclure les utilisateurs désabonnés",
+        "includeUnsubscribedHelp": "Le CSV inclura tous les utilisateurs (abonnés et désabonnés) avec une colonne \"subscribed\" indiquant leur statut.",
+        "subscribedOnlyHelp": "Le CSV inclura uniquement les utilisateurs actuellement abonnés.",
+        "export": "Exporter CSV",
+        "exporting": "Exportation..."
+      }
+    },
     "settings": {
       "title": "Paramètres",
       "subtitle": "Gérer les paramètres et la configuration à l'échelle de l'application",
@@ -1386,7 +1399,20 @@ export const frTranslations = {
     "days": "jours",
     "noVariantsAvailable": "Aucune Variante Disponible",
     "noVariantsMessage": "Ce produit n'a actuellement aucune variante disponible.",
-    "noMediaAvailable": "Aucun média disponible"
+    "noMediaAvailable": "Aucun média disponible",
+    "newsletter": {
+      "title": "Newsletter",
+      "description": "Exporter les données des abonnés à la newsletter",
+      "export": {
+        "title": "Exporter les Abonnés",
+        "description": "Télécharger un fichier CSV contenant les informations des abonnés à la newsletter",
+        "includeUnsubscribed": "Inclure les utilisateurs désabonnés",
+        "includeUnsubscribedHelp": "Le CSV inclura tous les utilisateurs (abonnés et désabonnés) avec une colonne \"subscribed\" indiquant leur statut.",
+        "subscribedOnlyHelp": "Le CSV inclura uniquement les utilisateurs actuellement abonnés.",
+        "export": "Exporter CSV",
+        "exporting": "Exportation..."
+      }
+    }
   },
   "cart": {
     "title": "Panier",

@@ -718,6 +718,45 @@ export type Database = {
   }
   morpheus: {
     Tables: {
+      dynamic_translations: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          is_active: boolean | null
+          key_path: string
+          language_code: string
+          namespace: string
+          translation_value: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean | null
+          key_path: string
+          language_code: string
+          namespace: string
+          translation_value: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean | null
+          key_path?: string
+          language_code?: string
+          namespace?: string
+          translation_value?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       settings: {
         Row: {
           id: number
@@ -964,18 +1003,21 @@ export type Database = {
           email: string
           id: number
           subscribed: boolean
+          unsubscription_token: string
         }
         Insert: {
           created_at?: string
           email: string
           id?: number
           subscribed?: boolean
+          unsubscription_token?: string
         }
         Update: {
           created_at?: string
           email?: string
           id?: number
           subscribed?: boolean
+          unsubscription_token?: string
         }
         Relationships: []
       }
@@ -2353,45 +2395,6 @@ export type Database = {
           },
         ]
       }
-      dynamic_translations: {
-        Row: {
-          id: string
-          language_code: string
-          namespace: string
-          key_path: string
-          translation_value: string
-          is_active: boolean
-          created_at: string
-          updated_at: string
-          created_by: string | null
-          updated_by: string | null
-        }
-        Insert: {
-          id?: string
-          language_code: string
-          namespace: string
-          key_path: string
-          translation_value: string
-          is_active?: boolean
-          created_at?: string
-          updated_at?: string
-          created_by?: string | null
-          updated_by?: string | null
-        }
-        Update: {
-          id?: string
-          language_code?: string
-          namespace?: string
-          key_path?: string
-          translation_value?: string
-          is_active?: boolean
-          created_at?: string
-          updated_at?: string
-          created_by?: string | null
-          updated_by?: string | null
-        }
-        Relationships: []
-      }
     }
     Views: {
       [_ in never]: never
@@ -2423,56 +2426,10 @@ export type Database = {
   }
   public: {
     Tables: {
-      dynamic_translations: {
-        Row: {
-          id: string
-          language_code: string
-          namespace: string
-          key_path: string
-          translation_value: string
-          is_active: boolean
-          created_at: string
-          updated_at: string
-          created_by: string | null
-          updated_by: string | null
-        }
-        Insert: {
-          id?: string
-          language_code: string
-          namespace: string
-          key_path: string
-          translation_value: string
-          is_active?: boolean
-          created_at?: string
-          updated_at?: string
-          created_by?: string | null
-          updated_by?: string | null
-        }
-        Update: {
-          id?: string
-          language_code?: string
-          namespace?: string
-          key_path?: string
-          translation_value?: string
-          is_active?: boolean
-          created_at?: string
-          updated_at?: string
-          created_by?: string | null
-          updated_by?: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Views: {
-      active_translations: {
-        Row: {
-          language_code: string
-          namespace: string
-          key_path: string
-          translation_value: string
-          updated_at: string
-        }
-      }
+      [_ in never]: never
     }
     Functions: {
       [_ in never]: never

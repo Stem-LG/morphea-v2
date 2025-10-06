@@ -932,6 +932,19 @@ export const enTranslations = {
       }
     },
     "virtualTourAdmin": "Virtual Tour",
+    "newsletter": {
+      "title": "Newsletter",
+      "description": "Manage newsletter subscriptions and exports",
+      "export": {
+        "title": "Export Subscribers",
+        "description": "Download a CSV file containing newsletter subscriber information",
+        "includeUnsubscribed": "Include unsubscribed users",
+        "includeUnsubscribedHelp": "The CSV will include all users (subscribed and unsubscribed) with a \"subscribed\" column indicating their status.",
+        "subscribedOnlyHelp": "The CSV will only include currently subscribed users.",
+        "export": "Export CSV",
+        "exporting": "Exporting..."
+      }
+    },
     "settings": {
       "title": "Settings",
       "subtitle": "Manage application-wide settings and configuration",
@@ -1350,7 +1363,20 @@ export const enTranslations = {
     "days": "days",
     "noVariantsAvailable": "No Variants Available",
     "noVariantsMessage": "This product currently has no available variants.",
-    "noMediaAvailable": "No media available"
+    "noMediaAvailable": "No media available",
+    "newsletter": {
+      "title": "Newsletter",
+      "description": "Export newsletter subscriber data",
+      "export": {
+        "title": "Export Subscribers",
+        "description": "Download a CSV file containing newsletter subscriber information",
+        "includeUnsubscribed": "Include unsubscribed users",
+        "includeUnsubscribedHelp": "The CSV will include all users (subscribed and unsubscribed) with a \"subscribed\" column indicating their status.",
+        "subscribedOnlyHelp": "The CSV will only include currently subscribed users.",
+        "export": "Export CSV",
+        "exporting": "Exporting..."
+      }
+    }
   },
   "cart": {
     "title": "Shopping Cart",
