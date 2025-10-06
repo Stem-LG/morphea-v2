@@ -208,7 +208,7 @@ export default function NavBar() {
                                     : t('nav.guestAccount')}
                             </DropdownMenuLabel>
                             <DropdownMenuSeparator />
-                            <LanguageSwitcher />
+                            {/* <LanguageSwitcher /> */}
                             <CurrencySwitcher />
                             <DropdownMenuSeparator />
 

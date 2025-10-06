@@ -506,7 +506,8 @@ export default function Footer() {
 
                 {/* Bottom language row - Mobile Responsive */}
                 <div className="font-supreme sm:flex justify-between py-3 text-base text-stone-500 md:py-4 md:text-lg">
-                    <div className="relative inline-block flex-1 mb-4 sm:mb-0" ref={dropdownRef}>
+                    {/* Language selector hidden - French only version */}
+                    {/* <div className="relative inline-block flex-1 mb-4 sm:mb-0" ref={dropdownRef}>
                         <button
                             onClick={() =>
                                 setIsLanguageDropdownOpen(
@@ -558,7 +559,8 @@ export default function Footer() {
                                 ))}
                             </div>
                         )}
-                    </div>
+                    </div> */}
+                    <div className="flex-1"></div>
                     <PoweredBy />
                     <div className='flex-1'></div>
                 </div>
