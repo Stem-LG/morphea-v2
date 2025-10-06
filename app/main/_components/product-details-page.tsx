@@ -1278,7 +1278,7 @@ export function ProductDetailsPage({
                             </div>
 
                             {/* Delivery Info */}
-                            {selectedVariant &&
+                            {/* {selectedVariant &&
                                 selectedVariant.yvarprodnbrjourlivraison >
                                     0 && (
                                     <div className="rounded-lg bg-white/5 p-4">
@@ -1299,7 +1299,7 @@ export function ProductDetailsPage({
                                             {t('productDetails.days') || 'days'}
                                         </div>
                                     </div>
-                                )}
+                                )} */}
                         </div>
                     </div>
                 </div>
