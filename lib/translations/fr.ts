@@ -12,7 +12,7 @@ export const frTranslations = {
     "notifications": "Notifications",
     "account": "Mon compte",
     "guestAccount": "Compte invité",
-    "home": "Acceuil",
+    "home": "Accueil",
     "newProducts": "Nouveautés",
     "categories": "Categories",
     "about": "A Propos",
