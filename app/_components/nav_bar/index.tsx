@@ -209,8 +209,8 @@ export default function NavBar() {
                             </DropdownMenuLabel>
                             <DropdownMenuSeparator />
                             {/* <LanguageSwitcher /> */}
-                            <CurrencySwitcher />
-                            <DropdownMenuSeparator />
+                            {/* <CurrencySwitcher /> */}
+                            {/* <DropdownMenuSeparator /> */}
 
                             {currentUser && !currentUser.is_anonymous ? (
                                 <>
