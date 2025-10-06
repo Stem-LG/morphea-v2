@@ -27,6 +27,10 @@ interface ProductVariant {
     promotionStartDate?: string | null;
     promotionEndDate?: string | null;
     currencyId?: number | null;
+    // Track deleted media for proper database updates
+    deletedImages?: number[]; // Array of ymediaid to delete
+    deletedVideos?: number[]; // Array of ymediaid to delete
+    deletedModels3d?: number[]; // Array of yobjet3did to delete
 }
 
 interface UpdateProductParams {
@@ -305,6 +309,45 @@ export function useUpdateProduct() {
 
     async function handleVariantMedia(variant: ProductVariant, variantId: number) {
         const mediaPromises = [];
+
+        // First, delete any media that was marked for deletion
+        if (variant.deletedImages && variant.deletedImages.length > 0) {
+            for (const mediaId of variant.deletedImages) {
+                mediaPromises.push(
+                    supabase
+                        .schema("morpheus")
+                        .from("yvarprodmedia")
+                        .delete()
+                        .eq("ymediaidfk", mediaId)
+                        .eq("yvarprodidfk", variantId)
+                );
+            }
+        }
+
+        if (variant.deletedVideos && variant.deletedVideos.length > 0) {
+            for (const mediaId of variant.deletedVideos) {
+                mediaPromises.push(
+                    supabase
+                        .schema("morpheus")
+                        .from("yvarprodmedia")
+                        .delete()
+                        .eq("ymediaidfk", mediaId)
+                        .eq("yvarprodidfk", variantId)
+                );
+            }
+        }
+
+        if (variant.deletedModels3d && variant.deletedModels3d.length > 0) {
+            for (const modelId of variant.deletedModels3d) {
+                mediaPromises.push(
+                    supabase
+                        .schema("morpheus")
+                        .from("yobjet3d")
+                        .delete()
+                        .eq("yobjet3did", modelId)
+                );
+            }
+        }
 
         // Handle images
         for (const image of variant.images) {

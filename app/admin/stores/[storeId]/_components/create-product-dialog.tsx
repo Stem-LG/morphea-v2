@@ -72,6 +72,10 @@ interface ProductVariant {
     promotionStartDate?: string | null;
     promotionEndDate?: string | null;
     currencyId?: number | null;
+    // Track deleted media for proper database updates
+    deletedImages?: number[]; // Array of ymediaid to delete
+    deletedVideos?: number[]; // Array of ymediaid to delete
+    deletedModels3d?: number[]; // Array of yobjet3did to delete
 }
 
 interface CreateProductDialogProps {
@@ -299,6 +303,9 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                     promotionStartDate: null,
                     promotionEndDate: null,
                     currencyId: null,
+                    deletedImages: [],
+                    deletedVideos: [],
+                    deletedModels3d: [],
                 },
             ]);
         }
@@ -360,6 +367,9 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
             promotionStartDate: null,
             promotionEndDate: null,
             currencyId: null,
+            deletedImages: [],
+            deletedVideos: [],
+            deletedModels3d: [],
         };
         setVariants([...variants, newVariant]);
     };
@@ -470,16 +480,41 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
     };
 
     const handleRemoveFile = (variantId: string, type: "images" | "videos" | "models3d", index: number) => {
-        setVariants(
-            variants.map((v) =>
-                v.id === variantId
-                    ? {
+        setVariants(variants.map((v) => {
+            if (v.id === variantId) {
+                const fileToRemove = v[type][index];
+                
+                // If removing an existing media file (not a new File upload), track it for deletion
+                if (fileToRemove && !(fileToRemove instanceof File)) {
+                    const deletedKey = type === "models3d" ? "deletedModels3d" : type === "videos" ? "deletedVideos" : "deletedImages";
+                    let mediaId: number;
+                    
+                    if (type === "models3d" && 'yobjet3did' in fileToRemove) {
+                        mediaId = fileToRemove.yobjet3did;
+                    } else if ('ymediaid' in fileToRemove) {
+                        mediaId = fileToRemove.ymediaid;
+                    } else {
+                        return {
+                            ...v,
+                            [type]: v[type].filter((_, i) => i !== index),
+                        };
+                    }
+                    
+                    return {
                         ...v,
                         [type]: v[type].filter((_, i) => i !== index),
-                    }
-                    : v
-            )
-        );
+                        [deletedKey]: [...(v[deletedKey] || []), mediaId],
+                    };
+                }
+                
+                // For new File uploads, just remove from array
+                return {
+                    ...v,
+                    [type]: v[type].filter((_, i) => i !== index),
+                };
+            }
+            return v;
+        }));
     };
 
     const handleCreateColor = async () => {
@@ -767,6 +802,10 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                         models3d: v.models3d.filter((model): model is File => model instanceof File),
                         backgroundColor: normalizedBgColor,
                         ycouleurarriereplan: normalizedBgColor,
+                        // Include deleted media tracking
+                        deletedImages: v.deletedImages || [],
+                        deletedVideos: v.deletedVideos || [],
+                        deletedModels3d: v.deletedModels3d || [],
                     };
                 });
                 console.log("Updating product with background colors:", formattedVariants.map(v => ({
@@ -1790,31 +1829,48 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                                         </Button>
                                                                     </div>
                                                                     <div className="flex flex-wrap gap-2">
-                                                                        {variant.images.map((file, fileIndex) => (
-                                                                            <Badge
-                                                                                key={fileIndex}
-                                                                                variant="secondary"
-                                                                                className="bg-blue-100 text-blue-800 border-blue-200"
-                                                                            >
-                                                                                {file instanceof File
-                                                                                    ? file.name
-                                                                                    : file.ymediaintitule}
-                                                                                <Button
-                                                                                    onClick={() =>
-                                                                                        handleRemoveFile(
-                                                                                            variant.id,
-                                                                                            "images",
-                                                                                            fileIndex
-                                                                                        )
-                                                                                    }
-                                                                                    size="sm"
-                                                                                    variant="ghost"
-                                                                                    className="h-4 w-4 p-0 ml-1 hover:bg-red-100"
-                                                                                >
-                                                                                    <Trash2 className="h-2 w-2" />
-                                                                                </Button>
-                                                                            </Badge>
-                                                                        ))}
+                                                                        {variant.images.map((file, fileIndex) => {
+                                                                            const imageUrl = file instanceof File 
+                                                                                ? URL.createObjectURL(file) 
+                                                                                : file.ymediaurl;
+                                                                            
+                                                                            return (
+                                                                                <div key={fileIndex} className="relative group">
+                                                                                    <div className="flex items-center gap-2 bg-blue-100 text-blue-800 border border-blue-200 rounded-full px-3 py-1 pr-8 hover:bg-blue-200 transition-colors">
+                                                                                        <img 
+                                                                                            src={imageUrl} 
+                                                                                            alt={file instanceof File ? file.name : file.ymediaintitule}
+                                                                                            className="w-6 h-6 object-cover rounded"
+                                                                                            onError={(e) => {
+                                                                                                // Fallback to icon if image fails to load
+                                                                                                const target = e.target as HTMLImageElement;
+                                                                                                target.style.display = 'none';
+                                                                                                const icon = target.nextElementSibling as HTMLElement;
+                                                                                                if (icon) icon.style.display = 'block';
+                                                                                            }}
+                                                                                        />
+                                                                                        <Image className="h-4 w-4 hidden" />
+                                                                                        <span className="text-sm truncate max-w-[120px]">
+                                                                                            {file instanceof File ? file.name : file.ymediaintitule}
+                                                                                        </span>
+                                                                                    </div>
+                                                                                    <Button
+                                                                                        onClick={() =>
+                                                                                            handleRemoveFile(
+                                                                                                variant.id,
+                                                                                                "images",
+                                                                                                fileIndex
+                                                                                            )
+                                                                                        }
+                                                                                        size="sm"
+                                                                                        variant="ghost"
+                                                                                        className="absolute -top-1 -right-1 h-5 w-5 p-0 bg-red-500 hover:bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                                                                    >
+                                                                                        <Trash2 className="h-3 w-3" />
+                                                                                    </Button>
+                                                                                </div>
+                                                                            );
+                                                                        })}
                                                                     </div>
                                                                 </div>
 
@@ -2000,17 +2056,32 @@ export function CreateProductDialog({ isOpen, onClose, productId }: CreateProduc
                                                                             <span className="text-sm text-gray-700">{t("admin.createProduct.images")}</span>
                                                                         </div>
                                                                         <div className="flex flex-wrap gap-2">
-                                                                            {variant.images.map((file, fileIndex) => (
-                                                                                <Badge
-                                                                                    key={fileIndex}
-                                                                                    variant="secondary"
-                                                                                    className="bg-blue-100 text-blue-800 border-blue-200"
-                                                                                >
-                                                                                    {file instanceof File
-                                                                                        ? file.name
-                                                                                        : file.ymediaintitule}
-                                                                                </Badge>
-                                                                            ))}
+                                                                            {variant.images.map((file, fileIndex) => {
+                                                                                const imageUrl = file instanceof File 
+                                                                                    ? URL.createObjectURL(file) 
+                                                                                    : file.ymediaurl;
+                                                                                
+                                                                                return (
+                                                                                    <div key={fileIndex} className="flex items-center gap-2 bg-blue-100 text-blue-800 border border-blue-200 rounded-full px-3 py-1">
+                                                                                        <img 
+                                                                                            src={imageUrl} 
+                                                                                            alt={file instanceof File ? file.name : file.ymediaintitule}
+                                                                                            className="w-6 h-6 object-cover rounded"
+                                                                                            onError={(e) => {
+                                                                                                // Fallback to icon if image fails to load
+                                                                                                const target = e.target as HTMLImageElement;
+                                                                                                target.style.display = 'none';
+                                                                                                const icon = target.nextElementSibling as HTMLElement;
+                                                                                                if (icon) icon.style.display = 'block';
+                                                                                            }}
+                                                                                        />
+                                                                                        <Image className="h-4 w-4 hidden" />
+                                                                                        <span className="text-sm truncate max-w-[120px]">
+                                                                                            {file instanceof File ? file.name : file.ymediaintitule}
+                                                                                        </span>
+                                                                                    </div>
+                                                                                );
+                                                                            })}
                                                                         </div>
                                                                     </div>
                                                                 )}
