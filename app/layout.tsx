@@ -35,10 +35,8 @@ export default function RootLayout({
         <html lang="en" className={`${supreme.variable} ${recia.variable}`}>
             <body className="antialiased">
                 <ClientProviders>
-                    <CookieConsentProvider>
                         {children}
                         <CookieConsentBanner />
-                    </CookieConsentProvider>
                 </ClientProviders>
             </body>
         </html>

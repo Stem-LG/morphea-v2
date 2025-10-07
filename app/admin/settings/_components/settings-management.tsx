@@ -39,6 +39,8 @@ interface PredefinedSetting {
         | 'email'
         | 'url'
         | 'currency_select'
+        | 'datetime-local'
+        | 'datetime-local'
     defaultValue: string
     required?: boolean
     options?: Array<{ value: string; label: string }>
@@ -85,6 +87,14 @@ const getPredefinedSettings = (
         label: t('admin.settings.mellimeUrl'),
         description: t('admin.settings.mellimeUrlDescription'),
         type: 'url' as const,
+        defaultValue: '',
+        required: false,
+    },
+    {
+        key: 'coming_soon_date',
+        label: t('admin.settings.comingSoonDate'),
+        description: t('admin.settings.comingSoonDateDescription'),
+        type: 'datetime-local' as const,
         defaultValue: '',
         required: false,
     },

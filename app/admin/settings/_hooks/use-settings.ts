@@ -128,7 +128,8 @@ const ALLOWED_SETTING_KEYS = [
   'footer_link_cookies_privacy',
   'footer_link_terms',
   // Creators mapping
-  'creators_images_by_boutique'
+  'creators_images_by_boutique',
+  'coming_soon_date'
 ]
 
 export function useUpdateSetting() {

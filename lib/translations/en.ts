@@ -962,6 +962,8 @@ export const enTranslations = {
       "poweredByDescription": "Text to display in the 'Powered by' footer",
       "mellimeUrl": "Mellime URL",
       "mellimeUrlDescription": "Base URL for Mellime integration",
+      "comingSoonDate": "Coming Soon Date",
+      "comingSoonDateDescription": "Date and time when the site will be active again. Leave empty to disable coming soon mode.",
       "selectDefaultCurrency": "Select default currency...",
       "pivotCurrency": "- Pivot Currency",
       "settingSet": "Set",
