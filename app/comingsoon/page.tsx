@@ -94,9 +94,9 @@ export default function ComingSoonPage() {
                 </div>
 
                 {/* Newsletter Form */}
-                <div className="max-w-md mx-auto">
-                    <p className="mb-8 text-gray-600 font-light">
-                        Soyez parmi les premiers à découvrir notre collection exclusive.
+                <div className="max-w-xl mx-auto">
+                    <p className="mb-8 text-sm text-gray-600 font-light">
+                        Inscrivez-vous pour être parmi les premiers invités à pénétrer nos boutiques virtuelles et à découvrir les collections soigneusement imaginées par nos créateurs.
                     </p>
                     <form onSubmit={onSubmit} className="relative group">
                         <input
