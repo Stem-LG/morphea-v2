@@ -10,7 +10,7 @@ export default function MainPage() {
             <VirtualTour
                 height="100vh"
                 width="100%"
-                startingScene="15"
+                startingScene="1759925208651"
                 showNavbar={true}
                 accountForNavbar={true}
                 startingPitch={0}
