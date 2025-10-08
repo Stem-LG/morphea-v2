@@ -17,6 +17,8 @@ import { ShoppingCart, CreditCard, MapPin, ArrowLeft } from 'lucide-react'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
+import { loadStripe } from '@stripe/stripe-js'
+import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js'
 
 interface AddressForm {
     firstName: string
@@ -36,7 +38,145 @@ interface PaymentForm {
     cardholderLastName: string
 }
 
-export default function OrderPage() {
+const StripePaymentForm = ({ onContinue }: { onContinue: (paymentIntentId: string) => void }) => {
+    const stripe = useStripe()
+    const elements = useElements()
+    const [isProcessing, setIsProcessing] = useState(false)
+    const { data: currentUser } = useAuth()
+    const { data: cartItems = [] } = useCart()
+    const { currentCurrency } = useCurrency()
+    const { data: deliveryFee = 10 } = useDeliveryFee()
+    const [paymentIntentId, setPaymentIntentId] = useState<string>('')
+
+    const subtotal = cartItems.reduce((total, item) => {
+        if (!item.yvarprod) return total
+        const price = item.yvarprod.yvarprodprixpromotion || item.yvarprod.yvarprodprixcatalogue || 0
+        return total + price * item.ypanierqte
+    }, 0)
+
+    const total = subtotal + deliveryFee
+
+    const createPaymentIntent = async () => {
+        if (!currentUser?.id) return
+
+        try {
+            const response = await fetch('/api/stripe/create-payment-intent', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    amount: total,
+                    currency: currentCurrency.xdevisecodealpha,
+                    orderItems: cartItems.map(item => ({
+                        id: item.yvarprod?.yvarprodid,
+                        quantity: item.ypanierqte,
+                        price: item.yvarprod?.yvarprodprixpromotion || item.yvarprod?.yvarprodprixcatalogue,
+                    })),
+                    userId: currentUser.id,
+                }),
+            })
+
+            const data = await response.json()
+            if (data.clientSecret) {
+                setPaymentIntentId(data.paymentIntentId)
+                return data.clientSecret
+            } else {
+                throw new Error(data.error || 'Failed to create payment intent')
+            }
+        } catch (error: any) {
+            console.error('Error creating payment intent:', error)
+            throw error
+        }
+    }
+
+    const handleSubmit = async (event: React.FormEvent) => {
+        event.preventDefault()
+
+        if (!stripe || !elements) {
+            toast.error('Stripe not initialized')
+            return
+        }
+
+        const cardElement = elements.getElement(CardElement)
+        if (!cardElement) {
+            toast.error('Card element not found')
+            return
+        }
+
+        setIsProcessing(true)
+
+        try {
+            // Create payment intent first
+            const secret = await createPaymentIntent()
+            if (!secret) return
+
+            // Confirm the payment using the client secret and card element
+            const { error } = await stripe.confirmCardPayment(secret, {
+                payment_method: {
+                    card: cardElement,
+                },
+                return_url: `${window.location.origin}/order-confirmation`,
+            })
+
+            if (error) {
+                toast.error(error.message || 'Payment failed')
+                return
+            }
+
+            // Payment succeeded, continue to review
+            onContinue(paymentIntentId)
+        } catch (error: any) {
+            toast.error(error.message || 'Payment initialization failed')
+        } finally {
+            setIsProcessing(false)
+        }
+    }
+
+    return (
+        <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+                <Label className="font-supreme font-semibold text-[#053340]">
+                    Card Information <span className="text-red-500">*</span>
+                </Label>
+                <div className="mt-2 rounded-md border border-gray-300 bg-white p-3 focus-within:border-[#053340] focus-within:ring-1 focus-within:ring-[#053340]">
+                    <CardElement
+                        options={{
+                            style: {
+                                base: {
+                                    fontSize: '16px',
+                                    color: '#053340',
+                                    '::placeholder': {
+                                        color: '#9CA3AF',
+                                    },
+                                },
+                            },
+                        }}
+                    />
+                </div>
+            </div>
+            <div className="flex justify-between pt-4">
+                <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => window.history.back()}
+                    className="font-supreme border-gray-300 font-medium text-[#053340] hover:border-[#053340] hover:bg-gray-50"
+                >
+                    Back to Shipping
+                </Button>
+                <Button
+                    type="submit"
+                    disabled={!stripe || isProcessing}
+                    className="font-supreme bg-[#053340] font-semibold text-white shadow-lg transition-all hover:bg-[#053340]/90 hover:shadow-xl disabled:opacity-50"
+                >
+                    {isProcessing ? 'Processing...' : 'Continue to Review'}
+                </Button>
+            </div>
+        </form>
+    )
+}
+
+function OrderPage() {
     const { t } = useLanguage()
     const { formatPrice, currencies, convertPrice, currentCurrency } =
         useCurrency()
@@ -47,8 +187,15 @@ export default function OrderPage() {
     const { data: deliveryFee = 10, isLoading: isLoadingDeliveryFee } =
         useDeliveryFee()
 
+    // Stripe hooks
+    const stripe = useStripe()
+    const elements = useElements()
+
     // Stepper state
     const [currentStep, setCurrentStep] = useState(1)
+
+    // Stripe state
+    const [paymentIntentId, setPaymentIntentId] = useState<string>('')
 
     const steps = [
         {
@@ -90,13 +237,40 @@ export default function OrderPage() {
         phone: '',
     })
 
-    const [paymentForm, setPaymentForm] = useState<PaymentForm>({
-        cardNumber: '',
-        expiryDate: '',
-        cvv: '',
-        cardholderFirstName: '',
-        cardholderLastName: '',
-    })
+    // Payment intent creation
+    const createPaymentIntent = async () => {
+        if (!currentUser?.id) return
+
+        try {
+            const response = await fetch('/api/stripe/create-payment-intent', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    amount: total,
+                    currency: currentCurrency.xdevisecodealpha,
+                    orderItems: cartItems.map(item => ({
+                        id: item.yvarprod?.yvarprodid,
+                        quantity: item.ypanierqte,
+                        price: item.yvarprod?.yvarprodprixpromotion || item.yvarprod?.yvarprodprixcatalogue,
+                    })),
+                    userId: currentUser.id,
+                }),
+            })
+
+            const data = await response.json()
+            if (data.clientSecret) {
+                setPaymentIntentId(data.paymentIntentId)
+                return data.clientSecret
+            } else {
+                throw new Error(data.error || 'Failed to create payment intent')
+            }
+        } catch (error: any) {
+            console.error('Error creating payment intent:', error)
+            toast.error('Failed to initialize payment')
+        }
+    }
 
     const calculateSubtotal = () => {
         return cartItems.reduce((total, item) => {
@@ -203,17 +377,9 @@ export default function OrderPage() {
         setAddressForm((prev) => ({ ...prev, [field]: value }))
     }
 
-    const handlePaymentChange = (field: keyof PaymentForm, value: string) => {
-        setPaymentForm((prev) => ({ ...prev, [field]: value }))
-    }
-
     // Validation functions
     const validateAddressForm = () => {
         return Object.values(addressForm).every((value) => value.trim() !== '')
-    }
-
-    const validatePaymentForm = () => {
-        return Object.values(paymentForm).every((value) => value.trim() !== '')
     }
 
     const handleContinueToShipping = () => {
@@ -224,31 +390,24 @@ export default function OrderPage() {
         if (!validateAddressForm()) {
             toast.error(
                 t('order.pleaseCompleteAddressFields') ||
-                    'Please complete all address fields'
+                'Please complete all address fields'
             )
             return
         }
         nextStep()
     }
 
-    const handleContinueToReview = () => {
-        if (!validatePaymentForm()) {
-            toast.error(
-                t('order.pleaseCompletePaymentFields') ||
-                    'Please complete all payment fields'
-            )
-            return
-        }
-        if (paymentForm.cardNumber.length < 16) {
-            toast.error(t('order.invalidCardNumber') || 'Invalid card number')
-            return
-        }
+    const handleContinueToReview = (paymentIntentId: string) => {
+        setPaymentIntentId(paymentIntentId)
         nextStep()
     }
 
     const handlePlaceOrder = async () => {
         try {
-            await createOrderMutation.mutateAsync({ cartItems })
+            await createOrderMutation.mutateAsync({
+                cartItems,
+                paymentIntentId
+            })
             toast.success(t('order.orderPlacedSuccessfully'))
             router.push('/order-confirmation')
         } catch (error) {
@@ -575,142 +734,7 @@ export default function OrderPage() {
     )
 
     const renderPaymentInfo = () => (
-        <Card className="border-border bg-card shadow-lg">
-            <CardHeader className="border-b border-border pb-4">
-                <CardTitle className="flex items-center gap-3 text-card-foreground">
-                    <div className="rounded-lg bg-muted p-2">
-                        <CreditCard className="h-5 w-5 text-foreground" />
-                    </div>
-                    <span className="font-recia text-2xl font-extrabold">
-                        {t('order.paymentInformation')}
-                    </span>
-                </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6 pt-6">
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                    <div>
-                        <Label
-                            htmlFor="cardholderFirstName"
-                            className="font-supreme font-semibold text-[#053340]"
-                        >
-                            {t('profile.firstName') || 'First Name'}<span className="text-red-500"> *</span>
-                        </Label>
-                        <Input
-                            id="cardholderFirstName"
-                            value={paymentForm.cardholderFirstName}
-                            onChange={(e) =>
-                                handlePaymentChange(
-                                    'cardholderFirstName',
-                                    e.target.value
-                                )
-                            }
-                            className="mt-2 h-12 border-gray-300 bg-white text-[#053340] placeholder:text-gray-400 focus:border-[#053340] focus:ring-[#053340]"
-                            placeholder={
-                                t('order.firstNamePlaceholder') ||
-                                'Enter cardholder first name'
-                            }
-                        />
-                    </div>
-                    <div>
-                        <Label
-                            htmlFor="cardholderLastName"
-                            className="font-supreme font-semibold text-[#053340]"
-                        >
-                            {t('profile.lastName') || 'Last Name'}<span className="text-red-500"> *</span>
-                        </Label>
-                        <Input
-                            id="cardholderLastName"
-                            value={paymentForm.cardholderLastName}
-                            onChange={(e) =>
-                                handlePaymentChange(
-                                    'cardholderLastName',
-                                    e.target.value
-                                )
-                            }
-                            className="mt-2 h-12 border-gray-300 bg-white text-[#053340] placeholder:text-gray-400 focus:border-[#053340] focus:ring-[#053340]"
-                            placeholder={
-                                t('order.lastNamePlaceholder') ||
-                                'Enter cardholder last name'
-                            }
-                        />
-                    </div>
-                </div>
-                <div>
-                    <Label
-                        htmlFor="cardNumber"
-                        className="font-supreme font-semibold text-[#053340]"
-                    >
-                        {t('order.cardNumber')}<span className="text-red-500"> *</span>
-                    </Label>
-                    <Input
-                        id="cardNumber"
-                        value={paymentForm.cardNumber}
-                        onChange={(e) =>
-                            handlePaymentChange('cardNumber', e.target.value)
-                        }
-                        className="mt-2 h-12 border-gray-300 bg-white text-[#053340] placeholder:text-gray-400 focus:border-[#053340] focus:ring-[#053340]"
-                        placeholder={t('order.cardNumberPlaceholder')}
-                        maxLength={19}
-                    />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                    <div>
-                        <Label
-                            htmlFor="expiryDate"
-                            className="font-supreme font-semibold text-[#053340]"
-                        >
-                            {t('order.expiryDate')}<span className="text-red-500"> *</span>
-                        </Label>
-                        <Input
-                            id="expiryDate"
-                            value={paymentForm.expiryDate}
-                            onChange={(e) =>
-                                handlePaymentChange(
-                                    'expiryDate',
-                                    e.target.value
-                                )
-                            }
-                            className="mt-2 h-12 border-gray-300 bg-white text-[#053340] placeholder:text-gray-400 focus:border-[#053340] focus:ring-[#053340]"
-                            placeholder={t('order.expiryDatePlaceholder')}
-                            maxLength={5}
-                        />
-                    </div>
-                    <div>
-                        <Label
-                            htmlFor="cvv"
-                            className="font-supreme font-semibold text-[#053340]"
-                        >
-                            {t('order.cvv')}<span className="text-red-500"> *</span>
-                        </Label>
-                        <Input
-                            id="cvv"
-                            value={paymentForm.cvv}
-                            onChange={(e) =>
-                                handlePaymentChange('cvv', e.target.value)
-                            }
-                            className="mt-2 h-12 border-gray-300 bg-white text-[#053340] placeholder:text-gray-400 focus:border-[#053340] focus:ring-[#053340]"
-                            placeholder={t('order.cvvPlaceholder')}
-                            maxLength={4}
-                        />
-                    </div>
-                </div>
-                <div className="flex justify-between pt-4">
-                    <Button
-                        variant="outline"
-                        onClick={prevStep}
-                        className="font-supreme border-gray-300 font-medium text-[#053340] hover:border-[#053340] hover:bg-gray-50"
-                    >
-                        {t('order.backToShipping') || 'Back to Shipping'}
-                    </Button>
-                    <Button
-                        onClick={handleContinueToReview}
-                        className="font-supreme bg-[#053340] font-semibold text-white shadow-lg transition-all hover:bg-[#053340]/90 hover:shadow-xl"
-                    >
-                        {t('order.continueToReview') || 'Continue to Review'}
-                    </Button>
-                </div>
-            </CardContent>
-        </Card>
+        <StripePaymentForm onContinue={handleContinueToReview} />
     )
 
     const renderOrderReview = () => (
@@ -878,52 +902,10 @@ export default function OrderPage() {
                         <CreditCard className="h-4 w-4" />
                         {t('order.paymentInformation')}
                     </h3>
-                    <div className="space-y-2 rounded-lg bg-gray-50 p-4">
-                        <div className="flex gap-4">
-                            <div className="flex-1">
-                                <span className="text-xs tracking-wide text-gray-500 uppercase">
-                                    {t('profile.firstName')}
-                                </span>
-                                <p className="font-supreme font-medium text-[#053340]">
-                                    {paymentForm.cardholderFirstName}
-                                </p>
-                            </div>
-                            <div className="flex-1">
-                                <span className="text-xs tracking-wide text-gray-500 uppercase">
-                                    {t('profile.lastName')}
-                                </span>
-                                <p className="font-supreme font-medium text-[#053340]">
-                                    {paymentForm.cardholderLastName}
-                                </p>
-                            </div>
-                        </div>
-                        <div>
-                            <span className="text-xs tracking-wide text-gray-500 uppercase">
-                                {t('order.cardNumber')}
-                            </span>
-                            <p className="font-supreme font-medium text-[#053340]">
-                                •••• •••• ••••{' '}
-                                {paymentForm.cardNumber.slice(-4)}
-                            </p>
-                        </div>
-                        <div className="flex gap-4">
-                            <div className="flex-1">
-                                <span className="text-xs tracking-wide text-gray-500 uppercase">
-                                    {t('order.expiryDate')}
-                                </span>
-                                <p className="font-supreme font-medium text-[#053340]">
-                                    {paymentForm.expiryDate}
-                                </p>
-                            </div>
-                            <div className="flex-1">
-                                <span className="text-xs tracking-wide text-gray-500 uppercase">
-                                    {t('order.cvv')}
-                                </span>
-                                <p className="font-supreme font-medium text-[#053340]">
-                                    •••
-                                </p>
-                            </div>
-                        </div>
+                    <div className="rounded-lg bg-gray-50 p-4">
+                        <p className="font-supreme text-[#053340]">
+                            Payment method will be processed securely via Stripe
+                        </p>
                     </div>
                 </div>
 
@@ -1041,5 +1023,15 @@ export default function OrderPage() {
                 </div>
             </div>
         </div>
+    )
+}
+
+export default function OrderPageWrapper() {
+    const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
+
+    return (
+        <Elements stripe={stripePromise}>
+            <OrderPage />
+        </Elements>
     )
 }

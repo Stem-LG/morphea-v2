@@ -17,6 +17,7 @@ interface CartItem {
 
 interface CreateOrderParams {
   cartItems: CartItem[];
+  paymentIntentId?: string;
 }
 
 export function useCreateOrder() {
@@ -25,7 +26,7 @@ export function useCreateOrder() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ cartItems }: CreateOrderParams) => {
+    mutationFn: async ({ cartItems, paymentIntentId }: CreateOrderParams) => {
       if (!userData) {
         throw new Error("User not authenticated");
       }
@@ -37,7 +38,7 @@ export function useCreateOrder() {
       // Generate a unique order number using timestamp
       const zcommandeno = Date.now().toString();
       const currentDate = new Date().toISOString();
-      
+
       // Calculate delivery date (7 days from now)
       const deliveryDate = new Date();
       deliveryDate.setDate(deliveryDate.getDate() + 7);
@@ -130,7 +131,7 @@ export function useCreateOrder() {
         zcommandequantite: item.ypanierqte,
         zcommandedate: currentDate,
         zcommandelivraisondate: zcommandelivraisondate,
-        zcommandestatut: "pending",
+        zcommandestatut: paymentIntentId ? "paid" : "pending",
         sysaction: "INSERT",
         sysuser: userData.id,
         sysdate: currentDate,
