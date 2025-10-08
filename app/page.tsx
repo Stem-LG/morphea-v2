@@ -193,7 +193,7 @@ export default function Home() {
     // Video and overlay data - now dynamic from settings
     const videoData = {
         side1: {
-            src: homeSettings?.hero.video1.url || '/v1.mp4',
+            src: homeSettings?.hero.video1.url,
             topText:
                 homeSettings?.hero.video1.topText[language] ||
                 t('homepage.hero.mode'),
