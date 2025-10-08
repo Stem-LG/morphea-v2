@@ -51,7 +51,7 @@ export async function updateSession(request: NextRequest) {
     const now = new Date()
     const targetDate = new Date(comingSoonDate)
 
-    if (now > targetDate) {
+    if (now < targetDate) {
       // Site is in coming soon mode
       const isLoginPage = request.nextUrl.pathname.startsWith('/auth/login') || request.nextUrl.pathname === '/login'
       const isAdminPage = request.nextUrl.pathname.startsWith('/admin') || request.nextUrl.pathname === '/admin'

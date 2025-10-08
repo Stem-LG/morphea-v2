@@ -88,7 +88,7 @@ export default function ComingSoonPage() {
                         {/* Elegant Divider */}
                         <div className="flex items-center justify-center space-x-2 md:space-x-4 px-4">
                             <div className="h-px w-8 md:w-16 bg-gradient-to-r from-transparent to-gray-800" />
-                            <span className="text-xs sm:text-sm md:text-base lg:text-xl uppercase tracking-[0.15em] md:tracking-[0.3em] text-gray-900 text-center">Morphea sera dévoilée à 22H</span>
+                            <span className="text-xs sm:text-sm md:text-base lg:text-xl uppercase tracking-[0.15em] md:tracking-[0.3em] text-gray-900 text-center">Morphea sera dévoilée à 00H</span>
                             <div className="h-px w-8 md:w-16 bg-gradient-to-l from-transparent to-gray-800" />
                         </div>
                 </div>
