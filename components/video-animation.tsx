@@ -83,7 +83,7 @@ export default function VideoAnimation() {
 
                         {/* Video - stays in same position - Mobile Responsive */}
                         <video
-                            src="/morpheus.webm"
+                            src="https://bv90iny2pa.ufs.sh/f/JbGxKbqSczovLyH4jNwzwAQ8gnLDNVGBRdy1HukflXxpW3KS"
                             autoPlay
                             muted
                             playsInline
