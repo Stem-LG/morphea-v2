@@ -19,16 +19,16 @@ export default function AdminRejectedProductsPage() {
     const { t } = useLanguage();
     const [viewMode, setViewMode] = useState<'table' | 'cards'>('table');
     const { filters, updateFilters, pagination, updatePagination } = useProductFilters();
-    
+
     // Dialog state for product view
     const [isProductViewDialogOpen, setIsProductViewDialogOpen] = useState(false);
     const [viewingProductId, setViewingProductId] = useState<number | null>(null);
-    
+
     const {
         data: result,
         isLoading
     } = useProductsByStatus("rejected", filters, pagination);
-    
+
     const filterOptions = useFilterOptions();
     const products = result?.data || [];
     const paginationData = result?.pagination;
@@ -123,6 +123,8 @@ export default function AdminRejectedProductsPage() {
                                 onPageChange: (page) => updatePagination({ page }),
                             }}
                             serverFilters={true}
+                            globalFilter={filters.search || ''}
+                            onGlobalFilterChange={(value) => updateFilters({ search: value || null })}
                         />
                     </CardContent>
                 </Card>

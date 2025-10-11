@@ -532,6 +532,7 @@ export const frTranslations = {
       "allProducts": "Tous les Produits",
       "newProducts": "Nouveaux Produits",
       "variantApprovals": "Approbations de Variantes",
+      "pendingProducts": "Approbations de Produits",
       "rejected": "Rejeté",
       "allCategories": "Toutes les Catégories",
       "allStores": "Toutes les Boutiques",
@@ -625,7 +626,8 @@ export const frTranslations = {
       "productApprovalRequirements": "Le produit ne peut pas être approuvé - informations requises manquantes",
       "productApprovalRequirementsMessage": "Pour approuver ce produit, veuillez compléter les éléments suivants",
       "categoryRequired": "Sélectionner une catégorie de produit",
-      "none": "Aucune"
+      "none": "Aucune",
+      "preview": "Aperçu",
     },
     "currencies": {
       "title": "Gestion des Devises",

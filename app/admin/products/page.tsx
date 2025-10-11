@@ -161,7 +161,7 @@ export default function AdminApprovedProductsPage() {
                         <Eye className="mr-2 h-4 w-4" />
                         {Object.keys(rowSelection).length > 0
                             ? t('admin.makeSelectedVisible') ||
-                              'Make Selected Visible'
+                            'Make Selected Visible'
                             : t('admin.makeAllVisible') || 'Make All Visible'}
                     </Button>
                     <Button
@@ -174,9 +174,9 @@ export default function AdminApprovedProductsPage() {
                         <EyeOff className="mr-2 h-4 w-4" />
                         {Object.keys(rowSelection).length > 0
                             ? t('admin.makeSelectedInvisible') ||
-                              'Make Selected Invisible'
+                            'Make Selected Invisible'
                             : t('admin.makeAllInvisible') ||
-                              'Make All Invisible'}
+                            'Make All Invisible'}
                     </Button>
                     {/* View mode toggle */}
                     <div className="ml-2 border-l border-gray-600 pl-2">
@@ -244,6 +244,8 @@ export default function AdminApprovedProductsPage() {
                                     updatePagination({ page }),
                             }}
                             serverFilters={true}
+                            globalFilter={filters.search || ''}
+                            onGlobalFilterChange={(value) => updateFilters({ search: value || null })}
                         />
                     </CardContent>
                 </Card>

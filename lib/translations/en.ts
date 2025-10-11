@@ -505,6 +505,7 @@ export const enTranslations = {
       "allProducts": "All Products",
       "newProducts": "New Products",
       "variantApprovals": "Variant Approvals",
+      "pendingProducts": "Product Approvals",
       "rejected": "Rejected",
       "allCategories": "All Categories",
       "allStores": "All Stores",
@@ -598,7 +599,8 @@ export const enTranslations = {
       "productApprovalRequirements": "Product cannot be approved - missing required information",
       "productApprovalRequirementsMessage": "To approve this product, please complete the following",
       "categoryRequired": "Select a product category",
-      "none": "None"
+      "none": "None",
+      "preview": "Preview",
     },
     "currencies": {
       "title": "Currency Management",
