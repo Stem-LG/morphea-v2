@@ -289,7 +289,7 @@ export default function Home() {
             t('homepage.creators.subtitle'),
         images:
             homeSettings?.creators.images &&
-            homeSettings.creators.images.length > 0
+                homeSettings.creators.images.length > 0
                 ? homeSettings.creators.images
                 : [],
         creators: homeSettings?.creators.creators || [],
@@ -306,6 +306,7 @@ export default function Home() {
                     autoPlay
                     muted={isMuted}
                     playsInline
+                    preload='none'
                 />
                 <video
                     ref={video2Ref}
@@ -315,6 +316,7 @@ export default function Home() {
                     autoPlay
                     muted={isMuted}
                     playsInline
+                    preload='none'
                 />
             </div>
 
