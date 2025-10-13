@@ -34,49 +34,49 @@ export function useUpdateEvent() {
             } = updateData;
 
             try {
-               // If updating dates, validate them
-               if (eventFields.startDate || eventFields.endDate) {
-                   const now = new Date();
-                   const start = eventFields.startDate ? new Date(eventFields.startDate) : undefined;
-                   const end = eventFields.endDate ? new Date(eventFields.endDate) : undefined;
+                // If updating dates, validate them
+                if (eventFields.startDate || eventFields.endDate) {
+                    const now = new Date();
+                    const start = eventFields.startDate ? new Date(eventFields.startDate) : undefined;
+                    const end = eventFields.endDate ? new Date(eventFields.endDate) : undefined;
 
-                   // For start date validation: allow past dates but not before the original start date
-                   if (start && updateData.originalStartDate) {
-                       const originalStart = new Date(updateData.originalStartDate);
-                       if (start < originalStart) {
-                           throw new Error("Event start date cannot be before the original start date");
-                       }
-                   }
-                   
-                   // For end date validation: still prevent past end dates
-                   if (end && end < now) {
-                       throw new Error("Event end date cannot be in the past");
-                   }
-                   
-                   if (start && end && end < start) {
-                       throw new Error("Event end date cannot be before start date");
-                   }
+                    // For start date validation: allow past dates but not before the original start date
+                    if (start && updateData.originalStartDate) {
+                        const originalStart = new Date(updateData.originalStartDate);
+                        if (start < originalStart) {
+                            throw new Error("Event start date cannot be before the original start date");
+                        }
+                    }
 
-                   // Fetch existing events excluding current
-                   const { data: existingEvents, error: existingEventsError } = await supabase
-                       .schema("morpheus")
-                       .from("yevent")
-                       .select("yeventid, yeventdatedeb, yeventdatefin")
-                       .neq("yeventid", eventId);
-                   if (existingEventsError) {
-                       throw new Error(`Failed to fetch existing events: ${existingEventsError.message}`);
-                   }
-                   const checkStart = start || new Date();
-                   const checkEnd = end || start || new Date();
-                   for (const ev of existingEvents || []) {
-                       const evStart = new Date(ev.yeventdatedeb);
-                       const evEnd = new Date(ev.yeventdatefin);
-                       const overlap = (checkStart <= evEnd && checkEnd >= evStart);
-                       if (overlap) {
-                           throw new Error("Updated event dates overlap with an existing event");
-                       }
-                   }
-               }
+                    // For end date validation: still prevent past end dates
+                    if (end && end < now) {
+                        throw new Error("Event end date cannot be in the past");
+                    }
+
+                    if (start && end && end < start) {
+                        throw new Error("Event end date cannot be before start date");
+                    }
+
+                    // Fetch existing events excluding current
+                    const { data: existingEvents, error: existingEventsError } = await supabase
+                        .schema("morpheus")
+                        .from("yevent")
+                        .select("yeventid, yeventdatedeb, yeventdatefin")
+                        .neq("yeventid", eventId);
+                    if (existingEventsError) {
+                        throw new Error(`Failed to fetch existing events: ${existingEventsError.message}`);
+                    }
+                    const checkStart = start || new Date();
+                    const checkEnd = end || start || new Date();
+                    for (const ev of existingEvents || []) {
+                        const evStart = new Date(ev.yeventdatedeb);
+                        const evEnd = new Date(ev.yeventdatefin);
+                        const overlap = (checkStart <= evEnd && checkEnd >= evStart);
+                        if (overlap) {
+                            throw new Error("Updated event dates overlap with an existing event");
+                        }
+                    }
+                }
                 // Step 1: Update event basic information if provided
                 const basicFields = { code: eventFields.code, name: eventFields.name, startDate: eventFields.startDate, endDate: eventFields.endDate };
                 if (Object.values(basicFields).some(val => val !== undefined)) {
@@ -166,72 +166,135 @@ export function useUpdateEvent() {
                     }
                 }
 
-                // Step 4: Update mall/boutique/designer relationships
-                // Preserve existing designer assignments BEFORE deletion
-                let preservedAssignments: { yboutiqueidfk: number; ydesignidfk: number }[] = [];
-                try {
-                    const { data: assignmentsBeforeDelete, error: assignmentsFetchError } = await supabase
-                        .schema("morpheus")
-                        .from("ydetailsevent")
-                        .select("yboutiqueidfk, ydesignidfk")
-                        .eq("yeventidfk", eventId)
-                        .not("yboutiqueidfk", "is", null)
-                        .not("ydesignidfk", "is", null);
-
-                    if (assignmentsFetchError) {
-                        console.warn("Could not fetch existing designer assignments before delete:", assignmentsFetchError.message);
-                    } else {
-                        preservedAssignments = assignmentsBeforeDelete || [];
-                    }
-                } catch (e) {
-                    console.warn("Unexpected error while preserving assignments:", (e as Error).message);
-                }
-
-                // Now remove all existing ydetailsevent records for this event
-                const { error: removeDetailsError } = await supabase
+                // Step 4: Update mall/boutique relationships surgically
+                // First, fetch ALL existing ydetailsevent records for this event
+                const { data: existingDetails, error: fetchDetailsError } = await supabase
                     .schema("morpheus")
                     .from("ydetailsevent")
-                    .delete()
+                    .select("ydetailseventid, ymallidfk, yboutiqueidfk, ydesignidfk, yprodidfk")
                     .eq("yeventidfk", eventId);
 
-                if (removeDetailsError) {
-                    throw new Error(`Failed to remove existing event details: ${removeDetailsError.message}`);
+                if (fetchDetailsError) {
+                    throw new Error(`Failed to fetch existing event details: ${fetchDetailsError.message}`);
                 }
 
-                // Step 5: Create new ydetailsevent records for each mall
-                const mallDetailRecords = selectedMallIds.map((mallId) => ({
-                    yeventidfk: eventId,
-                    ymallidfk: mallId,
-                }));
+                const existing = existingDetails || [];
 
-                if (mallDetailRecords.length > 0) {
-                    const { error: mallDetailsError } = await supabase
+                // Separate records by type:
+                // - Mall-only records (no boutique, no designer, no product)
+                // - Boutique-only records (has boutique, no designer, no product)
+                // - Designer assignment records (has boutique AND designer, no product)
+                // - Product assignment records (has product)
+                const mallOnlyRecords = existing.filter(r =>
+                    !r.yboutiqueidfk && !r.ydesignidfk && !r.yprodidfk
+                );
+                const boutiqueOnlyRecords = existing.filter(r =>
+                    r.yboutiqueidfk && !r.ydesignidfk && !r.yprodidfk
+                );
+                const designerAssignmentRecords = existing.filter(r =>
+                    r.yboutiqueidfk && r.ydesignidfk && !r.yprodidfk
+                );
+                const productAssignmentRecords = existing.filter(r => r.yprodidfk);
+
+                // Determine what needs to change for malls
+                const existingMallIds = new Set(mallOnlyRecords.map(r => r.ymallidfk));
+                const newMallIds = new Set(selectedMallIds);
+
+                const mallsToAdd = selectedMallIds.filter(id => !existingMallIds.has(id));
+                const mallsToRemove = mallOnlyRecords.filter(r => !newMallIds.has(r.ymallidfk));
+
+                // Delete mall-only records that are no longer selected
+                if (mallsToRemove.length > 0) {
+                    const idsToDelete = mallsToRemove.map(r => r.ydetailseventid);
+                    const { error: deleteMallsError } = await supabase
                         .schema("morpheus")
                         .from("ydetailsevent")
-                        .insert(mallDetailRecords);
+                        .delete()
+                        .in("ydetailseventid", idsToDelete);
 
-                    if (mallDetailsError) {
-                        throw new Error(`Failed to create mall event details: ${mallDetailsError.message}`);
+                    if (deleteMallsError) {
+                        throw new Error(`Failed to remove old mall associations: ${deleteMallsError.message}`);
                     }
                 }
 
-                // Step 6: Create ydetailsevent records for boutiques (preserving existing designer assignments)
-                if (selectedBoutiqueIds.length > 0) {
-                    // Fetch boutique data to get mall mappings
-                    const { data: boutiquesData, error: boutiquesError } = await supabase
+                // Insert new mall-only records
+                if (mallsToAdd.length > 0) {
+                    const mallRecordsToInsert = mallsToAdd.map(mallId => ({
+                        yeventidfk: eventId,
+                        ymallidfk: mallId,
+                    }));
+
+                    const { error: insertMallsError } = await supabase
                         .schema("morpheus")
-                        .from("yboutique")
-                        .select("yboutiqueid, ymallidfk")
-                        .in("yboutiqueid", selectedBoutiqueIds);
+                        .from("ydetailsevent")
+                        .insert(mallRecordsToInsert);
 
-                    if (boutiquesError) {
-                        throw new Error(`Failed to fetch boutique data: ${boutiquesError.message}`);
+                    if (insertMallsError) {
+                        throw new Error(`Failed to add new mall associations: ${insertMallsError.message}`);
                     }
+                }
 
-                    // Use preservedAssignments fetched before deletion to keep designer assignments
-                    // Recreate base boutique rows WITHOUT designer assignment
-                    const boutiqueDetailRecords = selectedBoutiqueIds.map((boutiqueId) => {
-                        // Find the mall ID for this boutique
+                // Determine what needs to change for boutiques
+                // Get boutique data to find their mall IDs
+                const { data: boutiquesData, error: boutiquesError } = await supabase
+                    .schema("morpheus")
+                    .from("yboutique")
+                    .select("yboutiqueid, ymallidfk")
+                    .in("yboutiqueid", selectedBoutiqueIds);
+
+                if (boutiquesError) {
+                    throw new Error(`Failed to fetch boutique data: ${boutiquesError.message}`);
+                }
+
+                const existingBoutiqueIds = new Set(boutiqueOnlyRecords.map(r => r.yboutiqueidfk!));
+                const newBoutiqueIds = new Set(selectedBoutiqueIds);
+
+                const boutiquesToAdd = selectedBoutiqueIds.filter(id => !existingBoutiqueIds.has(id));
+                const boutiquesToRemove = boutiqueOnlyRecords.filter(r => !newBoutiqueIds.has(r.yboutiqueidfk!));
+
+                // Delete boutique-only records that are no longer selected
+                // BUT KEEP designer and product assignments even if boutique is deselected
+                if (boutiquesToRemove.length > 0) {
+                    const idsToDelete = boutiquesToRemove.map(r => r.ydetailseventid);
+                    const { error: deleteBoutiquesError } = await supabase
+                        .schema("morpheus")
+                        .from("ydetailsevent")
+                        .delete()
+                        .in("ydetailseventid", idsToDelete);
+
+                    if (deleteBoutiquesError) {
+                        throw new Error(`Failed to remove old boutique associations: ${deleteBoutiquesError.message}`);
+                    }
+                }
+
+                // For boutiques that were deselected, also remove their designer assignments
+                // (but keep product assignments as they might be global)
+                const deselectedBoutiqueIds = boutiqueOnlyRecords
+                    .filter(r => !newBoutiqueIds.has(r.yboutiqueidfk!))
+                    .map(r => r.yboutiqueidfk!);
+
+                if (deselectedBoutiqueIds.length > 0) {
+                    const designerAssignmentsToRemove = designerAssignmentRecords.filter(r =>
+                        deselectedBoutiqueIds.includes(r.yboutiqueidfk!)
+                    );
+
+                    if (designerAssignmentsToRemove.length > 0) {
+                        const idsToDelete = designerAssignmentsToRemove.map(r => r.ydetailseventid);
+                        const { error: deleteDesignersError } = await supabase
+                            .schema("morpheus")
+                            .from("ydetailsevent")
+                            .delete()
+                            .in("ydetailseventid", idsToDelete);
+
+                        if (deleteDesignersError) {
+                            throw new Error(`Failed to remove designer assignments for deselected boutiques: ${deleteDesignersError.message}`);
+                        }
+                    }
+                }
+
+                // Insert new boutique-only records
+                if (boutiquesToAdd.length > 0) {
+                    const boutiqueRecordsToInsert = boutiquesToAdd.map(boutiqueId => {
                         const boutique = boutiquesData?.find(b => b.yboutiqueid === boutiqueId);
                         if (!boutique) {
                             throw new Error(`Boutique with ID ${boutiqueId} not found`);
@@ -241,48 +304,16 @@ export function useUpdateEvent() {
                             yeventidfk: eventId,
                             ymallidfk: boutique.ymallidfk,
                             yboutiqueidfk: boutiqueId,
-                            ydesignidfk: null, // keep base record without designer
                         };
                     });
 
-                    if (boutiqueDetailRecords.length > 0) {
-                        const { error: boutiqueDetailsError } = await supabase
-                            .schema("morpheus")
-                            .from("ydetailsevent")
-                            .insert(boutiqueDetailRecords);
+                    const { error: insertBoutiquesError } = await supabase
+                        .schema("morpheus")
+                        .from("ydetailsevent")
+                        .insert(boutiqueRecordsToInsert);
 
-                        if (boutiqueDetailsError) {
-                            throw new Error(`Failed to create boutique event details: ${boutiqueDetailsError.message}`);
-                        }
-                    }
-
-                    // Recreate preserved designer assignments as SEPARATE rows
-                    if (preservedAssignments && preservedAssignments.length > 0) {
-                        const assignmentRows = preservedAssignments
-                            .filter(a => selectedBoutiqueIds.includes(a.yboutiqueidfk))
-                            .map(a => {
-                                const boutique = boutiquesData?.find(b => b.yboutiqueid === a.yboutiqueidfk);
-                                if (!boutique) {
-                                    throw new Error(`Boutique with ID ${a.yboutiqueidfk} not found for assignment`);
-                                }
-                                return {
-                                    yeventidfk: eventId,
-                                    ymallidfk: boutique.ymallidfk,
-                                    yboutiqueidfk: a.yboutiqueidfk,
-                                    ydesignidfk: a.ydesignidfk,
-                                };
-                            });
-
-                        if (assignmentRows.length > 0) {
-                            const { error: assignmentInsertError } = await supabase
-                                .schema("morpheus")
-                                .from("ydetailsevent")
-                                .insert(assignmentRows);
-
-                            if (assignmentInsertError) {
-                                throw new Error(`Failed to recreate designer assignments: ${assignmentInsertError.message}`);
-                            }
-                        }
+                    if (insertBoutiquesError) {
+                        throw new Error(`Failed to add new boutique associations: ${insertBoutiquesError.message}`);
                     }
                 }
 
