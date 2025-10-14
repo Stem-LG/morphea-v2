@@ -44,10 +44,10 @@ export default function StoreDetails() {
     const params = useParams();
     const storeId = parseInt(params.storeId as string);
     const { data: user } = useAuth();
-    
+
     const isAdmin = user?.app_metadata?.roles?.includes("admin");
     const isStoreAdmin = user?.app_metadata?.roles?.includes("store_admin");
-    
+
     // State for pagination, filters, sorting, and event context using nuqs
     const [{ page, category, search, sortBy, sortOrder, eventId, mallId }, setFilters] = useQueryStates({
         page: parseAsInteger.withDefault(1),
@@ -58,7 +58,7 @@ export default function StoreDetails() {
         eventId: parseAsInteger,
         mallId: parseAsInteger
     });
-    
+
     // Dialog state
     const [isCreateProductDialogOpen, setIsCreateProductDialogOpen] = useState(false);
     const [editingProductId, setEditingProductId] = useState<number | null>(null);
@@ -66,7 +66,7 @@ export default function StoreDetails() {
     const [viewingProductId, setViewingProductId] = useState<number | null>(null);
     const [isDeleteProductDialogOpen, setIsDeleteProductDialogOpen] = useState(false);
     const [productToDelete, setProductToDelete] = useState<Product | null>(null);
-    
+
     const perPage = 10;
     const currentPage = page;
     const categoryFilter = category;
@@ -201,25 +201,25 @@ export default function StoreDetails() {
         // If product itself is not approved, return product status
         if (product.yprodstatut === 'rejected') return 'rejected';
         if (product.yprodstatut === 'not_approved') return 'pending';
-        
+
         // If product is approved, check variant statuses
         if (product.yvarprod && product.yvarprod.length > 0) {
             const statuses = product.yvarprod.map((variant: any) => variant.yvarprodstatut);
             const hasRejected = statuses.includes('rejected');
             const hasPending = statuses.includes('not_approved');
             const hasApproved = statuses.includes('approved');
-            
+
             // If there are rejected variants, show as rejected
             if (hasRejected) return 'rejected';
-            
+
             // If there are pending variants (even with approved product), show as mixed
             if (hasPending && hasApproved) return 'mixed';
             if (hasPending) return 'pending';
-            
+
             // All variants are approved
             if (hasApproved) return 'approved';
         }
-        
+
         // Fallback to product status
         return product.yprodstatut === 'approved' ? 'approved' : 'pending';
     };
@@ -230,14 +230,14 @@ export default function StoreDetails() {
             // Admin can edit everything except rejected products
             return getProductStatus(product) !== 'rejected';
         }
-        
+
         if (isStoreAdmin) {
             const status = getProductStatus(product);
             // Store admin can edit pending products, approved products (to add variants),
             // and mixed status products (to edit unapproved variants)
             return status === 'pending' || status === 'approved' || status === 'mixed';
         }
-        
+
         return false;
     };
 
@@ -247,12 +247,12 @@ export default function StoreDetails() {
             // Admin can delete non-rejected products
             return getProductStatus(product) !== 'rejected';
         }
-        
+
         if (isStoreAdmin) {
             // Store admin can only delete pending products
             return getProductStatus(product) === 'pending';
         }
-        
+
         return false;
     };
 
@@ -298,7 +298,7 @@ export default function StoreDetails() {
             cell: ({ row }) => {
                 const product = row.original;
                 const status = getProductStatus(product);
-                
+
                 const statusConfig = {
                     approved: {
                         icon: CheckCircle,
@@ -329,15 +329,15 @@ export default function StoreDetails() {
                         label: t('admin.mixedStatus')
                     }
                 };
-                
+
                 const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.pending;
                 const Icon = config.icon;
-                
+
                 // For mixed status, show additional variant info
                 if (status === 'mixed' && product.yvarprod) {
                     const pendingCount = product.yvarprod.filter((v: any) => v.yvarprodstatut === 'not_approved').length;
                     const approvedCount = product.yvarprod.filter((v: any) => v.yvarprodstatut === 'approved').length;
-                    
+
                     return (
                         <div className="flex items-center gap-2">
                             <Badge
@@ -362,7 +362,7 @@ export default function StoreDetails() {
                         </div>
                     );
                 }
-                
+
                 return (
                     <Badge
                         variant="secondary"
@@ -395,11 +395,10 @@ export default function StoreDetails() {
                             variant="ghost"
                             onClick={() => handleEditProduct(product)}
                             disabled={!canEditProduct(product)}
-                            className={`h-8 w-8 p-0 ${
-                                canEditProduct(product)
+                            className={`h-8 w-8 p-0 ${canEditProduct(product)
                                     ? "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                                     : "text-gray-400 cursor-not-allowed"
-                            }`}
+                                }`}
                             title={canEditProduct(product) ? t('admin.editProduct') : t('admin.cannotEditProduct')}
                         >
                             <Edit className="h-3 w-3" />
@@ -441,14 +440,13 @@ export default function StoreDetails() {
                         <p className="text-gray-600 mb-4">
                             {t('admin.storeNotFoundMessage')}
                         </p>
-                        <Link href={`/admin/stores${
-                            eventId || mallId
+                        <Link href={`/admin/stores${eventId || mallId
                                 ? `?${new URLSearchParams({
                                     ...(eventId && { eventId: eventId.toString() }),
                                     ...(mallId && { mallId: mallId.toString() })
                                 }).toString()}`
                                 : ''
-                        }`}>
+                            }`}>
                             <Button variant="outline" className="border-red-300 text-red-600 hover:bg-red-50">
                                 <ArrowLeft className="h-4 w-4 mr-2" />
                                 {t('admin.backToStores')}
@@ -464,14 +462,13 @@ export default function StoreDetails() {
         <div className="p-6 space-y-6">
             {/* Header with Back Button */}
             <div className="flex items-center gap-4 mb-6">
-                <Link href={`/admin/stores${
-                    eventId || mallId
+                <Link href={`/admin/stores${eventId || mallId
                         ? `?${new URLSearchParams({
                             ...(eventId && { eventId: eventId.toString() }),
                             ...(mallId && { mallId: mallId.toString() })
                         }).toString()}`
                         : ''
-                }`}>
+                    }`}>
                     <Button
                         variant="outline"
                         size="sm"
@@ -585,8 +582,8 @@ export default function StoreDetails() {
                             total: productsData?.count || 0,
                             perPage,
                             pages: productsData?.totalPages || 1,
-                            currentPage: currentPage - 1, // DataTable expects 0-based indexing
-                            onPageChange: (page) => handlePageChange(page + 1), // Convert back to 1-based
+                            currentPage: currentPage,
+                            onPageChange: handlePageChange,
                             maxVisiblePages: 5
                         }}
                     />
