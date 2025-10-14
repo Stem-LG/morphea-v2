@@ -83,11 +83,11 @@ export function DataTable<T extends object>({
         globalFilterFn: "auto",
         onSortingChange: manualSorting
             ? (updater) => {
-                  if (typeof updater === "function") {
-                      const newSorting = updater(manualSorting.sorting);
-                      manualSorting.onSortingChange(newSorting);
-                  }
-              }
+                if (typeof updater === "function") {
+                    const newSorting = updater(manualSorting.sorting);
+                    manualSorting.onSortingChange(newSorting);
+                }
+            }
             : setSorting,
         manualFiltering: serverFilters,
         manualSorting: !!manualSorting,
@@ -101,28 +101,28 @@ export function DataTable<T extends object>({
             rowSelection: rowSelection || {},
             pagination: pagination
                 ? {
-                      pageIndex: pagination.currentPage,
-                      pageSize: pagination.perPage,
-                  }
+                    pageIndex: pagination.currentPage,
+                    pageSize: pagination.perPage,
+                }
                 : undefined,
         },
         ...(pagination
             ? {
-                  manualPagination: true,
-                  onPaginationChange: (updater) => {
-                      if (typeof updater === "function") {
-                          const newPagination = updater({
-                              pageIndex: pagination.currentPage,
-                              pageSize: pagination.perPage,
-                          });
+                manualPagination: true,
+                onPaginationChange: (updater) => {
+                    if (typeof updater === "function") {
+                        const newPagination = updater({
+                            pageIndex: pagination.currentPage,
+                            pageSize: pagination.perPage,
+                        });
 
-                          console.log(newPagination);
+                        console.log(newPagination);
 
-                          pagination.onPageChange(newPagination.pageIndex);
-                      }
-                  },
-                  rowCount: pagination.total,
-              }
+                        pagination.onPageChange(newPagination.pageIndex);
+                    }
+                },
+                rowCount: pagination.total,
+            }
             : {}),
     });
 
@@ -217,7 +217,7 @@ export function DataTable<T extends object>({
                 <PaginationControl
                     currentPage={pagination.currentPage}
                     totalPages={pagination.pages}
-                    onPageChange={(page) => table.setPageIndex(page - 1)}
+                    onPageChange={pagination.onPageChange}
                     maxVisiblePages={pagination.maxVisiblePages}
                 />
             )}

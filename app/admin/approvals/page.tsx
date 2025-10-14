@@ -55,20 +55,20 @@ export default function ApprovalsPage() {
     const sortingConfig =
         sortBy && sortOrder
             ? {
-                  column: sortBy,
-                  direction: sortOrder as 'asc' | 'desc',
-              }
+                column: sortBy,
+                direction: sortOrder as 'asc' | 'desc',
+            }
             : null
 
     // Convert nuqs sorting state to React Table format
     const sorting: SortingState =
         sortBy && sortOrder
             ? [
-                  {
-                      id: sortBy,
-                      desc: sortOrder === 'desc',
-                  },
-              ]
+                {
+                    id: sortBy,
+                    desc: sortOrder === 'desc',
+                },
+            ]
             : []
 
     // Fetch data
@@ -509,9 +509,8 @@ export default function ApprovalsPage() {
                                 total: approvalsData?.count || 0,
                                 perPage,
                                 pages: approvalsData?.totalPages || 1,
-                                currentPage: currentPage - 1,
-                                onPageChange: (page) =>
-                                    handlePageChange(page + 1),
+                                currentPage: currentPage,
+                                onPageChange: handlePageChange,
                                 maxVisiblePages: 5,
                             }}
                         />
