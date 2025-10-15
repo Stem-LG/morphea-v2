@@ -59,7 +59,7 @@ export function useProductsByStatus(
             // Debug logging
             console.log('Filters received:', filters);
             console.log('Visibility filter value:', filters.visibility, typeof filters.visibility);
-            
+
             // Build the main query for products using schema
             let query = supabase
                 .schema('morpheus')
@@ -100,6 +100,44 @@ export function useProductsByStatus(
                 query = query.eq('yestvisible', filters.visibility === 'true');
             }
 
+            // Apply event/mall/boutique filters by getting matching product IDs first
+            let eventFilteredProductIds: number[] | null = null;
+            if (filters.event || filters.mall || filters.boutique) {
+                let eventFilterQuery = supabase
+                    .schema('morpheus')
+                    .from('ydetailsevent')
+                    .select('yprodidfk');
+
+                if (filters.event) {
+                    eventFilterQuery = eventFilterQuery.eq('yeventidfk', parseInt(filters.event) as any);
+                }
+                if (filters.mall) {
+                    eventFilterQuery = eventFilterQuery.eq('ymallidfk', parseInt(filters.mall) as any);
+                }
+                if (filters.boutique) {
+                    eventFilterQuery = eventFilterQuery.eq('yboutiqueidfk', parseInt(filters.boutique) as any);
+                }
+
+                const { data: eventFilteredProducts } = await eventFilterQuery;
+                eventFilteredProductIds = eventFilteredProducts?.map((p: any) => p.yprodidfk).filter((id: any) => id !== null && id !== undefined) || [];
+
+                // If event filter returns no products, return early
+                if (eventFilteredProductIds.length === 0) {
+                    return {
+                        data: [],
+                        pagination: {
+                            total: 0,
+                            pages: 0,
+                            currentPage: pagination.page,
+                            perPage: pagination.perPage,
+                        }
+                    };
+                }
+
+                // Apply the product ID filter
+                query = query.in('yprodid', eventFilteredProductIds as any);
+            }
+
             // Get total count for pagination
             let countQuery = supabase
                 .schema('morpheus')
@@ -116,6 +154,9 @@ export function useProductsByStatus(
             }
             if (filters.visibility) {
                 countQuery = countQuery.eq('yestvisible', filters.visibility === 'true');
+            }
+            if (eventFilteredProductIds !== null) {
+                countQuery = countQuery.in('yprodid', eventFilteredProductIds as any);
             }
 
             const { count } = await countQuery;
@@ -165,17 +206,13 @@ export function useProductsByStatus(
                         `)
                         .eq('yprodidfk', product.yprodid as any);
 
-                    // Apply event filter
+                    // Apply the same event/mall/boutique filters to get only matching events
                     if (filters.event) {
                         eventQuery = eventQuery.eq('yeventidfk', parseInt(filters.event) as any);
                     }
-
-                    // Apply mall filter
                     if (filters.mall) {
                         eventQuery = eventQuery.eq('ymallidfk', parseInt(filters.mall) as any);
                     }
-
-                    // Apply boutique filter
                     if (filters.boutique) {
                         eventQuery = eventQuery.eq('yboutiqueidfk', parseInt(filters.boutique) as any);
                     }
@@ -208,16 +245,10 @@ export function useProductsByStatus(
                 })
             );
 
-            // Filter products that don't match event/mall/boutique criteria
-            let filteredProducts = productsWithEvents;
-            if (filters.event || filters.mall || filters.boutique) {
-                filteredProducts = productsWithEvents.filter(product => product.events.length > 0);
-            }
-
             const totalPages = Math.ceil((count || 0) / pagination.perPage);
 
             return {
-                data: filteredProducts,
+                data: productsWithEvents,
                 pagination: {
                     total: count || 0,
                     pages: totalPages,
