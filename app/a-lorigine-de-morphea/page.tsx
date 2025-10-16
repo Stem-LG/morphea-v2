@@ -336,7 +336,7 @@ export default function OriginePage() {
                                                 {t('morpheaOrigin.founder.conclusion')}
                                             </p>
                                             <p className="font-supreme mt-6 text-base tracking-wide text-morpheus-blue-dark">
-                                                — {t('morpheaOrigin.founder.name')}, {t('morpheaOrigin.founder.role')}
+                                                — {t('morpheaOrigin.founder.name')}
                                             </p>
                                         </div>
                                     </div>
