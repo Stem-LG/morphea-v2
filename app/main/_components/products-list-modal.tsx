@@ -115,8 +115,11 @@ export default function ProductsListModal({
                     {isLoading ? (
                         /* Loading State */
                         <div className="flex flex-col items-center justify-center space-y-4 py-12">
-                            <div className="h-16 w-16 animate-spin rounded-full border-4 border-gray-200 border-t-[#053340]"></div>
-                            <div className="text-center">
+<img
+                        src="/logo.png"
+                        alt="Loading"
+                        className="mx-auto mb-6 h-16 w-16 animate-pulse"
+                    />                            <div className="text-center">
                                 <h3 className="font-recia mb-2 text-lg font-semibold text-[#053340] sm:text-xl">
                                     Chargement des produits...
                                 </h3>

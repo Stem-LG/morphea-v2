@@ -26,6 +26,7 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 import { CurrencySelector } from '@/app/_components/currency-selector'
+import { LoadingAnimation } from '../_components/loading'
 
 // Custom SVG Components
 const ThreeColumnIcon = ({
@@ -478,13 +479,13 @@ function ShopContent() {
     const displayPrices = useMemo(() => {
         const displayMin = minPrice
             ? Number(
-                  convertPrice(minPrice).toFixed(convertedPriceRange.decimals)
-              )
+                convertPrice(minPrice).toFixed(convertedPriceRange.decimals)
+            )
             : null
         const displayMax = maxPrice
             ? Number(
-                  convertPrice(maxPrice).toFixed(convertedPriceRange.decimals)
-              )
+                convertPrice(maxPrice).toFixed(convertedPriceRange.decimals)
+            )
             : null
 
         return { min: displayMin, max: displayMax }
@@ -688,7 +689,7 @@ function ShopContent() {
                     {/* Products Grid */}
                     {isLoadingProducts ? (
                         <div className="flex h-64 items-center justify-center">
-                            <div className="border-t-morpheus-gold-light h-16 w-16 animate-spin rounded-full border-4 border-gray-300"></div>
+                            <LoadingAnimation />
                         </div>
                     ) : products.length > 0 ? (
                         <>
@@ -1327,12 +1328,12 @@ function ShopContent() {
                                                         type="number"
                                                         step={
                                                             convertedPriceRange.decimals ===
-                                                            0
+                                                                0
                                                                 ? '1'
                                                                 : Math.pow(
-                                                                      10,
-                                                                      -convertedPriceRange.decimals
-                                                                  ).toString()
+                                                                    10,
+                                                                    -convertedPriceRange.decimals
+                                                                ).toString()
                                                         }
                                                         placeholder={convertedPriceRange.min.toString()}
                                                         value={inputValues.min}
@@ -1346,9 +1347,9 @@ function ShopContent() {
                                                             displayPrices.min !==
                                                                 null &&
                                                                 displayPrices.max !==
-                                                                    null &&
+                                                                null &&
                                                                 displayPrices.min >
-                                                                    displayPrices.max
+                                                                displayPrices.max
                                                                 ? 'border-red-300 focus:border-red-400'
                                                                 : 'border-gray-300 focus:border-gray-400'
                                                         )}
@@ -1356,9 +1357,9 @@ function ShopContent() {
                                                     {displayPrices.min !==
                                                         null &&
                                                         displayPrices.max !==
-                                                            null &&
+                                                        null &&
                                                         displayPrices.min >
-                                                            displayPrices.max && (
+                                                        displayPrices.max && (
                                                             <p className="mt-1 text-xs text-red-500">
                                                                 {t(
                                                                     'shop.priceMinError'
@@ -1377,12 +1378,12 @@ function ShopContent() {
                                                         type="number"
                                                         step={
                                                             convertedPriceRange.decimals ===
-                                                            0
+                                                                0
                                                                 ? '1'
                                                                 : Math.pow(
-                                                                      10,
-                                                                      -convertedPriceRange.decimals
-                                                                  ).toString()
+                                                                    10,
+                                                                    -convertedPriceRange.decimals
+                                                                ).toString()
                                                         }
                                                         placeholder={convertedPriceRange.max.toString()}
                                                         value={inputValues.max}
@@ -1396,9 +1397,9 @@ function ShopContent() {
                                                             displayPrices.min !==
                                                                 null &&
                                                                 displayPrices.max !==
-                                                                    null &&
+                                                                null &&
                                                                 displayPrices.max <
-                                                                    displayPrices.min
+                                                                displayPrices.min
                                                                 ? 'border-red-300 focus:border-red-400'
                                                                 : 'border-gray-300 focus:border-gray-400'
                                                         )}
@@ -1406,9 +1407,9 @@ function ShopContent() {
                                                     {displayPrices.min !==
                                                         null &&
                                                         displayPrices.max !==
-                                                            null &&
+                                                        null &&
                                                         displayPrices.max <
-                                                            displayPrices.min && (
+                                                        displayPrices.min && (
                                                             <p className="mt-1 text-xs text-red-500">
                                                                 {t(
                                                                     'shop.priceMaxError'

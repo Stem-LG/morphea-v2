@@ -47,7 +47,11 @@ export default function DashboardContent() {
     // Loading skeleton component
     const LoadingSkeleton = () => (
         <div className="flex items-center justify-center">
-            <Loader2 className="text-morpheus-gold-light h-6 w-6 animate-spin" />
+            <img
+                src="/logo.png"
+                alt="Loading"
+                className="mx-auto mb-6 h-16 w-16 animate-pulse"
+            />
         </div>
     )
 
