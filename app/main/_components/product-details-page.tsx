@@ -1022,7 +1022,7 @@ export function ProductDetailsPage({
                             {!isJewelryProduct &&
                                 availableColors.length > 0 && (
                                     <div className="mb-6">
-                                        <h3 className="font-recia mb-3 text-lg font-semibold text-[#053340]">
+                                        <h3 className="font-recia mb-3 text-base font-semibold text-[#053340]">
                                             {t('productDetails.color') ||
                                                 'Color'}
                                         </h3>
@@ -1035,7 +1035,7 @@ export function ProductDetailsPage({
                                                             color.xcouleurid
                                                         )
                                                     }
-                                                    className={`group relative h-12 w-12 rounded-full border-2 transition-all duration-300 ${
+                                                    className={`group relative size-8 rounded-full border-2 transition-all duration-300 ${
                                                         selectedColorId ===
                                                         color.xcouleurid
                                                             ? 'scale-110 border-[#053340] shadow-lg'
@@ -1074,7 +1074,7 @@ export function ProductDetailsPage({
                             {/* Size Selection - Only for Regular Products */}
                             {!isJewelryProduct && availableSizes.length > 0 && (
                                 <div className="mb-6">
-                                    <h3 className="font-recia mb-3 text-lg font-semibold text-[#053340]">
+                                    <h3 className="font-recia mb-3 text-base font-semibold text-[#053340]">
                                         {t('productDetails.size') || 'Size'}
                                     </h3>
                                     <div className="flex flex-wrap gap-2">
@@ -1086,7 +1086,7 @@ export function ProductDetailsPage({
                                                         size.xtailleid
                                                     )
                                                 }
-                                                className={`font-supreme rounded-lg border px-4 py-2 transition-all duration-300 ${
+                                                className={`font-supreme rounded-lg border px-3 py-1.5 transition-all duration-300 ${
                                                     selectedSizeId ===
                                                     size.xtailleid
                                                         ? 'border-[#053340] bg-[#053340] text-white'
@@ -1103,7 +1103,7 @@ export function ProductDetailsPage({
                             {/* Jewelry Type Selection */}
                             {isJewelryProduct && (
                                 <div className="mb-6">
-                                    <h3 className="font-recia mb-3 text-lg font-semibold text-[#053340]">
+                                    <h3 className="font-recia mb-3 text-base font-semibold text-[#053340]">
                                         {t('productDetails.jewelryType') ||
                                             'Jewelry Type'}
                                     </h3>
@@ -1118,7 +1118,7 @@ export function ProductDetailsPage({
                                                                 type
                                                             )
                                                         }
-                                                        className={`font-supreme rounded-lg border px-4 py-2 transition-all duration-300 ${
+                                                        className={`font-supreme rounded-lg border px-3 py-1.5 transition-all duration-300 ${
                                                             selectedJewelryType ===
                                                             type
                                                                 ? 'border-[#053340] bg-[#053340] text-white'
@@ -1142,7 +1142,7 @@ export function ProductDetailsPage({
                             {/* Material Selection */}
                             {isJewelryProduct && (
                                 <div className="mb-6">
-                                    <h3 className="font-recia mb-3 text-lg font-semibold text-[#053340]">
+                                    <h3 className="font-recia mb-3 text-base font-semibold text-[#053340]">
                                         {t('productDetails.materials') ||
                                             'Materials'}
                                     </h3>
@@ -1157,7 +1157,7 @@ export function ProductDetailsPage({
                                                                 material
                                                             )
                                                         }
-                                                        className={`font-supreme rounded-lg border px-4 py-2 transition-all duration-300 ${
+                                                        className={`font-supreme rounded-lg border px-3 py-1.5 transition-all duration-300 ${
                                                             selectedMaterial ===
                                                             material
                                                                 ? 'border-[#053340] bg-[#053340] text-white'
@@ -1179,7 +1179,7 @@ export function ProductDetailsPage({
 
                             {/* Quantity */}
                             <div className="mb-8">
-                                <h3 className="font-recia mb-3 text-lg font-semibold text-[#053340]">
+                                <h3 className="font-recia mb-3 text-base font-semibold text-[#053340]">
                                     {t('productDetails.quantity') || 'Quantity'}
                                 </h3>
                                 <div className="flex items-center gap-4">
@@ -1189,18 +1189,18 @@ export function ProductDetailsPage({
                                                 Math.max(1, quantity - 1)
                                             )
                                         }
-                                        className="font-supreme flex h-10 w-10 items-center justify-center rounded-lg border border-gray-300 text-lg font-semibold text-[#053340] transition-all duration-300 hover:border-gray-400 hover:bg-gray-50"
+                                        className="font-supreme flex size-8 items-center justify-center rounded-lg border border-gray-300 text-lg font-semibold text-[#053340] transition-all duration-300 hover:border-gray-400 hover:bg-gray-50"
                                     >
                                         −
                                     </button>
-                                    <span className="font-supreme w-12 text-center text-xl font-bold text-[#053340]">
+                                    <span className="font-supreme w-8 text-center text-lg font-bold text-[#053340]">
                                         {quantity}
                                     </span>
                                     <button
                                         onClick={() =>
                                             setQuantity(quantity + 1)
                                         }
-                                        className="font-supreme flex h-10 w-10 items-center justify-center rounded-lg border border-gray-300 text-lg font-semibold text-[#053340] transition-all duration-300 hover:border-gray-400 hover:bg-gray-50"
+                                        className="font-supreme flex size-8 items-center justify-center rounded-lg border border-gray-300 text-lg font-semibold text-[#053340] transition-all duration-300 hover:border-gray-400 hover:bg-gray-50"
                                     >
                                         +
                                     </button>
@@ -1209,7 +1209,7 @@ export function ProductDetailsPage({
 
                             {/* Price */}
                             <div className="mb-6 flex items-center gap-3">
-                                <span className="text-4xl font-bold text-[#053340]">
+                                <span className="text-3xl font-bold text-[#053340]">
                                     {pricing.formattedPrice}
                                 </span>
                                 {pricing.hasDiscount &&
