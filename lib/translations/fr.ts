@@ -2088,7 +2088,7 @@ export const frTranslations = {
       ]
     },
     "mission": {
-      "title": "Nos Missions",
+      "title": "Nos missions",
       "items": [
         {
           "title": "Réinventer le shopping de demain",
@@ -2109,13 +2109,13 @@ export const frTranslations = {
       ]
     },
     "vision": {
-      "title": "Notre Vision",
+      "title": "Notre vision",
       "description": "Redéfinir le commerce en ligne en créant un monde virtuel immersif et équitable où l'innovation rencontre l'âme des traditions, pour offrir des expériences d'achat à la fois uniques, sensorielles et mémorables.",
       "imageAlt": "Vision",
       "defaultImageAlt": "Vision par défaut"
     },
     "values": {
-      "title": "Nos Valeurs",
+      "title": "Nos valeurs",
       "items": [
         {
           "title": "Transmission vivante",
