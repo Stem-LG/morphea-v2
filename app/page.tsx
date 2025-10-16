@@ -36,83 +36,107 @@ export default function Home() {
     }, [router, supabase.auth])
 
     useEffect(() => {
+        const video1 = video1Ref.current
+        const video2 = video2Ref.current
+
+        if (!video1 || !video2) return
+
         // Handle video end events for auto-switching
         const handleVideo1End = () => {
             console.log('Video 1 ended, switching to video 2')
-            const video2 = video2Ref.current
-            if (video2) {
-                video2.currentTime = 0
-                if (isPlaying) {
-                    video2.play()
-                }
-            }
             setActiveVideo('right')
         }
 
         const handleVideo2End = () => {
             console.log('Video 2 ended, switching to video 1')
-            const video1 = video1Ref.current
-            if (video1) {
-                video1.currentTime = 0
-                if (isPlaying) {
-                    video1.play()
-                }
-            }
             setActiveVideo('left')
         }
 
-        // Ensure videos play when ready and add event listeners
-        const setupVideo = (video: HTMLVideoElement | null, onEnded: () => void) => {
-            if (!video) return
+        // Add ended event listeners
+        video1.addEventListener('ended', handleVideo1End)
+        video2.addEventListener('ended', handleVideo2End)
 
-            // Add ended event listener
-            video.addEventListener('ended', onEnded)
+        console.log('Event listeners attached to videos')
 
-            if (video.readyState >= 3) { // HAVE_FUTURE_DATA
-                video.play()
-            } else {
-                const handleCanPlay = () => {
-                    video.play()
-                    video.removeEventListener('canplay', handleCanPlay)
-                }
-                video.addEventListener('canplay', handleCanPlay)
-            }
+        // Initial playback - wait for video to be ready
+        const startVideo1 = () => {
+            video1.currentTime = 0
+            video1.play().catch(err => {
+                console.error('Error playing video 1:', err)
+                // Retry after a short delay if autoplay is blocked
+                setTimeout(() => {
+                    video1.play().catch(err2 => console.error('Retry failed:', err2))
+                }, 1000)
+            })
+            video2.pause()
+            video2.currentTime = 0
         }
 
-        const video1 = video1Ref.current
-        const video2 = video2Ref.current
-
-        setupVideo(video1, handleVideo1End)
-        setupVideo(video2, handleVideo2End)
+        if (video1.readyState >= 3) { // HAVE_FUTURE_DATA
+            startVideo1()
+        } else {
+            const handleCanPlay = () => {
+                startVideo1()
+                video1.removeEventListener('canplay', handleCanPlay)
+            }
+            video1.addEventListener('canplay', handleCanPlay)
+        }
 
         // Cleanup event listeners
         return () => {
-            if (video1) {
-                video1.removeEventListener('ended', handleVideo1End)
-            }
-            if (video2) {
-                video2.removeEventListener('ended', handleVideo2End)
-            }
+            video1.removeEventListener('ended', handleVideo1End)
+            video2.removeEventListener('ended', handleVideo2End)
         }
     }, [])
 
-    // Additional effect to handle video switching and ensure proper playback
+    // Separate effect to handle active video switching
     useEffect(() => {
         const video1 = video1Ref.current
         const video2 = video2Ref.current
 
-        if (activeVideo === 'left' && video1) {
-            // When switching to video 1, ensure it's playing if the global play state is true
-            if (isPlaying && video1.paused) {
-                video1.play()
+        if (!video1 || !video2) return
+
+        console.log('Active video switched to:', activeVideo)
+
+        if (activeVideo === 'left') {
+            // Switch to video 1
+            video2.pause()
+            video1.currentTime = 0
+            if (isPlaying) {
+                video1.play().catch(err => console.error('Error playing video 1:', err))
             }
-        } else if (activeVideo === 'right' && video2) {
-            // When switching to video 2, ensure it's playing if the global play state is true
-            if (isPlaying && video2.paused) {
-                video2.play()
+        } else {
+            // Switch to video 2
+            video1.pause()
+            video2.currentTime = 0
+            if (isPlaying) {
+                video2.play().catch(err => console.error('Error playing video 2:', err))
             }
         }
-    }, [activeVideo, isPlaying])
+    }, [activeVideo])
+
+    // Separate effect to handle play/pause state
+    useEffect(() => {
+        const video1 = video1Ref.current
+        const video2 = video2Ref.current
+
+        if (!video1 || !video2) return
+
+        console.log('Play state changed to:', isPlaying)
+
+        if (isPlaying) {
+            // Play the active video
+            if (activeVideo === 'left') {
+                video1.play().catch(err => console.error('Error playing video 1:', err))
+            } else {
+                video2.play().catch(err => console.error('Error playing video 2:', err))
+            }
+        } else {
+            // Pause both videos
+            video1.pause()
+            video2.pause()
+        }
+    }, [isPlaying])
 
     // Video control functions
     const togglePlayPause = () => {
@@ -122,11 +146,16 @@ export default function Home() {
         if (isPlaying) {
             video1?.pause()
             video2?.pause()
+            setIsPlaying(false)
         } else {
-            video1?.play()
-            video2?.play()
+            // Only play the active video
+            if (activeVideo === 'left') {
+                video1?.play().catch(err => console.error('Error playing video:', err))
+            } else {
+                video2?.play().catch(err => console.error('Error playing video:', err))
+            }
+            setIsPlaying(true)
         }
-        setIsPlaying(!isPlaying)
     }
 
     const toggleMute = () => {
@@ -143,18 +172,20 @@ export default function Home() {
         const video1 = video1Ref.current
         const video2 = video2Ref.current
 
-        // Reset the target video to the beginning
-        if (video === 'left' && video1) {
+        if (!video1 || !video2) return
+
+        // Reset the target video to the beginning and pause the other
+        if (video === 'left') {
+            video2.pause()
             video1.currentTime = 0
-            // If videos should be playing, start the video
             if (isPlaying) {
-                video1.play()
+                video1.play().catch(err => console.error('Error playing video:', err))
             }
-        } else if (video === 'right' && video2) {
+        } else {
+            video1.pause()
             video2.currentTime = 0
-            // If videos should be playing, start the video
             if (isPlaying) {
-                video2.play()
+                video2.play().catch(err => console.error('Error playing video:', err))
             }
         }
 
@@ -213,6 +244,19 @@ export default function Home() {
             discoverLink: homeSettings?.hero.video2.discoverLink || '/main',
         },
     }
+
+    // Effect to update video sources when settings load
+    useEffect(() => {
+        const video1 = video1Ref.current
+        const video2 = video2Ref.current
+
+        if (video1 && videoData.side1.src) {
+            video1.src = videoData.side1.src
+        }
+        if (video2 && videoData.side2.src) {
+            video2.src = videoData.side2.src
+        }
+    }, [videoData.side1.src, videoData.side2.src])
 
     const collectionData = {
         title:
@@ -300,23 +344,19 @@ export default function Home() {
             <div className="fixed top-0 left-0 h-svh w-full">
                 <video
                     ref={video1Ref}
-                    key={videoData.side1.src}
                     src={videoData.side1.src}
                     className={`absolute top-0 left-0 h-full w-full object-cover transition-opacity duration-700 ${activeVideo === 'right' ? 'opacity-0' : 'opacity-100'}`}
-                    autoPlay
                     muted={isMuted}
                     playsInline
-                    preload='none'
+                    preload='auto'
                 />
                 <video
                     ref={video2Ref}
-                    key={videoData.side2.src}
                     src={videoData.side2.src}
                     className={`absolute top-0 left-0 h-full w-full object-cover transition-opacity duration-700 ${activeVideo === 'right' ? 'opacity-100' : 'opacity-0'}`}
-                    autoPlay
                     muted={isMuted}
                     playsInline
-                    preload='none'
+                    preload='auto'
                 />
             </div>
 
