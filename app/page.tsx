@@ -221,6 +221,23 @@ export default function Home() {
         heroContainerRef.current?.removeAttribute('data-touch-start-x')
     }
 
+    // Hover side detection for video switching
+    const handleMouseMove = (e: React.MouseEvent) => {
+        if (!heroContainerRef.current) return
+
+        const rect = heroContainerRef.current.getBoundingClientRect()
+        const hoverPercentage = (e.clientX - rect.left) / rect.width
+
+        // Left 25% of the video area
+        if (hoverPercentage < 0.25 && activeVideo === 'right') {
+            switchToVideo('left')
+        }
+        // Right 25% of the video area
+        else if (hoverPercentage > 0.75 && activeVideo === 'left') {
+            switchToVideo('right')
+        }
+    }
+
     // Video and overlay data - now dynamic from settings
     const videoData = {
         side1: {
@@ -431,6 +448,7 @@ export default function Home() {
                 className="relative z-0 h-[calc(100svh-250px)] sm:h-[calc(100svh-280px)]"
                 onTouchStart={handleTouchStart}
                 onTouchEnd={handleTouchEnd}
+                onMouseMove={handleMouseMove}
             >
                 {/* Video Control Buttons - Mobile Responsive */}
                 <div className="absolute bottom-3 left-0 z-50 flex w-full justify-between px-2 md:bottom-6 md:px-4">
