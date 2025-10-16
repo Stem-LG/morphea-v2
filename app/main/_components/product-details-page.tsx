@@ -688,7 +688,7 @@ export function ProductDetailsPage({
                 {/* Close button - top right */}
                 <button
                     onClick={onClose}
-                    className="fixed top-28 right-4 z-20 rounded-full bg-white p-2 text-gray-500 shadow-lg transition-all duration-300 hover:rotate-90 hover:text-[#053340]"
+                    className="fixed top-28 left-12 z-20 rounded-full bg-white p-2 text-gray-500 shadow-lg transition-all duration-300 hover:rotate-90 hover:text-[#053340]"
                 >
                     <svg
                         className="h-6 w-6"
