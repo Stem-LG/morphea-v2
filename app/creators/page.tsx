@@ -43,7 +43,7 @@ export default function CreatorsPage() {
           <ChevronLeft className="size-10"/>
         </Link>
       </Button>
-      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="mb-8 text-center">
           <h1 className="font-recia text-3xl font-medium">
             {t("shop.creators") || "Creators"}
@@ -58,8 +58,8 @@ export default function CreatorsPage() {
             <div className="border-t-morpheus-gold-light h-16 w-16 animate-spin rounded-full border-4 border-gray-300" />
           </div>
         ) : boutiques && boutiques.length > 0 ? (
-          <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4">
-            {boutiques.map((b: any) => (
+          <div className="grid grid-cols-2 gap-6 sm:grid-cols-3">
+            {boutiques.sort((a, b) => a.yboutiqueintitule.localeCompare(b.yboutiqueintitule)).map((b: any) => (
               <Link
                 key={b.yboutiqueid}
                 href={`/shop?boutiqueId=${b.yboutiqueid}`}
