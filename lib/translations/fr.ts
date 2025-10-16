@@ -2054,18 +2054,18 @@ export const frTranslations = {
       "subtitle": "Imaginé par Morpheus, Morphea est un espace immersif dédié à la mise en lumière de talents rares et de savoir-faire d'exception, entre tradition et innovation."
     },
     "identity": {
-      "title": "Notre Identité",
+      "title": "Notre identité",
       "morpheus": {
         "name": "Morpheus",
-        "description": " : Un créateur d'expériences singulières, où se croisent mode, art de vivre et raffinement. Il y révèle des talents rares et des savoir-faire d'exception, mêlant avec audace héritage et innovation."
+        "description": " : un créateur d'expériences singulières, où se croisent mode, art de vivre et raffinement. Il y révèle des talents rares et des savoir-faire d'exception, mêlant avec audace héritage et innovation."
       },
       "morphea": {
         "name": "Morphea",
-        "description": " : À la croisée du luxe et de l'innovation, Morphea est une plateforme de réalité virtuelle conçue pour réinventer l'achat en ligne en une expérience immersive, sensorielle et profondément humaine. Dans un environnement digital réaliste, interactif et novateur, les utilisateurs peuvent explorer, vivre et acquérir des pièces d'exception de manière totalement inédite."
+        "description": " : à la croisée du luxe et de l'innovation, Morphea est une plateforme de réalité virtuelle conçue pour réinventer l'achat en ligne en une expérience immersive, sensorielle et profondément humaine. Dans un environnement digital réaliste, interactif et novateur, les utilisateurs peuvent explorer, vivre et acquérir des pièces d'exception de manière totalement inédite."
       },
       "heritage": {
         "name": "Héritage & Innovation",
-        "description": " : Notre mission est de préserver les héritages artisanaux tout en embrassant les possibilités offertes par la technologie. Morphea agit comme un trait d'union entre le passé et l'avenir, entre la gestuelle ancestrale et les expériences immersives du monde numérique. Nous construisons des ponts entre tradition et innovation pour faire vivre des histoires, des matières et des talents d'exception au sein d'un nouvel espace d'expression."
+        "description": " : notre mission est de préserver les héritages artisanaux tout en embrassant les possibilités offertes par la technologie. Morphea agit comme un trait d'union entre le passé et l'avenir, entre la gestuelle ancestrale et les expériences immersives du monde numérique. Nous construisons des ponts entre tradition et innovation pour faire vivre des histoires, des matières et des talents d'exception au sein d'un nouvel espace d'expression."
       },
       "cards": [
         {
@@ -2192,7 +2192,7 @@ export const frTranslations = {
       "description": "Plus qu'une marketplace virtuelle, Morphea est un lieu d'émotions et de découvertes, où l'héritage des savoir-faire rencontre les technologies immersives. Ici, chaque pièce raconte un récit et chaque visite vous plonge au cœur de la création."
     },
     "founder": {
-      "title": "Fondatrice de Morpheus",
+      "title": "CEO Morpheus / Fondatrice de Morphea",
       "name": "Myriam Koubaa",
       "role": "CEO Morpheus",
       "bio": "Myriam a toujours été attirée par la beauté : une étoffe qui capte la lumière, une scène qui raconte une histoire, un parfum qui éveille l'imagination.",
