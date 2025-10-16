@@ -99,7 +99,7 @@ export default function VirtualTour({
         try {
             const seen = window.localStorage.getItem('vt_guide_seen_v1')
             if (seen !== '1' && seen !== 'skipped') setShowGuide(true)
-        } catch {}
+        } catch { }
         // run once after scenes load
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [tourData.scenes.length])
@@ -567,7 +567,7 @@ export default function VirtualTour({
                             {
                                 detail: {
                                     sceneId: currentSceneData.id,
-                                    sceneName: currentSceneData.name ,
+                                    sceneName: currentSceneData.name,
                                     isInitialLoad: true,
                                 },
                             }
@@ -734,7 +734,7 @@ export default function VirtualTour({
                             {
                                 detail: {
                                     sceneId: currentSceneData.id,
-                                    sceneName: currentSceneData.name ,
+                                    sceneName: currentSceneData.name,
                                     viewCount: currentSceneData.id, // We'll get the actual count from the database
                                 },
                             }
@@ -788,9 +788,9 @@ export default function VirtualTour({
             viewerRef.current.container.querySelector('.psv-navbar')
         if (navbarElement) {
             if (isProductDetailsOpen || isProductsListOpen) {
-                ;(navbarElement as HTMLElement).style.display = 'none'
+                ; (navbarElement as HTMLElement).style.display = 'none'
             } else {
-                ;(navbarElement as HTMLElement).style.display = ''
+                ; (navbarElement as HTMLElement).style.display = ''
             }
         }
     }, [isProductDetailsOpen, isProductsListOpen])
@@ -871,7 +871,7 @@ export default function VirtualTour({
                     position: 'top center',
                 },
                 data: {
-                    type: 'info' ,
+                    type: 'info',
                     title: info.title,
                     text: t(info.text),
                     action: info.action,
@@ -1099,11 +1099,11 @@ export default function VirtualTour({
                     className="transition-transform duration-200 scale-200 -translate-x-3 -rotate-90"
                 >
                     {/* Left-pointing arrow based on original polygon, scaled up and modified for direction */}
-                     <polygon points="200,110 300,155 260,155 200,140 140,155 100,155"
-           fill="white"
-           stroke="white"
-           strokeWidth="3"
-           strokeLinejoin="round"/>
+                    <polygon points="200,110 300,155 260,155 200,140 140,155 100,155"
+                        fill="white"
+                        stroke="white"
+                        strokeWidth="3"
+                        strokeLinejoin="round" />
                 </svg>
             </button>
 
@@ -1120,7 +1120,7 @@ export default function VirtualTour({
                     className="transition-transform duration-200 scale-200 translate-x-3 rotate-90"
                 >
                     {/* Left-pointing arrow based on original polygon, scaled up and modified for direction */}
-                     <polygon points="200,110 300,155 260,155 200,140 140,155 100,155"
+                    <polygon points="200,110 300,155 260,155 200,140 140,155 100,155"
                         fill="white"
                         stroke="white"
                         strokeWidth="3"
@@ -1200,13 +1200,12 @@ export default function VirtualTour({
                                                 }
                                             }}
                                             disabled={isTransitioning}
-                                            className={`w-full border-b border-white/10 px-4 py-3 text-left text-sm transition-colors last:border-b-0 ${
-                                                currentScene === scene.id
-                                                    ? 'bg-white/10 font-semibold text-white shadow-inner'
-                                                    : isTransitioning
-                                                      ? 'cursor-not-allowed text-gray-400'
-                                                      : 'text-white hover:bg-white/20 hover:text-white'
-                                            }`}
+                                            className={`w-full border-b border-white/10 px-4 py-3 text-left text-sm transition-colors last:border-b-0 ${currentScene === scene.id
+                                                ? 'bg-white/10 font-semibold text-white shadow-inner'
+                                                : isTransitioning
+                                                    ? 'cursor-not-allowed text-gray-400'
+                                                    : 'text-white hover:bg-white/20 hover:text-white'
+                                                }`}
                                         >
                                             <div className="font-supreme">
                                                 {t(scene.name)}
@@ -1216,12 +1215,12 @@ export default function VirtualTour({
                                 {tourData.scenes.filter(
                                     (scene) => scene.yboutiqueidfk
                                 ).length === 0 && (
-                                    <div className="px-4 py-3 text-center text-sm text-gray-300">
-                                        {t(
-                                            'virtualTour.noBoutiqueSceneAvailable'
-                                        )}
-                                    </div>
-                                )}
+                                        <div className="px-4 py-3 text-center text-sm text-gray-300">
+                                            {t(
+                                                'virtualTour.noBoutiqueSceneAvailable'
+                                            )}
+                                        </div>
+                                    )}
                             </div>
                         </div>
                     )}
@@ -1337,7 +1336,7 @@ export default function VirtualTour({
                         </p>
                         <div className="flex items-center justify-between">
                             <button
-                                onClick={() => { try { localStorage.setItem('vt_guide_seen_v1', '1') } catch {} ; setShowGuide(false) }}
+                                onClick={() => { try { localStorage.setItem('vt_guide_seen_v1', '1') } catch { }; setShowGuide(false) }}
                                 className="text-sm text-gray-600 hover:text-gray-900"
                             >
                                 {t('virtualTour.guide.skip')}
@@ -1353,7 +1352,7 @@ export default function VirtualTour({
                                 <button
                                     onClick={() => {
                                         if (guideStep < 5) setGuideStep(guideStep + 1)
-                                        else { try { localStorage.setItem('vt_guide_seen_v1', '1') } catch {} ; setShowGuide(false) }
+                                        else { try { localStorage.setItem('vt_guide_seen_v1', '1') } catch { }; setShowGuide(false) }
                                     }}
                                     className="ml-2 px-3 py-1.5 rounded-md bg-gray-900 text-white text-sm hover:bg-black"
                                 >
@@ -1369,11 +1368,7 @@ export default function VirtualTour({
             {/* Scene information overlay */}
             <div className="absolute top-4 left-4 z-10 rounded-lg bg-black/20 px-4 py-2 font-light text-white">
                 <h3 className="font-supreme">
-                    {
-                       t(tourData.scenes.find(
-                            (scene) => scene.id === currentScene
-                        )?.name)
-                    }
+                    {tourData.scenes.find((scene) => scene.id === currentScene)?.name.split('-')[0].trim()}
                 </h3>
                 {/* <p className="text-sm opacity-75">
                     {tourData.scenes.findIndex((scene) => scene.id === currentScene) + 1} sur {tourData.scenes.length}
