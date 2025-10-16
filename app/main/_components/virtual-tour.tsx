@@ -819,7 +819,7 @@ export default function VirtualTour({
                 size: { width: 90, height: 90 },
                 anchor: 'center center',
                 tooltip: {
-                    content: t(link.name),
+                    content: t(link.name.split('-')[0]),
                     position: 'top center',
                 },
                 data: {
