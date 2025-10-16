@@ -556,7 +556,7 @@ export default function Home() {
                     <ThreeDPhotoCarousel
                         images={creatorsData.images}
                         creators={creatorsData.creators}
-                        autoRotateSpeed={0.05}
+                        autoRotateSpeed={0.2}
                         height={300}
                         radius={homeSettings?.creators.carouselRadius || 3000}
                         isLoading={isLoadingSettings}
