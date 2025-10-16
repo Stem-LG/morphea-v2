@@ -1013,19 +1013,6 @@ export function ProductDetailsPage({
                                 {productData.yprodintitule}
                             </h1>
 
-                            {/* Price */}
-                            <div className="mb-6 flex items-center gap-3">
-                                <span className="text-4xl font-bold text-[#053340]">
-                                    {pricing.formattedPrice}
-                                </span>
-                                {pricing.hasDiscount &&
-                                    pricing.formattedOriginalPrice && (
-                                        <span className="text-xl text-gray-400 line-through">
-                                            {pricing.formattedOriginalPrice}
-                                        </span>
-                                    )}
-                            </div>
-
                             {/* Description */}
                             <div className="font-supreme mb-8 leading-relaxed whitespace-pre-line text-gray-600">
                                 {productData.yproddetailstech}
@@ -1218,6 +1205,19 @@ export function ProductDetailsPage({
                                         +
                                     </button>
                                 </div>
+                            </div>
+
+                            {/* Price */}
+                            <div className="mb-6 flex items-center gap-3">
+                                <span className="text-4xl font-bold text-[#053340]">
+                                    {pricing.formattedPrice}
+                                </span>
+                                {pricing.hasDiscount &&
+                                    pricing.formattedOriginalPrice && (
+                                        <span className="text-xl text-gray-400 line-through">
+                                            {pricing.formattedOriginalPrice}
+                                        </span>
+                                    )}
                             </div>
 
                             {/* Action Buttons */}
