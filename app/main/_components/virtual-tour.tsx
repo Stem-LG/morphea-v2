@@ -972,9 +972,9 @@ export default function VirtualTour({
             >
                 <div className="mx-auto max-w-md px-6 text-center text-white">
                     <img
-                        src="/logo.png"
+                        src="/images/morph_logo.webp"
                         alt="Loading"
-                        className="mx-auto mb-6 h-16 w-16 animate-pulse"
+                        className="mx-auto mb-6 h-16 animate-pulse"
                     />
                     <h3 className="font-supreme mb-4 text-xl text-gray-700">
                         {t('virtualTour.loadingVirtualTour')}
@@ -1034,9 +1034,9 @@ export default function VirtualTour({
                 <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/80">
                     <div className="mx-auto max-w-md px-6 text-center text-white">
                         <img
-                            src="/logo.png"
+                            src="/images/morph_logo.webp"
                             alt="Loading"
-                            className="mx-auto mb-6 h-16 w-16 animate-pulse"
+                            className="mx-auto mb-6 h-16 animate-pulse"
                         />
                         <h3 className="font-supreme mb-4 text-xl">
                             {loadingText}

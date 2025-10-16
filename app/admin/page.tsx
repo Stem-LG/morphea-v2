@@ -48,9 +48,9 @@ export default function DashboardContent() {
     const LoadingSkeleton = () => (
         <div className="flex items-center justify-center">
             <img
-                src="/logo.png"
+                src="/images/morph_logo.webp"
                 alt="Loading"
-                className="mx-auto mb-6 h-16 w-16 animate-pulse"
+                className="mx-auto mb-6 h-16 animate-pulse"
             />
         </div>
     )

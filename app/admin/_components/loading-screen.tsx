@@ -1,6 +1,7 @@
 'use client'
 import React from 'react'
 import { useLanguage } from '@/hooks/useLanguage'
+import { LoadingAnimation } from '@/app/_components/loading'
 
 export function LoadingScreen() {
     const { t } = useLanguage()
@@ -22,9 +23,7 @@ export function LoadingScreen() {
 
                 {/* Loading Animation */}
                 <div className="border border-gray-200/50 bg-gradient-to-br from-gray-50/50 to-white/50 p-8 shadow-2xl">
-                    <div className="mb-4 flex items-center justify-center">
-                        <div className="h-12 w-12 animate-spin rounded-full border-4 border-blue-500/30 border-t-blue-500"></div>
-                    </div>
+                    <LoadingAnimation />
                     <p className="mb-2 text-lg font-medium text-gray-900">
                         {t('admin.loadingSystem')}
                     </p>
