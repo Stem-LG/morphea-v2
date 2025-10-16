@@ -1,7 +1,7 @@
 'use client'
 
 import { Suspense, useState, useCallback, useEffect, useMemo } from 'react'
-import { X, ChevronDown } from 'lucide-react'
+import { X, ChevronDown, ChevronLeft } from 'lucide-react'
 import { useQueryStates, parseAsInteger, parseAsString } from 'nuqs'
 import { useLanguage } from '@/hooks/useLanguage'
 import { useCurrency } from '@/hooks/useCurrency'
@@ -27,6 +27,8 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 import { CurrencySelector } from '@/app/_components/currency-selector'
 import { LoadingAnimation } from '../_components/loading'
+import { Button } from '@/components/ui/button'
+import Link from 'next/link'
 
 // Custom SVG Components
 const ThreeColumnIcon = ({
@@ -647,6 +649,11 @@ function ShopContent() {
 
     return (
         <div className="min-h-[100svh] bg-white">
+            <Button className="absolute left-8 top-8 size-16" size="icon" variant="ghost" asChild>
+                <Link href="/" aria-label="Back to home">
+                    <ChevronLeft className="size-10" />
+                </Link>
+            </Button>
             <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
                 {/* Header with Results Count and Column Toggle */}
                 <div className="mb-8 flex items-center justify-between">

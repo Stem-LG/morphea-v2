@@ -6,8 +6,6 @@ import { useLanguage } from "@/hooks/useLanguage"
 import { useCurrentEvent } from "@/app/main/_hooks/useCurrentEvent"
 import { useShopBoutiques } from "@/app/shop/_hooks/use-shop-filters"
 import { useSettings } from "@/app/admin/settings/_hooks/use-settings"
-import { Button } from "@/components/ui/button"
-import { ChevronLeft } from "lucide-react"
 
 export default function CreatorsPage() {
   const { t } = useLanguage()
@@ -38,11 +36,6 @@ export default function CreatorsPage() {
 
   return (
     <div className="min-h-[100svh] bg-white">
-      <Button className="absolute left-8 top-8 size-16" size="icon" variant="ghost" asChild>
-        <Link href="/" aria-label="Back to home">
-          <ChevronLeft className="size-10"/>
-        </Link>
-      </Button>
       <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="mb-8 text-center">
           <h1 className="font-recia text-3xl font-medium">
