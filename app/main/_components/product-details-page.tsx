@@ -1004,9 +1004,9 @@ export function ProductDetailsPage({
                         {/* Right Side - Product Details */}
                         <div className="relative rounded-lg border border-gray-200 bg-white p-8 shadow-sm">
                             {/* Currency Selector */}
-                            <div className="absolute bottom-[138px] right-8">
+                            {/* <div className="absolute bottom-[138px] right-8">
                                 <CurrencySelector />
-                            </div>
+                            </div> */}
 
                             {/* Product Title */}
                             <h1 className="font-recia mb-2 text-3xl font-bold text-[#053340]">
@@ -1182,25 +1182,25 @@ export function ProductDetailsPage({
                                 <h3 className="font-recia mb-3 text-sm font-semibold text-[#053340]">
                                     {t('productDetails.quantity') || 'Quantity'}
                                 </h3>
-                                <div className="flex items-center gap-4">
+                                <div className="flex items-center gap-1">
                                     <button
                                         onClick={() =>
                                             setQuantity(
                                                 Math.max(1, quantity - 1)
                                             )
                                         }
-                                        className="font-supreme flex size-8 items-center justify-center rounded-lg border border-gray-300 text-lg font-semibold text-[#053340] transition-all duration-300 hover:border-gray-400 hover:bg-gray-50"
+                                        className="font-supreme flex size-6 items-center justify-center rounded-lg border border-gray-300 text-sm font-semibold text-[#053340] transition-all duration-300 hover:border-gray-400 hover:bg-gray-50"
                                     >
                                         −
                                     </button>
-                                    <span className="font-supreme w-8 text-center text-lg font-bold text-[#053340]">
+                                    <span className="font-supreme w-8 text-center text-base font-bold text-[#053340]">
                                         {quantity}
                                     </span>
                                     <button
                                         onClick={() =>
                                             setQuantity(quantity + 1)
                                         }
-                                        className="font-supreme flex size-8 items-center justify-center rounded-lg border border-gray-300 text-lg font-semibold text-[#053340] transition-all duration-300 hover:border-gray-400 hover:bg-gray-50"
+                                        className="font-supreme flex size-6 items-center justify-center rounded-lg border border-gray-300 text-sm font-semibold text-[#053340] transition-all duration-300 hover:border-gray-400 hover:bg-gray-50"
                                     >
                                         +
                                     </button>
@@ -1209,12 +1209,12 @@ export function ProductDetailsPage({
 
                             {/* Price */}
                             <div className="mb-6 flex items-center gap-3">
-                                <span className="text-3xl font-bold text-[#053340]">
+                                <span className="text-lg font-bold text-[#053340]">
                                     {pricing.formattedPrice}
                                 </span>
                                 {pricing.hasDiscount &&
                                     pricing.formattedOriginalPrice && (
-                                        <span className="text-xl text-gray-400 line-through">
+                                        <span className="text-base text-gray-400 line-through">
                                             {pricing.formattedOriginalPrice}
                                         </span>
                                     )}
