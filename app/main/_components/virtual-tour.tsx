@@ -1208,7 +1208,7 @@ export default function VirtualTour({
                                                 }`}
                                         >
                                             <div className="font-supreme">
-                                                {t(scene.name)}
+                                                {t(scene.name.split('-')[0])}
                                             </div>
                                         </button>
                                     ))}
