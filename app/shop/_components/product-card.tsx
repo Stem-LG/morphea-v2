@@ -185,18 +185,18 @@ export function ProductCard({
 
     // Get the first variant for pricing and media
     const firstVariant = product.yvarprod?.[0]
-    
+
     // Advanced variant selection logic to handle all combinations
     const activeVariant = (() => {
         if (!product.yvarprod || product.yvarprod.length === 0) return null;
-        
+
         // If hovering over color, prioritize color-based selection
         if (hoveredColor) {
             return product.yvarprod.find(
                 (v) => v.xcouleur?.xcouleurhexa === hoveredColor
             ) || firstVariant;
         }
-        
+
         // Default to first variant
         return firstVariant;
     })()
@@ -219,35 +219,35 @@ export function ProductCard({
     // Get pricing info
     const pricing = activeVariant
         ? {
-              catalogPrice: activeVariant.yvarprodprixcatalogue,
-              promotionPrice: activeVariant.yvarprodprixpromotion,
-              productCurrency: currencies.find(
-                  (c) => c.xdeviseid === activeVariant.xdeviseidfk
-              ),
-              formattedCatalogPrice: formatPrice(
-                  activeVariant.yvarprodprixcatalogue,
-                  currencies.find(
-                      (c) => c.xdeviseid === activeVariant.xdeviseidfk
-                  )
-              ),
-              formattedPromotionPrice: activeVariant.yvarprodprixpromotion
-                  ? formatPrice(
-                        activeVariant.yvarprodprixpromotion,
-                        currencies.find(
-                            (c) => c.xdeviseid === activeVariant.xdeviseidfk
-                        )
+            catalogPrice: activeVariant.yvarprodprixcatalogue,
+            promotionPrice: activeVariant.yvarprodprixpromotion,
+            productCurrency: currencies.find(
+                (c) => c.xdeviseid === activeVariant.xdeviseidfk
+            ),
+            formattedCatalogPrice: formatPrice(
+                activeVariant.yvarprodprixcatalogue,
+                currencies.find(
+                    (c) => c.xdeviseid === activeVariant.xdeviseidfk
+                )
+            ),
+            formattedPromotionPrice: activeVariant.yvarprodprixpromotion
+                ? formatPrice(
+                    activeVariant.yvarprodprixpromotion,
+                    currencies.find(
+                        (c) => c.xdeviseid === activeVariant.xdeviseidfk
                     )
-                  : null,
-              hasDiscount: !!activeVariant.yvarprodprixpromotion,
-              discountPercentage: activeVariant.yvarprodprixpromotion
-                  ? Math.round(
-                        ((activeVariant.yvarprodprixcatalogue -
-                            activeVariant.yvarprodprixpromotion) /
-                            activeVariant.yvarprodprixcatalogue) *
-                            100
-                    )
-                  : 0,
-          }
+                )
+                : null,
+            hasDiscount: !!activeVariant.yvarprodprixpromotion,
+            discountPercentage: activeVariant.yvarprodprixpromotion
+                ? Math.round(
+                    ((activeVariant.yvarprodprixcatalogue -
+                        activeVariant.yvarprodprixpromotion) /
+                        activeVariant.yvarprodprixcatalogue) *
+                    100
+                )
+                : 0,
+        }
         : null
 
     // Get unique colors with availability info
@@ -256,7 +256,7 @@ export function ProductCard({
             if (variant.xcouleur?.xcouleurhexa && variant.xcouleur?.xcouleurintitule) {
                 const colorHex = variant.xcouleur.xcouleurhexa
                 const existingColor = acc.find((c) => c.hex === colorHex)
-                
+
                 if (!existingColor) {
                     acc.push({
                         hex: colorHex,
@@ -273,14 +273,14 @@ export function ProductCard({
         },
         [] as Array<{ hex: string; name: string; hasSize: boolean; variantCount: number }>
     )
-    
+
     // Get unique sizes with availability info
     const uniqueSizes = product.yvarprod?.reduce(
         (acc, variant) => {
             if (variant.xtaille?.xtailleid && variant.xtaille?.xtailleintitule) {
                 const sizeId = variant.xtaille.xtailleid
                 const existing = acc.find(s => s.id === sizeId)
-                
+
                 if (!existing) {
                     acc.push({
                         id: sizeId,
@@ -601,10 +601,7 @@ export function ProductCard({
                                     onMouseEnter={() => setHoveredColor(color.hex)}
                                     onMouseLeave={() => setHoveredColor(null)}
                                 >
-                                    {/* Small indicators for additional options */}
-                                    {color.hasSize && (
-                                        <div className="absolute -top-0.5 -right-0.5 h-1.5 w-1.5 rounded-full bg-morpheus-gold-light border border-white"></div>
-                                    )}
+
                                 </div>
                             ))}
                         {uniqueColors.length > 4 && (
