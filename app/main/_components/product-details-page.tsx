@@ -1004,7 +1004,7 @@ export function ProductDetailsPage({
                         {/* Right Side - Product Details */}
                         <div className="relative rounded-lg border border-gray-200 bg-white p-8 shadow-sm">
                             {/* Currency Selector */}
-                            <div className="absolute top-8 right-8">
+                            <div className="absolute bottom-[138px] right-8">
                                 <CurrencySelector />
                             </div>
 
