@@ -32,7 +32,7 @@ export default function ClientProviders({
                                 {/* Main content with navbar spacing */}
                                 <div className="relative z-10">{children}</div>
                                 {/* Visitor form dialog */}
-                                {!isComingSoonPage && <VisitorFormDialog />}
+                                {/* {!isComingSoonPage && <VisitorFormDialog />} */}
                             </CookieConsentProvider>
                         </TooltipProvider>
                     </CurrencyProvider>
