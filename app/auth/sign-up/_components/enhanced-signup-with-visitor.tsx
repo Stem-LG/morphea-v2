@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Separator } from '@/components/ui/separator'
 import { Badge } from '@/components/ui/badge'
+import { PhoneInput } from '@/components/ui/phone-input'
 import { useLanguage } from '@/hooks/useLanguage'
 import { useWebsiteUrl } from '@/hooks/use-website-url'
 import { useCookieConsent } from '@/hooks/useCookieConsent'
@@ -506,10 +507,10 @@ export function EnhancedSignupWithVisitor({
                         <div className="flex flex-1 flex-col items-center">
                             <div
                                 className={`mb-2 flex h-10 w-10 items-center justify-center rounded-full border-2 transition-all ${currentStep === 1
-                                        ? 'border-[#063846] bg-[#063846] text-white'
-                                        : currentStep > 1
-                                            ? 'border-green-500 bg-green-500 text-white'
-                                            : 'border-slate-300 bg-white text-slate-400'
+                                    ? 'border-[#063846] bg-[#063846] text-white'
+                                    : currentStep > 1
+                                        ? 'border-green-500 bg-green-500 text-white'
+                                        : 'border-slate-300 bg-white text-slate-400'
                                     }`}
                             >
                                 {currentStep > 1 ? (
@@ -520,8 +521,8 @@ export function EnhancedSignupWithVisitor({
                             </div>
                             <span
                                 className={`text-xs font-medium ${currentStep === 1
-                                        ? 'text-[#063846]'
-                                        : 'text-slate-500'
+                                    ? 'text-[#063846]'
+                                    : 'text-slate-500'
                                     }`}
                             >
                                 Informations de base
@@ -540,16 +541,16 @@ export function EnhancedSignupWithVisitor({
                         <div className="flex flex-1 flex-col items-center">
                             <div
                                 className={`mb-2 flex h-10 w-10 items-center justify-center rounded-full border-2 transition-all ${currentStep === 2
-                                        ? 'border-[#063846] bg-[#063846] text-white'
-                                        : 'border-slate-300 bg-white text-slate-400'
+                                    ? 'border-[#063846] bg-[#063846] text-white'
+                                    : 'border-slate-300 bg-white text-slate-400'
                                     }`}
                             >
                                 <span className="text-sm font-semibold">2</span>
                             </div>
                             <span
                                 className={`text-xs font-medium ${currentStep === 2
-                                        ? 'text-[#063846]'
-                                        : 'text-slate-500'
+                                    ? 'text-[#063846]'
+                                    : 'text-slate-500'
                                     }`}
                             >
                                 Profil visiteur
@@ -1022,17 +1023,17 @@ export function EnhancedSignupWithVisitor({
                                                     </span>
                                                 )}
                                             </Label>
-                                            <Input
+                                            <PhoneInput
                                                 id="phone"
-                                                type="tel"
+                                                defaultCountry="FR"
                                                 value={visitorData.phone}
-                                                onChange={(e) =>
+                                                onChange={(value) =>
                                                     setVisitorData((prev) => ({
                                                         ...prev,
-                                                        phone: e.target.value,
+                                                        phone: value || '',
                                                     }))
                                                 }
-                                                className={`h-10 rounded-md border-slate-300 bg-white text-sm text-[#05141D] transition-colors placeholder:text-slate-400 focus:border-[#063846] focus:ring-[#063846] ${visitorData.phone.trim()
+                                                className={`rounded-md border-slate-300 bg-white text-sm text-[#05141D] transition-colors placeholder:text-slate-400 focus:border-[#063846] focus:ring-[#063846] ${visitorData.phone.trim()
                                                     ? 'border-green-300 focus:border-green-500'
                                                     : ''
                                                     }`}
