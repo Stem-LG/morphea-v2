@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
+import { PhoneInput } from '@/components/ui/phone-input'
 import { OrderStepper } from '@/app/_components/order-stepper'
 import Image from 'next/image'
 import { ShoppingCart, CreditCard, MapPin, ArrowLeft } from 'lucide-react'
@@ -631,11 +632,12 @@ function OrderPage() {
                     >
                         {t('visitorForm.phone')}<span className="text-red-500"> *</span>
                     </Label>
-                    <Input
+                    <PhoneInput
                         id="phone"
+                        defaultCountry="FR"
                         value={addressForm.phone}
-                        onChange={(e) =>
-                            handleAddressChange('phone', e.target.value)
+                        onChange={(value) =>
+                            handleAddressChange('phone', value || '')
                         }
                         className="mt-2 h-12 border-gray-300 bg-white text-[#053340] placeholder:text-gray-400 focus:border-[#053340] focus:ring-[#053340]"
                         placeholder={t('order.phonePlaceholder')}
