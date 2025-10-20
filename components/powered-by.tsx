@@ -8,7 +8,7 @@ export function PoweredBy() {
     const { t } = useLanguage()
 
     const handleClick = () => {
-        if (mellimeUrl) {
+        if (mellimeUrl != "#") {
             window.open(mellimeUrl, '_blank', 'noopener,noreferrer')
         }
     }
