@@ -542,7 +542,7 @@ export default function Home() {
                                     <h3 className="font-recia mb-2 text-2xl leading-tight font-extrabold md:text-4xl">
                                         {collectionData.card1.title}
                                     </h3>
-                                    <p className="font-supreme text-lg font-semibold opacity-90 md:text-2xl">
+                                    <p className="font-supreme text-lg opacity-90 md:text-xl">
                                         {collectionData.card1.subtitle}
                                     </p>
                                 </div>
