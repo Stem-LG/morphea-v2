@@ -39,7 +39,7 @@ interface PaymentForm {
     cardholderLastName: string
 }
 
-const StripePaymentForm = ({ onContinue }: { onContinue: (paymentIntentId: string) => void }) => {
+const StripePaymentForm = ({ onBack, onContinue }: { onBack: () => void, onContinue: (paymentIntentId: string) => void }) => {
     const stripe = useStripe()
     const elements = useElements()
     const [isProcessing, setIsProcessing] = useState(false)
@@ -160,17 +160,17 @@ const StripePaymentForm = ({ onContinue }: { onContinue: (paymentIntentId: strin
                 <Button
                     type="button"
                     variant="outline"
-                    onClick={() => window.history.back()}
+                    onClick={onBack}
                     className="font-supreme border-gray-300 font-medium text-[#053340] hover:border-[#053340] hover:bg-gray-50"
                 >
-                    Back to Shipping
+                    Retour à la livraison
                 </Button>
                 <Button
                     type="submit"
                     disabled={!stripe || isProcessing}
                     className="font-supreme bg-[#053340] font-semibold text-white shadow-lg transition-all hover:bg-[#053340]/90 hover:shadow-xl disabled:opacity-50"
                 >
-                    {isProcessing ? 'Processing...' : 'Continue to Review'}
+                    {isProcessing ? 'Processing...' : 'Continuer vers la vérification'}
                 </Button>
             </div>
         </form>
@@ -401,6 +401,10 @@ function OrderPage() {
     const handleContinueToReview = (paymentIntentId: string) => {
         setPaymentIntentId(paymentIntentId)
         nextStep()
+    }
+
+    const handleBackToAddress = () => {
+        prevStep()
     }
 
     const handlePlaceOrder = async () => {
@@ -736,7 +740,7 @@ function OrderPage() {
     )
 
     const renderPaymentInfo = () => (
-        <StripePaymentForm onContinue={handleContinueToReview} />
+        <StripePaymentForm onContinue={handleContinueToReview} onBack={handleBackToAddress} />
     )
 
     const renderOrderReview = () => (
