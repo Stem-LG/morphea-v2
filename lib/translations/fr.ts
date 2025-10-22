@@ -1242,7 +1242,7 @@ export const frTranslations = {
       "clickPreviewButtonToView": "Cliquez sur le bouton aperçu pour voir"
     },
     "tour": {
-      
+
       "adminControls": "Contrôles d'administration",
       "view": "Voir",
       "edit": "Modifier",
@@ -1632,9 +1632,22 @@ export const frTranslations = {
     "helpUsKnowYouBetter": "Aidez-nous à mieux vous connaître",
     "personalDetails": "Détails personnels",
     "selectAllThatApply": "Sélectionnez tout ce qui s'applique",
+    "phoneNumber": "Numéro de téléphone",
+    "contactInfo": "Pour mieux vous contacter",
+    "profileQuestion": "Vous êtes ?",
+    "selectProfile": "Identifier le profil professionnel ou personnel",
+    "sourceQuestion": "Comment avez-vous entendu parler de Morphea ?",
+    "howHeard": "Mesurer les canaux de communication efficaces",
+    "interestQuestion": "Quel est votre principal intérêt sur Morphea ?",
+    "mainInterest": "Cerner les attentes utilisateur",
+    "specialtyQuestion": "Dans quel domaine évoluez-vous ?",
+    "specialty": "Affiner le profil professionnel / secteur",
+    "expectationQuestion": "Quel type d'expérience recherchez-vous sur Morphea ?",
+    "expectation": "Adapter l'offre de contenu et les recommandations",
     "name": "Nom",
     "nameRequired": "Nom *",
     "email": "Email",
+    "emailInvalid": "Veuillez entrer une adresse email valide",
     "phone": "Téléphone",
     "address": "Adresse",
     "namePlaceholder": "Entrez votre nom complet",

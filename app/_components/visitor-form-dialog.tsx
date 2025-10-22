@@ -9,10 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
-import { CheckCircle, User, Users, ArrowLeft, ArrowRight, Search } from "lucide-react";
+import { PhoneInput } from "@/components/ui/phone-input";
+import { CheckCircle, User, Users, ArrowLeft, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type VisitorFormData = {
@@ -21,7 +19,12 @@ type VisitorFormData = {
     email: string;
     phone: string;
     address: string;
-    selectedVisitorType: string; // Changed from visitorTypes object to single string
+    selectedVisitorType: string;
+    profileQuestion: string;
+    sourceQuestion: string;
+    interestQuestion: string;
+    specialtyQuestion: string;
+    expectationQuestion: string;
 };
 
 const VISITOR_FORM_STORAGE_KEY = "morpheus_visitor_form_skipped";
@@ -35,9 +38,33 @@ const STEPS = [
     },
     {
         id: 2,
-        title: "visitorTypes",
+        title: "profileQuestion",
         icon: Users,
-        description: "selectAllThatApply",
+        description: "selectProfile",
+    },
+    {
+        id: 3,
+        title: "sourceQuestion",
+        icon: Users,
+        description: "howHeard",
+    },
+    {
+        id: 4,
+        title: "interestQuestion",
+        icon: Users,
+        description: "mainInterest",
+    },
+    {
+        id: 5,
+        title: "specialtyQuestion",
+        icon: Users,
+        description: "specialty",
+    },
+    {
+        id: 6,
+        title: "expectationQuestion",
+        icon: Users,
+        description: "expectation",
     },
 ];
 
@@ -45,14 +72,18 @@ export default function VisitorFormDialog() {
     const [isOpen, setIsOpen] = useState(false);
     const [currentStep, setCurrentStep] = useState(1);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [visitorTypeSearch, setVisitorTypeSearch] = useState("");
     const [formData, setFormData] = useState<VisitorFormData>({
         firstName: "",
         lastName: "",
         email: "",
         phone: "",
         address: "",
-        selectedVisitorType: "", // Default to empty string (no selection)
+        selectedVisitorType: "",
+        profileQuestion: "",
+        sourceQuestion: "",
+        interestQuestion: "",
+        specialtyQuestion: "",
+        expectationQuestion: "",
     });
 
     const { data: currentUser } = useAuth();
@@ -63,31 +94,31 @@ export default function VisitorFormDialog() {
         const checkVisitorFormConditions = () => {
             // Check if user has already skipped the form
             const hasSkipped = localStorage.getItem(VISITOR_FORM_STORAGE_KEY);
-            
+
             // Check if cookies have been accepted or rejected using the cookie consent system
             const cookiePreferences = localStorage.getItem('cookie-preferences');
-            
+
             let cookiesDecisionMade = false;
-            
+
             if (cookiePreferences) {
                 try {
                     const preferences = JSON.parse(cookiePreferences);
                     // Check if user has made any decision (accepted all, rejected all, or customized preferences)
-                    cookiesDecisionMade = preferences.analytics !== undefined || 
-                                       preferences.marketing !== undefined || 
-                                       preferences.functional !== undefined;
+                    cookiesDecisionMade = preferences.analytics !== undefined ||
+                        preferences.marketing !== undefined ||
+                        preferences.functional !== undefined;
                 } catch (error) {
                     console.error('Error parsing cookie preferences:', error);
                 }
             }
-            
+
             console.log('Visitor Form Debug:', {
                 hasSkipped: !!hasSkipped,
                 currentUser: !!currentUser,
                 cookiesDecisionMade,
                 cookiePreferences
             });
-            
+
             // Only show the visitor form if:
             // 1. User hasn't skipped it before
             // 2. User is logged in
@@ -102,11 +133,11 @@ export default function VisitorFormDialog() {
 
                 return timer;
             } else {
-                console.log('❌ Not showing visitor form dialog:', { 
-                    hasSkipped: !!hasSkipped, 
-                    currentUser: !!currentUser, 
+                console.log('❌ Not showing visitor form dialog:', {
+                    hasSkipped: !!hasSkipped,
+                    currentUser: !!currentUser,
                     cookiesDecisionMade,
-                    isOpen 
+                    isOpen
                 });
             }
             return null;
@@ -121,12 +152,12 @@ export default function VisitorFormDialog() {
             if (currentPreferences) {
                 try {
                     const preferences = JSON.parse(currentPreferences);
-                    const cookiesDecisionMade = preferences.analytics !== undefined || 
-                                              preferences.marketing !== undefined || 
-                                              preferences.functional !== undefined;
-                    
+                    const cookiesDecisionMade = preferences.analytics !== undefined ||
+                        preferences.marketing !== undefined ||
+                        preferences.functional !== undefined;
+
                     const hasSkipped = localStorage.getItem(VISITOR_FORM_STORAGE_KEY);
-                    
+
                     if (!hasSkipped && currentUser && cookiesDecisionMade && !isOpen) {
                         console.log('✅ Cookie decision detected via polling, showing visitor form');
                         setTimeout(() => {
@@ -192,19 +223,11 @@ export default function VisitorFormDialog() {
                 yvisiteuremail: formData.email.trim() || null,
                 yvisiteurtelephone: formData.phone.trim() || null,
                 yvisiteuradresse: formData.address.trim() || null,
-                yvisiteurboolacheteurluxe: formData.selectedVisitorType === "acheteurluxe" ? "1" : "0",
-                yvisiteurboolacheteurpro: formData.selectedVisitorType === "acheteurpro" ? "1" : "0",
-                yvisiteurboolartisan: formData.selectedVisitorType === "artisan" ? "1" : "0",
-                yvisiteurboolclientprive: formData.selectedVisitorType === "clientprive" ? "1" : "0",
-                yvisiteurboolcollectionneur: formData.selectedVisitorType === "collectionneur" ? "1" : "0",
-                yvisiteurboolcreateur: formData.selectedVisitorType === "createur" ? "1" : "0",
-                yvisiteurboolculturel: formData.selectedVisitorType === "culturel" ? "1" : "0",
-                yvisiteurboolgrandpublic: formData.selectedVisitorType === "grandpublic" ? "1" : "0",
-                yvisiteurboolinfluenceur: formData.selectedVisitorType === "influenceur" ? "1" : "0",
-                yvisiteurboolinvestisseur: formData.selectedVisitorType === "investisseur" ? "1" : "0",
-                yvisiteurbooljournaliste: formData.selectedVisitorType === "journaliste" ? "1" : "0",
-                yvisiteurboolpressespecialisee: formData.selectedVisitorType === "pressespecialisee" ? "1" : "0",
-                yvisiteurboolvip: formData.selectedVisitorType === "vip" ? "1" : "0",
+                profile_question: (formData.profileQuestion.trim() || null) as any,
+                source_question: (formData.sourceQuestion.trim() || null) as any,
+                interest_question: (formData.interestQuestion.trim() || null) as any,
+                specialty_question: (formData.specialtyQuestion.trim() || null) as any,
+                expectation_question: (formData.expectationQuestion.trim() || null) as any,
             };
 
             const { error } = await supabase.schema("morpheus").from("yvisiteur").insert(visitorData);
@@ -244,39 +267,37 @@ export default function VisitorFormDialog() {
     };
 
     const isStep1Valid = () => {
-        return formData.firstName.trim().length > 0 && formData.lastName.trim().length > 0;
+        const hasFirstName = formData.firstName.trim().length > 0;
+        const hasLastName = formData.lastName.trim().length > 0;
+        const hasValidEmail = formData.email.trim().length > 0 && formData.email.includes('@');
+        return hasFirstName && hasLastName && hasValidEmail;
     };
+
+    const isStep2Valid = () => formData.profileQuestion.trim().length > 0;
+    const isStep3Valid = () => formData.sourceQuestion.trim().length > 0;
+    const isStep4Valid = () => formData.interestQuestion.trim().length > 0;
+    const isStep5Valid = () => formData.specialtyQuestion.trim().length > 0;
+    const isStep6Valid = () => formData.expectationQuestion.trim().length > 0;
 
     const canProceedToNextStep = () => {
-        if (currentStep === 1) return isStep1Valid();
-        return true;
+        switch (currentStep) {
+            case 1:
+                return isStep1Valid();
+            case 2:
+                return isStep2Valid();
+            case 3:
+                return isStep3Valid();
+            case 4:
+                return isStep4Valid();
+            case 5:
+                return isStep5Valid();
+            case 6:
+                return isStep6Valid();
+            default:
+                return true;
+        }
     };
 
-    // Filter visitor types based on search
-    const filteredVisitorTypes = useMemo(() => {
-        const visitorTypeOptions = [
-            { key: "grandpublic", label: "Grand Public", category: "General" },
-            { key: "clientprive", label: "Client Privé", category: "General" },
-            { key: "acheteurluxe", label: "Acheteur de Luxe", category: "Acheteur" },
-            { key: "acheteurpro", label: "Acheteur Professionnel", category: "Acheteur" },
-            { key: "artisan", label: "Artisan", category: "Créatif" },
-            { key: "createur", label: "Créateur/Designer", category: "Créatif" },
-            { key: "collectionneur", label: "Collectionneur", category: "Spécialisé" },
-            { key: "investisseur", label: "Investisseur", category: "Finance" },
-            { key: "influenceur", label: "Influenceur", category: "Média" },
-            { key: "journaliste", label: "Journaliste", category: "Média" },
-            { key: "pressespecialisee", label: "Presse Spécialisée", category: "Média" },
-            { key: "culturel", label: "Professionnel Culturel", category: "Culture" },
-            { key: "vip", label: "VIP", category: "Spécialisé" },
-        ];
-
-        if (!visitorTypeSearch.trim()) return visitorTypeOptions;
-
-        return visitorTypeOptions.filter(option =>
-            option.label.toLowerCase().includes(visitorTypeSearch.toLowerCase()) ||
-            option.category.toLowerCase().includes(visitorTypeSearch.toLowerCase())
-        );
-    }, [visitorTypeSearch]);
 
     const handleNext = () => {
         if (canProceedToNextStep() && currentStep < STEPS.length) {
@@ -309,8 +330,8 @@ export default function VisitorFormDialog() {
                         isCompleted
                             ? "bg-[#063846] border-[#063846] text-white"
                             : isActive
-                            ? "border-[#063846] text-[#063846] bg-[#063846]/10"
-                            : "border-slate-300 text-slate-400"
+                                ? "border-[#063846] text-[#063846] bg-[#063846]/10"
+                                : "border-slate-300 text-slate-400"
                     )}
                 >
                     {isCompleted ? <CheckCircle className="w-5 h-5" /> : <Icon className="w-5 h-5" />}
@@ -360,9 +381,8 @@ export default function VisitorFormDialog() {
                                 {STEPS.map((step) => (
                                     <div
                                         key={step.id}
-                                        className={`w-2 h-2 rounded-full ${
-                                            currentStep >= step.id ? 'bg-[#063846]' : 'bg-slate-300'
-                                        }`}
+                                        className={`w-2 h-2 rounded-full ${currentStep >= step.id ? 'bg-[#063846]' : 'bg-slate-300'
+                                            }`}
                                     />
                                 ))}
                             </div>
@@ -392,11 +412,19 @@ export default function VisitorFormDialog() {
                                     <div className="space-y-2">
                                         <h2 className="text-xl sm:text-2xl font-bold text-[#05141D]">
                                             {currentStep === 1 && t("visitorForm.basicInformation")}
-                                            {currentStep === 2 && t("visitorForm.visitorTypes")}
+                                            {currentStep === 2 && "1. Vous êtes ?"}
+                                            {currentStep === 3 && "2. Comment avez-vous entendu parler de Morphea ?"}
+                                            {currentStep === 4 && "3. Quel est votre principal intérêt sur Morphea ?"}
+                                            {currentStep === 5 && "4. Dans quel domaine évoluez-vous ?"}
+                                            {currentStep === 6 && "5. Quel type d'expérience recherchez-vous sur Morphea ?"}
                                         </h2>
                                         <p className="text-slate-600 text-sm sm:text-base">
                                             {currentStep === 1 && t("visitorForm.personalDetails")}
-                                            {currentStep === 2 && t("visitorForm.selectAllThatApply")}
+                                            {currentStep === 2 && "Identifier le profil professionnel ou personnel"}
+                                            {currentStep === 3 && "Mesurer les canaux de communication efficaces"}
+                                            {currentStep === 4 && "Cerner les attentes utilisateur"}
+                                            {currentStep === 5 && "Affiner le profil professionnel / secteur"}
+                                            {currentStep === 6 && "Adapter l'offre de contenu et les recommandations"}
                                         </p>
                                     </div>
 
@@ -415,9 +443,8 @@ export default function VisitorFormDialog() {
                                                         required
                                                         value={formData.firstName}
                                                         onChange={(e) => handleInputChange("firstName", e.target.value)}
-                                                        className={`bg-white border-slate-300 text-[#05141D] placeholder:text-slate-400 h-11 text-base focus:border-[#063846] focus:ring-[#063846] rounded-md transition-colors ${
-                                                            formData.firstName.trim() ? 'border-green-300 focus:border-green-500' : ''
-                                                        }`}
+                                                        className={`bg-white border-slate-300 text-[#05141D] placeholder:text-slate-400 h-11 text-base focus:border-[#063846] focus:ring-[#063846] rounded-md transition-colors ${formData.firstName.trim() ? 'border-green-300 focus:border-green-500' : ''
+                                                            }`}
                                                         placeholder={t("auth.firstNamePlaceholder")}
                                                     />
                                                 </div>
@@ -433,27 +460,30 @@ export default function VisitorFormDialog() {
                                                         required
                                                         value={formData.lastName}
                                                         onChange={(e) => handleInputChange("lastName", e.target.value)}
-                                                        className={`bg-white border-slate-300 text-[#05141D] placeholder:text-slate-400 h-11 text-base focus:border-[#063846] focus:ring-[#063846] rounded-md transition-colors ${
-                                                            formData.lastName.trim() ? 'border-green-300 focus:border-green-500' : ''
-                                                        }`}
+                                                        className={`bg-white border-slate-300 text-[#05141D] placeholder:text-slate-400 h-11 text-base focus:border-[#063846] focus:ring-[#063846] rounded-md transition-colors ${formData.lastName.trim() ? 'border-green-300 focus:border-green-500' : ''
+                                                            }`}
                                                         placeholder={t("auth.lastNamePlaceholder")}
                                                     />
                                                 </div>
 
                                                 <div className="space-y-2">
                                                     <Label htmlFor="email" className="text-[#05141D] text-sm font-medium">
-                                                        {t("visitorForm.email")}
+                                                        {t("visitorForm.email")} *
                                                         {formData.email.trim() && formData.email.includes('@') && <span className="text-green-500 ml-1">✓</span>}
                                                     </Label>
                                                     <Input
                                                         id="email"
                                                         type="email"
+                                                        required
                                                         value={formData.email}
                                                         onChange={(e) => handleInputChange("email", e.target.value)}
-                                                        className={`bg-white border-slate-300 text-[#05141D] placeholder:text-slate-400 h-11 text-base focus:border-[#063846] focus:ring-[#063846] rounded-md transition-colors ${formData.email.trim() && formData.email.includes('@') ? 'border-green-300 focus:border-green-500' : ''
+                                                        className={`bg-white border-slate-300 text-[#05141D] placeholder:text-slate-400 h-11 text-base focus:border-[#063846] focus:ring-[#063846] rounded-md transition-colors ${formData.email.trim() && formData.email.includes('@') ? 'border-green-300 focus:border-green-500' : formData.email.trim() ? 'border-red-300 focus:border-red-500' : ''
                                                             }`}
                                                         placeholder={t("visitorForm.emailPlaceholder")}
                                                     />
+                                                    {formData.email.trim() && !formData.email.includes('@') && (
+                                                        <p className="text-xs text-red-500 mt-1">{t("visitorForm.emailInvalid")}</p>
+                                                    )}
                                                 </div>
 
                                                 <div className="space-y-2">
@@ -461,13 +491,10 @@ export default function VisitorFormDialog() {
                                                         {t("visitorForm.phone")}
                                                         {formData.phone.trim() && <span className="text-green-500 ml-1">✓</span>}
                                                     </Label>
-                                                    <Input
-                                                        id="phone"
-                                                        type="tel"
+                                                    <PhoneInput
                                                         value={formData.phone}
-                                                        onChange={(e) => handleInputChange("phone", e.target.value)}
-                                                        className={`bg-white border-slate-300 text-[#05141D] placeholder:text-slate-400 h-11 text-base focus:border-[#063846] focus:ring-[#063846] rounded-md transition-colors ${formData.phone.trim() ? 'border-green-300 focus:border-green-500' : ''
-                                                            }`}
+                                                        onChange={(value) => handleInputChange("phone", value || "")}
+                                                        defaultCountry="FR"
                                                         placeholder={t("visitorForm.phonePlaceholder")}
                                                     />
                                                 </div>
@@ -491,65 +518,149 @@ export default function VisitorFormDialog() {
                                         </div>
                                     )}
 
-                                    {/* Step 2: Visitor Types */}
+                                    {/* Step 2: Profile Question */}
                                     {currentStep === 2 && (
                                         <div className="space-y-4">
-                                            {/* Search for visitor types */}
-                                            <div className="relative">
-                                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
-                                                <Input
-                                                    type="text"
-                                                    placeholder="Rechercher un type de profil..."
-                                                    value={visitorTypeSearch}
-                                                    onChange={(e) => setVisitorTypeSearch(e.target.value)}
-                                                    className="pl-10 bg-white border-slate-300 text-[#05141D] placeholder:text-slate-400 h-9 text-sm focus:border-[#063846] focus:ring-[#063846] rounded-md"
-                                                />
+                                            <div className="space-y-2">
+                                                {[
+                                                    { value: 'student', label: 'Étudiant' },
+                                                    { value: 'pro', label: 'Professionnel du secteur mode / design' },
+                                                    { value: 'designer', label: 'Designer de mode' },
+                                                    { value: 'artist', label: 'Artiste / Artisan' },
+                                                    { value: 'project_lead', label: 'Porteur de projet' },
+                                                    { value: 'curious', label: 'Curieux / Passionné d\'art et de design' },
+                                                    { value: 'representative', label: 'Représentant d\'institution ou de marque' },
+                                                    { value: 'other', label: 'Autre' },
+                                                ].map(({ value, label }) => (
+                                                    <label key={value} className="group flex cursor-pointer items-center space-x-3 rounded-lg border border-slate-200 p-4 transition-all hover:border-[#063846] hover:bg-slate-50">
+                                                        <input
+                                                            type="radio"
+                                                            name="profileQuestion"
+                                                            value={value}
+                                                            checked={formData.profileQuestion === value}
+                                                            onChange={(e) => setFormData((prev) => ({ ...prev, profileQuestion: e.target.value }))}
+                                                            className="h-5 w-5 border-slate-300 bg-white text-[#063846] transition-colors focus:ring-2 focus:ring-[#063846]"
+                                                        />
+                                                        <span className="text-base font-medium text-slate-700">{label}</span>
+                                                    </label>
+                                                ))}
                                             </div>
+                                        </div>
+                                    )}
 
-                                            {/* Selected type display */}
-                                            {formData.selectedVisitorType && (
-                                                <div className="flex items-center gap-2">
-                                                    <Badge variant="outline" className="text-[#063846] border-[#063846]">
-                                                        {filteredVisitorTypes.find(type => type.key === formData.selectedVisitorType)?.label || formData.selectedVisitorType} sélectionné
-                                                    </Badge>
-                                                </div>
-                                            )}
+                                    {/* Step 3: Source Question */}
+                                    {currentStep === 3 && (
+                                        <div className="space-y-4">
+                                            <div className="space-y-2">
+                                                {[
+                                                    { value: 'linkedin', label: 'LinkedIn' },
+                                                    { value: 'facebook', label: 'Facebook' },
+                                                    { value: 'instagram', label: 'Instagram' },
+                                                    { value: 'word', label: 'Bouche à oreille' },
+                                                    { value: 'news', label: 'Presse spécialisée' },
+                                                    { value: 'event', label: 'Événement / salon' },
+                                                    { value: 'other', label: 'Autre' },
+                                                ].map(({ value, label }) => (
+                                                    <label key={value} className="group flex cursor-pointer items-center space-x-3 rounded-lg border border-slate-200 p-4 transition-all hover:border-[#063846] hover:bg-slate-50">
+                                                        <input
+                                                            type="radio"
+                                                            name="sourceQuestion"
+                                                            value={value}
+                                                            checked={formData.sourceQuestion === value}
+                                                            onChange={(e) => setFormData((prev) => ({ ...prev, sourceQuestion: e.target.value }))}
+                                                            className="h-5 w-5 border-slate-300 bg-white text-[#063846] transition-colors focus:ring-2 focus:ring-[#063846]"
+                                                        />
+                                                        <span className="text-base font-medium text-slate-700">{label}</span>
+                                                    </label>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
 
-                                            <div className="border border-slate-200 rounded-md p-3 bg-slate-50 max-h-64 overflow-y-auto">
-                                                {filteredVisitorTypes.length === 0 ? (
-                                                    <p className="text-slate-500 text-sm text-center py-4">
-                                                        Aucun profil trouvé pour "{visitorTypeSearch}"
-                                                    </p>
-                                                ) : (
-                                                    <div className="space-y-1">
-                                                        {filteredVisitorTypes.map(({ key, label, category }) => (
-                                                            <label
-                                                                key={key}
-                                                                className="flex items-center space-x-3 cursor-pointer p-2 rounded hover:bg-slate-100 transition-colors group"
-                                                            >
-                                                                <input
-                                                                    type="radio"
-                                                                    name="visitorType"
-                                                                    value={key}
-                                                                    checked={formData.selectedVisitorType === key}
-                                                                    onChange={(e) => handleVisitorTypeChange(e.target.value)}
-                                                                    className="w-4 h-4 text-[#063846] bg-white border-slate-300 focus:ring-[#063846] focus:ring-1 transition-colors"
-                                                                />
-                                                                <div className="flex-1">
-                                                                    <span className="text-slate-700 text-sm font-medium block">
-                                                                        {label}
-                                                                    </span>
-                                                                    <span className="text-slate-500 text-xs">
-                                                                        {category}
-                                                                    </span>
-                                                                </div>
-                                                                <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                                                                    <div className="w-2 h-2 bg-[#063846] rounded-full"></div>
-                                                                </div>
-                                                            </label>
-                                                        ))}
-                                                    </div>
-                                                )}
+                                    {/* Step 4: Interest Question */}
+                                    {currentStep === 4 && (
+                                        <div className="space-y-4">
+                                            <div className="space-y-2">
+                                                {[
+                                                    { value: 'discover', label: 'Découvrir des créateurs et leurs créations' },
+                                                    { value: 'sell', label: 'Vendre mes créations' },
+                                                    { value: 'buy', label: 'Acheter des pièces uniques' },
+                                                    { value: 'participate', label: 'Participer à des événements immersifs' },
+                                                    { value: 'inspiration', label: 'M\'inspirer pour un projet personnel ou professionnel' },
+                                                    { value: 'explore', label: 'Explorer un nouveau type d\'expérience digitale' },
+                                                    { value: 'other', label: 'Autre' },
+                                                ].map(({ value, label }) => (
+                                                    <label key={value} className="group flex cursor-pointer items-center space-x-3 rounded-lg border border-slate-200 p-4 transition-all hover:border-[#063846] hover:bg-slate-50">
+                                                        <input
+                                                            type="radio"
+                                                            name="interestQuestion"
+                                                            value={value}
+                                                            checked={formData.interestQuestion === value}
+                                                            onChange={(e) => setFormData((prev) => ({ ...prev, interestQuestion: e.target.value }))}
+                                                            className="h-5 w-5 border-slate-300 bg-white text-[#063846] transition-colors focus:ring-2 focus:ring-[#063846]"
+                                                        />
+                                                        <span className="text-base font-medium text-slate-700">{label}</span>
+                                                    </label>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Step 5: Specialty Question */}
+                                    {currentStep === 5 && (
+                                        <div className="space-y-4">
+                                            <div className="space-y-2">
+                                                {[
+                                                    { value: 'fashion', label: 'Mode' },
+                                                    { value: 'design', label: 'Design d\'objet' },
+                                                    { value: 'artist', label: 'Artisanat / Métiers d\'art' },
+                                                    { value: 'visual_art', label: 'Arts visuels' },
+                                                    { value: 'marketing', label: 'Communication / Marketing' },
+                                                    { value: 'teaching', label: 'Enseignement / Formation' },
+                                                    { value: 'development', label: 'Développement technologique / 3D / VR' },
+                                                    { value: 'other', label: 'Autre' },
+                                                ].map(({ value, label }) => (
+                                                    <label key={value} className="group flex cursor-pointer items-center space-x-3 rounded-lg border border-slate-200 p-4 transition-all hover:border-[#063846] hover:bg-slate-50">
+                                                        <input
+                                                            type="radio"
+                                                            name="specialtyQuestion"
+                                                            value={value}
+                                                            checked={formData.specialtyQuestion === value}
+                                                            onChange={(e) => setFormData((prev) => ({ ...prev, specialtyQuestion: e.target.value }))}
+                                                            className="h-5 w-5 border-slate-300 bg-white text-[#063846] transition-colors focus:ring-2 focus:ring-[#063846]"
+                                                        />
+                                                        <span className="text-base font-medium text-slate-700">{label}</span>
+                                                    </label>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Step 6: Expectation Question */}
+                                    {currentStep === 6 && (
+                                        <div className="space-y-4">
+                                            <div className="space-y-2">
+                                                {[
+                                                    { value: 'art', label: 'Une expérience artistique et immersive' },
+                                                    { value: 'display', label: 'Une vitrine pour mes créations' },
+                                                    { value: 'networking', label: 'Un espace de networking créatif' },
+                                                    { value: 'buy_sell', label: 'Une plateforme pour vendre ou acheter des œuvres' },
+                                                    { value: 'inspiration', label: 'Une source d\'inspiration culturelle' },
+                                                    { value: 'opportunity', label: 'Une opportunité de collaboration ou de visibilité' },
+                                                    { value: 'other', label: 'Autre' },
+                                                ].map(({ value, label }) => (
+                                                    <label key={value} className="group flex cursor-pointer items-center space-x-3 rounded-lg border border-slate-200 p-4 transition-all hover:border-[#063846] hover:bg-slate-50">
+                                                        <input
+                                                            type="radio"
+                                                            name="expectationQuestion"
+                                                            value={value}
+                                                            checked={formData.expectationQuestion === value}
+                                                            onChange={(e) => setFormData((prev) => ({ ...prev, expectationQuestion: e.target.value }))}
+                                                            className="h-5 w-5 border-slate-300 bg-white text-[#063846] transition-colors focus:ring-2 focus:ring-[#063846]"
+                                                        />
+                                                        <span className="text-base font-medium text-slate-700">{label}</span>
+                                                    </label>
+                                                ))}
                                             </div>
                                         </div>
                                     )}
