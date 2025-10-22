@@ -35,6 +35,11 @@ type VisitorFormData = {
     phone: string
     address: string
     selectedVisitorType: string
+    profileQuestion: string
+    sourceQuestion: string
+    interestQuestion: string
+    specialtyQuestion: string
+    expectationQuestion: string
 }
 
 interface EnhancedSignupWithVisitorProps
@@ -97,7 +102,10 @@ export function EnhancedSignupWithVisitor({
     showVisitorForm = false,
     ...props
 }: EnhancedSignupWithVisitorProps) {
+    // Steps: 1=Basic, 2=Phone, 3=Profile, 4=Source, 5=Interest, 6=Specialty, 7=Expectation
     const [currentStep, setCurrentStep] = useState(1)
+    const totalSteps = showVisitorForm && true ? 7 : 1
+    
     const [firstName, setFirstName] = useState('')
     const [lastName, setLastName] = useState('')
     const [email, setEmail] = useState('')
@@ -115,6 +123,11 @@ export function EnhancedSignupWithVisitor({
         phone: '',
         address: '',
         selectedVisitorType: '',
+        profileQuestion: '',
+        sourceQuestion: '',
+        interestQuestion: '',
+        specialtyQuestion: '',
+        expectationQuestion: '',
     })
 
     const router = useRouter()
@@ -214,11 +227,14 @@ export function EnhancedSignupWithVisitor({
     const passwordsMatch =
         password === repeatPassword && repeatPassword.length > 0
 
+    // Email validation
+    const isEmailValid = email.trim() && email.includes('@') && email.includes('.')
+
     // Step 1 validation
     const isStep1Valid =
         firstName.trim() &&
         lastName.trim() &&
-        email.trim() &&
+        isEmailValid &&
         isPasswordValid &&
         passwordsMatch &&
         acceptedTerms
@@ -228,10 +244,21 @@ export function EnhancedSignupWithVisitor({
         !showVisitorForm ||
         !hasConsent ||
         (visitorData.phone.trim() &&
-            visitorData.address.trim() &&
-            visitorData.selectedVisitorType.trim()) // Visitor type selected
+            visitorData.profileQuestion.trim() &&
+            visitorData.sourceQuestion.trim() &&
+            visitorData.interestQuestion.trim() &&
+            visitorData.specialtyQuestion.trim() &&
+            visitorData.expectationQuestion.trim())
 
     const isFormValid = isStep1Valid && isVisitorFormValid
+
+    // Step-specific validators
+    const isStep2Valid = visitorData.phone.trim()
+    const isStep3Valid = visitorData.profileQuestion.trim()
+    const isStep4Valid = visitorData.sourceQuestion.trim()
+    const isStep5Valid = visitorData.interestQuestion.trim()
+    const isStep6Valid = visitorData.specialtyQuestion.trim()
+    const isStep7Valid = visitorData.expectationQuestion.trim()
 
     // Filter visitor types based on search
     const filteredVisitorTypes = useMemo(() => {
@@ -296,19 +323,29 @@ export function EnhancedSignupWithVisitor({
     }
 
     const handleNextStep = () => {
+        setError(null)
         if (currentStep === 1 && isStep1Valid) {
             if (!showVisitorForm || !hasConsent) {
-                // If no visitor form, submit directly
                 handleSignUp(new Event('submit') as any)
             } else {
                 setCurrentStep(2)
             }
+        } else if (currentStep === 2 && isStep2Valid) {
+            setCurrentStep(3)
+        } else if (currentStep === 3 && isStep3Valid) {
+            setCurrentStep(4)
+        } else if (currentStep === 4 && isStep4Valid) {
+            setCurrentStep(5)
+        } else if (currentStep === 5 && isStep5Valid) {
+            setCurrentStep(6)
+        } else if (currentStep === 6 && isStep6Valid) {
+            setCurrentStep(7)
         }
     }
 
     const handlePreviousStep = () => {
-        if (currentStep === 2) {
-            setCurrentStep(1)
+        if (currentStep > 1) {
+            setCurrentStep(currentStep - 1)
             setError(null)
         }
     }
@@ -407,7 +444,6 @@ export function EnhancedSignupWithVisitor({
                     try {
                         const visitorCode = `V${Date.now().toString().slice(-8)}`
 
-                        // Get the next available ID
                         const { data: existingVisitors } = await supabase
                             .schema('morpheus')
                             .from('yvisiteur')
@@ -420,33 +456,25 @@ export function EnhancedSignupWithVisitor({
                                 ? existingVisitors[0].yvisiteurid + 1
                                 : 1
 
+                        const visitorRecord = {
+                            yvisiteurid: nextId,
+                            yuseridfk: signUpData.user.id,
+                            yvisiteurcode: visitorCode,
+                            yvisiteurnom: `${firstName.trim()} ${lastName.trim()}`,
+                            yvisiteuremail: email,
+                            yvisiteurtelephone:
+                                visitorData.phone.trim() || null,
+                            profile_question: visitorData.profileQuestion.trim() || null,
+                            source_question: visitorData.sourceQuestion.trim() || null,
+                            interest_question: visitorData.interestQuestion.trim() || null,
+                            specialty_question: visitorData.specialtyQuestion.trim() || null,
+                            expectation_question: visitorData.expectationQuestion.trim() || null,
+                        }
+
                         await supabase
                             .schema('morpheus')
                             .from('yvisiteur')
-                            .insert({
-                                yvisiteurid: nextId,
-                                yuseridfk: signUpData.user.id,
-                                yvisiteurcode: visitorCode,
-                                yvisiteurnom: `${firstName.trim()} ${lastName.trim()}`,
-                                yvisiteuremail: email,
-                                yvisiteurtelephone:
-                                    visitorData.phone.trim() || null,
-                                yvisiteuradresse:
-                                    visitorData.address.trim() || null,
-                                yvisiteurboolacheteurluxe: visitorData.selectedVisitorType === 'acheteurluxe' ? '1' : '0',
-                                yvisiteurboolacheteurpro: visitorData.selectedVisitorType === 'acheteurpro' ? '1' : '0',
-                                yvisiteurboolartisan: visitorData.selectedVisitorType === 'artisan' ? '1' : '0',
-                                yvisiteurboolclientprive: visitorData.selectedVisitorType === 'clientprive' ? '1' : '0',
-                                yvisiteurboolcollectionneur: visitorData.selectedVisitorType === 'collectionneur' ? '1' : '0',
-                                yvisiteurboolcreateur: visitorData.selectedVisitorType === 'createur' ? '1' : '0',
-                                yvisiteurboolculturel: visitorData.selectedVisitorType === 'culturel' ? '1' : '0',
-                                yvisiteurboolgrandpublic: visitorData.selectedVisitorType === 'grandpublic' ? '1' : '0',
-                                yvisiteurboolinfluenceur: visitorData.selectedVisitorType === 'influenceur' ? '1' : '0',
-                                yvisiteurboolinvestisseur: visitorData.selectedVisitorType === 'investisseur' ? '1' : '0',
-                                yvisiteurbooljournaliste: visitorData.selectedVisitorType === 'journaliste' ? '1' : '0',
-                                yvisiteurboolpressespecialisee: visitorData.selectedVisitorType === 'pressespecialisee' ? '1' : '0',
-                                yvisiteurboolvip: visitorData.selectedVisitorType === 'vip' ? '1' : '0',
-                            })
+                            .insert(visitorRecord as any)
                     } catch (insertError) {
                         console.error(
                             'Error creating visitor record:',
@@ -499,62 +527,23 @@ export function EnhancedSignupWithVisitor({
                 </p>
             </div>
 
-            {/* Stepper Progress */}
+            {/* Progress Bar */}
             {showVisitorForm && hasConsent && (
-                <div className="mx-auto mb-8 max-w-md">
-                    <div className="flex items-center justify-between">
-                        {/* Step 1 */}
-                        <div className="flex flex-1 flex-col items-center">
-                            <div
-                                className={`mb-2 flex h-10 w-10 items-center justify-center rounded-full border-2 transition-all ${currentStep === 1
-                                    ? 'border-[#063846] bg-[#063846] text-white'
-                                    : currentStep > 1
-                                        ? 'border-green-500 bg-green-500 text-white'
-                                        : 'border-slate-300 bg-white text-slate-400'
-                                    }`}
-                            >
-                                {currentStep > 1 ? (
-                                    <CheckCircle className="h-5 w-5" />
-                                ) : (
-                                    <span className="text-sm font-semibold">1</span>
-                                )}
-                            </div>
-                            <span
-                                className={`text-xs font-medium ${currentStep === 1
-                                    ? 'text-[#063846]'
-                                    : 'text-slate-500'
-                                    }`}
-                            >
-                                Informations de base
+                <div className="mx-auto w-full max-w-2xl px-4">
+                    <div className="mb-6">
+                        <div className="mb-2 flex items-center justify-between text-sm">
+                            <span className="font-medium text-slate-700">
+                                Étape {currentStep} sur {totalSteps}
+                            </span>
+                            <span className="text-slate-500">
+                                {Math.round((currentStep / totalSteps) * 100)}%
                             </span>
                         </div>
-
-                        {/* Connector Line */}
-                        <div className="mx-4 mb-6 h-0.5 flex-1 bg-slate-300">
+                        <div className="h-2 w-full overflow-hidden rounded-full bg-slate-200">
                             <div
-                                className={`h-full transition-all duration-300 ${currentStep > 1 ? 'w-full bg-green-500' : 'w-0'
-                                    }`}
+                                className="h-full bg-gradient-to-r from-[#05141D] to-[#063846] transition-all duration-500 ease-out"
+                                style={{ width: `${(currentStep / totalSteps) * 100}%` }}
                             />
-                        </div>
-
-                        {/* Step 2 */}
-                        <div className="flex flex-1 flex-col items-center">
-                            <div
-                                className={`mb-2 flex h-10 w-10 items-center justify-center rounded-full border-2 transition-all ${currentStep === 2
-                                    ? 'border-[#063846] bg-[#063846] text-white'
-                                    : 'border-slate-300 bg-white text-slate-400'
-                                    }`}
-                            >
-                                <span className="text-sm font-semibold">2</span>
-                            </div>
-                            <span
-                                className={`text-xs font-medium ${currentStep === 2
-                                    ? 'text-[#063846]'
-                                    : 'text-slate-500'
-                                    }`}
-                            >
-                                Profil visiteur
-                            </span>
                         </div>
                     </div>
                 </div>
@@ -565,7 +554,7 @@ export function EnhancedSignupWithVisitor({
                 <form onSubmit={handleSignUp} className="h-full">
                     {/* Step 1: Basic Registration */}
                     {currentStep === 1 && (
-                        <div className="flex h-full max-h-[80vh] flex-col">
+                        <div className="flex h-full flex-col">
                             <div className="flex-1 overflow-y-auto p-8">
                                 {isLoadingVisitor ? (
                                     // Skeleton loading state
@@ -932,31 +921,16 @@ export function EnhancedSignupWithVisitor({
                                             disabled={isLoading || !isStep1Valid}
                                             className="h-11 w-full transform rounded-md bg-gradient-to-r from-[#05141D] to-[#063846] text-base font-semibold text-white shadow-lg transition-all duration-300 hover:scale-[1.02] hover:from-[#04111a] hover:to-[#052d37] hover:shadow-xl active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:shadow-lg"
                                         >
-                                            {showVisitorForm && hasConsent ? (
-                                                <div className="flex items-center justify-center gap-2">
-                                                    <span>Continuer</span>
-                                                    <svg
-                                                        className="h-4 w-4 transition-transform group-hover:translate-x-1"
-                                                        fill="none"
-                                                        stroke="currentColor"
-                                                        viewBox="0 0 24 24"
-                                                    >
-                                                        <path
-                                                            strokeLinecap="round"
-                                                            strokeLinejoin="round"
-                                                            strokeWidth={2}
-                                                            d="M9 5l7 7-7 7"
-                                                        />
-                                                    </svg>
-                                                </div>
-                                            ) : isLoading ? (
+                                            {isLoading ? (
                                                 <div className="flex items-center gap-2">
                                                     <Loader2 className="h-4 w-4 animate-spin" />
                                                 </div>
                                             ) : (
                                                 <div className="flex items-center justify-center gap-2">
                                                     <span>
-                                                        {t('auth.createAccount')}
+                                                        {showVisitorForm && hasConsent
+                                                            ? 'Continuer'
+                                                            : t('auth.createAccount')}
                                                     </span>
                                                     <svg
                                                         className="h-4 w-4 transition-transform group-hover:translate-x-1"
@@ -992,172 +966,38 @@ export function EnhancedSignupWithVisitor({
                         </div>
                     )}
 
-                    {/* Step 2: Visitor Information */}
+                    {/* Step 2: Phone Input */}
                     {currentStep === 2 && showVisitorForm && hasConsent && (
-                        <div className="flex h-full max-h-[80vh] flex-col">
+                        <div className="flex h-full flex-col">
                             <div className="flex-1 overflow-y-auto p-8">
                                 <div className="space-y-6">
-                                    {/* Header */}
                                     <div>
-                                        <div className="mb-4 flex items-center gap-2 font-medium text-[#063846]">
-                                            <Users className="h-5 w-5" />
-                                            <span className="text-lg">
-                                                Informations supplémentaires
-                                            </span>
-                                        </div>
-                                        <p className="mb-6 text-sm text-slate-600">
-                                            Aidez-nous à mieux vous connaître
+                                        <Label className="mb-2 block text-lg font-semibold text-[#05141D]">
+                                            Quel est votre numéro de téléphone ?
+                                        </Label>
+                                        <p className="mb-4 text-sm text-slate-600">
+                                            Pour mieux vous contacter
                                         </p>
                                     </div>
 
-                                    <div className="space-y-4">
-                                        <div className="space-y-2">
-                                            <Label
-                                                htmlFor="phone"
-                                                className="text-sm font-medium text-[#05141D]"
-                                            >
-                                                Téléphone
-                                                {visitorData.phone.trim() && (
-                                                    <span className="ml-1 text-green-500">
-                                                        ✓
-                                                    </span>
-                                                )}
-                                            </Label>
-                                            <PhoneInput
-                                                id="phone"
-                                                defaultCountry="FR"
-                                                value={visitorData.phone}
-                                                onChange={(value) =>
-                                                    setVisitorData((prev) => ({
-                                                        ...prev,
-                                                        phone: value || '',
-                                                    }))
-                                                }
-                                                className={`rounded-md border-slate-300 bg-white text-sm text-[#05141D] transition-colors placeholder:text-slate-400 focus:border-[#063846] focus:ring-[#063846] ${visitorData.phone.trim()
+                                    <div className="space-y-2">
+                                        <PhoneInput
+                                            id="phone"
+                                            defaultCountry="FR"
+                                            value={visitorData.phone}
+                                            onChange={(value) =>
+                                                setVisitorData((prev) => ({
+                                                    ...prev,
+                                                    phone: value || '',
+                                                }))
+                                            }
+                                            className={`h-12 rounded-md border-slate-300 bg-white text-base text-[#05141D] transition-colors placeholder:text-slate-400 focus:border-[#063846] focus:ring-[#063846] ${
+                                                visitorData.phone.trim()
                                                     ? 'border-green-300 focus:border-green-500'
                                                     : ''
-                                                    }`}
-                                                placeholder="Entrez votre numéro de téléphone"
-                                            />
-                                        </div>
-
-                                        <div className="space-y-2">
-                                            <Label
-                                                htmlFor="address"
-                                                className="text-sm font-medium text-[#05141D]"
-                                            >
-                                                Adresse
-                                                {visitorData.address.trim() && (
-                                                    <span className="ml-1 text-green-500">
-                                                        ✓
-                                                    </span>
-                                                )}
-                                            </Label>
-                                            <Input
-                                                id="address"
-                                                type="text"
-                                                value={visitorData.address}
-                                                onChange={(e) =>
-                                                    setVisitorData((prev) => ({
-                                                        ...prev,
-                                                        address: e.target.value,
-                                                    }))
-                                                }
-                                                className={`h-10 rounded-md border-slate-300 bg-white text-sm text-[#05141D] transition-colors placeholder:text-slate-400 focus:border-[#063846] focus:ring-[#063846] ${visitorData.address.trim()
-                                                    ? 'border-green-300 focus:border-green-500'
-                                                    : ''
-                                                    }`}
-                                                placeholder="Entrez votre adresse"
-                                            />
-                                        </div>
-
-                                        <div className="space-y-3">
-                                            <div>
-                                                <Label className="text-sm font-medium text-[#05141D]">
-                                                    Votre profil
-                                                </Label>
-                                                <p className="mt-1 text-xs text-slate-500">
-                                                    Sélectionnez votre profil principal
-                                                </p>
-                                            </div>
-
-                                            {/* Search for visitor types */}
-                                            <div className="relative">
-                                                <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-slate-400" />
-                                                <Input
-                                                    type="text"
-                                                    placeholder="Rechercher un type de profil..."
-                                                    value={visitorTypeSearch}
-                                                    onChange={(e) =>
-                                                        setVisitorTypeSearch(
-                                                            e.target.value
-                                                        )
-                                                    }
-                                                    className="h-9 rounded-md border-slate-300 bg-white pl-10 text-sm text-[#05141D] placeholder:text-slate-400 focus:border-[#063846] focus:ring-[#063846]"
-                                                />
-                                            </div>
-
-                                            {/* Selected type display */}
-                                            {visitorData.selectedVisitorType && (
-                                                <div className="flex items-center gap-2">
-                                                    <Badge
-                                                        variant="outline"
-                                                        className="border-[#063846] text-[#063846]"
-                                                    >
-                                                        {filteredVisitorTypes.find(type => type.key === visitorData.selectedVisitorType)?.label || visitorData.selectedVisitorType} sélectionné
-                                                    </Badge>
-                                                </div>
-                                            )}
-
-                                            <div className="max-h-64 overflow-y-auto rounded-md border border-slate-200 bg-slate-50 p-3">
-                                                {filteredVisitorTypes.length ===
-                                                    0 ? (
-                                                    <p className="py-4 text-center text-sm text-slate-500">
-                                                        Aucun profil trouvé pour
-                                                        "{visitorTypeSearch}"
-                                                    </p>
-                                                ) : (
-                                                    <div className="space-y-1">
-                                                        {filteredVisitorTypes.map(
-                                                            ({
-                                                                key,
-                                                                label,
-                                                                category,
-                                                            }) => (
-                                                                <label
-                                                                    key={key}
-                                                                    className="group flex cursor-pointer items-center space-x-3 rounded p-2 transition-colors hover:bg-slate-100"
-                                                                >
-                                                                    <input
-                                                                        type="radio"
-                                                                        name="visitorType"
-                                                                        value={key}
-                                                                        checked={visitorData.selectedVisitorType === key}
-                                                                        onChange={(e) => handleVisitorTypeChange(e.target.value)}
-                                                                        className="h-4 w-4 border-slate-300 bg-white text-[#063846] transition-colors focus:ring-1 focus:ring-[#063846]"
-                                                                    />
-                                                                    <div className="flex-1">
-                                                                        <span className="block text-sm font-medium text-slate-700">
-                                                                            {
-                                                                                label
-                                                                            }
-                                                                        </span>
-                                                                        <span className="text-xs text-slate-500">
-                                                                            {
-                                                                                category
-                                                                            }
-                                                                        </span>
-                                                                    </div>
-                                                                    <div className="opacity-0 transition-opacity group-hover:opacity-100">
-                                                                        <div className="h-2 w-2 rounded-full bg-[#063846]"></div>
-                                                                    </div>
-                                                                </label>
-                                                            )
-                                                        )}
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
+                                            }`}
+                                            placeholder="Entrez votre numéro de téléphone"
+                                        />
                                     </div>
 
                                     {error && (
@@ -1165,52 +1005,526 @@ export function EnhancedSignupWithVisitor({
                                             {error}
                                         </div>
                                     )}
+                                </div>
+                            </div>
+                            <div className="border-t border-slate-200 bg-slate-50 px-8 py-4">
+                                <div className="flex gap-3">
+                                    <Button
+                                        type="button"
+                                        onClick={handlePreviousStep}
+                                        disabled={isLoading}
+                                        variant="outline"
+                                        className="h-11 flex-1 rounded-md border-slate-300 text-base font-semibold text-slate-700 transition-all hover:bg-slate-100"
+                                    >
+                                        <svg
+                                            className="mr-2 h-4 w-4"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M15 19l-7-7 7-7"
+                                            />
+                                        </svg>
+                                        Retour
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        onClick={handleNextStep}
+                                        disabled={isLoading || !isStep2Valid}
+                                        className="h-11 flex-1 transform rounded-md bg-gradient-to-r from-[#05141D] to-[#063846] text-base font-semibold text-white shadow-lg transition-all duration-300 hover:scale-[1.02] hover:from-[#04111a] hover:to-[#052d37] hover:shadow-xl active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+                                    >
+                                        Continuer
+                                        <svg
+                                            className="ml-2 h-4 w-4"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M9 5l7 7-7 7"
+                                            />
+                                        </svg>
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
-                                    {/* Step 2 Action Buttons */}
-                                    <div className="flex gap-3">
-                                        <Button
-                                            type="button"
-                                            onClick={handlePreviousStep}
-                                            disabled={isLoading}
-                                            variant="outline"
-                                            className="h-11 flex-1 rounded-md border-slate-300 text-base font-semibold text-slate-700 transition-all hover:bg-slate-50"
-                                        >
-                                            <div className="flex items-center justify-center gap-2">
-                                                <svg
-                                                    className="h-4 w-4"
-                                                    fill="none"
-                                                    stroke="currentColor"
-                                                    viewBox="0 0 24 24"
-                                                >
-                                                    <path
-                                                        strokeLinecap="round"
-                                                        strokeLinejoin="round"
-                                                        strokeWidth={2}
-                                                        d="M15 19l-7-7 7-7"
-                                                    />
-                                                </svg>
-                                                <span>Retour</span>
-                                            </div>
-                                        </Button>
-                                        <Button
-                                            type="submit"
-                                            disabled={isLoading || !isVisitorFormValid}
-                                            className="h-11 flex-1 transform rounded-md bg-gradient-to-r from-[#05141D] to-[#063846] text-base font-semibold text-white shadow-lg transition-all duration-300 hover:scale-[1.02] hover:from-[#04111a] hover:to-[#052d37] hover:shadow-xl active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:shadow-lg"
-                                        >
-                                            {isLoading ? (
-                                                <div className="flex items-center gap-2">
-                                                    <Loader2 className="h-4 w-4 animate-spin" />
-                                                </div>
-                                            ) : (
-                                                <div className="flex items-center justify-center gap-2">
-                                                    <span>
-                                                        {t('auth.createAccount')}
-                                                    </span>
-                                                    <CheckCircle className="h-4 w-4" />
-                                                </div>
-                                            )}
-                                        </Button>
+                    {/* Step 3: Profile Question */}
+                    {currentStep === 3 && showVisitorForm && hasConsent && (
+                        <div className="flex h-full flex-col">
+                            <div className="flex-1 overflow-y-auto p-8">
+                                <div className="space-y-6">
+                                    <div>
+                                        <Label className="mb-2 block text-lg font-semibold text-[#05141D]">
+                                            1. Vous êtes ?
+                                        </Label>
+                                        <p className="text-sm text-slate-600">
+                                            Identifier le profil professionnel ou personnel
+                                        </p>
                                     </div>
+
+                                    <div className="space-y-2">
+                                        {[
+                                            { value: 'student', label: 'Étudiant' },
+                                            { value: 'pro', label: 'Professionnel du secteur mode / design' },
+                                            { value: 'designer', label: 'Designer de mode' },
+                                            { value: 'artist', label: 'Artiste / Artisan' },
+                                            { value: 'project_lead', label: 'Porteur de projet' },
+                                            { value: 'curious', label: 'Curieux / Passionné d\'art et de design' },
+                                            { value: 'representative', label: 'Représentant d\'institution ou de marque' },
+                                            { value: 'other', label: 'Autre' },
+                                        ].map(({ value, label }) => (
+                                            <label key={value} className="group flex cursor-pointer items-center space-x-3 rounded-lg border border-slate-200 p-4 transition-all hover:border-[#063846] hover:bg-slate-50">
+                                                <input
+                                                    type="radio"
+                                                    name="profileQuestion"
+                                                    value={value}
+                                                    checked={visitorData.profileQuestion === value}
+                                                    onChange={(e) => setVisitorData((prev) => ({ ...prev, profileQuestion: e.target.value }))}
+                                                    className="h-5 w-5 border-slate-300 bg-white text-[#063846] transition-colors focus:ring-2 focus:ring-[#063846]"
+                                                />
+                                                <span className="text-base font-medium text-slate-700">{label}</span>
+                                            </label>
+                                        ))}
+                                    </div>
+
+                                    {error && (
+                                        <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-red-700">
+                                            {error}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                            <div className="border-t border-slate-200 bg-slate-50 px-8 py-4">
+                                <div className="flex gap-3">
+                                    <Button
+                                        type="button"
+                                        onClick={handlePreviousStep}
+                                        disabled={isLoading}
+                                        variant="outline"
+                                        className="h-11 flex-1 rounded-md border-slate-300 text-base font-semibold text-slate-700 transition-all hover:bg-slate-100"
+                                    >
+                                        <svg
+                                            className="mr-2 h-4 w-4"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M15 19l-7-7 7-7"
+                                            />
+                                        </svg>
+                                        Retour
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        onClick={handleNextStep}
+                                        disabled={isLoading || !isStep3Valid}
+                                        className="h-11 flex-1 transform rounded-md bg-gradient-to-r from-[#05141D] to-[#063846] text-base font-semibold text-white shadow-lg transition-all duration-300 hover:scale-[1.02] hover:from-[#04111a] hover:to-[#052d37] hover:shadow-xl active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+                                    >
+                                        Continuer
+                                        <svg
+                                            className="ml-2 h-4 w-4"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M9 5l7 7-7 7"
+                                            />
+                                        </svg>
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Step 4: Source Question */}
+                    {currentStep === 4 && showVisitorForm && hasConsent && (
+                        <div className="flex h-full flex-col">
+                            <div className="flex-1 overflow-y-auto p-8">
+                                <div className="space-y-6">
+                                    <div>
+                                        <Label className="mb-2 block text-lg font-semibold text-[#05141D]">
+                                            2. Comment avez-vous entendu parler de Morphea ?
+                                        </Label>
+                                        <p className="text-sm text-slate-600">
+                                            Mesurer les canaux de communication efficaces
+                                        </p>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        {[
+                                            { value: 'linkedin', label: 'LinkedIn' },
+                                            { value: 'facebook', label: 'Facebook' },
+                                            { value: 'instagram', label: 'Instagram' },
+                                            { value: 'word', label: 'Bouche à oreille' },
+                                            { value: 'news', label: 'Presse spécialisée' },
+                                            { value: 'event', label: 'Événement / salon' },
+                                            { value: 'other', label: 'Autre' },
+                                        ].map(({ value, label }) => (
+                                            <label key={value} className="group flex cursor-pointer items-center space-x-3 rounded-lg border border-slate-200 p-4 transition-all hover:border-[#063846] hover:bg-slate-50">
+                                                <input
+                                                    type="radio"
+                                                    name="sourceQuestion"
+                                                    value={value}
+                                                    checked={visitorData.sourceQuestion === value}
+                                                    onChange={(e) => setVisitorData((prev) => ({ ...prev, sourceQuestion: e.target.value }))}
+                                                    className="h-5 w-5 border-slate-300 bg-white text-[#063846] transition-colors focus:ring-2 focus:ring-[#063846]"
+                                                />
+                                                <span className="text-base font-medium text-slate-700">{label}</span>
+                                            </label>
+                                        ))}
+                                    </div>
+
+                                    {error && (
+                                        <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-red-700">
+                                            {error}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                            <div className="border-t border-slate-200 bg-slate-50 px-8 py-4">
+                                <div className="flex gap-3">
+                                    <Button
+                                        type="button"
+                                        onClick={handlePreviousStep}
+                                        disabled={isLoading}
+                                        variant="outline"
+                                        className="h-11 flex-1 rounded-md border-slate-300 text-base font-semibold text-slate-700 transition-all hover:bg-slate-100"
+                                    >
+                                        <svg
+                                            className="mr-2 h-4 w-4"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M15 19l-7-7 7-7"
+                                            />
+                                        </svg>
+                                        Retour
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        onClick={handleNextStep}
+                                        disabled={isLoading || !isStep4Valid}
+                                        className="h-11 flex-1 transform rounded-md bg-gradient-to-r from-[#05141D] to-[#063846] text-base font-semibold text-white shadow-lg transition-all duration-300 hover:scale-[1.02] hover:from-[#04111a] hover:to-[#052d37] hover:shadow-xl active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+                                    >
+                                        Continuer
+                                        <svg
+                                            className="ml-2 h-4 w-4"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M9 5l7 7-7 7"
+                                            />
+                                        </svg>
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Step 5: Interest Question */}
+                    {currentStep === 5 && showVisitorForm && hasConsent && (
+                        <div className="flex h-full flex-col">
+                            <div className="flex-1 overflow-y-auto p-8">
+                                <div className="space-y-6">
+                                    <div>
+                                        <Label className="mb-2 block text-lg font-semibold text-[#05141D]">
+                                            3. Quel est votre principal intérêt sur Morphea ?
+                                        </Label>
+                                        <p className="text-sm text-slate-600">
+                                            Cerner les attentes utilisateur
+                                        </p>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        {[
+                                            { value: 'discover', label: 'Découvrir des créateurs et leurs créations' },
+                                            { value: 'sell', label: 'Vendre mes créations' },
+                                            { value: 'buy', label: 'Acheter des pièces uniques' },
+                                            { value: 'participate', label: 'Participer à des événements immersifs' },
+                                            { value: 'inspiration', label: 'M\'inspirer pour un projet personnel ou professionnel' },
+                                            { value: 'explore', label: 'Explorer un nouveau type d\'expérience digitale' },
+                                            { value: 'other', label: 'Autre' },
+                                        ].map(({ value, label }) => (
+                                            <label key={value} className="group flex cursor-pointer items-center space-x-3 rounded-lg border border-slate-200 p-4 transition-all hover:border-[#063846] hover:bg-slate-50">
+                                                <input
+                                                    type="radio"
+                                                    name="interestQuestion"
+                                                    value={value}
+                                                    checked={visitorData.interestQuestion === value}
+                                                    onChange={(e) => setVisitorData((prev) => ({ ...prev, interestQuestion: e.target.value }))}
+                                                    className="h-5 w-5 border-slate-300 bg-white text-[#063846] transition-colors focus:ring-2 focus:ring-[#063846]"
+                                                />
+                                                <span className="text-base font-medium text-slate-700">{label}</span>
+                                            </label>
+                                        ))}
+                                    </div>
+
+                                    {error && (
+                                        <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-red-700">
+                                            {error}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                            <div className="border-t border-slate-200 bg-slate-50 px-8 py-4">
+                                <div className="flex gap-3">
+                                    <Button
+                                        type="button"
+                                        onClick={handlePreviousStep}
+                                        disabled={isLoading}
+                                        variant="outline"
+                                        className="h-11 flex-1 rounded-md border-slate-300 text-base font-semibold text-slate-700 transition-all hover:bg-slate-100"
+                                    >
+                                        <svg
+                                            className="mr-2 h-4 w-4"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M15 19l-7-7 7-7"
+                                            />
+                                        </svg>
+                                        Retour
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        onClick={handleNextStep}
+                                        disabled={isLoading || !isStep5Valid}
+                                        className="h-11 flex-1 transform rounded-md bg-gradient-to-r from-[#05141D] to-[#063846] text-base font-semibold text-white shadow-lg transition-all duration-300 hover:scale-[1.02] hover:from-[#04111a] hover:to-[#052d37] hover:shadow-xl active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+                                    >
+                                        Continuer
+                                        <svg
+                                            className="ml-2 h-4 w-4"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M9 5l7 7-7 7"
+                                            />
+                                        </svg>
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Step 6: Specialty Question */}
+                    {currentStep === 6 && showVisitorForm && hasConsent && (
+                        <div className="flex h-full flex-col">
+                            <div className="flex-1 overflow-y-auto p-8">
+                                <div className="space-y-6">
+                                    <div>
+                                        <Label className="mb-2 block text-lg font-semibold text-[#05141D]">
+                                            4. Dans quel domaine évoluez-vous ?
+                                        </Label>
+                                        <p className="text-sm text-slate-600">
+                                            Affiner le profil professionnel / secteur
+                                        </p>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        {[
+                                            { value: 'fashion', label: 'Mode' },
+                                            { value: 'design', label: 'Design d\'objet' },
+                                            { value: 'artist', label: 'Artisanat / Métiers d\'art' },
+                                            { value: 'visual_art', label: 'Arts visuels' },
+                                            { value: 'marketing', label: 'Communication / Marketing' },
+                                            { value: 'teaching', label: 'Enseignement / Formation' },
+                                            { value: 'development', label: 'Développement technologique / 3D / VR' },
+                                            { value: 'other', label: 'Autre' },
+                                        ].map(({ value, label }) => (
+                                            <label key={value} className="group flex cursor-pointer items-center space-x-3 rounded-lg border border-slate-200 p-4 transition-all hover:border-[#063846] hover:bg-slate-50">
+                                                <input
+                                                    type="radio"
+                                                    name="specialtyQuestion"
+                                                    value={value}
+                                                    checked={visitorData.specialtyQuestion === value}
+                                                    onChange={(e) => setVisitorData((prev) => ({ ...prev, specialtyQuestion: e.target.value }))}
+                                                    className="h-5 w-5 border-slate-300 bg-white text-[#063846] transition-colors focus:ring-2 focus:ring-[#063846]"
+                                                />
+                                                <span className="text-base font-medium text-slate-700">{label}</span>
+                                            </label>
+                                        ))}
+                                    </div>
+
+                                    {error && (
+                                        <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-red-700">
+                                            {error}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                            <div className="border-t border-slate-200 bg-slate-50 px-8 py-4">
+                                <div className="flex gap-3">
+                                    <Button
+                                        type="button"
+                                        onClick={handlePreviousStep}
+                                        disabled={isLoading}
+                                        variant="outline"
+                                        className="h-11 flex-1 rounded-md border-slate-300 text-base font-semibold text-slate-700 transition-all hover:bg-slate-100"
+                                    >
+                                        <svg
+                                            className="mr-2 h-4 w-4"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M15 19l-7-7 7-7"
+                                            />
+                                        </svg>
+                                        Retour
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        onClick={handleNextStep}
+                                        disabled={isLoading || !isStep6Valid}
+                                        className="h-11 flex-1 transform rounded-md bg-gradient-to-r from-[#05141D] to-[#063846] text-base font-semibold text-white shadow-lg transition-all duration-300 hover:scale-[1.02] hover:from-[#04111a] hover:to-[#052d37] hover:shadow-xl active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+                                    >
+                                        Continuer
+                                        <svg
+                                            className="ml-2 h-4 w-4"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M9 5l7 7-7 7"
+                                            />
+                                        </svg>
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Step 7: Expectation Question */}
+                    {currentStep === 7 && showVisitorForm && hasConsent && (
+                        <div className="flex h-full flex-col">
+                            <div className="flex-1 overflow-y-auto p-8">
+                                <div className="space-y-6">
+                                    <div>
+                                        <Label className="mb-2 block text-lg font-semibold text-[#05141D]">
+                                            5. Quel type d'expérience recherchez-vous sur Morphea ?
+                                        </Label>
+                                        <p className="text-sm text-slate-600">
+                                            Adapter l'offre de contenu et les recommandations
+                                        </p>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        {[
+                                            { value: 'art', label: 'Une expérience artistique et immersive' },
+                                            { value: 'display', label: 'Une vitrine pour mes créations' },
+                                            { value: 'networking', label: 'Un espace de networking créatif' },
+                                            { value: 'buy_sell', label: 'Une plateforme pour vendre ou acheter des œuvres' },
+                                            { value: 'inspiration', label: 'Une source d\'inspiration culturelle' },
+                                            { value: 'opportunity', label: 'Une opportunité de collaboration ou de visibilité' },
+                                            { value: 'other', label: 'Autre' },
+                                        ].map(({ value, label }) => (
+                                            <label key={value} className="group flex cursor-pointer items-center space-x-3 rounded-lg border border-slate-200 p-4 transition-all hover:border-[#063846] hover:bg-slate-50">
+                                                <input
+                                                    type="radio"
+                                                    name="expectationQuestion"
+                                                    value={value}
+                                                    checked={visitorData.expectationQuestion === value}
+                                                    onChange={(e) => setVisitorData((prev) => ({ ...prev, expectationQuestion: e.target.value }))}
+                                                    className="h-5 w-5 border-slate-300 bg-white text-[#063846] transition-colors focus:ring-2 focus:ring-[#063846]"
+                                                />
+                                                <span className="text-base font-medium text-slate-700">{label}</span>
+                                            </label>
+                                        ))}
+                                    </div>
+
+                                    {error && (
+                                        <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-red-700">
+                                            {error}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                            <div className="border-t border-slate-200 bg-slate-50 px-8 py-4">
+                                <div className="flex gap-3">
+                                    <Button
+                                        type="button"
+                                        onClick={handlePreviousStep}
+                                        disabled={isLoading}
+                                        variant="outline"
+                                        className="h-11 flex-1 rounded-md border-slate-300 text-base font-semibold text-slate-700 transition-all hover:bg-slate-100"
+                                    >
+                                        <svg
+                                            className="mr-2 h-4 w-4"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M15 19l-7-7 7-7"
+                                            />
+                                        </svg>
+                                        Retour
+                                    </Button>
+                                    <Button
+                                        type="submit"
+                                        disabled={isLoading || !isStep7Valid}
+                                        className="h-11 flex-1 transform rounded-md bg-gradient-to-r from-[#05141D] to-[#063846] text-base font-semibold text-white shadow-lg transition-all duration-300 hover:scale-[1.02] hover:from-[#04111a] hover:to-[#052d37] hover:shadow-xl active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+                                    >
+                                        {isLoading ? (
+                                            <>
+                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                Création en cours...
+                                            </>
+                                        ) : (
+                                            <>
+                                                Créer mon compte
+                                                <CheckCircle className="ml-2 h-4 w-4" />
+                                            </>
+                                        )}
+                                    </Button>
                                 </div>
                             </div>
                         </div>

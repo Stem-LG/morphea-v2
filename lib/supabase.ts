@@ -274,11 +274,89 @@ export type Database = {
           },
         ]
       }
+      oauth_authorizations: {
+        Row: {
+          approved_at: string | null
+          authorization_code: string | null
+          authorization_id: string
+          client_id: string
+          code_challenge: string | null
+          code_challenge_method:
+            | Database["auth"]["Enums"]["code_challenge_method"]
+            | null
+          created_at: string
+          expires_at: string
+          id: string
+          redirect_uri: string
+          resource: string | null
+          response_type: Database["auth"]["Enums"]["oauth_response_type"]
+          scope: string
+          state: string | null
+          status: Database["auth"]["Enums"]["oauth_authorization_status"]
+          user_id: string | null
+        }
+        Insert: {
+          approved_at?: string | null
+          authorization_code?: string | null
+          authorization_id: string
+          client_id: string
+          code_challenge?: string | null
+          code_challenge_method?:
+            | Database["auth"]["Enums"]["code_challenge_method"]
+            | null
+          created_at?: string
+          expires_at?: string
+          id: string
+          redirect_uri: string
+          resource?: string | null
+          response_type?: Database["auth"]["Enums"]["oauth_response_type"]
+          scope: string
+          state?: string | null
+          status?: Database["auth"]["Enums"]["oauth_authorization_status"]
+          user_id?: string | null
+        }
+        Update: {
+          approved_at?: string | null
+          authorization_code?: string | null
+          authorization_id?: string
+          client_id?: string
+          code_challenge?: string | null
+          code_challenge_method?:
+            | Database["auth"]["Enums"]["code_challenge_method"]
+            | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          redirect_uri?: string
+          resource?: string | null
+          response_type?: Database["auth"]["Enums"]["oauth_response_type"]
+          scope?: string
+          state?: string | null
+          status?: Database["auth"]["Enums"]["oauth_authorization_status"]
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "oauth_authorizations_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "oauth_clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "oauth_authorizations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       oauth_clients: {
         Row: {
-          client_id: string
           client_name: string | null
-          client_secret_hash: string
+          client_secret_hash: string | null
+          client_type: Database["auth"]["Enums"]["oauth_client_type"]
           client_uri: string | null
           created_at: string
           deleted_at: string | null
@@ -290,9 +368,9 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          client_id: string
           client_name?: string | null
-          client_secret_hash: string
+          client_secret_hash?: string | null
+          client_type?: Database["auth"]["Enums"]["oauth_client_type"]
           client_uri?: string | null
           created_at?: string
           deleted_at?: string | null
@@ -304,9 +382,9 @@ export type Database = {
           updated_at?: string
         }
         Update: {
-          client_id?: string
           client_name?: string | null
-          client_secret_hash?: string
+          client_secret_hash?: string | null
+          client_type?: Database["auth"]["Enums"]["oauth_client_type"]
           client_uri?: string | null
           created_at?: string
           deleted_at?: string | null
@@ -318,6 +396,48 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      oauth_consents: {
+        Row: {
+          client_id: string
+          granted_at: string
+          id: string
+          revoked_at: string | null
+          scopes: string
+          user_id: string
+        }
+        Insert: {
+          client_id: string
+          granted_at?: string
+          id: string
+          revoked_at?: string | null
+          scopes: string
+          user_id: string
+        }
+        Update: {
+          client_id?: string
+          granted_at?: string
+          id?: string
+          revoked_at?: string | null
+          scopes?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "oauth_consents_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "oauth_clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "oauth_consents_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       one_time_tokens: {
         Row: {
@@ -511,8 +631,9 @@ export type Database = {
           created_at: string | null
           factor_id: string | null
           id: string
-          ip: unknown | null
+          ip: unknown
           not_after: string | null
+          oauth_client_id: string | null
           refreshed_at: string | null
           tag: string | null
           updated_at: string | null
@@ -524,8 +645,9 @@ export type Database = {
           created_at?: string | null
           factor_id?: string | null
           id: string
-          ip?: unknown | null
+          ip?: unknown
           not_after?: string | null
+          oauth_client_id?: string | null
           refreshed_at?: string | null
           tag?: string | null
           updated_at?: string | null
@@ -537,8 +659,9 @@ export type Database = {
           created_at?: string | null
           factor_id?: string | null
           id?: string
-          ip?: unknown | null
+          ip?: unknown
           not_after?: string | null
+          oauth_client_id?: string | null
           refreshed_at?: string | null
           tag?: string | null
           updated_at?: string | null
@@ -546,6 +669,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "sessions_oauth_client_id_fkey"
+            columns: ["oauth_client_id"]
+            isOneToOne: false
+            referencedRelation: "oauth_clients"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "sessions_user_id_fkey"
             columns: ["user_id"]
@@ -730,29 +860,20 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      email: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      jwt: {
-        Args: Record<PropertyKey, never>
-        Returns: Json
-      }
-      role: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      uid: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
+      email: { Args: never; Returns: string }
+      jwt: { Args: never; Returns: Json }
+      role: { Args: never; Returns: string }
+      uid: { Args: never; Returns: string }
     }
     Enums: {
       aal_level: "aal1" | "aal2" | "aal3"
       code_challenge_method: "s256" | "plain"
       factor_status: "unverified" | "verified"
       factor_type: "totp" | "webauthn" | "phone"
+      oauth_authorization_status: "pending" | "approved" | "denied" | "expired"
+      oauth_client_type: "public" | "confidential"
       oauth_registration_type: "dynamic" | "manual"
+      oauth_response_type: "code"
       one_time_token_type:
         | "confirmation_token"
         | "reauthentication_token"
@@ -2264,25 +2385,27 @@ export type Database = {
       }
       yvisiteur: {
         Row: {
+          expectation_question:
+            | Database["morpheus"]["Enums"]["expectation_question"]
+            | null
+          interest_question:
+            | Database["morpheus"]["Enums"]["interest_question"]
+            | null
+          profile_question:
+            | Database["morpheus"]["Enums"]["profile_question"]
+            | null
+          source_question:
+            | Database["morpheus"]["Enums"]["source_question"]
+            | null
+          specialty_question:
+            | Database["morpheus"]["Enums"]["specialty_question"]
+            | null
           sysaction: string | null
           sysadresseip: string | null
           sysdate: string | null
           sysuser: string | null
           yuseridfk: string
           yvisiteuradresse: string | null
-          yvisiteurboolacheteurluxe: string
-          yvisiteurboolacheteurpro: string
-          yvisiteurboolartisan: string
-          yvisiteurboolclientprive: string
-          yvisiteurboolcollectionneur: string
-          yvisiteurboolcreateur: string
-          yvisiteurboolculturel: string
-          yvisiteurboolgrandpublic: string
-          yvisiteurboolinfluenceur: string
-          yvisiteurboolinvestisseur: string
-          yvisiteurbooljournaliste: string
-          yvisiteurboolpressespecialisee: string
-          yvisiteurboolvip: string
           yvisiteurcode: string
           yvisiteuremail: string | null
           yvisiteurid: number
@@ -2290,25 +2413,27 @@ export type Database = {
           yvisiteurtelephone: string | null
         }
         Insert: {
+          expectation_question?:
+            | Database["morpheus"]["Enums"]["expectation_question"]
+            | null
+          interest_question?:
+            | Database["morpheus"]["Enums"]["interest_question"]
+            | null
+          profile_question?:
+            | Database["morpheus"]["Enums"]["profile_question"]
+            | null
+          source_question?:
+            | Database["morpheus"]["Enums"]["source_question"]
+            | null
+          specialty_question?:
+            | Database["morpheus"]["Enums"]["specialty_question"]
+            | null
           sysaction?: string | null
           sysadresseip?: string | null
           sysdate?: string | null
           sysuser?: string | null
           yuseridfk: string
           yvisiteuradresse?: string | null
-          yvisiteurboolacheteurluxe: string
-          yvisiteurboolacheteurpro: string
-          yvisiteurboolartisan: string
-          yvisiteurboolclientprive: string
-          yvisiteurboolcollectionneur: string
-          yvisiteurboolcreateur: string
-          yvisiteurboolculturel: string
-          yvisiteurboolgrandpublic: string
-          yvisiteurboolinfluenceur: string
-          yvisiteurboolinvestisseur: string
-          yvisiteurbooljournaliste: string
-          yvisiteurboolpressespecialisee: string
-          yvisiteurboolvip: string
           yvisiteurcode: string
           yvisiteuremail?: string | null
           yvisiteurid?: number
@@ -2316,25 +2441,27 @@ export type Database = {
           yvisiteurtelephone?: string | null
         }
         Update: {
+          expectation_question?:
+            | Database["morpheus"]["Enums"]["expectation_question"]
+            | null
+          interest_question?:
+            | Database["morpheus"]["Enums"]["interest_question"]
+            | null
+          profile_question?:
+            | Database["morpheus"]["Enums"]["profile_question"]
+            | null
+          source_question?:
+            | Database["morpheus"]["Enums"]["source_question"]
+            | null
+          specialty_question?:
+            | Database["morpheus"]["Enums"]["specialty_question"]
+            | null
           sysaction?: string | null
           sysadresseip?: string | null
           sysdate?: string | null
           sysuser?: string | null
           yuseridfk?: string
           yvisiteuradresse?: string | null
-          yvisiteurboolacheteurluxe?: string
-          yvisiteurboolacheteurpro?: string
-          yvisiteurboolartisan?: string
-          yvisiteurboolclientprive?: string
-          yvisiteurboolcollectionneur?: string
-          yvisiteurboolcreateur?: string
-          yvisiteurboolculturel?: string
-          yvisiteurboolgrandpublic?: string
-          yvisiteurboolinfluenceur?: string
-          yvisiteurboolinvestisseur?: string
-          yvisiteurbooljournaliste?: string
-          yvisiteurboolpressespecialisee?: string
-          yvisiteurboolvip?: string
           yvisiteurcode?: string
           yvisiteuremail?: string | null
           yvisiteurid?: number
@@ -2449,25 +2576,58 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      add_system_columns: {
-        Args: { table_name: string }
-        Returns: string
-      }
-      add_system_columns_to_all: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      apply_system_triggers: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
+      add_system_columns: { Args: { table_name: string }; Returns: string }
+      add_system_columns_to_all: { Args: never; Returns: string }
+      apply_system_triggers: { Args: never; Returns: string }
       create_store_admin_notification: {
         Args: { p_user_id: string }
         Returns: undefined
       }
     }
     Enums: {
+      expectation_question:
+        | "art"
+        | "display"
+        | "networking"
+        | "buy_sell"
+        | "inspiration"
+        | "opportunity"
+        | "other"
+      interest_question:
+        | "discover"
+        | "sell"
+        | "buy"
+        | "participate"
+        | "inspiration"
+        | "explore"
+        | "other"
       product_status: "approved" | "not_approved" | "rejected"
+      profile_question:
+        | "student"
+        | "pro"
+        | "designer"
+        | "artist"
+        | "project_lead"
+        | "curious"
+        | "representative"
+        | "other"
+      source_question:
+        | "linkedin"
+        | "facebook"
+        | "instagram"
+        | "word"
+        | "news"
+        | "event"
+        | "other"
+      specialty_question:
+        | "fashion"
+        | "design"
+        | "artist"
+        | "visual_art"
+        | "marketing"
+        | "teaching"
+        | "development"
+        | "other"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2616,7 +2776,10 @@ export const Constants = {
       code_challenge_method: ["s256", "plain"],
       factor_status: ["unverified", "verified"],
       factor_type: ["totp", "webauthn", "phone"],
+      oauth_authorization_status: ["pending", "approved", "denied", "expired"],
+      oauth_client_type: ["public", "confidential"],
       oauth_registration_type: ["dynamic", "manual"],
+      oauth_response_type: ["code"],
       one_time_token_type: [
         "confirmation_token",
         "reauthentication_token",
@@ -2629,7 +2792,54 @@ export const Constants = {
   },
   morpheus: {
     Enums: {
+      expectation_question: [
+        "art",
+        "display",
+        "networking",
+        "buy_sell",
+        "inspiration",
+        "opportunity",
+        "other",
+      ],
+      interest_question: [
+        "discover",
+        "sell",
+        "buy",
+        "participate",
+        "inspiration",
+        "explore",
+        "other",
+      ],
       product_status: ["approved", "not_approved", "rejected"],
+      profile_question: [
+        "student",
+        "pro",
+        "designer",
+        "artist",
+        "project_lead",
+        "curious",
+        "representative",
+        "other",
+      ],
+      source_question: [
+        "linkedin",
+        "facebook",
+        "instagram",
+        "word",
+        "news",
+        "event",
+        "other",
+      ],
+      specialty_question: [
+        "fashion",
+        "design",
+        "artist",
+        "visual_art",
+        "marketing",
+        "teaching",
+        "development",
+        "other",
+      ],
     },
   },
   public: {
