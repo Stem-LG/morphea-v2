@@ -138,7 +138,7 @@ const StripePaymentForm = ({ onBack, onContinue }: { onBack: () => void, onConti
         <form onSubmit={handleSubmit} className="space-y-6">
             <div>
                 <Label className="font-supreme font-semibold text-[#053340]">
-                    Card Information <span className="text-red-500">*</span>
+                    Informations de paiement <span className="text-red-500">*</span>
                 </Label>
                 <div className="mt-2 rounded-md border border-gray-300 bg-white p-3 focus-within:border-[#053340] focus-within:ring-1 focus-within:ring-[#053340]">
                     <CardElement
