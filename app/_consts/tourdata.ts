@@ -26,6 +26,7 @@ export interface Scene {
     name: string;
     panorama: string;
     yboutiqueidfk?: number | null;
+    order?: number;
     initialView: {
         yaw: number;
         pitch: number;
@@ -134,7 +135,8 @@ export async function getTourData(t?: (key: string) => string): Promise<TourData
                     fov: scene.ysceneszoomfov
                 },
                 links,
-                infoSpots
+                infoSpots,
+                order: scene.order
             }
         })
         

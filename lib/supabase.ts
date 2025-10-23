@@ -2127,6 +2127,7 @@ export type Database = {
       }
       yscenes: {
         Row: {
+          order: number | null
           sysaction: string | null
           sysadresseip: string | null
           sysdate: string | null
@@ -2141,6 +2142,7 @@ export type Database = {
           ysceneszoomfov: number
         }
         Insert: {
+          order?: number | null
           sysaction?: string | null
           sysadresseip?: string | null
           sysdate?: string | null
@@ -2155,6 +2157,7 @@ export type Database = {
           ysceneszoomfov: number
         }
         Update: {
+          order?: number | null
           sysaction?: string | null
           sysadresseip?: string | null
           sysdate?: string | null

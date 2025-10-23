@@ -1188,7 +1188,7 @@ export default function VirtualTour({
                             <div className="max-h-80 overflow-y-auto">
                                 {tourData.scenes
                                     .filter((scene) => scene.yboutiqueidfk) // Only show scenes with boutique ID
-                                    .sort((a, b) => a.name.localeCompare(b.name)) // Sort scenes alphabetically by name
+                                    .sort((a, b) => a.order - b.order) // Sort scenes by order
                                     .map((scene) => (
                                         <button
                                             key={scene.id}
