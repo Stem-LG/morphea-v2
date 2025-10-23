@@ -188,10 +188,6 @@ function OrderPage() {
     const { data: deliveryFee = 10, isLoading: isLoadingDeliveryFee } =
         useDeliveryFee()
 
-    // Stripe hooks
-    const stripe = useStripe()
-    const elements = useElements()
-
     // Stepper state
     const [currentStep, setCurrentStep] = useState(1)
 
@@ -1033,7 +1029,9 @@ function OrderPage() {
 }
 
 export default function OrderPageWrapper() {
-    const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
+    const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!, {
+        locale: "fr-FR"
+    })
 
     return (
         <Elements stripe={stripePromise}>
