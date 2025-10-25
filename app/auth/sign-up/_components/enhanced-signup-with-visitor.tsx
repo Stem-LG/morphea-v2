@@ -25,6 +25,7 @@ import {
     EyeOff,
     Loader2,
 } from 'lucide-react'
+import { VISITOR_FORM_STORAGE_KEY } from '@/app/_components/visitor-form-dialog'
 
 type PasswordRequirement = {
     label: string
@@ -105,7 +106,7 @@ export function EnhancedSignupWithVisitor({
     // Steps: 1=Basic, 2=Phone, 3=Profile, 4=Source, 5=Interest, 6=Specialty, 7=Expectation
     const [currentStep, setCurrentStep] = useState(1)
     const totalSteps = showVisitorForm && true ? 7 : 1
-    
+
     const [firstName, setFirstName] = useState('')
     const [lastName, setLastName] = useState('')
     const [email, setEmail] = useState('')
@@ -325,7 +326,7 @@ export function EnhancedSignupWithVisitor({
     const handleNextStep = () => {
         setError(null)
         if (currentStep === 1 && isStep1Valid) {
-            if (!showVisitorForm || !hasConsent) {
+            if (!showVisitorForm) {
                 handleSignUp(new Event('submit') as any)
             } else {
                 setCurrentStep(2)
@@ -475,6 +476,8 @@ export function EnhancedSignupWithVisitor({
                             .schema('morpheus')
                             .from('yvisiteur')
                             .insert(visitorRecord as any)
+
+                        localStorage.setItem(VISITOR_FORM_STORAGE_KEY, "true");
                     } catch (insertError) {
                         console.error(
                             'Error creating visitor record:',
@@ -528,7 +531,7 @@ export function EnhancedSignupWithVisitor({
             </div>
 
             {/* Progress Bar */}
-            {showVisitorForm && hasConsent && (
+            {showVisitorForm && (
                 <div className="mx-auto w-full max-w-2xl px-4">
                     <div className="mb-6">
                         <div className="mb-2 flex items-center justify-between text-sm">
@@ -967,7 +970,7 @@ export function EnhancedSignupWithVisitor({
                     )}
 
                     {/* Step 2: Phone Input */}
-                    {currentStep === 2 && showVisitorForm && hasConsent && (
+                    {currentStep === 2 && showVisitorForm && (
                         <div className="flex h-full flex-col">
                             <div className="flex-1 overflow-y-auto p-8">
                                 <div className="space-y-6">
@@ -991,11 +994,10 @@ export function EnhancedSignupWithVisitor({
                                                     phone: value || '',
                                                 }))
                                             }
-                                            className={`h-12 rounded-md border-slate-300 bg-white text-base text-[#05141D] transition-colors placeholder:text-slate-400 focus:border-[#063846] focus:ring-[#063846] ${
-                                                visitorData.phone.trim()
-                                                    ? 'border-green-300 focus:border-green-500'
-                                                    : ''
-                                            }`}
+                                            className={`h-12 rounded-md border-slate-300 bg-white text-base text-[#05141D] transition-colors placeholder:text-slate-400 focus:border-[#063846] focus:ring-[#063846] ${visitorData.phone.trim()
+                                                ? 'border-green-300 focus:border-green-500'
+                                                : ''
+                                                }`}
                                             placeholder="Entrez votre numéro de téléphone"
                                         />
                                     </div>
@@ -1058,7 +1060,7 @@ export function EnhancedSignupWithVisitor({
                     )}
 
                     {/* Step 3: Profile Question */}
-                    {currentStep === 3 && showVisitorForm && hasConsent && (
+                    {currentStep === 3 && showVisitorForm && (
                         <div className="flex h-full flex-col">
                             <div className="flex-1 overflow-y-auto p-8">
                                 <div className="space-y-6">
@@ -1154,7 +1156,7 @@ export function EnhancedSignupWithVisitor({
                     )}
 
                     {/* Step 4: Source Question */}
-                    {currentStep === 4 && showVisitorForm && hasConsent && (
+                    {currentStep === 4 && showVisitorForm && (
                         <div className="flex h-full flex-col">
                             <div className="flex-1 overflow-y-auto p-8">
                                 <div className="space-y-6">
@@ -1249,7 +1251,7 @@ export function EnhancedSignupWithVisitor({
                     )}
 
                     {/* Step 5: Interest Question */}
-                    {currentStep === 5 && showVisitorForm && hasConsent && (
+                    {currentStep === 5 && showVisitorForm && (
                         <div className="flex h-full flex-col">
                             <div className="flex-1 overflow-y-auto p-8">
                                 <div className="space-y-6">
@@ -1344,7 +1346,7 @@ export function EnhancedSignupWithVisitor({
                     )}
 
                     {/* Step 6: Specialty Question */}
-                    {currentStep === 6 && showVisitorForm && hasConsent && (
+                    {currentStep === 6 && showVisitorForm && (
                         <div className="flex h-full flex-col">
                             <div className="flex-1 overflow-y-auto p-8">
                                 <div className="space-y-6">
@@ -1440,7 +1442,7 @@ export function EnhancedSignupWithVisitor({
                     )}
 
                     {/* Step 7: Expectation Question */}
-                    {currentStep === 7 && showVisitorForm && hasConsent && (
+                    {currentStep === 7 && showVisitorForm && (
                         <div className="flex h-full flex-col">
                             <div className="flex-1 overflow-y-auto p-8">
                                 <div className="space-y-6">

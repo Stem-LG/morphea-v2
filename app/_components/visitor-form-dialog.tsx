@@ -27,7 +27,7 @@ type VisitorFormData = {
     expectationQuestion: string;
 };
 
-const VISITOR_FORM_STORAGE_KEY = "morpheus_visitor_form_skipped";
+export const VISITOR_FORM_STORAGE_KEY = "morpheus_visitor_form_skipped";
 
 const STEPS = [
     {
