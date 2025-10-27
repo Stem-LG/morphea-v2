@@ -117,7 +117,6 @@ export function EnhancedSignupWithVisitor({
     const [isLoading, setIsLoading] = useState(false)
     const [showPassword, setShowPassword] = useState(false)
     const [showRepeatPassword, setShowRepeatPassword] = useState(false)
-    const [visitorTypeSearch, setVisitorTypeSearch] = useState('')
 
     // Visitor form data
     const [visitorData, setVisitorData] = useState<VisitorFormData>({
@@ -251,78 +250,16 @@ export function EnhancedSignupWithVisitor({
             visitorData.specialtyQuestion.trim() &&
             visitorData.expectationQuestion.trim())
 
-    const isFormValid = isStep1Valid && isVisitorFormValid
 
     // Step-specific validators
-    const isStep2Valid = visitorData.phone.trim()
+    const isStep2Valid = visitorData.phone.trim() && visitorData.address.trim()
     const isStep3Valid = visitorData.profileQuestion.trim()
     const isStep4Valid = visitorData.sourceQuestion.trim()
     const isStep5Valid = visitorData.interestQuestion.trim()
     const isStep6Valid = visitorData.specialtyQuestion.trim()
     const isStep7Valid = visitorData.expectationQuestion.trim()
 
-    // Filter visitor types based on search
-    const filteredVisitorTypes = useMemo(() => {
-        const visitorTypeOptions = [
-            { key: 'grandpublic', label: 'Grand Public', category: 'General' },
-            { key: 'clientprive', label: 'Client Privé', category: 'General' },
-            {
-                key: 'acheteurluxe',
-                label: 'Acheteur de Luxe',
-                category: 'Acheteur',
-            },
-            {
-                key: 'acheteurpro',
-                label: 'Acheteur Professionnel',
-                category: 'Acheteur',
-            },
-            { key: 'artisan', label: 'Artisan', category: 'Créatif' },
-            {
-                key: 'createur',
-                label: 'Créateur/Designer',
-                category: 'Créatif',
-            },
-            {
-                key: 'collectionneur',
-                label: 'Collectionneur',
-                category: 'Spécialisé',
-            },
-            { key: 'investisseur', label: 'Investisseur', category: 'Finance' },
-            { key: 'influenceur', label: 'Influenceur', category: 'Média' },
-            { key: 'journaliste', label: 'Journaliste', category: 'Média' },
-            {
-                key: 'pressespecialisee',
-                label: 'Presse Spécialisée',
-                category: 'Média',
-            },
-            {
-                key: 'culturel',
-                label: 'Professionnel Culturel',
-                category: 'Culture',
-            },
-            { key: 'vip', label: 'VIP', category: 'Spécialisé' },
-        ]
-
-        if (!visitorTypeSearch.trim()) return visitorTypeOptions
-
-        return visitorTypeOptions.filter(
-            (option) =>
-                option.label
-                    .toLowerCase()
-                    .includes(visitorTypeSearch.toLowerCase()) ||
-                option.category
-                    .toLowerCase()
-                    .includes(visitorTypeSearch.toLowerCase())
-        )
-    }, [visitorTypeSearch])
-
-    const handleVisitorTypeChange = (type: string) => {
-        setVisitorData((prev) => ({
-            ...prev,
-            selectedVisitorType: type,
-        }))
-    }
-
+    
     const handleNextStep = () => {
         setError(null)
         if (currentStep === 1 && isStep1Valid) {
@@ -465,6 +402,8 @@ export function EnhancedSignupWithVisitor({
                             yvisiteuremail: email,
                             yvisiteurtelephone:
                                 visitorData.phone.trim() || null,
+                            yvisiteuradresse:
+                                visitorData.address.trim() || null,
                             profile_question: visitorData.profileQuestion.trim() || null,
                             source_question: visitorData.sourceQuestion.trim() || null,
                             interest_question: visitorData.interestQuestion.trim() || null,
@@ -525,7 +464,7 @@ export function EnhancedSignupWithVisitor({
                 <h1 className="font-recia mb-4 text-4xl leading-tight font-extrabold text-[#05141D] md:text-5xl">
                     {t('auth.joinTheFuture')}
                 </h1>
-                <p className="font-supreme mx-auto max-w-md text-lg text-[#063846]">
+                <p className="font-supreme mx-auto max-w-lg text-lg text-[#063846]">
                     {t('auth.signUpSubtitle')}
                 </p>
             </div>
@@ -976,30 +915,57 @@ export function EnhancedSignupWithVisitor({
                                 <div className="space-y-6">
                                     <div>
                                         <Label className="mb-2 block text-lg font-semibold text-[#05141D]">
-                                            Quel est votre numéro de téléphone ?
+                                            Informations de contact
                                         </Label>
                                         <p className="mb-4 text-sm text-slate-600">
                                             Pour mieux vous contacter
                                         </p>
                                     </div>
 
-                                    <div className="space-y-2">
-                                        <PhoneInput
-                                            id="phone"
-                                            defaultCountry="FR"
-                                            value={visitorData.phone}
-                                            onChange={(value) =>
-                                                setVisitorData((prev) => ({
-                                                    ...prev,
-                                                    phone: value || '',
-                                                }))
-                                            }
-                                            className={`h-12 rounded-md border-slate-300 bg-white text-base text-[#05141D] transition-colors placeholder:text-slate-400 focus:border-[#063846] focus:ring-[#063846] ${visitorData.phone.trim()
-                                                ? 'border-green-300 focus:border-green-500'
-                                                : ''
-                                                }`}
-                                            placeholder="Entrez votre numéro de téléphone"
-                                        />
+                                    <div className="space-y-4">
+                                        <div className="space-y-2">
+                                            <Label htmlFor="phone" className="text-[#05141D] text-sm font-medium">
+                                                Numéro de téléphone *
+                                            </Label>
+                                            <PhoneInput
+                                                id="phone"
+                                                defaultCountry="FR"
+                                                value={visitorData.phone}
+                                                onChange={(value) =>
+                                                    setVisitorData((prev) => ({
+                                                        ...prev,
+                                                        phone: value || '',
+                                                    }))
+                                                }
+                                                className={`h-12 rounded-md border-slate-300 bg-white text-base text-[#05141D] transition-colors placeholder:text-slate-400 focus:border-[#063846] focus:ring-[#063846] ${visitorData.phone.trim()
+                                                    ? 'border-green-300 focus:border-green-500'
+                                                    : ''
+                                                    }`}
+                                                placeholder="Entrez votre numéro de téléphone"
+                                            />
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <Label htmlFor="address" className="text-[#05141D] text-sm font-medium">
+                                                Adresse *
+                                            </Label>
+                                            <Input
+                                                id="address"
+                                                type="text"
+                                                value={visitorData.address}
+                                                onChange={(e) =>
+                                                    setVisitorData((prev) => ({
+                                                        ...prev,
+                                                        address: e.target.value,
+                                                    }))
+                                                }
+                                                className={`h-12 rounded-md border-slate-300 bg-white text-base text-[#05141D] transition-colors placeholder:text-slate-400 focus:border-[#063846] focus:ring-[#063846] ${visitorData.address.trim()
+                                                    ? 'border-green-300 focus:border-green-500'
+                                                    : ''
+                                                    }`}
+                                                placeholder="Entrez votre adresse complète"
+                                            />
+                                        </div>
                                     </div>
 
                                     {error && (

@@ -91,103 +91,34 @@ export default function VisitorFormDialog() {
     const supabase = createClient();
 
     useEffect(() => {
-        const checkVisitorFormConditions = () => {
-            // Check if user has already skipped the form
-            const hasSkipped = localStorage.getItem(VISITOR_FORM_STORAGE_KEY);
+        // Check if user has already skipped the form
+        const hasSkipped = localStorage.getItem(VISITOR_FORM_STORAGE_KEY);
 
-            // Check if cookies have been accepted or rejected using the cookie consent system
-            const cookiePreferences = localStorage.getItem('cookie-preferences');
+        if (currentUser && !hasSkipped) {
 
-            let cookiesDecisionMade = false;
+            console.log("Checking visitor data for user:", currentUser.email);
 
-            if (cookiePreferences) {
-                try {
-                    const preferences = JSON.parse(cookiePreferences);
-                    // Check if user has made any decision (accepted all, rejected all, or customized preferences)
-                    cookiesDecisionMade = preferences.analytics !== undefined ||
-                        preferences.marketing !== undefined ||
-                        preferences.functional !== undefined;
-                } catch (error) {
-                    console.error('Error parsing cookie preferences:', error);
+            supabase.from("yvisiteur").select("*").eq("yvisiteuremail", currentUser.email).then(({ data, error }) => {
+                if (error) {
+                    console.error("Error checking visitor data:", error);
+                    return;
                 }
-            }
 
-            console.log('Visitor Form Debug:', {
-                hasSkipped: !!hasSkipped,
-                currentUser: !!currentUser,
-                cookiesDecisionMade,
-                cookiePreferences
+                if (data && data.length > 0) {
+                    // User already has visitor data, do not show the form
+                    return;
+                }
+
+                console.log("we're showing the form because:", data);
+
+                // Show the visitor form dialog 
+                setIsOpen(true);
             });
 
-            // Only show the visitor form if:
-            // 1. User hasn't skipped it before
-            // 2. User is logged in
-            // 3. Cookie decision has been made (accepted or rejected)
-            // 4. Dialog is not already open
-            if (!hasSkipped && currentUser && cookiesDecisionMade && !isOpen) {
-                console.log('✅ Showing visitor form dialog - all conditions met');
-                // Add a small delay to ensure the page has loaded
-                const timer = setTimeout(() => {
-                    setIsOpen(true);
-                }, 500);
-
-                return timer;
-            } else {
-                console.log('❌ Not showing visitor form dialog:', {
-                    hasSkipped: !!hasSkipped,
-                    currentUser: !!currentUser,
-                    cookiesDecisionMade,
-                    isOpen
-                });
-            }
             return null;
-        };
+        }
 
-        // Check conditions on mount and when currentUser changes
-        const timer = checkVisitorFormConditions();
-
-        // Poll for cookie preferences changes since storage event doesn't work in same tab
-        const pollInterval = setInterval(() => {
-            const currentPreferences = localStorage.getItem('cookie-preferences');
-            if (currentPreferences) {
-                try {
-                    const preferences = JSON.parse(currentPreferences);
-                    const cookiesDecisionMade = preferences.analytics !== undefined ||
-                        preferences.marketing !== undefined ||
-                        preferences.functional !== undefined;
-
-                    const hasSkipped = localStorage.getItem(VISITOR_FORM_STORAGE_KEY);
-
-                    if (!hasSkipped && currentUser && cookiesDecisionMade && !isOpen) {
-                        console.log('✅ Cookie decision detected via polling, showing visitor form');
-                        setTimeout(() => {
-                            setIsOpen(true);
-                        }, 500);
-                        clearInterval(pollInterval); // Stop polling once we show the dialog
-                    }
-                } catch (error) {
-                    console.error('Error parsing cookie preferences in poll:', error);
-                }
-            }
-        }, 500); // Check every 500ms
-
-        // Listen for custom events dispatched by the cookie consent system
-        const handleCookieConsentChange = () => {
-            console.log('Cookie consent event received, checking visitor form conditions');
-            clearInterval(pollInterval); // Stop polling if we get an event
-            setTimeout(() => {
-                checkVisitorFormConditions();
-            }, 300);
-        };
-
-        window.addEventListener('cookieConsentChanged', handleCookieConsentChange);
-
-        return () => {
-            if (timer) clearTimeout(timer);
-            clearInterval(pollInterval);
-            window.removeEventListener('cookieConsentChanged', handleCookieConsentChange);
-        };
-    }, [currentUser, isOpen]);
+    }, [currentUser]);
 
     const handleSkip = () => {
         localStorage.setItem(VISITOR_FORM_STORAGE_KEY, "true");
