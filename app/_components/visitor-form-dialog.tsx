@@ -98,7 +98,7 @@ export default function VisitorFormDialog() {
 
             console.log("Checking visitor data for user:", currentUser.email);
 
-            supabase.from("yvisiteur").select("*").eq("yvisiteuremail", currentUser.email).then(({ data, error }) => {
+            supabase.schema("morpheus").from("yvisiteur").select("*").eq("yvisiteuremail", currentUser.email).then(({ data, error }) => {
                 if (error) {
                     console.error("Error checking visitor data:", error);
                     return;
