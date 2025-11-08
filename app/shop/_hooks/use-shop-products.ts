@@ -713,3 +713,110 @@ export function useShopProductsInfinite({
         gcTime: 5 * 60 * 1000, // 5 minutes
     });
 }
+
+export function useShopProduct(productId: number | null) {
+    const supabase = createClient();
+
+    return useQuery({
+        queryKey: ['shop-product', productId],
+        queryFn: async () => {
+            if (!productId) return null;
+
+            // Step 1: Get the current active event
+            const currentDate = new Date().toISOString().split('T')[0];
+
+            const { data: currentEvent, error: eventError } = await supabase
+                .schema("morpheus")
+                .from("yevent")
+                .select("*")
+                .lte("yeventdatedeb", currentDate)
+                .gte("yeventdatefin", currentDate)
+                .order("yeventdatedeb", { ascending: false })
+                .limit(1)
+                .single();
+
+            if (eventError || !currentEvent) {
+                console.error("No active event found:", eventError);
+                return null;
+            }
+
+            // Step 2: Check if the product is in the current event
+            const { data: eventDetail, error: detailError } = await supabase
+                .schema("morpheus")
+                .from("ydetailsevent")
+                .select("yprodidfk")
+                .eq("yeventidfk", currentEvent.yeventid)
+                .eq("yprodidfk", productId)
+                .single();
+
+            if (detailError || !eventDetail) {
+                console.error("Product not found in current event:", detailError);
+                return null;
+            }
+
+            // Step 3: Fetch the product with all details
+            const { data: product, error: productError } = await supabase
+                .schema("morpheus")
+                .from("yprod")
+                .select(`
+                    *,
+                    xcategprod:xcategprodidfk (
+                        xcategprodid,
+                        xcategprodintitule,
+                        xcategprodcode
+                    ),
+                    ydesign:ydesignidfk (
+                        ydesignid,
+                        ydesignnom,
+                        ydesignmarque
+                    ),
+                    yvarprod (
+                        *,
+                        xcouleur:xcouleuridfk (*),
+                        xtaille:xtailleidfk (*),
+                        xtypebijoux:xtypebijouxidfk (*),
+                        xmateriaux:xmatrieauxidfk (*),
+                        yvarprodmedia (
+                            ymedia:ymediaidfk (*)
+                        ),
+                        yobjet3d (*)
+                    ),
+                    ydetailsevent!inner (
+                        ymallidfk,
+                        yboutiqueidfk,
+                        ydesignidfk,
+                        ymall:ymallidfk (
+                            ymallid,
+                            ymallintitule
+                        ),
+                        yboutique:yboutiqueidfk (
+                            yboutiqueid,
+                            yboutiqueintitule,
+                            yboutiquecode
+                        )
+                    )
+                `)
+                .eq("yprodid", productId)
+                .eq("yprodstatut", "approved")
+                .eq("yestvisible", true)
+                .eq("ydetailsevent.yeventidfk", currentEvent.yeventid)
+                .single();
+
+            if (productError) {
+                console.error("Error fetching product:", productError);
+                return null;
+            }
+
+            // Filter approved variants
+            const productWithApprovedVariants = {
+                ...product,
+                yvarprod: product.yvarprod?.filter((v: any) => v.yvarprodstatut === "approved") || []
+            };
+
+            return productWithApprovedVariants as ProductWithDetails;
+        },
+        enabled: !!productId,
+        staleTime: 30 * 1000, // 30 seconds
+        gcTime: 5 * 60 * 1000, // 5 minutes
+    });
+}

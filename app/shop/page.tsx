@@ -5,7 +5,7 @@ import { X, ChevronDown, ChevronLeft } from 'lucide-react'
 import { useQueryStates, parseAsInteger, parseAsString } from 'nuqs'
 import { useLanguage } from '@/hooks/useLanguage'
 import { useCurrency } from '@/hooks/useCurrency'
-import { useShopProductsInfinite } from './_hooks/use-shop-products'
+import { useShopProductsInfinite, useShopProduct } from './_hooks/use-shop-products'
 import {
     useShopBoutiques,
     useShopCategories,
@@ -359,6 +359,7 @@ function ShopContent() {
             sizeId,
             minPrice,
             maxPrice,
+            productId,
         },
         setQueryState,
     ] = useQueryStates({
@@ -371,6 +372,7 @@ function ShopContent() {
         sizeId: parseAsInteger,
         minPrice: parseAsInteger,
         maxPrice: parseAsInteger,
+        productId: parseAsInteger,
     })
 
     const [showFilterSheet, setShowFilterSheet] = useState(false)
@@ -428,6 +430,9 @@ function ShopContent() {
     const { data: colors = [] } = useShopColors()
     const { data: sizes = [] } = useShopSizes()
     const { data: priceRange = { min: 0, max: 1000 } } = useShopPriceRange()
+
+    // Fetch product for details modal
+    const { data: productDetails, isLoading: isLoadingProduct } = useShopProduct(productId)
 
     // Convert price range to current currency and get decimal places
     const convertedPriceRange = useMemo(() => {
@@ -618,7 +623,7 @@ function ShopContent() {
         ]
     )
 
-    const hasActiveFilters = Boolean(boutiqueId || categoryId || search)
+    const hasActiveFilters = Boolean(boutiqueId || categoryId || search || productId)
 
     // Infinite scroll detection and footer proximity detection
     useEffect(() => {
@@ -646,6 +651,17 @@ function ShopContent() {
         window.addEventListener('scroll', handleScroll)
         return () => window.removeEventListener('scroll', handleScroll)
     }, [hasNextPage, isFetchingNextPage, fetchNextPage])
+
+    // Handle product details modal from URL
+    useEffect(() => {
+        if (productId && productDetails && !isLoadingProduct) {
+            setSelectedProduct(productDetails)
+            setShowProductDetails(true)
+        } else if (!productId) {
+            setSelectedProduct(null)
+            setShowProductDetails(false)
+        }
+    }, [productId, productDetails, isLoadingProduct])
 
     return (
         <div className="min-h-[100svh] bg-white">
@@ -714,6 +730,9 @@ function ShopContent() {
                                         product={product}
                                         viewMode="grid"
                                         onViewDetails={() => {
+                                            // Put the product id into the URL query params so
+                                            // the ProductDetailsPage can be opened directly via URL.
+                                            setQueryState({ productId: product.yprodid })
                                             setSelectedProduct(product)
                                             setShowProductDetails(true)
                                         }}
@@ -742,6 +761,7 @@ function ShopContent() {
                                                 categoryId: null,
                                                 search: '',
                                                 sortBy: 'default',
+                                                productId: null,
                                             })
                                         }}
                                         className="from-morpheus-gold-dark to-morpheus-gold-light hover:from-morpheus-gold-light hover:to-morpheus-gold-dark rounded-lg bg-gradient-to-r px-6 py-3 font-medium text-white transition-all duration-300"
@@ -1447,6 +1467,7 @@ function ShopContent() {
                                         sizeId: null,
                                         minPrice: null,
                                         maxPrice: null,
+                                        productId: null,
                                     })
                                 }}
                                 className="outline-morpheus-blue-dark hover:from-morpheus-blue-light hover:to-morpheus-blue-dark text-morpheus-blue-dark flex-1 rounded-none bg-gradient-to-r p-4 text-lg outline transition-all duration-300 hover:text-white"
@@ -1471,6 +1492,7 @@ function ShopContent() {
                     onClose={() => {
                         setShowProductDetails(false)
                         setSelectedProduct(null)
+                        setQueryState({ productId: null })
                     }}
                     extraTop
                 />
