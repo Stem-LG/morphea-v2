@@ -205,12 +205,12 @@ export default function StoreDetails() {
         // If product is approved, check variant statuses
         if (product.yvarprod && product.yvarprod.length > 0) {
             const statuses = product.yvarprod.map((variant: any) => variant.yvarprodstatut);
-            const hasRejected = statuses.includes('rejected');
+            // const hasRejected = statuses.includes('rejected');
             const hasPending = statuses.includes('not_approved');
             const hasApproved = statuses.includes('approved');
 
             // If there are rejected variants, show as rejected
-            if (hasRejected) return 'rejected';
+            // if (hasRejected) return 'rejected';
 
             // If there are pending variants (even with approved product), show as mixed
             if (hasPending && hasApproved) return 'mixed';

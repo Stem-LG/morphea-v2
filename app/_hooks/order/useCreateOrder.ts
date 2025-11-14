@@ -41,7 +41,7 @@ export function useCreateOrder() {
 
       // Calculate delivery date (7 days from now)
       const deliveryDate = new Date();
-      deliveryDate.setDate(deliveryDate.getDate() + 7);
+      deliveryDate.setDate(deliveryDate.getDate() + 30);
       const zcommandelivraisondate = deliveryDate.toISOString();
 
       // First, check if user has a yvisiteur record, if not create one

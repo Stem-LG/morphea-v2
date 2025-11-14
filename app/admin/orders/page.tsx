@@ -385,7 +385,7 @@ export default function AdminOrdersPage() {
                                     </div>
                                     <div className="flex gap-2">
                                         {orderGroup.zcommandestatut ===
-                                            'pending' && (
+                                            'paid' && (
                                             <>
                                                 <Button
                                                     size="sm"
